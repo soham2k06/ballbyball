@@ -9,7 +9,10 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import RestartButton from "./RestartButton";
 
 interface ScoreType {
   type: "score" | "extra" | "wicket" | "dot";
@@ -25,7 +28,7 @@ interface StateHistory {
 
 function ScorerLayout() {
   const teams = ["India", "Australia"];
-  const oversToPlay = 8;
+  // const oversToPlay = 8;
   const [runs, setRuns] = useState<number[]>([0, 0]);
   const [balls, setBalls] = useState<number[]>([0, 0]);
   const [wicket, setWicket] = useState<number[]>([0, 0]);
@@ -33,7 +36,11 @@ function ScorerLayout() {
 
   const [history, setHistory] = useState<StateHistory[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
-  console.log(history, historyIndex);
+
+  const [overSummary, setOverSummary] = useState<(number | "Wicket")[]>([]);
+
+  const [overBalls, setOverBalls] = useState(6);
+
   function increaseRuns(run: number) {
     setRuns((prevRuns) =>
       prevRuns.map((val, index) =>
@@ -66,6 +73,7 @@ function ScorerLayout() {
       setWicket([...prevState.wicket]);
       setCurrentBattingTeam(prevState.currentBattingTeam);
       setHistoryIndex((prevIndex) => prevIndex - 1);
+      overSummary.pop();
     }
   }
 
@@ -89,40 +97,38 @@ function ScorerLayout() {
       case "score":
         increaseRuns(score.value || 0);
         increaseBalls();
+        setOverSummary((prev) => [...prev, score.value || 0]);
         break;
       case "dot":
         increaseBalls();
+        setOverSummary((prev) => [...prev, 0]);
         break;
       case "wicket":
         increaseWicket();
         increaseBalls();
+        setOverSummary((prev) => [...prev, "Wicket"]);
         break;
       case "extra":
         increaseRuns(1);
+        setOverBalls((prev) => {
+          prev++;
+          return prev;
+        });
+        setOverSummary((prev) => [...prev, score.value || 0]);
         break;
     }
   }
 
+  useEffect(() => {
+    if (overSummary.length === overBalls) {
+      setOverSummary([]);
+      setOverBalls(6);
+    }
+  }, [overSummary, overBalls]);
+
   return (
-    <Card>
+    <Card className="max-sm:w-full">
       <div className="flex divide-x mt-4">
-        {/* {teams.map((team, i) => (
-          <div key={i} className="w-full">
-            <CardHeader className="pt-4">
-              <CardTitle>{team}</CardTitle>
-            </CardHeader>
-            <CardContent className="pb-2">
-              {currentBattingTeam === i ? (
-                <p className="leading-7">
-                  {runs[i]}/{wicket[i]} ({Math.floor(balls[i] / 6)}.
-                  {balls[i] % 6})
-                </p>
-              ) : (
-                "Yet to bat"
-              )}
-            </CardContent>
-          </div>
-        ))} */}
         <div className="w-full">
           <CardHeader className="pt-4">
             <CardTitle>{teams[currentBattingTeam]}</CardTitle>
@@ -138,6 +144,24 @@ function ScorerLayout() {
                 : ""}
               )
             </p>
+            <div className="pt-6 w-full">
+              <ul className="flex gap-2 w-full flex-wrap">
+                {Array.from({ length: overBalls }, (_, i) => (
+                  <li
+                    className={cn(
+                      "size-8 h-8 leading-8 text-center rounded-full",
+                      {
+                        "bg-primary text-primary-foreground":
+                          overSummary[i] !== undefined,
+                        "bg-muted": overSummary[i] === undefined,
+                      }
+                    )}
+                  >
+                    {overSummary[i]}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </CardContent>
         </div>
       </div>
@@ -145,25 +169,25 @@ function ScorerLayout() {
       <CardContent className="space-y-6">
         <ScoreButtonWrapper>
           <Button
-            className="size-12 text-lg"
+            className="size-12 max-sm:size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 1 })}
           >
             1
           </Button>
           <Button
-            className="size-12 text-lg"
+            className="size-12 max-sm:size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 2 })}
           >
             2
           </Button>
           <Button
-            className="size-12 text-lg"
+            className="size-12 max-sm:size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 4 })}
           >
             4
           </Button>
           <Button
-            className="size-12 text-lg"
+            className="size-12 max-sm:size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 6 })}
           >
             6
@@ -186,19 +210,31 @@ function ScorerLayout() {
         <ScoreButtonWrapper>
           <Button
             className="w-full h-12 text-lg"
-            onClick={() => handleScoreClick({ type: "extra", value: 0 })}
+            onClick={() => handleScoreClick({ type: "extra", value: 7 })}
           >
             No ball
           </Button>
           <Button
             className="w-full h-12 text-lg"
-            onClick={() => handleScoreClick({ type: "extra", value: 0 })}
+            onClick={() => handleScoreClick({ type: "extra", value: 8 })}
           >
             Wide
           </Button>
         </ScoreButtonWrapper>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="gap-2">
+        <RestartButton
+          onClick={() => {
+            setRuns([0, 0]);
+            setWicket([0, 0]);
+            setBalls([0, 0]);
+            setCurrentBattingTeam(0);
+            setHistory([]);
+            setHistoryIndex(-1);
+            setOverSummary([]);
+            setOverBalls(6);
+          }}
+        />
         <Button
           size="sm"
           variant="destructive"
