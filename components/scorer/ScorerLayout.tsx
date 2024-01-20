@@ -16,6 +16,13 @@ interface ScoreType {
   value?: number;
 }
 
+interface StateHistory {
+  runs: number[];
+  balls: number[];
+  wicket: number[];
+  currentBattingTeam: number;
+}
+
 function ScorerLayout() {
   const teams = ["India", "Australia"];
   const oversToPlay = 8;
@@ -24,24 +31,60 @@ function ScorerLayout() {
   const [wicket, setWicket] = useState<number[]>([0, 0]);
   const [currentBattingTeam, setCurrentBattingTeam] = useState<number>(0);
 
+  const [history, setHistory] = useState<StateHistory[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  console.log(history, historyIndex);
   function increaseRuns(run: number) {
-    const newRuns = [...runs];
-    newRuns[currentBattingTeam] += run;
-    setRuns(newRuns);
+    setRuns((prevRuns) =>
+      prevRuns.map((val, index) =>
+        index === currentBattingTeam ? val + run : val
+      )
+    );
   }
 
   function increaseBalls() {
-    const newBalls = [...balls];
-    newBalls[currentBattingTeam]++;
-    setBalls(newBalls);
+    setBalls((prevBalls) =>
+      prevBalls.map((val, index) =>
+        index === currentBattingTeam ? val + 1 : val
+      )
+    );
   }
+
   function increaseWicket() {
-    const newWicket = [...wicket];
-    newWicket[currentBattingTeam]++;
-    setWicket(newWicket);
+    setWicket((prevWicket) =>
+      prevWicket.map((val, index) =>
+        index === currentBattingTeam ? val + 1 : val
+      )
+    );
+  }
+
+  function handleUndo() {
+    if (historyIndex >= 0) {
+      const prevState = history[historyIndex];
+      setRuns([...prevState.runs]);
+      setBalls([...prevState.balls]);
+      setWicket([...prevState.wicket]);
+      setCurrentBattingTeam(prevState.currentBattingTeam);
+      setHistoryIndex((prevIndex) => prevIndex - 1);
+    }
   }
 
   function handleScoreClick(score: ScoreType) {
+    // Save current state before updating
+    const currentState: StateHistory = {
+      runs: [...runs],
+      balls: [...balls],
+      wicket: [...wicket],
+      currentBattingTeam,
+    };
+
+    // Update history with current state
+    setHistory((prevHistory) => [
+      ...prevHistory.slice(0, historyIndex + 1),
+      currentState,
+    ]);
+    setHistoryIndex((prevIndex) => prevIndex + 1);
+
     switch (score.type) {
       case "score":
         increaseRuns(score.value || 0);
@@ -59,6 +102,7 @@ function ScorerLayout() {
         break;
     }
   }
+
   return (
     <Card>
       <div className="flex divide-x mt-4">
@@ -155,7 +199,12 @@ function ScorerLayout() {
         </ScoreButtonWrapper>
       </CardContent>
       <CardFooter>
-        <Button size="sm" variant="destructive" className="w-full">
+        <Button
+          size="sm"
+          variant="destructive"
+          className="w-full"
+          onClick={handleUndo}
+        >
           Undo
         </Button>
       </CardFooter>
