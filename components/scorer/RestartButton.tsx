@@ -16,8 +16,8 @@ function RestartButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button size="icon" className="w-9 h-9" variant="destructive">
-          <RotateCcw />
+        <Button size="sm" className="w-full" variant="destructive">
+          Restart
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -26,12 +26,12 @@ function RestartButton({ onClick }: { onClick: MouseEventHandler }) {
           <AlertDialogDescription>
             This action cannot be undone.
             <br />
-            This will permanently delete your scores.
+            It will permanently delete your scores.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2">
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onClick}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={onClick}>Restart</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
