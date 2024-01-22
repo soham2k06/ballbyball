@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import RestartButton from "./RestartButton";
+import BallSummary from "./BallSummary";
 
 interface ScoreType {
   type: "score" | "extra" | "wicket" | "dot";
@@ -20,59 +21,54 @@ interface ScoreType {
 }
 
 interface StateHistory {
-  runs: number[];
-  balls: number[];
-  wicket: number[];
-  currentBattingTeam: number;
+  runs: number;
+  balls: number;
+  wicket: number;
 }
 
 function ScorerLayout() {
   const teams = ["India", "Australia"];
   // const oversToPlay = 8;
-  const [runs, setRuns] = useState<number[]>([0, 0]);
-  const [balls, setBalls] = useState<number[]>([0, 0]);
-  const [wicket, setWicket] = useState<number[]>([0, 0]);
-  const [currentBattingTeam, setCurrentBattingTeam] = useState<number>(0);
+  const [runs, setRuns] = useState<number>(0);
+  const [balls, setBalls] = useState<number>(0);
+  const [wicket, setWicket] = useState<number>(0);
 
   const [history, setHistory] = useState<StateHistory[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
-  const [overSummary, setOverSummary] = useState<(number | "Wicket")[]>([]);
+  const [overSummary, setOverSummary] = useState([]);
 
   const [overBalls, setOverBalls] = useState(6);
 
   function increaseRuns(run: number) {
-    setRuns((prevRuns) =>
-      prevRuns.map((val, index) =>
-        index === currentBattingTeam ? val + run : val
-      )
-    );
+    setRuns((prevRuns) => {
+      prevRuns += run;
+      return prevRuns;
+    });
   }
 
   function increaseBalls() {
-    setBalls((prevBalls) =>
-      prevBalls.map((val, index) =>
-        index === currentBattingTeam ? val + 1 : val
-      )
-    );
+    setBalls((prevBalls) => {
+      prevBalls++;
+      return prevBalls;
+    });
   }
 
   function increaseWicket() {
-    setWicket((prevWicket) =>
-      prevWicket.map((val, index) =>
-        index === currentBattingTeam ? val + 1 : val
-      )
-    );
+    setWicket((prevWicket) => {
+      prevWicket++;
+      return prevWicket;
+    });
   }
 
   function handleUndo() {
     if (historyIndex >= 0) {
       const prevState = history[historyIndex];
-      setRuns([...prevState.runs]);
-      setBalls([...prevState.balls]);
-      setWicket([...prevState.wicket]);
-      setCurrentBattingTeam(prevState.currentBattingTeam);
+      setRuns(prevState.runs);
+      setBalls(prevState.balls);
+      setWicket(prevState.wicket);
       setHistoryIndex((prevIndex) => prevIndex - 1);
+
       overSummary.pop();
     }
   }
@@ -80,11 +76,12 @@ function ScorerLayout() {
   function handleScoreClick(score: ScoreType) {
     // Save current state before updating
     const currentState: StateHistory = {
-      runs: [...runs],
-      balls: [...balls],
-      wicket: [...wicket],
-      currentBattingTeam,
+      runs,
+      balls,
+      wicket,
     };
+
+    setOverSummary((prev) => [...prev, score.value]);
 
     // Update history with current state
     setHistory((prevHistory) => [
@@ -97,16 +94,16 @@ function ScorerLayout() {
       case "score":
         increaseRuns(score.value || 0);
         increaseBalls();
-        setOverSummary((prev) => [...prev, score.value || 0]);
+        // setOverSummary((prev) => [...prev, score.value || 0]);
         break;
       case "dot":
         increaseBalls();
-        setOverSummary((prev) => [...prev, 0]);
+        // setOverSummary((prev) => [...prev, 0]);
         break;
       case "wicket":
         increaseWicket();
         increaseBalls();
-        setOverSummary((prev) => [...prev, "Wicket"]);
+        // setOverSummary((prev) => [...prev, "Wicket"]);
         break;
       case "extra":
         increaseRuns(1);
@@ -114,52 +111,40 @@ function ScorerLayout() {
           prev++;
           return prev;
         });
-        setOverSummary((prev) => [...prev, score.value || 0]);
+        // setOverSummary((prev) => [...prev, score.value || 0]);
         break;
     }
   }
 
-  useEffect(() => {
-    if (overSummary.length === overBalls) {
-      setOverSummary([]);
-      setOverBalls(6);
-    }
-  }, [overSummary, overBalls]);
-
   return (
-    <Card className="max-sm:w-full">
+    <Card className="max-sm:w-full sm:w-96">
       <div className="flex divide-x mt-4">
         <div className="w-full">
           <CardHeader className="pt-4">
-            <CardTitle>{teams[currentBattingTeam]}</CardTitle>
+            <CardTitle>{teams[0]}</CardTitle>
           </CardHeader>
           <CardContent className="pb-2">
-            <h2 className="inline pr-4 leading-7 font-semibold text-4xl tabular-nums">
-              {runs[currentBattingTeam]}/{wicket[currentBattingTeam]}
-            </h2>
-            <p className="inline text-lg">
-              ({Math.floor(balls[currentBattingTeam] / 6)}
-              {balls[currentBattingTeam] % 6
-                ? `.${balls[currentBattingTeam] % 6}`
-                : ""}
-              )
-            </p>
+            <div className="space-x-4">
+              <h2 className="inline leading-7 font-semibold text-4xl tabular-nums">
+                {runs}/{wicket}
+              </h2>
+              <span className="text-lg">
+                ({Math.floor(balls / 6)}
+                {balls % 6 ? `.${balls % 6}` : ""})
+              </span>
+              <span className="text-lg">
+                RR: {runs ? ((runs / balls) * 6).toFixed(2) : 0}
+              </span>
+            </div>
             <div className="pt-6 w-full">
-              <ul className="flex gap-2 w-full flex-wrap">
-                {Array.from({ length: overBalls }, (_, i) => (
-                  <li
-                    className={cn(
-                      "size-8 h-8 leading-8 text-center rounded-full",
-                      {
-                        "bg-primary text-primary-foreground":
-                          overSummary[i] !== undefined,
-                        "bg-muted": overSummary[i] === undefined,
-                      }
-                    )}
-                  >
-                    {overSummary[i]}
-                  </li>
-                ))}
+              <ul className="flex gap-2 w-full overflow-x-auto">
+                {Array.from({ length: overBalls }, (_, i) => {
+                  return (
+                    <BallSummary
+                      summary={overSummary[i + 6 * Math.floor(balls / 6)]}
+                    />
+                  );
+                })}
               </ul>
             </div>
           </CardContent>
@@ -169,25 +154,25 @@ function ScorerLayout() {
       <CardContent className="space-y-6">
         <ScoreButtonWrapper>
           <Button
-            className="size-12 max-sm:size-full text-lg"
+            className="size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 1 })}
           >
             1
           </Button>
           <Button
-            className="size-12 max-sm:size-full text-lg"
+            className="size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 2 })}
           >
             2
           </Button>
           <Button
-            className="size-12 max-sm:size-full text-lg"
+            className="size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 4 })}
           >
             4
           </Button>
           <Button
-            className="size-12 max-sm:size-full text-lg"
+            className="size-full text-lg"
             onClick={() => handleScoreClick({ type: "score", value: 6 })}
           >
             6
@@ -225,10 +210,9 @@ function ScorerLayout() {
       <CardFooter className="gap-2">
         <RestartButton
           onClick={() => {
-            setRuns([0, 0]);
-            setWicket([0, 0]);
-            setBalls([0, 0]);
-            setCurrentBattingTeam(0);
+            setRuns(0);
+            setWicket(0);
+            setBalls(0);
             setHistory([]);
             setHistoryIndex(-1);
             setOverSummary([]);
