@@ -20,6 +20,19 @@ interface ScoreType {
   value?: number;
 }
 
+const events = {
+  "-3": "NB",
+  "-2": "wide",
+  "-1": "wicket",
+  "0": 0,
+  "1": 1,
+  "2": 2,
+  "3": 3,
+  "4": 4,
+  "5": 5,
+  "6": 6,
+};
+
 interface StateHistory {
   runs: number;
   balls: number;
@@ -37,6 +50,7 @@ function ScorerLayout() {
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
   const [overSummary, setOverSummary] = useState([]);
+  // [[1, 1, 0, "wide"], []];
 
   const [overBalls, setOverBalls] = useState(6);
 
@@ -74,6 +88,8 @@ function ScorerLayout() {
   }
 
   function handleScoreClick(score: ScoreType) {
+    console.log(score);
+
     // Save current state before updating
     const currentState: StateHistory = {
       runs,
