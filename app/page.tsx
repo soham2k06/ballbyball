@@ -2,8 +2,8 @@ import ScorerLayout from "@/components/scorer/ScorerLayout";
 
 export default function Home() {
   return (
-    <main className="flex justify-center items-center flex-col">
+    <div className="flex justify-center items-center flex-col h-full">
       <ScorerLayout />
-    </main>
+    </div>
   );
 }

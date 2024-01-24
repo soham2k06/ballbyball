@@ -10,125 +10,100 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import RestartButton from "./RestartButton";
 import BallSummary from "./BallSummary";
+import { EventType } from "@/types";
 
-interface ScoreType {
-  type: "score" | "extra" | "wicket" | "dot";
-  value?: number;
-}
-
-const events = {
+export const events: Record<string, string> = {
   "-3": "NB",
-  "-2": "wide",
-  "-1": "wicket",
-  "0": 0,
-  "1": 1,
-  "2": 2,
-  "3": 3,
-  "4": 4,
-  "5": 5,
-  "6": 6,
+  "-2": "WD",
+  "-1": "W",
+  "0": "0",
+  "1": "1",
+  "2": "2",
+  "3": "3",
+  "4": "4",
+  "5": "5",
+  "6": "6",
 };
 
-interface StateHistory {
-  runs: number;
-  balls: number;
-  wicket: number;
-}
-
 function ScorerLayout() {
-  const teams = ["India", "Australia"];
-  // const oversToPlay = 8;
-  const [runs, setRuns] = useState<number>(0);
-  const [balls, setBalls] = useState<number>(0);
-  const [wicket, setWicket] = useState<number>(0);
+  const [balls, setBalls] = useState<EventType[]>([]);
 
-  const [history, setHistory] = useState<StateHistory[]>([]);
-  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const invalidBalls = ["-3", "-2"];
 
-  const [overSummary, setOverSummary] = useState([]);
-  // [[1, 1, 0, "wide"], []];
+  const totalBalls = balls.filter((d) => !invalidBalls.includes(d)).length;
+  const runs = balls
+    .filter((ball) => ball !== "-1")
+    .map((ball) => ball.replace("-3", "1").replace("-2", "1"))
+    .reduce((acc, cur) => acc + +cur, 0);
+  const wickets = balls.filter((ball) => ball === "-1").length;
+  const extras = balls.filter((ball) => ball === "-2" || ball === "-3");
 
+  const [overSummaries, setOverSummaries] = useState<Array<Array<EventType>>>(
+    []
+  );
+  const [curOverIndex, setCurOverIndex] = useState(0);
   const [overBalls, setOverBalls] = useState(6);
 
-  function increaseRuns(run: number) {
-    setRuns((prevRuns) => {
-      prevRuns += run;
-      return prevRuns;
-    });
+  const validCount = calculateValidCount();
+
+  function calculateValidCount() {
+    return overSummaries.reduce((total, overBalls) => {
+      if (Array.isArray(overBalls)) {
+        const validNumbers = overBalls.filter((number) => number);
+        return total + validNumbers.length;
+      }
+      return total;
+    }, 0);
   }
 
-  function increaseBalls() {
-    setBalls((prevBalls) => {
-      prevBalls++;
-      return prevBalls;
-    });
-  }
+  const handleScore = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const event = e.currentTarget.value;
 
-  function increaseWicket() {
-    setWicket((prevWicket) => {
-      prevWicket++;
-      return prevWicket;
-    });
-  }
+    setBalls((pre) => [...pre, event as EventType]);
+
+    // Summary
+    const newSummaries = [...overSummaries];
+
+    if (invalidBalls.includes(event)) {
+      setOverBalls((prevOverBalls) => prevOverBalls + 1);
+    }
+    if (newSummaries.length > 0 && newSummaries[curOverIndex].length === 0) {
+      newSummaries[curOverIndex].push(event as EventType);
+    } else {
+      if (
+        newSummaries.length === 0 ||
+        newSummaries[curOverIndex].length === 6
+      ) {
+        newSummaries.push([event as EventType]);
+        setCurOverIndex(newSummaries.length - 1);
+        setOverBalls(6);
+      } else {
+        newSummaries[curOverIndex].push(event as EventType);
+      }
+    }
+
+    setOverSummaries(newSummaries);
+  };
 
   function handleUndo() {
-    if (historyIndex >= 0) {
-      const prevState = history[historyIndex];
-      setRuns(prevState.runs);
-      setBalls(prevState.balls);
-      setWicket(prevState.wicket);
-      setHistoryIndex((prevIndex) => prevIndex - 1);
+    setBalls((prev) => prev.slice(0, -1));
 
-      overSummary.pop();
-    }
-  }
+    const newSummaries = [...overSummaries];
 
-  function handleScoreClick(score: ScoreType) {
-    console.log(score);
+    if (newSummaries.length > 0) {
+      if (curOverIndex > 0 && newSummaries[curOverIndex].length === 0) {
+        newSummaries.splice(curOverIndex, 1);
+        setCurOverIndex(curOverIndex - 1);
 
-    // Save current state before updating
-    const currentState: StateHistory = {
-      runs,
-      balls,
-      wicket,
-    };
+        setOverBalls(6);
+      } else if (newSummaries[curOverIndex].length > 0) {
+        newSummaries[curOverIndex].pop();
+      }
 
-    setOverSummary((prev) => [...prev, score.value]);
-
-    // Update history with current state
-    setHistory((prevHistory) => [
-      ...prevHistory.slice(0, historyIndex + 1),
-      currentState,
-    ]);
-    setHistoryIndex((prevIndex) => prevIndex + 1);
-
-    switch (score.type) {
-      case "score":
-        increaseRuns(score.value || 0);
-        increaseBalls();
-        // setOverSummary((prev) => [...prev, score.value || 0]);
-        break;
-      case "dot":
-        increaseBalls();
-        // setOverSummary((prev) => [...prev, 0]);
-        break;
-      case "wicket":
-        increaseWicket();
-        increaseBalls();
-        // setOverSummary((prev) => [...prev, "Wicket"]);
-        break;
-      case "extra":
-        increaseRuns(1);
-        setOverBalls((prev) => {
-          prev++;
-          return prev;
-        });
-        // setOverSummary((prev) => [...prev, score.value || 0]);
-        break;
+      setOverSummaries(newSummaries);
     }
   }
 
@@ -137,30 +112,28 @@ function ScorerLayout() {
       <div className="flex divide-x mt-4">
         <div className="w-full">
           <CardHeader className="pt-4">
-            <CardTitle>{teams[0]}</CardTitle>
+            <CardTitle>India</CardTitle>
           </CardHeader>
           <CardContent className="pb-2">
             <div className="space-x-4">
               <h2 className="inline leading-7 font-semibold text-4xl tabular-nums">
-                {runs}/{wicket}
+                {runs}/{wickets}
               </h2>
               <span className="text-lg">
-                ({Math.floor(balls / 6)}
-                {balls % 6 ? `.${balls % 6}` : ""})
+                ({Math.floor(totalBalls / 6)}
+                {totalBalls % 6 ? `.${totalBalls % 6}` : ""})
               </span>
               <span className="text-lg">
-                RR: {runs ? ((runs / balls) * 6).toFixed(2) : 0}
+                RR: {runs ? ((runs / totalBalls) * 6).toFixed(2) : 0}
               </span>
             </div>
             <div className="pt-6 w-full">
               <ul className="flex gap-2 w-full overflow-x-auto">
-                {Array.from({ length: overBalls }, (_, i) => {
-                  return (
-                    <BallSummary
-                      summary={overSummary[i + 6 * Math.floor(balls / 6)]}
-                    />
-                  );
-                })}
+                {overSummaries[Math.floor(totalBalls / 6)]?.map(
+                  (summary, i) => (
+                    <BallSummary key={i} summary={summary} />
+                  )
+                )}
               </ul>
             </div>
           </CardContent>
@@ -169,70 +142,50 @@ function ScorerLayout() {
       <Separator className="mt-4 mb-6" />
       <CardContent className="space-y-6">
         <ScoreButtonWrapper>
+          {["0", "1", "2", "3"].map((event, i) => (
+            <Button
+              key={i}
+              className="size-full text-lg"
+              value={event}
+              onClick={handleScore}
+            >
+              {event}
+            </Button>
+          ))}
+        </ScoreButtonWrapper>
+        <ScoreButtonWrapper>
           <Button
-            className="size-full text-lg"
-            onClick={() => handleScoreClick({ type: "score", value: 1 })}
-          >
-            1
-          </Button>
-          <Button
-            className="size-full text-lg"
-            onClick={() => handleScoreClick({ type: "score", value: 2 })}
-          >
-            2
-          </Button>
-          <Button
-            className="size-full text-lg"
-            onClick={() => handleScoreClick({ type: "score", value: 4 })}
+            className="size-full text-lg bg-emerald-500 text-emerald-50 dark:bg-emerald-600"
+            value="4"
+            onClick={handleScore}
           >
             4
           </Button>
           <Button
-            className="size-full text-lg"
-            onClick={() => handleScoreClick({ type: "score", value: 6 })}
+            className="size-full text-lg bg-amber-400 text-amber-950 dark:bg-amber-600 dark:text-amber-50"
+            value="6"
+            onClick={handleScore}
           >
             6
           </Button>
         </ScoreButtonWrapper>
         <ScoreButtonWrapper>
-          <Button
-            className="w-full h-12 text-lg"
-            onClick={() => handleScoreClick({ type: "dot" })}
-          >
-            Dot ball
-          </Button>
-          <Button
-            className="w-full h-12 text-lg"
-            onClick={() => handleScoreClick({ type: "wicket" })}
-          >
-            Wicket
-          </Button>
-        </ScoreButtonWrapper>
-        <ScoreButtonWrapper>
-          <Button
-            className="w-full h-12 text-lg"
-            onClick={() => handleScoreClick({ type: "extra", value: 7 })}
-          >
-            No ball
-          </Button>
-          <Button
-            className="w-full h-12 text-lg"
-            onClick={() => handleScoreClick({ type: "extra", value: 8 })}
-          >
-            Wide
-          </Button>
+          {["-2", "-3"].map((event, i) => (
+            <Button
+              key={i}
+              className="size-full text-lg"
+              value={event}
+              onClick={handleScore}
+            >
+              {events[event]}
+            </Button>
+          ))}
         </ScoreButtonWrapper>
       </CardContent>
       <CardFooter className="gap-2">
         <RestartButton
           onClick={() => {
-            setRuns(0);
-            setWicket(0);
-            setBalls(0);
-            setHistory([]);
-            setHistoryIndex(-1);
-            setOverSummary([]);
-            setOverBalls(6);
+            setBalls([]);
           }}
         />
         <Button
@@ -248,7 +201,8 @@ function ScorerLayout() {
   );
 }
 
+export default ScorerLayout;
+
 function ScoreButtonWrapper({ children }: { children: React.ReactNode }) {
   return <div className="flex gap-4 justify-center w-full">{children}</div>;
 }
-export default ScorerLayout;
