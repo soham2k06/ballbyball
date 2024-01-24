@@ -26,7 +26,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Nav />
-          <main className="max-w-7xl mx-auto p-4">{children}</main>
+          <main className="max-w-7xl mx-auto p-4 h-[calc(100dvh-4.5rem)]">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
