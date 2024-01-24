@@ -45,21 +45,32 @@ function ScorerLayout() {
     []
   );
   const [curOverIndex, setCurOverIndex] = useState(0);
-  const [overBalls, setOverBalls] = useState(6);
 
-  const validCount = calculateValidCount();
+  // const handleScore = (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   const event = e.currentTarget.value;
 
-  function calculateValidCount() {
-    return overSummaries.reduce((total, overBalls) => {
-      if (Array.isArray(overBalls)) {
-        const validNumbers = overBalls.filter((number) => number);
-        return total + validNumbers.length;
-      }
-      return total;
-    }, 0);
-  }
+  //   setBalls((pre) => [...pre, event as EventType]);
 
-  const handleScore = (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   // Summary
+  //   const newSummaries = [...overSummaries];
+
+  //   if (newSummaries.length > 0 && newSummaries[curOverIndex].length === 0) {
+  //     newSummaries[curOverIndex].push(event as EventType);
+  //   } else {
+  //     if (
+  //       newSummaries.length === 0 ||
+  //       newSummaries[curOverIndex].length === 6
+  //     ) {
+  //       newSummaries.push([event as EventType]);
+  //       setCurOverIndex(newSummaries.length - 1);
+  //     } else {
+  //       newSummaries[curOverIndex].push(event as EventType);
+  //     }
+  //   }
+
+  //   setOverSummaries(newSummaries);
+  // };
+  function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     const event = e.currentTarget.value;
 
     setBalls((pre) => [...pre, event as EventType]);
@@ -67,9 +78,6 @@ function ScorerLayout() {
     // Summary
     const newSummaries = [...overSummaries];
 
-    if (invalidBalls.includes(event)) {
-      setOverBalls((prevOverBalls) => prevOverBalls + 1);
-    }
     if (newSummaries.length > 0 && newSummaries[curOverIndex].length === 0) {
       newSummaries[curOverIndex].push(event as EventType);
     } else {
@@ -79,14 +87,23 @@ function ScorerLayout() {
       ) {
         newSummaries.push([event as EventType]);
         setCurOverIndex(newSummaries.length - 1);
-        setOverBalls(6);
       } else {
-        newSummaries[curOverIndex].push(event as EventType);
+        // Only consider valid events while counting the length
+        const validEvents = newSummaries[curOverIndex].filter(
+          (validEvent) => !invalidBalls.includes(validEvent)
+        );
+
+        if (validEvents.length < 6) {
+          newSummaries[curOverIndex].push(event as EventType);
+        } else {
+          newSummaries.push([event as EventType]);
+          setCurOverIndex(newSummaries.length - 1);
+        }
       }
     }
 
     setOverSummaries(newSummaries);
-  };
+  }
 
   function handleUndo() {
     setBalls((prev) => prev.slice(0, -1));
@@ -97,8 +114,6 @@ function ScorerLayout() {
       if (curOverIndex > 0 && newSummaries[curOverIndex].length === 0) {
         newSummaries.splice(curOverIndex, 1);
         setCurOverIndex(curOverIndex - 1);
-
-        setOverBalls(6);
       } else if (newSummaries[curOverIndex].length > 0) {
         newSummaries[curOverIndex].pop();
       }

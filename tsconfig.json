@@ -26,7 +26,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "components/scorer/ScorerLayout.jsx"
+    "components/scorer/ScorerLayout.jsx",
+    "app/test/page.jsx"
   ],
   "exclude": ["node_modules"]
 }
