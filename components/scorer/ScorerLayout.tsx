@@ -122,7 +122,7 @@ function ScorerLayout() {
                   (_, i) => (
                     <BallSummary
                       key={i}
-                      summary={overSummaries[curOverIndex]?.[i]}
+                      summary={overSummaries[curOverIndex]?.[i] as EventType}
                     />
                   )
                 )}
