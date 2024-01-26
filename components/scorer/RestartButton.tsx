@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+
 import { MouseEventHandler } from "react";
 function RestartButton({ onClick }: { onClick: MouseEventHandler }) {
   return (
