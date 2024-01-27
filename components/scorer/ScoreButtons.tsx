@@ -73,8 +73,9 @@ function ScoreButtons({
                 .filter(
                   (ball) => ball !== "-1" && ball !== "-2" && ball !== "-3"
                 )
-                .map((event) => (
+                .map((event, i) => (
                   <Button
+                    key={i}
                     className={
                       event === "6"
                         ? "bg-amber-400 font-semibold text-amber-950 dark:bg-amber-600 dark:text-amber-50"

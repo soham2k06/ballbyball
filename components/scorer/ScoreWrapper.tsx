@@ -4,12 +4,10 @@ function ScoreWrapper({
   runs,
   wickets,
   totalBalls,
-  curOverIndex,
 }: {
   runs: number;
   wickets: number;
   totalBalls: number;
-  curOverIndex: number;
 }) {
   return (
     <div className="pb-4">
@@ -18,7 +16,7 @@ function ScoreWrapper({
       </h2>
       <div className="opacity-50 flex justify-center text-center">
         <span>
-          ({curOverIndex}
+          ({Math.floor(totalBalls / 6)}
           {totalBalls % 6 ? `.${totalBalls % 6}` : ""})
         </span>
         <Separator

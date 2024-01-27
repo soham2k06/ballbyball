@@ -15,6 +15,7 @@ import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
 import OverStats from "./OverStats";
 import FooterSummary from "./FooterSummary";
+import FullOverSummary from "./FullOverSummary";
 
 export const ballEvents: Record<string, string> = {
   "-3": "NB",
@@ -94,12 +95,7 @@ function ScorerLayout() {
       />
       <Card className="max-sm:w-full sm:w-96 border-0">
         <CardContent className="p-0">
-          <ScoreWrapper
-            runs={runs}
-            wickets={wickets}
-            curOverIndex={curOverIndex}
-            totalBalls={totalBalls}
-          />
+          <ScoreWrapper runs={runs} wickets={wickets} totalBalls={totalBalls} />
           <ul className="grid grid-flow-col gap-1 place-items-center border-muted rounded-md border p-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
@@ -112,7 +108,7 @@ function ScorerLayout() {
         <CardFooter className="block px-0">
           <div className="gap-2 flex pb-6">
             <OverStats chartSummaryData={chartSummaryData} />
-            <Button className="w-full">Summary</Button>
+            <FullOverSummary overSummaries={overSummaries} />
           </div>
 
           <FooterSummary

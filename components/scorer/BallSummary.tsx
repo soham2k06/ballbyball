@@ -3,9 +3,15 @@ import { EventType } from "@/types";
 import { cva } from "class-variance-authority";
 import { Dot } from "lucide-react";
 
-function BallSummary({ event }: { event: EventType }) {
+function BallSummary({
+  event,
+  size = "default",
+}: {
+  event: EventType;
+  size?: "sm" | "default";
+}) {
   const summaryVariants = cva(
-    "h-8 w-full min-w-10 text-center rounded flex justify-center items-center",
+    "text-center rounded flex justify-center items-center",
     {
       variants: {
         variant: {
@@ -20,6 +26,10 @@ function BallSummary({ event }: { event: EventType }) {
           "-3": "bg-muted text-muted-foreground",
           "-1": "bg-destructive text-destructive-foreground font-extrabold",
         },
+        size: {
+          sm: "h-7 w-full min-w-7 text-sm",
+          default: "h-8 w-full min-w-10",
+        },
       },
       defaultVariants: { variant: "default" },
     }
@@ -30,7 +40,11 @@ function BallSummary({ event }: { event: EventType }) {
   switch (event) {
     case "0":
       summaryToShow = (
-        <Dot size={32} strokeWidth={6} className="text-muted-foreground" />
+        <Dot
+          size={size === "sm" ? 20 : 32}
+          strokeWidth={6}
+          className="text-muted-foreground"
+        />
       );
       break;
     case "-1":
@@ -54,6 +68,7 @@ function BallSummary({ event }: { event: EventType }) {
           variant: event?.includes("-3")
             ? (event.slice(2) as EventType)
             : event,
+          size,
         })
       )}
     >
