@@ -25,7 +25,6 @@ export const ballEvents: Record<string, string> = {
   "2": "2",
   "3": "3",
   "4": "4",
-  // "5": "5",
   "6": "6",
 };
 
@@ -36,7 +35,7 @@ function ScorerLayout() {
   const runs = calcRuns(balls);
   const wickets = calcWickets(balls);
   const totalBalls = balls.filter(
-    (ball, i) => !invalidBalls.includes(ball) && !ball.includes("-3")
+    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3")
   ).length;
 
   const extras = balls.filter(
@@ -67,7 +66,6 @@ function ScorerLayout() {
 
     return overSummaries;
   }
-
   const overSummaries: EventType[][] = generateOverSummary(balls);
 
   const chartSummaryData = overSummaries.map((summary, i) => ({

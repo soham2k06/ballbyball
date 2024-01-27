@@ -20,6 +20,8 @@ function DangerActions({
     <DropdownMenu open={showMenu} onOpenChange={() => setShowMenu(!showMenu)}>
       <DropdownMenuTrigger asChild>
         <Button
+          name="danger-actions"
+          title="danger-actions"
           className="absolute right-2 top-2"
           size="icon"
           variant="outline"
