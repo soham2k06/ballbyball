@@ -44,7 +44,9 @@ function OverStats({
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="pt-6 pb-4 mb-2 shadow shadow-muted">
-          <DrawerTitle className="text-2xl">Run rate bar</DrawerTitle>
+          <DrawerTitle className="text-2xl text-center">
+            Run rate bar
+          </DrawerTitle>
         </DrawerHeader>
         <div className="h-96 p-2">
           {chartSummaryData.length > 0 ? (
