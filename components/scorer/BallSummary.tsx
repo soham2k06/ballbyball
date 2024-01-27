@@ -3,25 +3,9 @@ import { EventType } from "@/types";
 import { cva } from "class-variance-authority";
 import { Dot } from "lucide-react";
 
-function BallSummary({
-  summary,
-  ballLimitInOver,
-}: {
-  summary: EventType[];
-  ballLimitInOver: number;
-}) {
-  return (
-    <ul className="flex gap-1 border-muted rounded-md justify-center border p-2 overflow-x-auto">
-      {Array.from({ length: ballLimitInOver }, (_, i) => (
-        <Summary key={i} event={summary?.[i]} />
-      ))}
-    </ul>
-  );
-}
-
-function Summary({ event }: { event: EventType }) {
+function BallSummary({ event }: { event: EventType }) {
   const summaryVariants = cva(
-    "size-8 min-w-8 text-center rounded flex justify-center items-center",
+    "h-8 w-full min-w-10 text-center rounded flex justify-center items-center",
     {
       variants: {
         variant: {
@@ -46,7 +30,7 @@ function Summary({ event }: { event: EventType }) {
   switch (event) {
     case "0":
       summaryToShow = (
-        <Dot size={40} strokeWidth={6} className="text-muted-foreground" />
+        <Dot size={32} strokeWidth={6} className="text-muted-foreground" />
       );
       break;
     case "-1":
@@ -55,17 +39,26 @@ function Summary({ event }: { event: EventType }) {
     case "-2":
       summaryToShow = "Wd";
       break;
-    case "-3":
-      summaryToShow = "NB";
-      break;
 
     default:
       summaryToShow = event;
       break;
   }
 
+  if (event?.includes("-3")) summaryToShow = event?.replace("-3", "NB");
+
   return (
-    <li className={cn(summaryVariants({ variant: event }))}>{summaryToShow}</li>
+    <li
+      className={cn(
+        summaryVariants({
+          variant: event?.includes("-3")
+            ? (event.slice(2) as EventType)
+            : event,
+        })
+      )}
+    >
+      {summaryToShow}
+    </li>
   );
 }
 

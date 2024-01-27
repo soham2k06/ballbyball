@@ -1,107 +1,129 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
 
-import { useState } from 'react'
+import { EventType } from "@/types";
+import { calcRuns, calcWickets } from "@/lib/utils";
 
-import BallSummary from './BallSummary'
-import { EventType } from '@/types'
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
-import ScoreWrapper from './ScoreWrapper'
-import DangerActions from './DangerActions'
-import ScoreButtons from './ScoreButtons'
-import OverStats from './OverStats'
-import FooterSummary from './FooterSummary'
+import DangerActions from "./DangerActions";
+import ScoreWrapper from "./ScoreWrapper";
+import BallSummary from "./BallSummary";
+import ScoreButtons from "./ScoreButtons";
+import OverStats from "./OverStats";
+import FooterSummary from "./FooterSummary";
 
 export const ballEvents: Record<string, string> = {
-  '-3': 'NB',
-  '-2': 'WD',
-  '-1': 'W',
-  '0': '0',
-  '1': '1',
-  '2': '2',
-  '3': '3',
-  '4': '4',
-  '5': '5',
-  '6': '6',
-}
+  "-3": "NB",
+  "-2": "WD",
+  "-1": "W",
+  "0": "0",
+  "1": "1",
+  "2": "2",
+  "3": "3",
+  "4": "4",
+  // "5": "5",
+  "6": "6",
+};
 
 function ScorerLayout() {
-  const [balls, setBalls] = useState<EventType[]>([])
-  const invalidBalls = ['-3', '-2']
+  const [balls, setBalls] = useState<EventType[]>([]);
+  const invalidBalls = ["-3", "-2"];
+
+  const runs = calcRuns(balls);
+  const wickets = calcWickets(balls);
   const totalBalls = balls.filter(
-    (d, index) => !invalidBalls.includes(d) && (index === 0 || balls[index - 1] !== '-3')
-  ).length
+    (ball, i) => !invalidBalls.includes(ball) && !ball.includes("-3")
+  ).length;
 
-  console.log('👀totalBalls', totalBalls)
+  const extras = balls.filter(
+    (ball) => ball === "-2" || ball.includes("-3")
+  ).length;
 
-  let ballLimitInOver = 6
+  let ballLimitInOver = 6;
   function generateOverSummary(ballEvents: EventType[]) {
-    const overSummaries = []
-    let validBallCount = 0
-    let currentOver = []
+    const overSummaries: EventType[][] = [];
+    let validBallCount = 0;
+    let currentOver: EventType[] = [];
     for (const ballEvent of ballEvents) {
-      currentOver.push(ballEvent)
-
-      if (!invalidBalls.includes(ballEvent)) {
-        validBallCount++
+      currentOver.push(ballEvent);
+      if (!invalidBalls.includes(ballEvent) && !ballEvent.includes("-3")) {
+        validBallCount++;
         if (validBallCount === 6) {
-          overSummaries.push(currentOver)
-          currentOver = []
-          validBallCount = 0
-          ballLimitInOver = 6
+          overSummaries.push(currentOver);
+          currentOver = [];
+          validBallCount = 0;
+          ballLimitInOver = 6;
         }
-      } else ballLimitInOver++
+      } else ballLimitInOver++;
     }
 
     if (validBallCount >= 0 && currentOver.length > 0) {
-      overSummaries.push(currentOver)
+      overSummaries.push(currentOver);
     }
 
-    return overSummaries
+    return overSummaries;
   }
 
-  const overSummaries: EventType[][] = generateOverSummary(balls) as EventType[][]
+  const overSummaries: EventType[][] = generateOverSummary(balls);
 
-  // stats - small
-  const curOverIndex = Math.floor(totalBalls / 6)
+  const chartSummaryData = overSummaries.map((summary) => ({
+    runs: summary.reduce((acc, cur) => acc + Number(cur), 0),
+    wickets: summary.filter((ball) => ball === "-1").length,
+  }));
+
+  const curOverIndex = Math.floor(totalBalls / 6);
+  const curOverRuns = calcRuns(overSummaries[curOverIndex]);
+  const curOverWickets = calcWickets(overSummaries[curOverIndex]);
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
-    const event = e.currentTarget.value
-    setBalls((prev) => [...prev, event as EventType])
+    const event = e.currentTarget.value;
+    setBalls((prev) => [...prev, event as EventType]);
   }
 
-  function handleUndo() {
-    setBalls((prev) => prev.slice(0, -1))
-  }
+  const handleUndo = () => setBalls((prev) => prev.slice(0, -1));
 
   return (
     <>
-      <DangerActions handleRestart={() => setBalls([])} handleUndo={handleUndo} />
-      <Card className='max-sm:w-full sm:w-96 border-0'>
-        <CardContent className='p-0'>
-          <ScoreWrapper balls={balls} curOverIndex={curOverIndex} totalBalls={totalBalls} />
-          <BallSummary summary={overSummaries[curOverIndex]} ballLimitInOver={ballLimitInOver} />
+      <DangerActions
+        handleRestart={() => setBalls([])}
+        handleUndo={handleUndo}
+      />
+      <Card className="max-sm:w-full sm:w-96 border-0">
+        <CardContent className="p-0">
+          <ScoreWrapper
+            runs={runs}
+            wickets={wickets}
+            curOverIndex={curOverIndex}
+            totalBalls={totalBalls}
+          />
+          <ul className="grid grid-flow-col gap-1 place-items-center border-muted rounded-md border p-2 overflow-x-auto">
+            {Array.from({ length: ballLimitInOver }, (_, i) => (
+              <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
+            ))}
+          </ul>
         </CardContent>
 
-        {/* <Separator className="sm:my-4 my-2" /> */}
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
-        <Separator className='sm:my-4 my-2' />
-        <CardFooter className='block px-0'>
-          <div className='gap-2 flex pb-6'>
-            <OverStats overSummaries={overSummaries} />
-            <Button className='w-full' onClick={handleUndo}>
-              Summary
-            </Button>
+        <Separator className="sm:my-4 my-2" />
+        <CardFooter className="block px-0">
+          <div className="gap-2 flex pb-6">
+            <OverStats chartSummaryData={chartSummaryData} />
+            <Button className="w-full">Summary</Button>
           </div>
 
-          <FooterSummary balls={balls} curOverSummary={overSummaries[curOverIndex]} />
+          <FooterSummary
+            extras={extras}
+            curOverRuns={curOverRuns}
+            curOverWickets={curOverWickets}
+          />
         </CardFooter>
       </Card>
     </>
-  )
+  );
 }
 
-export default ScorerLayout
+export default ScorerLayout;

@@ -1,6 +1,7 @@
 import { Button } from "../ui/button";
 import { CardContent } from "../ui/card";
 import { MouseEventHandler } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 function ScoreButtons({
   handleScore,
@@ -41,17 +42,37 @@ function ScoreButtons({
         </Button>
       </div>
       <div className="flex gap-1 justify-center w-full">
-        {["-2", "-3"].map((event, i) => (
-          <Button
-            key={i}
-            variant="secondary"
-            className="w-full h-16 text-lg"
-            value={event}
-            onClick={handleScore}
-          >
-            {ballEvents[event]}
-          </Button>
-        ))}
+        {/* {["-2", "-3"].map((event, i) => (
+        ))} */}
+        <Button
+          variant="secondary"
+          className="w-full h-16 text-lg"
+          value="-2"
+          onClick={handleScore}
+        >
+          Wd
+        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="secondary"
+              className="w-full h-16 text-lg"
+              value="-3"
+            >
+              NB
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            {Object.keys(ballEvents)
+              .filter((ball) => ball !== "-1" && ball !== "-2")
+              .map((event) => (
+                <Button value={`-3${event}`} onClick={handleScore}>
+                  {event}
+                </Button>
+              ))}
+          </PopoverContent>
+        </Popover>
+
         <Button
           className="w-full h-16 text-lg"
           variant="destructive"

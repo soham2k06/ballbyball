@@ -9,7 +9,11 @@ export function cn(...inputs: ClassValue[]) {
 export function calcRuns(ballEvents: EventType[]) {
   const runs = ballEvents
     ?.filter((ball) => ball !== "-1")
-    ?.map((ball) => ball.replace("-3", "1").replace("-2", "1"))
+    ?.map((event) =>
+      event.includes("-3")
+        ? (Number(event.slice(2)) + 1).toString()
+        : event.replace("-2", "1")
+    )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
   return runs;

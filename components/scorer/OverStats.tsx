@@ -3,12 +3,11 @@ import { Button } from "../ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import { EventType } from "@/types";
 
-function OverStats({ overSummaries }: { overSummaries: EventType[][] }) {
-  const chartSummaryData = overSummaries.map((summary) => ({
-    runs: summary.reduce((acc, cur) => acc + Number(cur), 0),
-    wickets: summary.filter((ball) => ball === "-1").length,
-  }));
-
+function OverStats({
+  chartSummaryData,
+}: {
+  chartSummaryData: { runs: number; wickets: number }[];
+}) {
   const renderCustomizedLabel = (props: any) => {
     const { x, y, width, value } = props;
     const radius = 10;

@@ -1,21 +1,17 @@
-import { EventType } from "@/types";
 import { Separator } from "../ui/separator";
-import { calcRuns, calcWickets } from "@/lib/utils";
 
 function FooterSummary({
-  curOverSummary,
-  balls,
+  curOverRuns,
+  curOverWickets,
+  extras,
 }: {
-  curOverSummary: EventType[];
-  balls: EventType[];
+  curOverRuns: number;
+  curOverWickets: number;
+  extras: number;
 }) {
-  const curOverRuns = calcRuns(curOverSummary);
-  const curOverWickets = calcWickets(curOverSummary);
-
-  const extras = balls.filter((ball) => ball === "-2" || ball === "-3");
   return (
     <div className="bg-muted text-primary w-full left-0 rounded-md flex items-center p-2">
-      <span>Extras: {extras.length}</span>
+      <span>Extras: {extras}</span>
       <Separator
         orientation="vertical"
         className="bg-muted-foreground h-6 mx-3"
