@@ -13,7 +13,7 @@ function BallSummary({
   return (
     <ul className="flex gap-1 border-muted rounded-md justify-center border p-2 overflow-x-auto">
       {Array.from({ length: ballLimitInOver }, (_, i) => (
-        <Summary event={summary?.[i]} />
+        <Summary key={i} event={summary?.[i]} />
       ))}
     </ul>
   );
