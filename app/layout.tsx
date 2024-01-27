@@ -5,9 +5,9 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Scorer",
+  title: "Ball By Ball | Your cricket partner",
   description: "Your cricket partner",
-  creator: "Soham Bhikadiya",
+  creator: "Soham Bhikadiya & Rudra Bhikadiya",
   keywords: [
     "cricket",
     "scorer",
