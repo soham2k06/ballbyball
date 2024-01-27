@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 import { EventType } from "@/types";
 import { calcRuns, calcWickets } from "@/lib/utils";
@@ -30,7 +31,7 @@ export const ballEvents: Record<string, string> = {
 
 function ScorerLayout() {
   const [balls, setBalls] = useState<EventType[]>(
-    JSON.parse(localStorage.getItem("balls") as string) || []
+    JSON.parse((getCookie("balls") as string) || "[]") || []
   );
   const invalidBalls = ["-3", "-2"];
 
@@ -83,12 +84,12 @@ function ScorerLayout() {
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     const event = e.currentTarget.value;
     setBalls((prev) => [...prev, event as EventType]);
-    localStorage.setItem("balls", JSON.stringify([...balls, event]));
+    setCookie("balls", JSON.stringify([...balls, event]));
   }
 
   const handleUndo = () => {
     setBalls((prev) => prev.slice(0, -1));
-    localStorage.setItem("balls", JSON.stringify(balls.slice(0, -1)));
+    setCookie("balls", JSON.stringify(balls.slice(0, -1)));
   };
 
   return (
@@ -97,7 +98,7 @@ function ScorerLayout() {
         <DangerActions
           handleRestart={() => {
             setBalls([]);
-            localStorage.removeItem("balls");
+            deleteCookie("balls");
           }}
           handleUndo={handleUndo}
         />
