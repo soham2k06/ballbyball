@@ -29,7 +29,9 @@ export const ballEvents: Record<string, string> = {
 };
 
 function ScorerLayout() {
-  const [balls, setBalls] = useState<EventType[]>([]);
+  const [balls, setBalls] = useState<EventType[]>(
+    JSON.parse(localStorage.getItem("balls") as string) || []
+  );
   const invalidBalls = ["-3", "-2"];
 
   const runs = calcRuns(balls);
@@ -81,9 +83,13 @@ function ScorerLayout() {
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     const event = e.currentTarget.value;
     setBalls((prev) => [...prev, event as EventType]);
+    localStorage.setItem("balls", JSON.stringify([...balls, event]));
   }
 
-  const handleUndo = () => setBalls((prev) => prev.slice(0, -1));
+  const handleUndo = () => {
+    setBalls((prev) => prev.slice(0, -1));
+    localStorage.setItem("balls", JSON.stringify(balls.slice(0, -1)));
+  };
 
   return (
     <>
