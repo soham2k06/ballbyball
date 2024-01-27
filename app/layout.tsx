@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Scorer",
@@ -22,10 +23,8 @@ export default function RootLayout({
           defaultTheme="system"
           disableTransitionOnChange
         >
-          {/* <Nav /> */}
-          <main className="max-w-7xl mx-auto  h-[calc(100dvh-4.5rem)]">
-            {children}
-          </main>
+          <main className="max-w-7xl mx-auto overscroll-none">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
