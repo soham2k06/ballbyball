@@ -19,7 +19,7 @@ function NoballPopver({
         <Button
           size="lg"
           variant="secondary"
-          className="w-full h-16 text-lg text-muted-foreground"
+          className="w-full h-20 text-lg text-muted-foreground"
           value="-3"
         >
           NB

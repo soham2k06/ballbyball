@@ -41,6 +41,8 @@ function ScorerLayout() {
     (ball) => !invalidBalls.includes(ball) && !ball.includes("-3")
   ).length;
 
+  const runRate = totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0;
+
   const extras = balls.filter(
     (ball) => ball === "-2" || ball.includes("-3")
   ).length;
@@ -103,27 +105,29 @@ function ScorerLayout() {
           handleUndo={handleUndo}
         />
         <CardContent className="max-sm:p-0 space-y-4">
-          <ScoreWrapper runs={runs} wickets={wickets} totalBalls={totalBalls} />
-          <ul className="grid grid-flow-col gap-1 place-items-center border-muted rounded-md border p-2 overflow-x-auto">
+          <ScoreWrapper
+            runs={runs}
+            wickets={wickets}
+            totalBalls={totalBalls}
+            runRate={runRate as number}
+          />
+          <ul className="flex gap-2 justify-start rounded-md overflow-x-auto w-fit">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
           </ul>
-          <div className="gap-2 flex">
-            <OverStats chartSummaryData={chartSummaryData} />
-            <FullOverSummary overSummaries={overSummaries} />
-          </div>
-        </CardContent>
-        <Separator className="sm:my-4 my-6" />
-        <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
-        <Separator className="sm:my-4 my-6" />
-        <CardFooter className="max-sm:!p-0">
+
           <FooterSummary
             extras={extras}
             curOverRuns={curOverRuns}
             curOverWickets={curOverWickets}
+            runRate={runRate as number}
+            chartSummaryData={chartSummaryData}
+            overSummaries={overSummaries}
           />
-        </CardFooter>
+        </CardContent>
+        <Separator className="sm:my-4 my-4" />
+        <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
       </Card>
     </>
   );

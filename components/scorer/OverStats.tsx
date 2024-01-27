@@ -14,10 +14,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
+import { BarChart3 } from "lucide-react";
 
 function OverStats({
   chartSummaryData,
+  runRate,
 }: {
+  runRate: number;
   chartSummaryData: { runs: number; wickets: number }[];
 }) {
   const renderCustomizedLabel = (props: any) => {
@@ -40,12 +43,14 @@ function OverStats({
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button className="w-full">Stats</Button>
+        <Button size="icon">
+          <BarChart3 />
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader className="pt-6 pb-4 mb-2 shadow shadow-muted">
+        <DrawerHeader className="pt-6 pb-4 mb-2 ">
           <DrawerTitle className="text-2xl text-center">
-            Run rate bar
+            CRR: {runRate}
           </DrawerTitle>
         </DrawerHeader>
         <div className="h-96 p-2">

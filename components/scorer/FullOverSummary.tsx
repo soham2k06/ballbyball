@@ -9,12 +9,15 @@ import {
 } from "../ui/drawer";
 import BallSummary from "./BallSummary";
 import { calcRuns } from "@/lib/utils";
+import { ListOrdered } from "lucide-react";
 
 function FullOverSummary({ overSummaries }: { overSummaries: EventType[][] }) {
   return (
     <Drawer preventScrollRestoration>
       <DrawerTrigger asChild>
-        <Button className="w-full">Summary</Button>
+        <Button size="icon">
+          <ListOrdered />
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="pt-6 pb-4 mb-2 shadow shadow-muted">

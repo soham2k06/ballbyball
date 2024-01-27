@@ -93,9 +93,7 @@ export default function RootLayout({
           defaultTheme="system"
           disableTransitionOnChange
         >
-          <main className="max-w-7xl mx-auto overscroll-none md:h-dvh">
-            {children}
-          </main>
+          <main className="max-w-7xl mx-auto md:h-dvh">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

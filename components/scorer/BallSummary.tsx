@@ -11,12 +11,12 @@ function BallSummary({
   size?: "sm" | "default";
 }) {
   const summaryVariants = cva(
-    "text-center rounded flex justify-center items-center",
+    "text-center rounded-full flex justify-center items-center",
     {
       variants: {
         variant: {
           default: "bg-muted",
-          "0": "bg-muted text-muted flex justify-center items-center",
+          "0": "bg-muted text-muted-foreground flex justify-center items-center",
           "1": "bg-muted text-primary",
           "2": "bg-muted text-primary",
           "3": "bg-muted text-primary",
@@ -27,8 +27,8 @@ function BallSummary({
           "-1": "bg-destructive text-destructive-foreground font-extrabold",
         },
         size: {
-          sm: "h-7 w-full min-w-7 text-sm",
-          default: "h-10 w-full min-w-10",
+          sm: "h-7 min-w-7 text-sm",
+          default: "h-10 min-w-10",
         },
       },
       defaultVariants: { variant: "default" },
@@ -60,6 +60,7 @@ function BallSummary({
   }
 
   if (event?.includes("-3")) summaryToShow = event?.replace("-3", "NB");
+  console.log(summaryToShow);
 
   return (
     <li
