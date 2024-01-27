@@ -28,14 +28,14 @@ function ScoreButtons({
       </div>
       <div className="flex gap-2 justify-center w-full">
         <Button
-          className="w-full h-16 text-lg font-bold bg-emerald-500 text-emerald-50 dark:bg-emerald-600"
+          className="w-full h-16 text-lg font-bold bg-emerald-500 text-emerald-50 dark:bg-emerald-600 hover:bg-bg-emerald-500"
           value="4"
           onClick={handleScore}
         >
           4
         </Button>
         <Button
-          className="w-full h-16 text-lg font-bold bg-amber-400 text-amber-950 dark:bg-amber-600 dark:text-amber-50"
+          className="w-full h-16 text-lg font-bold bg-amber-400 text-amber-950 dark:bg-amber-600 dark:text-amber-50 hover:bg-amber-400"
           value="6"
           onClick={handleScore}
         >
