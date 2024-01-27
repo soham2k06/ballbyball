@@ -10,11 +10,11 @@ function ScoreWrapper({
   totalBalls: number;
 }) {
   return (
-    <div className="pb-4">
-      <h2 className="block text-center font-semibold text-7xl tabular-nums mb-5">
+    <>
+      <h2 className="block text-center font-semibold text-7xl tabular-nums mb-6">
         {runs}/{wickets}
       </h2>
-      <div className="opacity-50 flex justify-center text-center">
+      <div className="opacity-50 flex items-center justify-center text-center text-xl">
         <span>
           ({Math.floor(totalBalls / 6)}
           {totalBalls % 6 ? `.${totalBalls % 6}` : ""})
@@ -25,7 +25,7 @@ function ScoreWrapper({
         />
         <span>RR: {totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0}</span>
       </div>
-    </div>
+    </>
   );
 }
 

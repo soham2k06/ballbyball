@@ -12,13 +12,13 @@ function ScoreButtons({
 }) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   return (
-    <CardContent className="space-y-2 p-0">
-      <div className="flex gap-1 justify-center w-full">
+    <CardContent className="space-y-4 max-sm:p-0">
+      <div className="flex gap-2 justify-center w-full">
         {["0", "1", "2", "3"].map((event, i) => (
           <Button
             key={i}
             variant="secondary"
-            className="w-full h-16 text-lg"
+            className="w-full h-16 text-lg text-muted-foreground"
             value={event}
             onClick={handleScore}
           >
@@ -26,28 +26,27 @@ function ScoreButtons({
           </Button>
         ))}
       </div>
-      <div className="flex gap-1 justify-center w-full">
+      <div className="flex gap-2 justify-center w-full">
         <Button
-          className="w-full h-16 text-lg bg-emerald-500 text-emerald-50 dark:bg-emerald-600"
+          className="w-full h-16 text-lg font-bold bg-emerald-500 text-emerald-50 dark:bg-emerald-600"
           value="4"
           onClick={handleScore}
         >
           4
         </Button>
         <Button
-          className="w-full h-16 text-lg bg-amber-400 text-amber-950 dark:bg-amber-600 dark:text-amber-50"
+          className="w-full h-16 text-lg font-bold bg-amber-400 text-amber-950 dark:bg-amber-600 dark:text-amber-50"
           value="6"
           onClick={handleScore}
         >
           6
         </Button>
       </div>
-      <div className="flex gap-1 justify-center w-full">
-        {/* {["-2", "-3"].map((event, i) => (
-        ))} */}
+      <div className="flex gap-2 justify-center w-full">
         <Button
           variant="secondary"
-          className="w-full h-16 text-lg"
+          size="lg"
+          className="w-full h-16 text-lg text-muted-foreground"
           value="-2"
           onClick={handleScore}
         >
@@ -60,8 +59,9 @@ function ScoreButtons({
         >
           <PopoverTrigger asChild>
             <Button
+              size="lg"
               variant="secondary"
-              className="w-full h-16 text-lg"
+              className="w-full h-16 text-lg text-muted-foreground"
               value="-3"
             >
               NB
@@ -97,7 +97,8 @@ function ScoreButtons({
         </Popover>
 
         <Button
-          className="w-full h-16 text-lg"
+          size="lg"
+          className="w-full h-16 text-lg font-bold"
           variant="destructive"
           value="-1"
           onClick={handleScore}

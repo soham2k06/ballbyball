@@ -89,14 +89,14 @@ function ScorerLayout() {
 
   return (
     <>
-      <DangerActions
-        handleRestart={() => setBalls([])}
-        handleUndo={handleUndo}
-      />
-      <Card className="max-sm:w-full sm:w-96 border-0">
-        <CardContent className="p-0">
+      <Card className="max-sm:w-full sm:w-96 max-sm:border-0 p-2 relative">
+        <DangerActions
+          handleRestart={() => setBalls([])}
+          handleUndo={handleUndo}
+        />
+        <CardContent className="max-sm:p-0 space-y-4">
           <ScoreWrapper runs={runs} wickets={wickets} totalBalls={totalBalls} />
-          <ul className="grid grid-flow-col gap-1 place-items-center border-muted rounded-md border p-2 overflow-x-auto mb-4">
+          <ul className="grid grid-flow-col gap-1 place-items-center border-muted rounded-md border p-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
@@ -106,10 +106,10 @@ function ScorerLayout() {
             <FullOverSummary overSummaries={overSummaries} />
           </div>
         </CardContent>
-
+        <Separator className="sm:my-4 my-6" />
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
-        <Separator className="sm:my-4 my-2" />
-        <CardFooter className="block px-0">
+        <Separator className="sm:my-4 my-6" />
+        <CardFooter className="max-sm:!p-0">
           <FooterSummary
             extras={extras}
             curOverRuns={curOverRuns}

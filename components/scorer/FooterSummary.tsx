@@ -10,7 +10,7 @@ function FooterSummary({
   extras: number;
 }) {
   return (
-    <div className="bg-muted text-primary w-full left-0 rounded-md flex items-center p-2">
+    <div className="bg-muted w-full text-lg text-muted-foreground rounded-md flex items-center p-4">
       <span>Extras: {extras}</span>
       <Separator
         orientation="vertical"

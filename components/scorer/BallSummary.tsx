@@ -28,7 +28,7 @@ function BallSummary({
         },
         size: {
           sm: "h-7 w-full min-w-7 text-sm",
-          default: "h-8 w-full min-w-10",
+          default: "h-10 w-full min-w-10",
         },
       },
       defaultVariants: { variant: "default" },
