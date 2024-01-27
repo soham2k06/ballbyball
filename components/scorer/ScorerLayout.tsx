@@ -95,7 +95,10 @@ function ScorerLayout() {
     <>
       <Card className="max-sm:w-full sm:w-96 max-sm:border-0 p-2 relative">
         <DangerActions
-          handleRestart={() => setBalls([])}
+          handleRestart={() => {
+            setBalls([]);
+            localStorage.removeItem("balls");
+          }}
           handleUndo={handleUndo}
         />
         <CardContent className="max-sm:p-0 space-y-4">
