@@ -52,7 +52,12 @@ function OverStats({
           {chartSummaryData.length > 0 ? (
             <div className="h-full max-w-7xl mx-auto">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart width={100} height={40} data={chartSummaryData}>
+                <BarChart
+                  width={100}
+                  height={40}
+                  data={chartSummaryData}
+                  margin={{ top: 20 }}
+                >
                   <XAxis dataKey="name" />
                   <Bar
                     dataKey="runs"
