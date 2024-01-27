@@ -7,7 +7,6 @@ import { calcRuns, calcWickets } from "@/lib/utils";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 
 import DangerActions from "./DangerActions";
 import ScoreWrapper from "./ScoreWrapper";
@@ -71,8 +70,9 @@ function ScorerLayout() {
 
   const overSummaries: EventType[][] = generateOverSummary(balls);
 
-  const chartSummaryData = overSummaries.map((summary) => ({
-    runs: summary.reduce((acc, cur) => acc + Number(cur), 0),
+  const chartSummaryData = overSummaries.map((summary, i) => ({
+    name: `Over ${i + 1}`,
+    runs: calcRuns(summary),
     wickets: summary.filter((ball) => ball === "-1").length,
   }));
 
@@ -96,21 +96,20 @@ function ScorerLayout() {
       <Card className="max-sm:w-full sm:w-96 border-0">
         <CardContent className="p-0">
           <ScoreWrapper runs={runs} wickets={wickets} totalBalls={totalBalls} />
-          <ul className="grid grid-flow-col gap-1 place-items-center border-muted rounded-md border p-2 overflow-x-auto">
+          <ul className="grid grid-flow-col gap-1 place-items-center border-muted rounded-md border p-2 overflow-x-auto mb-4">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
           </ul>
+          <div className="gap-2 flex">
+            <OverStats chartSummaryData={chartSummaryData} />
+            <FullOverSummary overSummaries={overSummaries} />
+          </div>
         </CardContent>
 
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
         <Separator className="sm:my-4 my-2" />
         <CardFooter className="block px-0">
-          <div className="gap-2 flex pb-6">
-            <OverStats chartSummaryData={chartSummaryData} />
-            <FullOverSummary overSummaries={overSummaries} />
-          </div>
-
           <FooterSummary
             extras={extras}
             curOverRuns={curOverRuns}
