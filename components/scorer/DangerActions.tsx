@@ -33,8 +33,8 @@ function DangerActions({
         <RestartButton
           onClick={() => {
             handleRestart();
-            setShowMenu(false);
           }}
+          handleCloseMenu={() => setShowMenu(false)}
         />
         <Button
           size="sm"
