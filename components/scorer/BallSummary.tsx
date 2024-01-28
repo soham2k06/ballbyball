@@ -27,7 +27,7 @@ function BallSummary({
           "-1": "bg-destructive text-destructive-foreground font-extrabold",
         },
         size: {
-          sm: "h-7 min-w-7 text-sm",
+          sm: "h-8 min-w-8 text-sm",
           default: "h-10 min-w-10",
         },
       },

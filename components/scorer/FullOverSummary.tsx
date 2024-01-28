@@ -35,13 +35,13 @@ function FullOverSummary({ overSummaries }: { overSummaries: EventType[][] }) {
                   key={overI}
                   className="flex gap-4 py-4 items-center first:pt-0"
                 >
-                  <div className="font-bold whitespace-nowrap min-w-28 flex gap-2">
+                  <div className="font-bold whitespace-nowrap min-w-24 flex gap-2 text-sm">
                     <h3>Over {overI + 1}</h3>
                     <span>
                       ({runs}/{wickets})
                     </span>
                   </div>
-                  <ul className="flex gap-2 overflow-x-auto">
+                  <ul className="flex gap-2 overflow-x-auto h-12 items-center">
                     {over.map((ball, ballI) => (
                       <BallSummary key={ballI} event={ball} size="sm" />
                     ))}
