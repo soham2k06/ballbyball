@@ -111,7 +111,7 @@ function ScorerLayout() {
             totalBalls={totalBalls}
             runRate={runRate as number}
           />
-          <ul className="flex gap-2 justify-start rounded-md overflow-x-auto w-fit">
+          <ul className="flex gap-2 justify-start overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
