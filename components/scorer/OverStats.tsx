@@ -31,7 +31,7 @@ function OverStats({
       <text
         x={x + width / 2}
         y={y - radius}
-        fill="#fff"
+        fill="hsl(var(--foreground))"
         textAnchor="middle"
         dominantBaseline="middle"
       >
