@@ -71,7 +71,12 @@ function OverStats({
                       opacity: 0.9,
                     }}
                   >
-                    <LabelList dataKey="runs" content={renderCustomizedLabel} />
+                    {chartSummaryData.length <= 15 && (
+                      <LabelList
+                        dataKey="runs"
+                        content={renderCustomizedLabel}
+                      />
+                    )}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
