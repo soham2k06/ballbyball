@@ -13,7 +13,7 @@ function ScoreWrapper({
 }) {
   return (
     <>
-      <h2 className="block text-center font-semibold text-9xl tabular-nums my-6">
+      <h2 className="block text-center font-semibold text-8xl tabular-nums my-6">
         {runs}/{wickets}
       </h2>
       <div className="opacity-50 flex items-center justify-center text-center text-xl">
