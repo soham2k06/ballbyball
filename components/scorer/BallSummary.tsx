@@ -60,7 +60,6 @@ function BallSummary({
   }
 
   if (event?.includes("-3")) summaryToShow = event?.replace("-3", "NB");
-  console.log(summaryToShow);
 
   return (
     <li
