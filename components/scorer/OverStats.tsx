@@ -21,7 +21,7 @@ function OverStats({
   runRate,
 }: {
   runRate: number;
-  chartSummaryData: { runs: number; wickets: number }[];
+  chartSummaryData: { runs: number }[];
 }) {
   const renderCustomizedLabel = (props: any) => {
     const { x, y, width, value } = props;

@@ -15,7 +15,7 @@ function FooterSummary({
   curOverWickets: number;
   extras: number;
   runRate: number;
-  chartSummaryData: { runs: number; wickets: number }[];
+  chartSummaryData: { runs: number }[];
   overSummaries: EventType[][];
 }) {
   return (

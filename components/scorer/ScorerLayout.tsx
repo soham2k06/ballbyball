@@ -76,7 +76,6 @@ function ScorerLayout() {
   const chartSummaryData = overSummaries.map((summary, i) => ({
     name: `Over ${i + 1}`,
     runs: calcRuns(summary),
-    wickets: summary.filter((ball) => ball === "-1").length,
   }));
 
   const curOverIndex = Math.floor(totalBalls / 6);
