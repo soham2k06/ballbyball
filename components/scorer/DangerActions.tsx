@@ -22,9 +22,9 @@ function DangerActions({
         <Button
           name="danger-actions"
           title="danger-actions"
-          className="absolute right-2 top-2 "
+          className="absolute right-2 top-2"
           size="icon"
-          variant="ghost"
+          variant="secondary"
         >
           <MoreVertical size={20} />
         </Button>
