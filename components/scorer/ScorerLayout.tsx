@@ -6,16 +6,14 @@ import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { EventType } from "@/types";
 import { calcRuns, calcWickets } from "@/lib/utils";
 
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 import DangerActions from "./DangerActions";
 import ScoreWrapper from "./ScoreWrapper";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
-import OverStats from "./OverStats";
 import FooterSummary from "./FooterSummary";
-import FullOverSummary from "./FullOverSummary";
 
 export const ballEvents: Record<string, string> = {
   "-3": "NB",
@@ -31,20 +29,20 @@ export const ballEvents: Record<string, string> = {
 
 function ScorerLayout() {
   const [balls, setBalls] = useState<EventType[]>(
-    JSON.parse((getCookie("balls") as string) || "[]") || []
+    JSON.parse((getCookie("balls") as string) || "[]") || [],
   );
   const invalidBalls = ["-3", "-2"];
 
   const runs = calcRuns(balls);
   const wickets = calcWickets(balls);
   const totalBalls = balls.filter(
-    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3")
+    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
   ).length;
 
   const runRate = totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0;
 
   const extras = balls.filter(
-    (ball) => ball === "-2" || ball.includes("-3")
+    (ball) => ball === "-2" || ball.includes("-3"),
   ).length;
 
   let ballLimitInOver = 6;
@@ -95,7 +93,7 @@ function ScorerLayout() {
 
   return (
     <>
-      <Card className="max-sm:w-full sm:w-96 max-sm:border-0 p-2 relative">
+      <Card className="relative p-2 max-sm:w-full max-sm:border-0 sm:w-96">
         <DangerActions
           handleRestart={() => {
             setBalls([]);
@@ -103,14 +101,14 @@ function ScorerLayout() {
           }}
           handleUndo={handleUndo}
         />
-        <CardContent className="max-sm:p-0 space-y-4">
+        <CardContent className="space-y-4 max-sm:p-0">
           <ScoreWrapper
             runs={runs}
             wickets={wickets}
             totalBalls={totalBalls}
             runRate={runRate as number}
           />
-          <ul className="flex gap-2 justify-start overflow-x-auto">
+          <ul className="flex justify-start gap-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
@@ -125,7 +123,7 @@ function ScorerLayout() {
             overSummaries={overSummaries}
           />
         </CardContent>
-        <Separator className="sm:my-4 my-4" />
+        <Separator className="my-4 sm:my-4" />
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
       </Card>
     </>
