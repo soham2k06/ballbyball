@@ -25,9 +25,9 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { useRouter } from "next/navigation";
 
-import LoadingButton from "../ui/loading-button";
+import LoadingButton from "../../../components/ui/loading-button";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -82,7 +82,7 @@ function AddPlayerFormDialog({ open, setOpen }: AddEditNoteDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="rounded-md bg-background p-4">
+      <DialogContent className="rounded-md p-4">
         <DialogHeader>
           <DialogTitle>Add Player</DialogTitle>
         </DialogHeader>

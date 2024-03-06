@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import { IBM_Plex_Sans } from "next/font/google";
+import { cn } from "@/lib/utils";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
 
-import { ClerkProvider } from "@clerk/nextjs";
-import Nav from "@/components/Nav";
+const IBMPlex = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ibm-plex",
+});
 
 export const metadata: Metadata = {
   title: "Ball By Ball | Your cricket partner",
@@ -83,22 +88,8 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <head>
-          <link
-            rel="icon"
-            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎾</text></svg>"
-          />
-        </head>
-        <body>
-          <ThemeProvider
-            attribute="class"
-            enableSystem
-            defaultTheme="system"
-            disableTransitionOnChange
-          >
-            <Nav />
-            <main className="mx-auto max-w-7xl md:h-dvh">{children}</main>
-          </ThemeProvider>
+        <body className={cn("font-IBMPlex antialiased", IBMPlex.variable)}>
+          {children}
         </body>
       </html>
     </ClerkProvider>

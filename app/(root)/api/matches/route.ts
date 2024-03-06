@@ -1,37 +1,37 @@
 import prisma from "@/lib/db/prisma";
+import { createMatchSchema } from "@/lib/validation/match";
 import {
-  createPlayerSchema,
   deletePlayerSchema,
   updatePlayerSchema,
 } from "@/lib/validation/player";
 import { auth } from "@clerk/nextjs";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const parsedRes = createPlayerSchema.safeParse(body);
+    const parsedRes = createMatchSchema.safeParse(body);
 
     if (!parsedRes.success) {
-      console.error(parsedRes.error);
-      return Response.json({ error: "Invalid input" }, { status: 400 });
+      console.error("Error Parsing JSON ----->", parsedRes.error);
+      return NextResponse.json({ error: "Invalid inputs" });
     }
 
-    const { name, image, desc } = parsedRes.data;
+    const { name, teamIds } = parsedRes.data;
 
     const { userId } = auth();
     if (!userId)
       return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-    const note = await prisma.player.create({
+    const match = await prisma.match.create({
       data: {
         userId,
-        desc,
         name,
-        image,
+        teamIds: { set: teamIds! },
       },
     });
 
-    return Response.json({ note }, { status: 201 });
+    return NextResponse.json({ match });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

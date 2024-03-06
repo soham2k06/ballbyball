@@ -48,14 +48,14 @@ function OverStats({
         </Button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader className="pt-6 pb-4 mb-2 ">
-          <DrawerTitle className="text-2xl text-center">
+        <DrawerHeader className="mb-2 pb-4 pt-6 ">
+          <DrawerTitle className="text-center text-2xl">
             CRR: {runRate}
           </DrawerTitle>
         </DrawerHeader>
         <div className="h-96 p-2">
           {chartSummaryData.length > 0 ? (
-            <div className="h-full max-w-7xl mx-auto">
+            <div className="mx-auto h-full max-w-7xl">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   width={100}
@@ -82,7 +82,7 @@ function OverStats({
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-2">
+            <div className="flex h-full flex-col items-center justify-center space-y-2 text-center">
               <h2 className="text-2xl font-bold">There is no data to show!</h2>
               <p>Start adding runs to see data</p>
             </div>

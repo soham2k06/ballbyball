@@ -8,13 +8,41 @@ datasource db {
 }
 
 model Player {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String
-  image String?
-  name String?
-  desc String?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  image     String?
+  name      String?
+  desc      String?
   isCaptain Boolean? @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  teamId    String?  @db.ObjectId
+
   @@map("players")
+}
+
+model Match {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  name      String
+  teamIds   String[] @db.ObjectId
+  // desc      String?
+  // date      DateTime?
+  // time      DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("matches")
+}
+
+model Team {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  name      String
+  playerIds String[] @db.ObjectId
+  matchId   String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("teams")
 }
