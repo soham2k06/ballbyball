@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
+import MatchList from "@/components/match/MatchList";
+import StartMatchButton from "@/components/match/StartMatch";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Matches - Ball By Ball",
@@ -15,9 +15,7 @@ function page() {
       </h2>
       <p>Start adding matches. They will be saved here.</p>
 
-      <Link href="/start-a-match">
-        <Button>Start a match</Button>
-      </Link>
+      <MatchList />
     </div>
   );
 }

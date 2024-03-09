@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         captain,
       },
     });
-    return NextResponse.json({ team });
+    return NextResponse.json({ team }, { status: 201 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

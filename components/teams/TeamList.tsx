@@ -33,12 +33,9 @@ function TeamList() {
         {teams.map((team, i) => {
           const players = playersArr?.[i].map((player) => player);
           const captainIndex = players?.findIndex(
-            (player, playerI) => player.id === team.captain,
+            (player) => player.id === team.captain,
           );
 
-          console.log(
-            players?.findIndex((player) => player.id === team.captain),
-          );
           return (
             <Card>
               <CardHeader>

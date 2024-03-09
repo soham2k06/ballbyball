@@ -1,9 +1,9 @@
+import { CreateMatchSchema } from "@/lib/validation/match";
 import { axiosInstance } from "../axiosInstance";
-import { CreateTeamSchema } from "@/lib/validation/team";
 
-export const createTeam = async (data: CreateTeamSchema) => {
+export const createMatch = async (data: CreateMatchSchema) => {
   try {
-    const res = await axiosInstance.post("/teams", data);
+    const res = await axiosInstance.post("/matches", data);
 
     if (res.status !== 201) {
       throw new Error("Network response was not ok");
@@ -11,7 +11,7 @@ export const createTeam = async (data: CreateTeamSchema) => {
 
     return res.data;
   } catch (error) {
-    console.error("Error while creating a team:", error);
+    console.error("Error while creating a Match:", error);
     throw new Error((error as Error).message);
   }
 };

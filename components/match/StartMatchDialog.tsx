@@ -16,44 +16,31 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
-import { CreateTeamSchema, createTeamSchema } from "@/lib/validation/team";
 import { OverlayStateProps } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Checkbox } from "../ui/checkbox";
-import { useAllPlayers } from "@/hooks/api/player/useAllPlayers";
-import { useCreateTeam } from "@/hooks/api/team/useCreateTeam";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { useAllTeams } from "@/hooks/api/team/useAllTeams";
+import { CreateMatchSchema, createMatchSchema } from "@/lib/validation/match";
+import { useCreateMatch } from "@/hooks/api/match/useCreateMatch";
 
-function AddTeamFormDialog({ open, setOpen }: OverlayStateProps) {
-  const form = useForm<CreateTeamSchema>({
-    resolver: zodResolver(createTeamSchema),
+function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
+  const form = useForm<CreateMatchSchema>({
+    resolver: zodResolver(createMatchSchema),
     defaultValues: {
       name: "",
-      playerIds: [],
-      captain: "",
+      teamIds: [],
     },
   });
 
+  const { allTeams: teams } = useAllTeams();
+
   const { handleSubmit, control, watch, reset } = form;
-  const { createTeam, isPending } = useCreateTeam();
+  const { createMatch, isPending } = useCreateMatch();
 
-  const { players } = useAllPlayers();
-
-  const watchedPlayerIds = watch("playerIds");
-  const selectedPlayers = players?.filter(({ id }) =>
-    watchedPlayerIds.includes(id),
-  );
-
-  function onSubmit(data: CreateTeamSchema) {
+  function onSubmit(data: CreateMatchSchema) {
     console.log(data);
-    createTeam(data, {
+    createMatch(data, {
       onSuccess: () => {
         reset();
         setOpen(false);
@@ -78,7 +65,7 @@ function AddTeamFormDialog({ open, setOpen }: OverlayStateProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Team name" {...field} />
+                    <Input placeholder="Match name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -87,20 +74,20 @@ function AddTeamFormDialog({ open, setOpen }: OverlayStateProps) {
 
             <FormField
               control={form.control}
-              name="playerIds"
+              name="teamIds"
               render={() => (
                 <FormItem>
                   <div className="mb-4">
-                    <FormLabel className="text-base">Players</FormLabel>
+                    <FormLabel className="text-base">Teams</FormLabel>
                     <FormDescription>
-                      Select the players from your collection
+                      Select the temas from your collection
                     </FormDescription>
                   </div>
-                  {players?.map((item) => (
+                  {teams?.map((item) => (
                     <FormField
                       key={item.id}
                       control={form.control}
-                      name="playerIds"
+                      name="teamIds"
                       render={({ field }) => {
                         return (
                           <FormItem
@@ -134,39 +121,6 @@ function AddTeamFormDialog({ open, setOpen }: OverlayStateProps) {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="captain"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Captain (Optional)</FormLabel>
-
-                  <Select
-                    onValueChange={field.onChange}
-                    disabled={!selectedPlayers?.length}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select the captain of your team" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {selectedPlayers?.length ? (
-                        selectedPlayers?.map(({ id, name }) => (
-                          <SelectItem value={id}>{name}</SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="disabled" disabled>
-                          Select players to choose a captain
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <DialogFooter>
               <LoadingButton
                 type="submit"
@@ -183,4 +137,4 @@ function AddTeamFormDialog({ open, setOpen }: OverlayStateProps) {
   );
 }
 
-export default AddTeamFormDialog;
+export default StartMatchDialog;

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createMatchSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   desc: z.string().optional(),
-  teamIds: z.array(z.string()).nullable(),
+  teamIds: z.array(z.string()).min(2, { message: "Select exact two teams" }),
   date: z.date().optional(),
   time: z.date().optional(),
 });
