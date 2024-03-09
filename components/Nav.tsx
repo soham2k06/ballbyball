@@ -14,7 +14,7 @@ function Nav() {
   if (blankRoutes.includes(pathName)) return null;
 
   return (
-    <nav className="border-b py-4 max-xl:p-4 max-sm:hidden">
+    <nav className="border-b py-4 max-xl:p-4">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link href="/">
           <h1 className="text-2xl font-semibold tracking-tighter">

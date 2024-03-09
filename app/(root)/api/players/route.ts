@@ -6,18 +6,26 @@ import {
 } from "@/lib/validation/player";
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
+import { toast } from "sonner";
 
 export async function GET() {
   try {
     const { userId } = auth();
-    const players = await prisma.player.findMany({});
 
-    console.log(players);
+    if (!userId) {
+      toast.error("User Unauthorized");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const players = await prisma.player.findMany({ where: { userId } });
 
     return NextResponse.json(players, { status: 200 });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -28,25 +36,28 @@ export async function POST(req: NextRequest) {
 
     if (!parsedRes.success) {
       console.error(parsedRes.error);
-      return Response.json({ error: "Invalid input" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const { name, image, desc } = parsedRes.data;
+    const { name } = parsedRes.data;
     const { userId } = auth();
     if (!userId)
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const player = await prisma.player.create({
       data: {
         userId,
-        desc,
         name,
-        image,
       },
     });
-    return Response.json({ player }, { status: 201 });
+
+    return NextResponse.json({ player }, { status: 201 });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -60,7 +71,7 @@ export async function PUT(req: Request) {
       return Response.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const { id, name, isCaptain, desc, image } = parsedRes.data;
+    const { id, name } = parsedRes.data;
 
     const player = await prisma.player.findUnique({ where: { id } });
 
@@ -75,9 +86,6 @@ export async function PUT(req: Request) {
       data: {
         name,
         userId,
-        isCaptain,
-        desc,
-        image,
       },
     });
   } catch (error) {

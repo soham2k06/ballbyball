@@ -1,8 +1,9 @@
+import { cn } from "@/lib/utils";
 import React, { ReactNode } from "react";
 
-interface TypographyProps {
+type TypographyProps = {
   children: ReactNode;
-}
+} & React.HTMLAttributes<HTMLParagraphElement>;
 
 function TypographyH1({ children }: TypographyProps) {
   return (
@@ -36,8 +37,12 @@ function TypographyH4({ children }: TypographyProps) {
   );
 }
 
-function TypographyP({ children }: TypographyProps) {
-  return <p className="leading-7 [&:not(:first-child)]:mt-6">{children}</p>;
+function TypographyP({ children, className }: TypographyProps) {
+  return (
+    <p className={cn("leading-7 [&:not(:first-child)]:mt-6", className)}>
+      {children}
+    </p>
+  );
 }
 
 export { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP };

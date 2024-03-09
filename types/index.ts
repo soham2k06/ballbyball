@@ -1,9 +1,8 @@
-import type { Match, Player, Team } from "@prisma/client";
+import { Dispatch, SetStateAction } from "react";
 
 export type EventType = "0" | "1" | "2" | "4" | "6" | "-1" | "-2" | "-3";
 
-export type IPLayer = Player;
-
-export type ITeam = Team;
-
-export type IMatch = Match;
+export type OverlayStateProps = {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+};

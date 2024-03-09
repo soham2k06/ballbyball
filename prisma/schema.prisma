@@ -13,10 +13,8 @@ model Player {
   image     String?
   name      String?
   desc      String?
-  isCaptain Boolean? @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  teamId    String?  @db.ObjectId
 
   @@map("players")
 }
