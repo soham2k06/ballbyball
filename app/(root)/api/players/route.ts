@@ -19,7 +19,7 @@ export async function GET() {
 
     const players = await prisma.player.findMany({ where: { userId } });
 
-    return NextResponse.json(players, { status: 201 });
+    return NextResponse.json(players, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
