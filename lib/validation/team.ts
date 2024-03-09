@@ -13,7 +13,8 @@ export const TeamSchema = z.object({
 
 export const createTeamSchema = z.object({
   name: z.string(),
-  playerIds: z.array(z.string()).nullable(),
+  playerIds: z.array(z.string()).refine((value) => value.some((item) => item)),
+  captain: z.string(),
 });
 
 export type CreateTeamSchema = z.infer<typeof createTeamSchema>;

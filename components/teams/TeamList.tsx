@@ -1,9 +1,8 @@
 "use client";
 
 import CreateTeam from "@/components/teams/CreateTeam";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TypographyH3, TypographyP } from "@/components/ui/typography";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TypographyP } from "@/components/ui/typography";
 import { useAllTeams } from "@/hooks/api/team/useAllTeams";
 
 import { LoaderIcon } from "lucide-react";
@@ -12,7 +11,7 @@ import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
 function TeamList() {
   const { allTeams: teams, isFetching } = useAllTeams();
 
-  const { players, arePlayerFetching } = usePlayersByIds(
+  const { players: playersArr, arePlayerFetching } = usePlayersByIds(
     teams?.map((team) => team.playerIds)!,
   );
 
@@ -27,48 +26,36 @@ function TeamList() {
     throw new Error("Team Not Found");
   }
 
-  const team1Players = players?.[0].map((player) => player);
-  const team2Players = players?.[1].map((player) => player);
-
   return (
-    <>
-      {teams.length ? (
-        <Tabs defaultValue="team1" className="w-[400px]">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="team1">{teams[0].name}</TabsTrigger>
-            <TabsTrigger value="team2">{teams[1].name}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="team1">
-            <Card>
-              <CardHeader>
-                <CardContent>
-                  <TypographyH3>{teams[0].name}</TypographyH3>
-                  {team1Players?.map(({ id, name }) => (
-                    <TypographyP key={id}>{name}</TypographyP>
-                  ))}
-                </CardContent>
-              </CardHeader>
-            </Card>
-          </TabsContent>
-          <TabsContent value="team2">
-            <Card>
-              <CardHeader>
-                <CardContent>
-                  <TypographyH3>{teams[1].name}</TypographyH3>
-                  {team2Players?.map(({ id, name }) => (
-                    <TypographyP key={id}>{name}</TypographyP>
-                  ))}
-                </CardContent>
-              </CardHeader>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <div>No teams to show</div>
-      )}
-
+    <div>
       <CreateTeam />
-    </>
+      <ul className="flex gap-4">
+        {teams.map((team, i) => {
+          const players = playersArr?.[i].map((player) => player);
+          const captainIndex = players?.findIndex(
+            (player, playerI) => player.id === team.captain,
+          );
+
+          console.log(
+            players?.findIndex((player) => player.id === team.captain),
+          );
+          return (
+            <Card>
+              <CardHeader>
+                <CardTitle>{team.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {players?.map(({ name }, playerIndex) => (
+                  <TypographyP>
+                    {name} {captainIndex === playerIndex && "(C)"}
+                  </TypographyP>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 

@@ -25,18 +25,19 @@ export async function POST(req: NextRequest) {
 
     if (!parsedRes.success) {
       console.error(parsedRes.error);
-      return Response.json({ error: "Invalid input" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const { name, playerIds } = parsedRes.data;
+    const { name, playerIds, captain } = parsedRes.data;
     const { userId } = auth();
     if (!userId)
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const team = await prisma.team.create({
       data: {
         userId,
         name,
-        playerIds: { set: playerIds! },
+        playerIds,
+        captain,
       },
     });
     return NextResponse.json({ team });

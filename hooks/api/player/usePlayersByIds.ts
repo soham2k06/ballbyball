@@ -12,7 +12,7 @@ export function usePlayersByIds(ids: Player["id"][][]) {
   } = useQuery({
     queryKey: ["playersByIds", ids],
     queryFn: () => getPlayersByIds(ids),
-    enabled: ids && !!ids.length && ids.some((id) => !id),
+    enabled: ids && !!ids.length && ids.some((id) => !!id),
   });
 
   if (playersError) throw new Error(playersError.message);
