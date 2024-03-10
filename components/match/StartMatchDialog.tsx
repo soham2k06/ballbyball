@@ -35,7 +35,7 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
 
   const { allTeams: teams } = useAllTeams();
 
-  const { handleSubmit, control, watch, reset } = form;
+  const { handleSubmit, control, reset } = form;
   const { createMatch, isPending } = useCreateMatch();
 
   function onSubmit(data: CreateMatchSchema) {

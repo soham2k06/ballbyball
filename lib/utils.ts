@@ -1,7 +1,5 @@
 import { EventType } from "@/types";
 import { type ClassValue, clsx } from "clsx";
-import { NextResponse } from "next/server";
-import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 // ** FRONTEND ** //

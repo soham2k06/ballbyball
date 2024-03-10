@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import { createTeamSchema, updateTeamSchema } from "@/lib/validation/team";
+import { createTeamSchema } from "@/lib/validation/team";
 
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";

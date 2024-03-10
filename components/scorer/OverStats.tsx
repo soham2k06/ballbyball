@@ -1,11 +1,4 @@
-import {
-  Bar,
-  BarChart,
-  LabelList,
-  Legend,
-  ResponsiveContainer,
-  XAxis,
-} from "recharts";
+import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis } from "recharts";
 import { Button } from "../ui/button";
 import {
   Drawer,
