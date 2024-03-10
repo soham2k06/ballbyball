@@ -1,7 +1,5 @@
 "use client";
 
-import { deleteCookie } from "cookies-next";
-
 import { EventType } from "@/types";
 import { calcRuns, calcWickets, cn } from "@/lib/utils";
 
@@ -18,6 +16,7 @@ import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
 import { useCreateBallEvent } from "@/hooks/api/ballEvent/useCreateBallEvent";
 import { Loader } from "lucide-react";
 import { useUndoBallEvent } from "@/hooks/api/ballEvent/useUndoBallEvent";
+import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -31,12 +30,14 @@ export const ballEvents: Record<BallEvent["type"], string> = {
   "6": "6",
 };
 
-function ScorerLayout({ matchId }: { matchId?: string }) {
+function ScorerLayout({ matchId }: { matchId: string }) {
   const { events, isFetching } = useEventsById("65ec91c16bf73a7fd38346cd");
+
   const balls = events?.map((event) => event.type as EventType);
 
   const { createBallEvent, isPending } = useCreateBallEvent();
   const { undoBallEvent } = useUndoBallEvent();
+  const { deleteAllBallEvents } = useDeleteAllBallEvents();
 
   if (!balls) return <p>loading...</p>;
 
@@ -48,7 +49,7 @@ function ScorerLayout({ matchId }: { matchId?: string }) {
     (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
   ).length;
 
-  const runRate = totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0;
+  const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
 
   const extras = balls.filter(
     (ball) => ball === "-2" || ball.includes("-3"),
@@ -95,15 +96,11 @@ function ScorerLayout({ matchId }: { matchId?: string }) {
       type: event,
       batsmanId: "65ec3e4d9c8d41462b3505b8",
       bowlerId: "65ec3e4d9c8d41462b3505be",
-      matchId: matchId!,
+      matchId,
     });
   }
 
-  const handleUndo = () => {
-    undoBallEvent(matchId!);
-    // setBalls((prev) => prev.slice(0, -1));
-    // setCookie("balls", JSON.stringify(balls.slice(0, -1)));
-  };
+  const handleUndo = () => undoBallEvent(matchId!);
 
   return (
     <>
@@ -114,10 +111,7 @@ function ScorerLayout({ matchId }: { matchId?: string }) {
           })}
         />
         <DangerActions
-          handleRestart={() => {
-            // setBalls([]);
-            deleteCookie("balls");
-          }}
+          handleRestart={() => deleteAllBallEvents(matchId)}
           handleUndo={handleUndo}
         />
         <CardContent className="space-y-4 max-sm:p-0">
@@ -125,7 +119,7 @@ function ScorerLayout({ matchId }: { matchId?: string }) {
             runs={runs}
             wickets={wickets}
             totalBalls={totalBalls}
-            runRate={runRate as number}
+            runRate={runRate}
           />
           <ul className="flex justify-start gap-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
@@ -137,7 +131,7 @@ function ScorerLayout({ matchId }: { matchId?: string }) {
             extras={extras}
             curOverRuns={curOverRuns}
             curOverWickets={curOverWickets}
-            runRate={runRate as number}
+            runRate={runRate}
             chartSummaryData={chartSummaryData}
             overSummaries={overSummaries}
           />
