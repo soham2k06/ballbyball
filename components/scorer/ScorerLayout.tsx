@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { deleteCookie, getCookie, setCookie } from "cookies-next";
+import { deleteCookie } from "cookies-next";
 
 import { EventType } from "@/types";
-import { calcRuns, calcWickets } from "@/lib/utils";
+import { calcRuns, calcWickets, cn } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -14,8 +13,13 @@ import ScoreWrapper from "./ScoreWrapper";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
 import FooterSummary from "./FooterSummary";
+import { BallEvent } from "@prisma/client";
+import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
+import { useCreateBallEvent } from "@/hooks/api/ballEvent/useCreateBallEvent";
+import { Loader } from "lucide-react";
+import { useUndoBallEvent } from "@/hooks/api/ballEvent/useUndoBallEvent";
 
-export const ballEvents: Record<string, string> = {
+export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
   "-2": "WD",
   "-1": "W",
@@ -27,10 +31,15 @@ export const ballEvents: Record<string, string> = {
   "6": "6",
 };
 
-function ScorerLayout() {
-  const [balls, setBalls] = useState<EventType[]>(
-    JSON.parse((getCookie("balls") as string) || "[]") || [],
-  );
+function ScorerLayout({ matchId }: { matchId?: string }) {
+  const { events, isFetching } = useEventsById("65ec91c16bf73a7fd38346cd");
+  const balls = events?.map((event) => event.type as EventType);
+
+  const { createBallEvent, isPending } = useCreateBallEvent();
+  const { undoBallEvent } = useUndoBallEvent();
+
+  if (!balls) return <p>loading...</p>;
+
   const invalidBalls = ["-3", "-2"];
 
   const runs = calcRuns(balls);
@@ -72,7 +81,7 @@ function ScorerLayout() {
   const overSummaries: EventType[][] = generateOverSummary(balls);
 
   const chartSummaryData = overSummaries.map((summary, i) => ({
-    name: `Over ${i + 1}`,
+    name: i < 9 ? `Over ${i + 1}` : i + 1,
     runs: calcRuns(summary),
   }));
 
@@ -82,21 +91,31 @@ function ScorerLayout() {
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     const event = e.currentTarget.value;
-    setBalls((prev) => [...prev, event as EventType]);
-    setCookie("balls", JSON.stringify([...balls, event]));
+    createBallEvent({
+      type: event,
+      batsmanId: "65ec3e4d9c8d41462b3505b8",
+      bowlerId: "65ec3e4d9c8d41462b3505be",
+      matchId: matchId!,
+    });
   }
 
   const handleUndo = () => {
-    setBalls((prev) => prev.slice(0, -1));
-    setCookie("balls", JSON.stringify(balls.slice(0, -1)));
+    undoBallEvent(matchId!);
+    // setBalls((prev) => prev.slice(0, -1));
+    // setCookie("balls", JSON.stringify(balls.slice(0, -1)));
   };
 
   return (
     <>
       <Card className="relative p-2 max-sm:w-full max-sm:border-0 sm:w-96">
+        <Loader
+          className={cn("invisible absolute", {
+            "visible animate-spin": isPending,
+          })}
+        />
         <DangerActions
           handleRestart={() => {
-            setBalls([]);
+            // setBalls([]);
             deleteCookie("balls");
           }}
           handleUndo={handleUndo}

@@ -45,3 +45,16 @@ model Team {
 
   @@map("teams")
 }
+
+model BallEvent {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  matchId   String   @db.ObjectId
+  batsmanId String   @db.ObjectId
+  bowlerId  String   @db.ObjectId
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ballEvents")
+}

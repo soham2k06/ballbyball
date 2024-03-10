@@ -10,8 +10,6 @@ export async function GET(
   try {
     const { userId } = auth();
 
-    console.log(id);
-
     if (!userId) {
       toast.error("User Unauthorized");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
