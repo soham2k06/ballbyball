@@ -6,7 +6,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import { type ThemeProviderProps } from "next-themes/dist/types";
 import { Toaster } from "./ui/sonner";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 interface ProviderProps extends ThemeProviderProps {}
@@ -25,8 +24,6 @@ export function Provider({ children, ...props }: ProviderProps) {
   });
 
   const [queryClientState] = useState(() => queryClient);
-
-  const pathName = usePathname();
 
   return (
     <QueryClientProvider client={queryClientState}>
