@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 import { Button, ButtonProps } from "./button";
 
 type LoadingButtonProps = {
@@ -8,7 +8,7 @@ type LoadingButtonProps = {
 function LoadingButton({ children, loading, ...props }: LoadingButtonProps) {
   return (
     <Button {...props} disabled={props.disabled || loading}>
-      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {children}
+      {loading && <Loader className="mr-2 h-4 w-4 animate-spin" />} {children}
     </Button>
   );
 }
