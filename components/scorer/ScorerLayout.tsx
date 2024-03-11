@@ -14,13 +14,13 @@ import FooterSummary from "./FooterSummary";
 import { BallEvent } from "@prisma/client";
 import { useSaveBallEvents } from "@/hooks/api/ballEvent/useCreateBallEvent";
 import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
-import BatsmanScores from "./BatsmanScores";
-import BowlerScores from "./BowlerScores";
 import { useEffect, useState } from "react";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import LoadingButton from "../ui/loading-button";
 import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
 import { toast } from "sonner";
+import { useMatchById } from "@/hooks/api/match/usePlayerById";
+import SelectBatsman from "../players-selection/SelectBatsman";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -37,20 +37,7 @@ export const ballEvents: Record<BallEvent["type"], string> = {
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { events: fetchedEvents } = useEventsById(matchId);
 
-  const curPlayerIds = [
-    {
-      id: "65ec3e4d9c8d41462b3505b8",
-      type: "batsman",
-    },
-    {
-      id: "65ec3e4d9c8d41462b3505b9",
-      type: "batsman",
-    },
-    {
-      id: "65ec3e4d9c8d41462b3505be",
-      type: "bowler",
-    },
-  ];
+  const { match } = useMatchById(matchId);
 
   const { createBallEvent, isPending } = useSaveBallEvents();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
@@ -129,23 +116,26 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const curOverWickets = calcWickets(overSummaries[curOverIndex]);
 
   function handleStrikeChange(ballEventType: EventType) {
-    const strikeChangers = ["1", "3", "-4"];
+    const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without run
     if (strikeChangers.includes(ballEventType)) changeStrike();
   }
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     setIsModified(true);
     const event = e.currentTarget.value;
-    setEvents([
-      ...events,
-      {
-        type: event,
-        batsmanId: curPlayerIds[onStrikeBatsman].id,
-        bowlerId: curPlayerIds[2].id,
-        matchId,
-      },
-    ]);
-    handleStrikeChange(event as EventType);
+    // setEvents([
+    //   ...events,
+    //   {
+    //     type: event,
+    //     batsmanId: curPlayers?.[onStrikeBatsman].id!,
+    //     bowlerId: curPlayers?.[2].id!,
+    //     matchId,
+    //   },
+    // ]);
+
+    handleStrikeChange(
+      (event.includes("-3") ? event.slice(-1) : event) as EventType,
+    );
   }
 
   const handleUndo = () => setEvents(events.slice(0, -1));
@@ -186,11 +176,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             ))}
           </ul>
 
-          <BatsmanScores
+          {/* <BatsmanScores
             onStrikeBatsman={onStrikeBatsman}
-            playerIds={curPlayerIds.map(({ id }) => id)}
+            playerIds={curPlayers?.map(({ id }) => id)!}
             events={events as BallEvent[]}
-          />
+          /> */}
 
           <FooterSummary
             extras={extras}
@@ -204,10 +194,13 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         <Separator className="my-4 sm:my-4" />
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
         <Separator className="my-4 sm:my-4" />
-        <BowlerScores
+        {/* <BowlerScores
           playerId={events[0]?.bowlerId!}
           events={events as BallEvent[]}
-        />
+        /> */}
+
+        {/* {!curPlayers?.length && <SelectBatsman />} */}
+        {<SelectBatsman match={match!} />}
       </Card>
     </>
   );
