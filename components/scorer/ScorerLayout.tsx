@@ -37,6 +37,21 @@ export const ballEvents: Record<BallEvent["type"], string> = {
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { events: fetchedEvents } = useEventsById(matchId);
 
+  const curPlayerIds = [
+    {
+      id: "65ec3e4d9c8d41462b3505b8",
+      type: "batsman",
+    },
+    {
+      id: "65ec3e4d9c8d41462b3505b9",
+      type: "batsman",
+    },
+    {
+      id: "65ec3e4d9c8d41462b3505be",
+      type: "bowler",
+    },
+  ];
+
   const { createBallEvent, isPending } = useSaveBallEvents();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
 
@@ -45,22 +60,31 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   );
   const [isModified, setIsModified] = useState(false);
 
+  const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
+
+  const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));
+
   useEffect(() => {
     setEvents(fetchedEvents as BallEvent[]);
   }, [fetchedEvents]);
 
-  if (!fetchedEvents) return <p>loading...</p>;
   const balls = events?.map((event) => event.type as EventType);
 
-  if (!balls) return <p>loading balls...</p>;
-
   const invalidBalls = ["-3", "-2"];
+  const totalBalls = balls?.filter(
+    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
+  ).length;
+
+  useEffect(() => {
+    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
+
+    if (isLastBallOfOver) changeStrike();
+  }, [fetchedEvents, totalBalls]);
+
+  if (!fetchedEvents || !balls) return <p>loading...</p>;
 
   const runs = calcRuns(balls);
   const wickets = calcWickets(balls);
-  const totalBalls = balls.filter(
-    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
-  ).length;
 
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
 
@@ -69,6 +93,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   ).length;
 
   let ballLimitInOver = 6;
+
   function generateOverSummary(ballEvents: EventType[]) {
     const overSummaries: EventType[][] = [];
     let validBallCount = 0;
@@ -103,6 +128,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const curOverRuns = calcRuns(overSummaries[curOverIndex]);
   const curOverWickets = calcWickets(overSummaries[curOverIndex]);
 
+  function handleStrikeChange(ballEventType: EventType) {
+    const strikeChangers = ["1", "3", "-4"];
+    if (strikeChangers.includes(ballEventType)) changeStrike();
+  }
+
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     setIsModified(true);
     const event = e.currentTarget.value;
@@ -110,16 +140,15 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       ...events,
       {
         type: event,
-        batsmanId: "65ec3e4d9c8d41462b3505b8",
-        bowlerId: "65ec3e4d9c8d41462b3505be",
+        batsmanId: curPlayerIds[onStrikeBatsman].id,
+        bowlerId: curPlayerIds[2].id,
         matchId,
       },
     ]);
+    handleStrikeChange(event as EventType);
   }
 
-  const handleUndo = () => {
-    setEvents(events.slice(0, -1));
-  };
+  const handleUndo = () => setEvents(events.slice(0, -1));
 
   return (
     <>
@@ -158,7 +187,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           </ul>
 
           <BatsmanScores
-            playerId={events?.[0]?.batsmanId!}
+            onStrikeBatsman={onStrikeBatsman}
+            playerIds={curPlayerIds.map(({ id }) => id)}
             events={events as BallEvent[]}
           />
 

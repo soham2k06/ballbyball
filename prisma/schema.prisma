@@ -20,15 +20,17 @@ model Player {
 }
 
 model Match {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
-  name      String
-  teamIds   String[] @db.ObjectId
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String
+  name         String
+  teamIds      String[] @db.ObjectId
+  overs        Int
+  curPlayerIds String[] @db.ObjectId
   // desc      String?
   // date      DateTime?
   // time      DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("matches")
 }
