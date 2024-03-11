@@ -16,7 +16,10 @@ import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
 import { useCreateBallEvent } from "@/hooks/api/ballEvent/useCreateBallEvent";
 import { Loader } from "lucide-react";
 import { useUndoBallEvent } from "@/hooks/api/ballEvent/useUndoBallEvent";
+import { usePlayerById } from "@/hooks/api/player/usePlayerById";
 import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
+import BatsmanScores from "./BatsmanScores";
+import BowlerScores from "./BowlerScores";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -31,7 +34,7 @@ export const ballEvents: Record<BallEvent["type"], string> = {
 };
 
 function ScorerLayout({ matchId }: { matchId: string }) {
-  const { events, isFetching } = useEventsById("65ec91c16bf73a7fd38346cd");
+  const { events } = useEventsById(matchId);
 
   const balls = events?.map((event) => event.type as EventType);
 
@@ -127,6 +130,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             ))}
           </ul>
 
+          <BatsmanScores playerId={events?.[0]?.batsmanId!} events={events!} />
+
           <FooterSummary
             extras={extras}
             curOverRuns={curOverRuns}
@@ -138,6 +143,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         </CardContent>
         <Separator className="my-4 sm:my-4" />
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
+        <Separator className="my-4 sm:my-4" />
+        <BowlerScores playerId={events?.[0].bowlerId!} events={events!} />
       </Card>
     </>
   );

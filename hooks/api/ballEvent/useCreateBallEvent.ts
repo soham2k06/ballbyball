@@ -8,6 +8,7 @@ export function useCreateBallEvent() {
   const { mutate: createBallEvent, isPending } = useMutation({
     mutationFn: createBallEventAPI,
     onSuccess: () => {
+      // TODO: Add player cur score query key here
       queryClient.invalidateQueries({ queryKey: ["eventsByMatchId"] });
     },
     onError: (err) => toast.error(err.message),

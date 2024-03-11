@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 export async function GET(
-  _: any,
+  _: unknown,
   { params: { matchId } }: { params: { matchId: string } },
 ) {
   try {
@@ -21,7 +21,7 @@ export async function GET(
 }
 
 export async function DELETE(
-  _: any,
+  _: unknown,
   { params: { matchId } }: { params: { matchId: string } },
 ) {
   try {

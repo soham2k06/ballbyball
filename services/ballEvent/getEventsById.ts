@@ -1,4 +1,4 @@
-import { Match } from "@prisma/client";
+import { BallEvent, Match } from "@prisma/client";
 import { axiosInstance } from "../axiosInstance";
 
 export const getEventsById = async (id: Match["id"] | null | undefined) => {
@@ -9,7 +9,7 @@ export const getEventsById = async (id: Match["id"] | null | undefined) => {
     if (res.status !== 200) {
       throw new Error("Network response was not ok");
     }
-    return res.data as Event[];
+    return res.data as BallEvent[];
   } catch (error) {
     console.error("Error while fetching a ball events:", error);
     throw new Error((error as Error).message);

@@ -12,17 +12,21 @@ export function cn(...inputs: ClassValue[]) {
 // If event is no ball(-3), add run came from no ball and 1 run for no ball
 // Else return an event and ensure to convert wide(-2) to 1 run
 // Sum all the runs
-export const calcRuns = (ballEvents: EventType[]) =>
+export const calcRuns = (
+  ballEvents: EventType[] | string[],
+  forPlayer?: boolean,
+  isBowling?: boolean,
+) =>
   ballEvents
     ?.filter((ball) => ball !== "-1")
     ?.map((event) =>
       event.includes("-3")
-        ? (Number(event.slice(2)) + 1).toString()
+        ? (Number(event.slice(2)) + Number(!forPlayer)).toString()
         : event.replace("-2", "1"),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
-export const calcWickets = (ballEvents: EventType[]) =>
+export const calcWickets = (ballEvents: EventType[] | string[]) =>
   ballEvents?.filter((ball) => ball === "-1").length;
 
 export const truncStr = (str: string, n: number) => {
