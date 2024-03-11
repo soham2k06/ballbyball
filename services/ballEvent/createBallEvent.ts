@@ -1,7 +1,7 @@
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { axiosInstance } from "../axiosInstance";
 
-export const createBallEvent = async (data: CreateBallEventSchema) => {
+export const saveBallEvents = async (data: CreateBallEventSchema[]) => {
   try {
     const res = await axiosInstance.post("/ball-events", data);
 
@@ -11,7 +11,7 @@ export const createBallEvent = async (data: CreateBallEventSchema) => {
 
     return res.data;
   } catch (error) {
-    console.error("Error while creating a event:", error);
+    console.error("Error while saving events:", error);
     throw new Error((error as Error).message);
   }
 };

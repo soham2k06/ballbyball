@@ -1,16 +1,14 @@
-import { createBallEvent as createBallEventAPI } from "@/services/ballEvent/createBallEvent";
+import { saveBallEvents as saveBallEventsAPI } from "@/services/ballEvent/createBallEvent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export function useCreateBallEvent() {
+export function useSaveBallEvents() {
   const queryClient = useQueryClient();
 
   const { mutate: createBallEvent, isPending } = useMutation({
-    mutationFn: createBallEventAPI,
-    onSuccess: () => {
-      // TODO: Add player cur score query key here
-      queryClient.invalidateQueries({ queryKey: ["eventsByMatchId"] });
-    },
+    mutationFn: saveBallEventsAPI,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["eventsByMatchId"] }),
     onError: (err) => toast.error(err.message),
   });
 

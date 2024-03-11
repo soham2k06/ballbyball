@@ -1,7 +1,7 @@
 "use client";
 
 import { EventType } from "@/types";
-import { calcRuns, calcWickets, cn } from "@/lib/utils";
+import { calcRuns, calcWickets } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -12,14 +12,15 @@ import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
 import FooterSummary from "./FooterSummary";
 import { BallEvent } from "@prisma/client";
-import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
-import { useCreateBallEvent } from "@/hooks/api/ballEvent/useCreateBallEvent";
-import { Loader } from "lucide-react";
-import { useUndoBallEvent } from "@/hooks/api/ballEvent/useUndoBallEvent";
-import { usePlayerById } from "@/hooks/api/player/usePlayerById";
+import { useSaveBallEvents } from "@/hooks/api/ballEvent/useCreateBallEvent";
 import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
 import BatsmanScores from "./BatsmanScores";
 import BowlerScores from "./BowlerScores";
+import { useEffect, useState } from "react";
+import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
+import LoadingButton from "../ui/loading-button";
+import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
+import { toast } from "sonner";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -34,15 +35,24 @@ export const ballEvents: Record<BallEvent["type"], string> = {
 };
 
 function ScorerLayout({ matchId }: { matchId: string }) {
-  const { events } = useEventsById(matchId);
+  const { events: fetchedEvents } = useEventsById(matchId);
 
-  const balls = events?.map((event) => event.type as EventType);
-
-  const { createBallEvent, isPending } = useCreateBallEvent();
-  const { undoBallEvent } = useUndoBallEvent();
+  const { createBallEvent, isPending } = useSaveBallEvents();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
 
-  if (!balls) return <p>loading...</p>;
+  const [events, setEvents] = useState<CreateBallEventSchema[] | BallEvent[]>(
+    [],
+  );
+  const [isModified, setIsModified] = useState(false);
+
+  useEffect(() => {
+    setEvents(fetchedEvents as BallEvent[]);
+  }, [fetchedEvents]);
+
+  if (!fetchedEvents) return <p>loading...</p>;
+  const balls = events?.map((event) => event.type as EventType);
+
+  if (!balls) return <p>loading balls...</p>;
 
   const invalidBalls = ["-3", "-2"];
 
@@ -94,29 +104,46 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const curOverWickets = calcWickets(overSummaries[curOverIndex]);
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
+    setIsModified(true);
     const event = e.currentTarget.value;
-    createBallEvent({
-      type: event,
-      batsmanId: "65ec3e4d9c8d41462b3505b8",
-      bowlerId: "65ec3e4d9c8d41462b3505be",
-      matchId,
-    });
+    setEvents([
+      ...events,
+      {
+        type: event,
+        batsmanId: "65ec3e4d9c8d41462b3505b8",
+        bowlerId: "65ec3e4d9c8d41462b3505be",
+        matchId,
+      },
+    ]);
   }
 
-  const handleUndo = () => undoBallEvent(matchId!);
+  const handleUndo = () => {
+    setEvents(events.slice(0, -1));
+  };
 
   return (
     <>
       <Card className="relative p-2 max-sm:w-full max-sm:border-0 sm:w-96">
-        <Loader
-          className={cn("invisible absolute", {
-            "visible animate-spin": isPending,
-          })}
-        />
-        <DangerActions
-          handleRestart={() => deleteAllBallEvents(matchId)}
-          handleUndo={handleUndo}
-        />
+        <div className="absolute left-0 top-0 flex w-full items-center justify-between p-2">
+          <div>
+            <LoadingButton
+              loading={isPending}
+              disabled={isPending || !isModified}
+              onClick={() => {
+                createBallEvent(events, {
+                  onSuccess: () => toast.success("Score saved successfully"),
+                });
+                setIsModified(false);
+              }}
+            >
+              {isPending ? "Saving..." : "Save"}
+            </LoadingButton>
+          </div>
+          <DangerActions
+            handleRestart={() => deleteAllBallEvents(matchId)}
+            handleUndo={handleUndo}
+          />
+        </div>
         <CardContent className="space-y-4 max-sm:p-0">
           <ScoreWrapper
             runs={runs}
@@ -130,7 +157,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             ))}
           </ul>
 
-          <BatsmanScores playerId={events?.[0]?.batsmanId!} events={events!} />
+          <BatsmanScores
+            playerId={events?.[0]?.batsmanId!}
+            events={events as BallEvent[]}
+          />
 
           <FooterSummary
             extras={extras}
@@ -144,7 +174,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         <Separator className="my-4 sm:my-4" />
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
         <Separator className="my-4 sm:my-4" />
-        <BowlerScores playerId={events?.[0].bowlerId!} events={events!} />
+        <BowlerScores
+          playerId={events[0]?.bowlerId!}
+          events={events as BallEvent[]}
+        />
       </Card>
     </>
   );

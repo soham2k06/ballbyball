@@ -22,14 +22,13 @@ function DangerActions({
         <Button
           name="danger-actions"
           title="danger-actions"
-          className="absolute right-2 top-2"
           size="icon"
           variant="secondary"
         >
           <MoreVertical size={20} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40 p-4 space-y-2" align="end">
+      <DropdownMenuContent className="w-40 space-y-2 p-4" align="end">
         <RestartButton
           onClick={() => {
             handleRestart();

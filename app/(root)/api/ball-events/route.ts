@@ -14,7 +14,10 @@ export async function GET() {
     return NextResponse.json(ballEvents, { status: 200 });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -24,26 +27,30 @@ export async function POST(req: NextRequest) {
     if (!userId) throw new Error("User not authenticated");
 
     const body = await req.json();
-    const parsedRes = createBallEventSchema.safeParse(body);
+    const parsedRes = createBallEventSchema.array().safeParse(body);
 
     if (!parsedRes.success) {
       console.error("Error Parsing JSON ----->", parsedRes.error);
       return NextResponse.json({ error: "Invalid inputs" }, { status: 422 });
     }
 
-    const { batsmanId, bowlerId, type, matchId } = parsedRes.data;
+    const ballEvents = parsedRes.data;
 
-    const newBallEvent = await prisma.ballEvent.create({
-      data: {
+    const { matchId } = ballEvents[0];
+
+    await prisma.ballEvent.deleteMany({ where: { matchId } });
+
+    const newBallEvents = await prisma.ballEvent.createMany({
+      data: ballEvents.map(({ batsmanId, bowlerId, type }) => ({
         userId,
         matchId,
         batsmanId,
         bowlerId,
         type,
-      },
+      })),
     });
 
-    return NextResponse.json(newBallEvent, { status: 201 });
+    return NextResponse.json(newBallEvents, { status: 201 });
   } catch (error) {
     console.error(error);
 
