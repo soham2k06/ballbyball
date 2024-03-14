@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 import DangerActions from "./DangerActions";
-import ScoreWrapper from "./ScoreWrapper";
+import ScoreDisplay from "./ScoreDisplay";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
 import FooterSummary from "./FooterSummary";
-import { BallEvent } from "@prisma/client";
+import { BallEvent, CurPlayer } from "@prisma/client";
 import { useSaveBallEvents } from "@/hooks/api/ballEvent/useCreateBallEvent";
 import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
 import { useEffect, useState } from "react";
@@ -19,8 +19,11 @@ import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import LoadingButton from "../ui/loading-button";
 import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
 import { toast } from "sonner";
-import { useMatchById } from "@/hooks/api/match/usePlayerById";
+import { useMatchById } from "@/hooks/api/match/useMatchById";
 import SelectBatsman from "../players-selection/SelectBatsman";
+import BowlerScores from "./BowlerScores";
+import BatsmanScores from "./BatsmanScores";
+import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -40,12 +43,18 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const { match } = useMatchById(matchId);
 
   const { createBallEvent, isPending } = useSaveBallEvents();
+  const { udpateMatch } = useUpdateMatch();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
 
+  const [curPlayers, setCurPlayers] = useState<CurPlayer[]>(
+    match?.curPlayers || [],
+  );
   const [events, setEvents] = useState<CreateBallEventSchema[] | BallEvent[]>(
     [],
   );
   const [isModified, setIsModified] = useState(false);
+
+  console.log(curPlayers);
 
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
@@ -54,6 +63,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   useEffect(() => {
     setEvents(fetchedEvents as BallEvent[]);
   }, [fetchedEvents]);
+
+  useEffect(() => {
+    if (match?.curPlayers) setCurPlayers(match.curPlayers);
+  }, [match?.curPlayers]);
 
   const balls = events?.map((event) => event.type as EventType);
 
@@ -123,15 +136,25 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     setIsModified(true);
     const event = e.currentTarget.value;
-    // setEvents([
-    //   ...events,
-    //   {
-    //     type: event,
-    //     batsmanId: curPlayers?.[onStrikeBatsman].id!,
-    //     bowlerId: curPlayers?.[2].id!,
-    //     matchId,
-    //   },
-    // ]);
+    setEvents([
+      ...events,
+      {
+        type: event,
+        batsmanId: curPlayers?.[onStrikeBatsman].id!,
+        bowlerId: curPlayers?.[2]?.id || "65ec3e4d9c8d41462b3505b9",
+        matchId,
+      },
+    ]);
+
+    if (event === "-1") {
+      // const updatedPlayers = [curPlayers?.[Number(!onStrikeBatsman)]];
+      // udpateMatch({
+      //   id: matchId,
+      //   curPlayers: updatedPlayers as CurPlayer[],
+      // });
+      const updatedPlayers = [curPlayers?.[Number(!onStrikeBatsman)]];
+      setCurPlayers(updatedPlayers as CurPlayer[]);
+    }
 
     handleStrikeChange(
       (event.includes("-3") ? event.slice(-1) : event) as EventType,
@@ -139,6 +162,19 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }
 
   const handleUndo = () => setEvents(events.slice(0, -1));
+
+  function handleSave() {
+    createBallEvent(events, {
+      onSuccess: () => toast.success("Score saved successfully"),
+    });
+
+    udpateMatch({
+      id: matchId,
+      curPlayers,
+    });
+
+    setIsModified(false);
+  }
 
   return (
     <>
@@ -148,12 +184,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             <LoadingButton
               loading={isPending}
               disabled={isPending || !isModified}
-              onClick={() => {
-                createBallEvent(events, {
-                  onSuccess: () => toast.success("Score saved successfully"),
-                });
-                setIsModified(false);
-              }}
+              onClick={handleSave}
             >
               {isPending ? "Saving..." : "Save"}
             </LoadingButton>
@@ -164,7 +195,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           />
         </div>
         <CardContent className="space-y-4 max-sm:p-0">
-          <ScoreWrapper
+          <ScoreDisplay
             runs={runs}
             wickets={wickets}
             totalBalls={totalBalls}
@@ -175,13 +206,15 @@ function ScorerLayout({ matchId }: { matchId: string }) {
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
           </ul>
-
-          {/* <BatsmanScores
+          <BatsmanScores
             onStrikeBatsman={onStrikeBatsman}
-            playerIds={curPlayers?.map(({ id }) => id)!}
+            playerIds={
+              curPlayers
+                .filter(({ type }) => type === "batsman")
+                ?.map(({ id }) => id)!
+            }
             events={events as BallEvent[]}
-          /> */}
-
+          />
           <FooterSummary
             extras={extras}
             curOverRuns={curOverRuns}
@@ -194,13 +227,18 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         <Separator className="my-4 sm:my-4" />
         <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
         <Separator className="my-4 sm:my-4" />
-        {/* <BowlerScores
-          playerId={events[0]?.bowlerId!}
-          events={events as BallEvent[]}
-        /> */}
 
-        {/* {!curPlayers?.length && <SelectBatsman />} */}
-        {<SelectBatsman match={match!} />}
+        <BowlerScores
+          playerId={curPlayers?.[2]?.id!}
+          events={events as BallEvent[]}
+        />
+        <SelectBatsman
+          curPlayers={curPlayers}
+          setCurPlayers={setCurPlayers}
+          events={events!}
+          match={match!}
+          open={curPlayers.length !== 2}
+        />
       </Card>
     </>
   );

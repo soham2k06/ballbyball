@@ -39,6 +39,7 @@ model Match {
 
 type PlayerType {
   id         String   @db.ObjectId
+  teamId     String   @db.ObjectId
   batEvents  String[]
   bowlEvents String[]
 }

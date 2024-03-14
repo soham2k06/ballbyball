@@ -13,12 +13,15 @@ function BatsmanScores({
   events,
   onStrikeBatsman,
 }: BatsmanScoresProps) {
-  // TODO: Skeleton here
+  // const players = playerIds.map((id) => usePlayerById(id));
+  if (!playerIds) return "Loading...";
+  const player1 = usePlayerById(playerIds[0]);
+  const player2 = usePlayerById(playerIds[1]);
 
   return (
     <div className="flex w-full flex-col items-center justify-between rounded-md bg-muted p-2 text-lg">
-      {playerIds.slice(0, -1).map((id, i) => {
-        const { player } = usePlayerById(id);
+      {playerIds.map((id, i) => {
+        const player = i === 0 ? player1.player : player2.player;
         const isOnStrike = onStrikeBatsman === i;
 
         const legalEvents = events.filter(
@@ -45,7 +48,7 @@ function BatsmanScores({
         );
 
         return (
-          <div key={id}>
+          <div key={player?.id}>
             {player?.name}
             {isOnStrike && " **"}
             <div className="flex gap-2">

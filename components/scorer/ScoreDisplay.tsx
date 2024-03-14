@@ -13,17 +13,17 @@ function ScoreWrapper({
 }) {
   return (
     <>
-      <h2 className="block text-center font-semibold text-8xl tabular-nums my-6">
+      <h2 className="my-6 block text-center text-8xl font-semibold tabular-nums">
         {runs}/{wickets}
       </h2>
-      <div className="opacity-50 flex items-center justify-center text-center text-xl">
+      <div className="flex items-center justify-center text-center text-xl opacity-50">
         <span>
           ({Math.floor(totalBalls / 6)}
           {totalBalls % 6 ? `.${totalBalls % 6}` : ""})
         </span>
         <Separator
           orientation="vertical"
-          className="bg-muted-foreground h-6 mx-2"
+          className="mx-2 h-6 bg-muted-foreground"
         />
         <span>RR: {runRate}</span>
       </div>

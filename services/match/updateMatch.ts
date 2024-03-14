@@ -5,7 +5,7 @@ export const udpateMatch = async (data: UpdateMatchSchema) => {
   try {
     const res = await axiosInstance.put("/matches", data);
 
-    if (res.status !== 201) {
+    if (res.status !== 202) {
       throw new Error("Network response was not ok");
     }
 

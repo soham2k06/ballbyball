@@ -2,6 +2,7 @@ import prisma from "@/lib/db/prisma";
 import { createMatchSchema, updateMatchSchema } from "@/lib/validation/match";
 
 import { auth } from "@clerk/nextjs";
+import { CurPlayer } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -31,7 +32,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" });
     }
 
-    const { name, teamIds, curTeam, overs } = parsedRes.data;
+    const { name, teamIds, curTeam, overs, curPlayers, allPlayers } =
+      parsedRes.data;
 
     const { userId } = auth();
     if (!userId)
@@ -42,12 +44,14 @@ export async function POST(req: NextRequest) {
         userId,
         name,
         teamIds: { set: teamIds! },
-        curTeam,
+        curPlayers,
+        allPlayers: allPlayers!,
+        curTeam: curTeam!,
         overs,
       },
     });
 
-    return NextResponse.json({ match, status: 201 });
+    return NextResponse.json({ match }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -67,26 +71,31 @@ export async function PUT(req: NextRequest) {
 
     if (!parsedRes.success) {
       console.error("Error Parsing JSON ----->", parsedRes.error);
-      return NextResponse.json({ error: "Invalid inputs" });
+      return NextResponse.json({ error: "Invalid inputs" }, { status: 422 });
     }
 
-    const { id: matchId, name, teamIds, curTeam, overs } = parsedRes.data;
+    const { id: matchId, curPlayers } = parsedRes.data;
 
     if (!matchId) {
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
     }
 
+    const curPlayersToSave = curPlayers.filter(
+      (player) => player,
+    ) as CurPlayer[];
+
     const updatedMatch = await prisma.match.update({
       where: { id: matchId },
       data: {
-        name,
-        teamIds,
-        curTeam,
-        overs,
+        curPlayers: curPlayersToSave,
+        // name,
+        // teamIds,
+        // curTeam,
+        // overs,
       },
     });
 
-    return NextResponse.json({ match: updatedMatch }, { status: 200 });
+    return NextResponse.json({ match: updatedMatch }, { status: 202 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
