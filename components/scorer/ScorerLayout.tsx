@@ -54,8 +54,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   );
   const [isModified, setIsModified] = useState(false);
 
-  console.log(curPlayers);
-
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
   const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));

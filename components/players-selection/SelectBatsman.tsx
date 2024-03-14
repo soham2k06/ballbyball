@@ -80,7 +80,7 @@ function SelectBatsman({
 
   useEffect(() => {
     watch("playerIds");
-  }, []);
+  }, [watch("playerIds")]);
 
   // TODO: Fix strike
   // TODO: Openable manually
@@ -129,6 +129,7 @@ function SelectBatsman({
                                       isOut
                                     )
                                       return;
+
                                     return checked
                                       ? field.onChange([
                                           ...field.value,
@@ -176,6 +177,7 @@ function SelectBatsman({
               <Button>Submit</Button>
             </form>
           </Form>
+          <button onClick={() => toast.success("success")}>Success</button>
         </div>
       </DialogContent>
     </Dialog>
