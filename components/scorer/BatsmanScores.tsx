@@ -1,5 +1,7 @@
 import { usePlayerById } from "@/hooks/api/player/usePlayerById";
 import { calcRuns } from "@/lib/utils";
+import { EventType } from "@/types";
+
 import { BallEvent, Player } from "@prisma/client";
 
 interface BatsmanScoresProps {
@@ -8,15 +10,45 @@ interface BatsmanScoresProps {
   events: BallEvent[];
 }
 
+interface BatsmanStats {
+  batsmanId: string;
+  events: EventType[];
+  outBy?: string;
+}
+
 function BatsmanScores({
   playerIds,
   events,
   onStrikeBatsman,
 }: BatsmanScoresProps) {
-  // const players = playerIds.map((id) => usePlayerById(id));
   if (!playerIds) return "Loading...";
   const player1 = usePlayerById(playerIds[0]);
   const player2 = usePlayerById(playerIds[1]);
+
+  function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
+    const batsmanStats: { [batsmanId: string]: BatsmanStats } = {};
+
+    events.forEach((event) => {
+      const { batsmanId, type, bowlerId } = event;
+
+      if (!batsmanStats[batsmanId]) {
+        batsmanStats[batsmanId] = {
+          batsmanId: batsmanId,
+          events: [],
+        };
+      }
+
+      batsmanStats[batsmanId].events.push(type);
+
+      if (type === "-1") {
+        batsmanStats[batsmanId].outBy = bowlerId;
+      }
+    });
+
+    return Object.values(batsmanStats);
+  }
+
+  const batsmanStats = getBatsmanStats(events);
 
   return (
     <div className="flex w-full flex-col items-center justify-between rounded-md bg-muted p-2 text-lg">
