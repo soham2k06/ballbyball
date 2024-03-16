@@ -37,8 +37,13 @@ model Match {
 }
 
 type CurPlayer {
-  id   String @db.ObjectId
-  type String
+  id   String     @db.ObjectId
+  type PlayerType
+}
+
+enum PlayerType {
+  batsman
+  bowler
 }
 
 model Team {

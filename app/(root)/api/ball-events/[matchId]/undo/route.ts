@@ -1,8 +1,7 @@
 import prisma from "@/lib/db/prisma";
-import { NextApiRequest } from "next";
 import { NextResponse } from "next/server";
 
-export async function DELETE(req: NextApiRequest) {
+export async function DELETE() {
   try {
     // Find the last document in descending order of createdAt
     const lastDocument = await prisma.ballEvent.findFirst({

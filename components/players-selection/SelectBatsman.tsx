@@ -68,7 +68,7 @@ function SelectBatsman({
   const playerPositions = ["Striker", "Non-Striker"];
 
   async function onSubmit(data: SelectBatsmanForm) {
-    const newCurPlayers = data.playerIds
+    const newCurPlayers: CurPlayer[] = data.playerIds
       .filter(
         (id) => curPlayers.find((curPlayer) => curPlayer.id === id)?.id !== id,
       )
@@ -77,7 +77,7 @@ function SelectBatsman({
     setCurPlayers([...curPlayers, ...newCurPlayers]);
 
     // 0 is trash value
-    handleSave(0, newCurPlayers);
+    handleSave(0, [...curPlayers, ...newCurPlayers]);
 
     setTimeout(reset, 500);
   }

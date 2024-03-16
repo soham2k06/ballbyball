@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const curPlayer = z.object({
   id: z.string(),
-  type: z.string(),
+  type: z.enum(["batsman", "bowler"]),
 });
 
 export const createMatchSchema = z.object({

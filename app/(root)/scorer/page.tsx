@@ -7,9 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
+  // TODO: remove full features for normal scoring
   return (
     <div className="flex h-full flex-col items-center md:justify-center">
-      <ScorerLayout />
+      <ScorerLayout matchId="none" />
     </div>
   );
 }

@@ -60,17 +60,19 @@ function SelectBowler({
   const { handleSubmit, watch, reset } = form;
 
   function onSubmit(data: z.infer<typeof schema>) {
-    const newBowler = {
+    const newBowler: CurPlayer = {
       id: data.playerId,
       type: "bowler",
     };
 
-    setCurPlayers((prev) => [
-      ...prev.filter((curPlayer) => curPlayer.type === "batsman"),
+    const newCurPlayers = [
+      ...curPlayers.filter((player) => player.type !== "bowler"),
       newBowler,
-    ]);
+    ];
 
-    handleSave(0, [newBowler]);
+    setCurPlayers(newCurPlayers);
+
+    handleSave(0, newCurPlayers);
 
     setTimeout(reset, 500);
   }

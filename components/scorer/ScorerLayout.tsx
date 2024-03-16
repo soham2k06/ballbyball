@@ -202,10 +202,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     if (updatedCurPlayers) {
       udpateMatch({
         id: matchId,
-        curPlayers: [...curPlayers, ...updatedCurPlayers],
+        curPlayers: updatedCurPlayers,
       });
 
-      if (updatedCurPlayers[0].type === "bowler") setIsBowlerSelected(true);
+      if (updatedCurPlayers.some((player) => player.type === "bowler"))
+        setIsBowlerSelected(true);
     }
 
     setIsModified(false);

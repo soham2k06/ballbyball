@@ -32,7 +32,7 @@ function BallSummary({
         },
       },
       defaultVariants: { variant: "default" },
-    }
+    },
   );
 
   let summaryToShow;
@@ -65,11 +65,17 @@ function BallSummary({
     <li
       className={cn(
         summaryVariants({
-          variant: event?.includes("-3")
-            ? (event.slice(2) as EventType)
-            : event,
-          size,
-        })
+          variant: (event?.includes("-3") ? event.slice(2) : event) as
+            | "0"
+            | "1"
+            | "2"
+            | "3"
+            | "4"
+            | "6"
+            | "-1"
+            | "-2"
+            | "-3",
+        }),
       )}
     >
       {summaryToShow}

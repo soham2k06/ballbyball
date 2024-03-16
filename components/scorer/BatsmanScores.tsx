@@ -50,6 +50,8 @@ function BatsmanScores({
 
   const batsmanStats = getBatsmanStats(events);
 
+  console.log(batsmanStats);
+
   return (
     <div className="flex w-full flex-col items-center justify-between rounded-md bg-muted p-2 text-lg">
       {playerIds.map((id, i) => {
