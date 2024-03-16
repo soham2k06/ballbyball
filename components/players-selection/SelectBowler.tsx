@@ -25,12 +25,14 @@ interface SelectBowlerProps {
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
+  handleUndo: () => void;
 }
 
 function SelectBowler({
   open,
   match,
   handleSave,
+  handleUndo,
   curPlayers,
   setCurPlayers,
 }: SelectBowlerProps) {
@@ -44,10 +46,14 @@ function SelectBowler({
     }),
   });
 
+  const defaultBowler = curPlayers.find(
+    (player) => player.type === "bowler",
+  )?.id;
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      playerId: curPlayers.find((player) => player.type === "bolwer")?.id,
+      playerId: defaultBowler,
     },
   });
 
@@ -59,9 +65,12 @@ function SelectBowler({
       type: "bowler",
     };
 
-    setCurPlayers((prev) => [...prev, newBowler]);
+    setCurPlayers((prev) => [
+      ...prev.filter((curPlayer) => curPlayer.type === "batsman"),
+      newBowler,
+    ]);
 
-    handleSave(0, [...curPlayers, newBowler]);
+    handleSave(0, [newBowler]);
 
     setTimeout(reset, 500);
   }
@@ -69,7 +78,7 @@ function SelectBowler({
   useEffect(() => {
     if (open)
       reset({
-        playerId: curPlayers.find((player) => player.type === "bowler")?.id,
+        playerId: defaultBowler,
       });
   }, [open]);
 
@@ -84,11 +93,18 @@ function SelectBowler({
 
   return (
     <Dialog open={open}>
-      <DialogContent>
+      <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
-          <TypographyH3 className="text-2xl font-bold">
-            Select Bowler
-          </TypographyH3>
+          <div className="flex items-center justify-between">
+            <TypographyH3 className="text-2xl font-bold">
+              Select Bowler
+            </TypographyH3>
+            {!!match?.curPlayers.find((player) => player.type === "bowler") && (
+              <Button variant="destructive" onClick={handleUndo}>
+                Undo
+              </Button>
+            )}
+          </div>
           <Form {...form}>
             {/* TODO: Search field HERE to filter players */}
             <form onSubmit={handleSubmit(onSubmit)}>

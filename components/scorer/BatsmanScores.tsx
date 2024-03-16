@@ -79,9 +79,11 @@ function BatsmanScores({
           { fours: 0, sixes: 0 },
         );
 
+        if (!player) return;
+
         return (
-          <div key={player?.id}>
-            {player?.name}
+          <div key={player.id}>
+            {player.name}
             {isOnStrike && " **"}
             <div className="flex gap-2">
               <div>Runs: {totalRuns}</div>

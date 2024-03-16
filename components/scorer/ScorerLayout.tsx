@@ -55,6 +55,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     [],
   );
   const [isModified, setIsModified] = useState(false);
+
+  // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
   const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without run
@@ -64,6 +66,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const totalBalls = balls?.filter(
     (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
   ).length;
+
+  const [isBowlerSelected, setIsBowlerSelected] = useState(true);
 
   const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));
 
@@ -79,7 +83,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   useEffect(() => {
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
     if (isLastBallOfOver) changeStrike();
-  }, [fetchedEvents, totalBalls]);
+  }, [totalBalls]);
 
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
@@ -94,8 +98,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const showSelectBatsman =
     curPlayers.filter((player) => player.type === "batsman").length !== 2;
   const showSelectBowler =
-    !curPlayers.find((player) => player.type === "bowler") &&
-    !showSelectBatsman;
+    (!curPlayers.find((player) => player.type === "bowler") &&
+      !showSelectBatsman) ||
+    !isBowlerSelected;
 
   // ** Over Summary
   let ballLimitInOver = 6;
@@ -140,6 +145,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     setIsModified(true);
+
     const event = e.currentTarget.value;
     setEvents([
       ...events,
@@ -161,15 +167,20 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     handleStrikeChange(
       (event.includes("-3") ? event.slice(-1) : event) as EventType,
     );
+
+    const isLastBallOfOver = totalBalls % 6 === 5 && totalBalls > 0;
+    if (isLastBallOfOver) setIsBowlerSelected(false);
   }
 
   const handleUndo = () => {
-    const isLastBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
-
+    const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
+    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
+    setIsModified(true);
     // TODO: Improve this logic
     // Explanation: Changing strike twice to tackle strike change on first ball of over
+    if (isLastBallOfOver) changeStrike();
     if (strikeChangers.includes(events[events.length - 1]?.type)) {
-      if (isLastBallOfOver) changeStrike();
+      if (isFirstBallOfOver) changeStrike();
       changeStrike();
     }
 
@@ -191,8 +202,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     if (updatedCurPlayers) {
       udpateMatch({
         id: matchId,
-        curPlayers: updatedCurPlayers!,
+        curPlayers: [...curPlayers, ...updatedCurPlayers],
       });
+
+      if (updatedCurPlayers[0].type === "bowler") setIsBowlerSelected(true);
     }
 
     setIsModified(false);
@@ -204,6 +217,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       id: matchId,
       curPlayers: [],
     });
+    setOnStrikeBatsman(0);
   }
 
   return (
@@ -273,6 +287,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           events={events}
           match={match!}
           handleSave={handleSave}
+          handleUndo={() => {
+            handleUndo();
+            setCurPlayers(match?.curPlayers || []);
+            changeStrike();
+          }}
         />
         <SelectBowler
           open={showSelectBowler}
@@ -280,6 +299,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           setCurPlayers={setCurPlayers}
           match={match!}
           handleSave={handleSave}
+          handleUndo={() => {
+            handleUndo();
+            setIsBowlerSelected(true);
+          }}
         />
       </Card>
     </>

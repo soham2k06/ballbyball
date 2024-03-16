@@ -27,6 +27,7 @@ interface SelectBatsmanProps {
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
+  handleUndo: () => void;
 }
 
 interface SelectBatsmanForm {
@@ -39,6 +40,7 @@ function SelectBatsman({
   events,
   open,
   handleSave,
+  handleUndo,
   setCurPlayers,
 }: SelectBatsmanProps) {
   const schema = z.object({
@@ -75,7 +77,7 @@ function SelectBatsman({
     setCurPlayers([...curPlayers, ...newCurPlayers]);
 
     // 0 is trash value
-    handleSave(0, [...curPlayers, ...newCurPlayers]);
+    handleSave(0, newCurPlayers);
 
     setTimeout(reset, 500);
   }
@@ -97,11 +99,16 @@ function SelectBatsman({
 
   return (
     <Dialog open={open}>
-      <DialogContent>
+      <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
-          <TypographyH3 className="text-2xl font-bold">
-            Select Batsman
-          </TypographyH3>
+          <div className="flex items-center justify-between">
+            <TypographyH3>Select Batsman</TypographyH3>
+            {!!curPlayers.length && (
+              <Button variant="destructive" onClick={handleUndo}>
+                Undo
+              </Button>
+            )}
+          </div>
           <Form {...form}>
             {/* TODO: Search field HERE to filter players */}
             <form onSubmit={handleSubmit(onSubmit)}>
