@@ -36,9 +36,11 @@ export async function POST(req: NextRequest) {
 
     const ballEvents = parsedRes.data;
 
-    const { matchId } = ballEvents[0];
+    const { matchId } = ballEvents[0] || {};
 
-    await prisma.ballEvent.deleteMany({ where: { matchId } });
+    if (ballEvents.length) {
+      await prisma.ballEvent.deleteMany({ where: { matchId } });
+    }
 
     const newBallEvents = await prisma.ballEvent.createMany({
       data: ballEvents.map(({ batsmanId, bowlerId, type }) => ({

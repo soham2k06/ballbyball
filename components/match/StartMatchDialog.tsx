@@ -23,7 +23,6 @@ import { Checkbox } from "../ui/checkbox";
 import { useAllTeams } from "@/hooks/api/team/useAllTeams";
 import { CreateMatchSchema, createMatchSchema } from "@/lib/validation/match";
 import { useCreateMatch } from "@/hooks/api/match/useCreateMatch";
-import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
 
 function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
   const form = useForm<CreateMatchSchema>({
@@ -36,7 +35,6 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
   });
 
   const { allTeams: teams } = useAllTeams();
-  const { players } = usePlayersByIds(teams?.map((team) => team.playerIds)!);
 
   const { handleSubmit, control, reset, setValue } = form;
   const { createMatch, isPending } = useCreateMatch();
@@ -47,12 +45,6 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
       {
         ...data,
         curTeam: 0,
-        allPlayers: players?.flat()?.map((player) => ({
-          id: player.id,
-          teamId: "65ec4c46240deefca7573ec0",
-          batEvents: [],
-          bowlEvents: [],
-        }))!,
       },
       {
         onSuccess: () => {

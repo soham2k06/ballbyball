@@ -24,6 +24,7 @@ import SelectBatsman from "../players-selection/SelectBatsman";
 import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
+import SelectBowler from "../players-selection/SelectBowler";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -46,6 +47,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const { udpateMatch } = useUpdateMatch();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
 
+  // ** States
   const [curPlayers, setCurPlayers] = useState<CurPlayer[]>(
     match?.curPlayers || [],
   );
@@ -53,11 +55,19 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     [],
   );
   const [isModified, setIsModified] = useState(false);
-
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
+
+  const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without run
+  const balls = events?.map((event) => event.type as EventType);
+
+  const invalidBalls = ["-3", "-2"];
+  const totalBalls = balls?.filter(
+    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
+  ).length;
 
   const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));
 
+  // ** Effects
   useEffect(() => {
     setEvents(fetchedEvents as BallEvent[]);
   }, [fetchedEvents]);
@@ -66,32 +76,29 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     if (match?.curPlayers) setCurPlayers(match.curPlayers);
   }, [match?.curPlayers]);
 
-  const balls = events?.map((event) => event.type as EventType);
-
-  const invalidBalls = ["-3", "-2"];
-  const totalBalls = balls?.filter(
-    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
-  ).length;
-
   useEffect(() => {
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-
     if (isLastBallOfOver) changeStrike();
   }, [fetchedEvents, totalBalls]);
 
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
+  // ** Calculations & Derived states
   const runs = calcRuns(balls);
   const wickets = calcWickets(balls);
-
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
-
   const extras = balls.filter(
     (ball) => ball === "-2" || ball.includes("-3"),
   ).length;
 
-  let ballLimitInOver = 6;
+  const showSelectBatsman =
+    curPlayers.filter((player) => player.type === "batsman").length !== 2;
+  const showSelectBowler =
+    !curPlayers.find((player) => player.type === "bowler") &&
+    !showSelectBatsman;
 
+  // ** Over Summary
+  let ballLimitInOver = 6;
   function generateOverSummary(ballEvents: EventType[]) {
     const overSummaries: EventType[][] = [];
     let validBallCount = 0;
@@ -126,8 +133,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const curOverRuns = calcRuns(overSummaries[curOverIndex]);
   const curOverWickets = calcWickets(overSummaries[curOverIndex]);
 
+  // ** Handlers
   function handleStrikeChange(ballEventType: EventType) {
-    const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without run
     if (strikeChangers.includes(ballEventType)) changeStrike();
   }
 
@@ -139,18 +146,15 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       {
         type: event,
         batsmanId: curPlayers?.[onStrikeBatsman].id!,
-        bowlerId: curPlayers?.[2]?.id || "65ec3e4d9c8d41462b3505b9",
+        bowlerId: curPlayers?.[2]?.id,
         matchId,
       },
     ]);
 
     if (event === "-1") {
-      // const updatedPlayers = [curPlayers?.[Number(!onStrikeBatsman)]];
-      // udpateMatch({
-      //   id: matchId,
-      //   curPlayers: updatedPlayers as CurPlayer[],
-      // });
-      const updatedPlayers = [curPlayers?.[Number(!onStrikeBatsman)]];
+      const updatedPlayers = curPlayers.filter((player) => {
+        return player.id !== curPlayers?.[onStrikeBatsman].id;
+      });
       setCurPlayers(updatedPlayers as CurPlayer[]);
     }
 
@@ -159,19 +163,47 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     );
   }
 
-  const handleUndo = () => setEvents(events.slice(0, -1));
+  const handleUndo = () => {
+    const isLastBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
 
-  function handleSave() {
-    createBallEvent(events, {
-      onSuccess: () => toast.success("Score saved successfully"),
-    });
+    // TODO: Improve this logic
+    // Explanation: Changing strike twice to tackle strike change on first ball of over
+    if (strikeChangers.includes(events[events.length - 1]?.type)) {
+      if (isLastBallOfOver) changeStrike();
+      changeStrike();
+    }
 
-    udpateMatch({
-      id: matchId,
-      curPlayers,
-    });
+    setEvents(events.slice(0, -1));
+  };
+
+  function handleSave(_: unknown, updatedCurPlayers?: CurPlayer[]) {
+    if (balls.length) {
+      createBallEvent(events, {
+        onSuccess: () =>
+          toast.success(
+            !!updatedCurPlayers
+              ? "Score auto saved"
+              : "Score saved successfully",
+          ),
+      });
+    }
+
+    if (updatedCurPlayers) {
+      udpateMatch({
+        id: matchId,
+        curPlayers: updatedCurPlayers!,
+      });
+    }
 
     setIsModified(false);
+  }
+
+  function handleRestart() {
+    deleteAllBallEvents(matchId);
+    udpateMatch({
+      id: matchId,
+      curPlayers: [],
+    });
   }
 
   return (
@@ -188,7 +220,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             </LoadingButton>
           </div>
           <DangerActions
-            handleRestart={() => deleteAllBallEvents(matchId)}
+            handleRestart={handleRestart}
             handleUndo={handleUndo}
           />
         </div>
@@ -227,15 +259,23 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         <Separator className="my-4 sm:my-4" />
 
         <BowlerScores
-          playerId={curPlayers?.[2]?.id!}
+          playerId={curPlayers.find((player) => player.type === "bowler")?.id!}
           events={events as BallEvent[]}
         />
         <SelectBatsman
+          open={showSelectBatsman}
           curPlayers={curPlayers}
           setCurPlayers={setCurPlayers}
-          events={events!}
+          events={events}
           match={match!}
-          open={curPlayers.length !== 2}
+          handleSave={handleSave}
+        />
+        <SelectBowler
+          open={showSelectBowler}
+          curPlayers={curPlayers}
+          setCurPlayers={setCurPlayers}
+          match={match!}
+          handleSave={handleSave}
         />
       </Card>
     </>

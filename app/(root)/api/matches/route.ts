@@ -32,8 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" });
     }
 
-    const { name, teamIds, curTeam, overs, curPlayers, allPlayers } =
-      parsedRes.data;
+    const { name, teamIds, curTeam, overs, curPlayers } = parsedRes.data;
 
     const { userId } = auth();
     if (!userId)
@@ -45,7 +44,6 @@ export async function POST(req: NextRequest) {
         name,
         teamIds: { set: teamIds! },
         curPlayers,
-        allPlayers: allPlayers!,
         curTeam: curTeam!,
         overs,
       },

@@ -7,7 +7,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "../ui/form";
 import { useForm } from "react-hook-form";
@@ -15,11 +14,11 @@ import { Checkbox } from "../ui/checkbox";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
 import { TypographyH3 } from "../ui/typography";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { toast } from "sonner";
+import PlayerLabel from "./PlayerLabel";
 
 interface SelectBatsmanProps {
   match: Match;
@@ -27,6 +26,7 @@ interface SelectBatsmanProps {
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
+  handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
 }
 
 interface SelectBatsmanForm {
@@ -36,17 +36,21 @@ interface SelectBatsmanForm {
 function SelectBatsman({
   curPlayers,
   match,
-  open,
   events,
+  open,
+  handleSave,
   setCurPlayers,
 }: SelectBatsmanProps) {
   const schema = z.object({
     playerIds: z.array(z.string()).max(2),
   });
+  const defaultPlayerIds = curPlayers
+    .filter((player) => player.type === "batsman")
+    .map((player) => player.id);
   const form = useForm<SelectBatsmanForm>({
     resolver: zodResolver(schema),
     defaultValues: {
-      playerIds: curPlayers.map((player) => player.id),
+      playerIds: defaultPlayerIds,
     },
   });
 
@@ -61,12 +65,17 @@ function SelectBatsman({
 
   const playerPositions = ["Striker", "Non-Striker"];
 
-  function onSubmit(data: SelectBatsmanForm) {
-    const curPlayers = data.playerIds.map((id) => ({
-      id,
-      type: "batsman",
-    }));
-    setCurPlayers(curPlayers);
+  async function onSubmit(data: SelectBatsmanForm) {
+    const newCurPlayers = data.playerIds
+      .filter(
+        (id) => curPlayers.find((curPlayer) => curPlayer.id === id)?.id !== id,
+      )
+      .map((id) => ({ id, type: "batsman" }));
+
+    setCurPlayers([...curPlayers, ...newCurPlayers]);
+
+    // 0 is trash value
+    handleSave(0, [...curPlayers, ...newCurPlayers]);
 
     setTimeout(reset, 500);
   }
@@ -74,7 +83,7 @@ function SelectBatsman({
   useEffect(() => {
     if (open)
       reset({
-        playerIds: curPlayers.map((player) => player.id),
+        playerIds: defaultPlayerIds,
       });
   }, [open]);
 
@@ -82,7 +91,7 @@ function SelectBatsman({
     watch("playerIds");
   }, [watch("playerIds")]);
 
-  // TODO: Fix strike
+  // TODO: Fix strike after out
   // TODO: Openable manually
   // TODO: New reusable component for player label
 
@@ -110,8 +119,13 @@ function SelectBatsman({
                         render={({ field }) => {
                           const isSelected = field.value?.includes(item.id);
                           const isBothSelected = field.value?.length === 2;
-                          const isAlreadyPlaying = curPlayers[0].id === item.id;
                           const isOut = outPlayers?.includes(item.id);
+
+                          const sortedCurPlayers = curPlayers.sort((a, b) =>
+                            a.type.localeCompare(b.type),
+                          );
+                          const isAlreadyPlaying =
+                            sortedCurPlayers[0]?.id === item.id;
 
                           return (
                             <FormItem key={item.id}>
@@ -121,7 +135,10 @@ function SelectBatsman({
                                   checked={field.value?.includes(item.id)}
                                   onCheckedChange={(checked) => {
                                     if (isAlreadyPlaying) {
-                                      toast.info("Player is already playing");
+                                      toast.info("Player is already playing", {
+                                        description:
+                                          "Go to manual mode to hard change",
+                                      });
                                       return;
                                     }
                                     if (
@@ -143,28 +160,26 @@ function SelectBatsman({
                                   }}
                                 />
                               </FormControl>
-                              <FormLabel
-                                className={cn(
-                                  "flex h-8 w-full items-center justify-between bg-muted p-2 font-normal",
-                                  {
-                                    "bg-emerald-500 font-bold text-emerald-950":
-                                      isSelected,
-                                    "opacity-50": isBothSelected && !isSelected,
-                                    "brightness-50": isOut,
-                                  },
-                                )}
-                              >
-                                {item.name}
-                                {isOut && <span>OUT</span>}
-                                <span className="whitespace-nowrap text-sm font-semibold">
-                                  {Array.from(
-                                    { length: 2 },
-                                    (_: unknown, i) =>
-                                      field.value?.[i] === item.id &&
-                                      playerPositions[i],
-                                  )}
-                                </span>
-                              </FormLabel>
+
+                              <PlayerLabel
+                                title={item.name}
+                                isSelected={isSelected}
+                                isOpacityDown={
+                                  (isBothSelected && !isSelected) ||
+                                  isAlreadyPlaying
+                                }
+                                isBrightnessDown={isOut}
+                                subTitle={
+                                  isOut
+                                    ? "Out"
+                                    : Array.from(
+                                        { length: 2 },
+                                        (_: unknown, i) =>
+                                          field.value?.[i] === item.id &&
+                                          playerPositions[i],
+                                      )
+                                }
+                              />
                             </FormItem>
                           );
                         }}
@@ -177,7 +192,6 @@ function SelectBatsman({
               <Button>Submit</Button>
             </form>
           </Form>
-          <button onClick={() => toast.success("success")}>Success</button>
         </div>
       </DialogContent>
     </Dialog>
