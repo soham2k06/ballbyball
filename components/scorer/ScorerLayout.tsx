@@ -1,7 +1,7 @@
 "use client";
 
 import { EventType } from "@/types";
-import { calcRuns, calcWickets } from "@/lib/utils";
+import { calcRuns, calcWickets, getIsInvalidBall } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -25,6 +25,7 @@ import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
 import SelectBowler from "../players-selection/SelectBowler";
+import { strikeChangers } from "@/lib/constants";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -59,13 +60,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
-  const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without run
   const balls = events?.map((event) => event.type as EventType);
 
-  const invalidBalls = ["-3", "-2"];
-  const totalBalls = balls?.filter(
-    (ball) => !invalidBalls.includes(ball) && !ball.includes("-3"),
-  ).length;
+  const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
 
   const [isBowlerSelected, setIsBowlerSelected] = useState(true);
 
@@ -109,8 +106,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     let validBallCount = 0;
     let currentOver: EventType[] = [];
     for (const ballEvent of ballEvents) {
+      const isInvalidBall = getIsInvalidBall(ballEvent);
       currentOver.push(ballEvent);
-      if (!invalidBalls.includes(ballEvent) && !ballEvent.includes("-3")) {
+      if (isInvalidBall) {
         validBallCount++;
         if (validBallCount === 6) {
           overSummaries.push(currentOver);

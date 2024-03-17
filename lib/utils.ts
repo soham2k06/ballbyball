@@ -1,6 +1,7 @@
 import { EventType } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { invalidBalls } from "./constants";
 
 // ** FRONTEND ** //
 
@@ -28,6 +29,9 @@ export const calcRuns = (
 
 export const calcWickets = (ballEvents: EventType[] | string[]) =>
   ballEvents?.filter((ball) => ball === "-1").length;
+
+export const getIsInvalidBall = (ball: EventType) =>
+  !invalidBalls.includes(ball) && !ball.includes("-3");
 
 export const truncStr = (str: string, n: number) => {
   return str.length > n ? str.substring(0, n - 1) + "..." : str;

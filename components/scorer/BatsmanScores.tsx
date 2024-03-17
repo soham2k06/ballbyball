@@ -1,5 +1,5 @@
 import { usePlayerById } from "@/hooks/api/player/usePlayerById";
-import { calcRuns } from "@/lib/utils";
+import { calcRuns, getIsInvalidBall } from "@/lib/utils";
 import { EventType } from "@/types";
 
 import { BallEvent, Player } from "@prisma/client";
@@ -66,9 +66,8 @@ function BatsmanScores({
           legalEvents.map(({ type }) => type),
           true,
         );
-        const totalBalls = legalEvents.filter(
-          (ball) =>
-            !["-3", "-2"].includes(ball.type) && !ball.type.includes("-3"),
+        const totalBalls = legalEvents.filter((ball) =>
+          getIsInvalidBall(ball.type),
         ).length;
 
         const scoreByState = legalEvents?.reduce(
