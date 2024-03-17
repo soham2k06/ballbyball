@@ -29,7 +29,7 @@ function DangerActions({
           <MoreVertical size={20} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40 p-4 space-y-2" align="end">
+      <DropdownMenuContent className="min-w-40 flex flex-col p-4 space-y-2" align="end">
         <RestartButton
           onClick={() => {
             handleRestart();
@@ -39,7 +39,6 @@ function DangerActions({
         <Button
           size="sm"
           variant="destructive"
-          className="w-full"
           onClick={() => {
             setShowMenu(false);
             handleUndo();
