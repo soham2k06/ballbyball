@@ -25,7 +25,8 @@ interface SelectBowlerProps {
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
-  handleUndo: () => void;
+  handleUndo?: () => void;
+  isManualMode?: boolean;
 }
 
 function SelectBowler({
@@ -35,6 +36,7 @@ function SelectBowler({
   handleUndo,
   curPlayers,
   setCurPlayers,
+  isManualMode,
 }: SelectBowlerProps) {
   const { team } = useTeamById(match?.teamIds[Number(!match.curTeam)]!);
   const { players } = usePlayersByIds([team?.playerIds!]);
@@ -101,11 +103,12 @@ function SelectBowler({
             <TypographyH3 className="text-2xl font-bold">
               Select Bowler
             </TypographyH3>
-            {!!match?.curPlayers.find((player) => player.type === "bowler") && (
-              <Button variant="destructive" onClick={handleUndo}>
-                Undo
-              </Button>
-            )}
+            {!!match?.curPlayers.find((player) => player.type === "bowler") &&
+              !isManualMode && (
+                <Button variant="destructive" onClick={handleUndo}>
+                  Undo
+                </Button>
+              )}
           </div>
           <Form {...form}>
             {/* TODO: Search field HERE to filter players */}
