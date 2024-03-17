@@ -10,8 +10,8 @@ datasource db {
 model Player {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String
+  name      String
   image     String?
-  name      String?
   desc      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -20,17 +20,30 @@ model Player {
 }
 
 model Match {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
-  name      String
-  teamIds   String[] @db.ObjectId
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String
+  name       String
+  teamIds    String[]    @db.ObjectId
+  overs      Int
+  curTeam    Int
+  curPlayers CurPlayer[]
   // desc      String?
   // date      DateTime?
   // time      DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
   @@map("matches")
+}
+
+type CurPlayer {
+  id   String     @db.ObjectId
+  type PlayerType
+}
+
+enum PlayerType {
+  batsman
+  bowler
 }
 
 model Team {
@@ -39,9 +52,21 @@ model Team {
   name      String
   playerIds String[] @db.ObjectId
   captain   String?  @db.ObjectId
-  matchId   String?  @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("teams")
+}
+
+model BallEvent {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  matchId   String   @db.ObjectId
+  batsmanId String   @db.ObjectId
+  bowlerId  String   @db.ObjectId
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ballEvents")
 }

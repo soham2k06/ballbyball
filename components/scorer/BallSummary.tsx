@@ -10,6 +10,7 @@ function BallSummary({
   event: EventType;
   size?: "sm" | "default";
 }) {
+  const isNoBall = event?.includes("-3");
   const summaryVariants = cva(
     "text-center rounded-full flex justify-center items-center",
     {
@@ -32,7 +33,7 @@ function BallSummary({
         },
       },
       defaultVariants: { variant: "default" },
-    }
+    },
   );
 
   let summaryToShow;
@@ -59,17 +60,24 @@ function BallSummary({
       break;
   }
 
-  if (event?.includes("-3")) summaryToShow = event?.replace("-3", "NB");
+  if (isNoBall) summaryToShow = event?.replace("-3", "NB");
 
   return (
     <li
       className={cn(
         summaryVariants({
-          variant: event?.includes("-3")
-            ? (event.slice(2) as EventType)
-            : event,
+          variant: (isNoBall ? event.slice(2) : event) as
+            | "0"
+            | "1"
+            | "2"
+            | "3"
+            | "4"
+            | "6"
+            | "-1"
+            | "-2"
+            | "-3",
           size,
-        })
+        }),
       )}
     >
       {summaryToShow}

@@ -9,7 +9,7 @@ export const getPlayerById = async (id: Player["id"] | null | undefined) => {
     if (res.status !== 200) {
       throw new Error("Network response was not ok");
     }
-    return res.data;
+    return res.data as Player;
   } catch (error) {
     console.error("Error while fetching a player:", error);
     throw new Error((error as Error).message);

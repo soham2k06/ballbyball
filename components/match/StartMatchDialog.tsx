@@ -30,22 +30,29 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
     defaultValues: {
       name: "",
       teamIds: [],
+      overs: 0,
     },
   });
 
   const { allTeams: teams } = useAllTeams();
 
-  const { handleSubmit, control, watch, reset } = form;
+  const { handleSubmit, control, reset, setValue } = form;
   const { createMatch, isPending } = useCreateMatch();
 
-  function onSubmit(data: CreateMatchSchema) {
-    console.log(data);
-    createMatch(data, {
-      onSuccess: () => {
-        reset();
-        setOpen(false);
+  async function onSubmit(data: CreateMatchSchema) {
+    // TODO: Create Input for curTeam
+    createMatch(
+      {
+        ...data,
+        curTeam: 0,
       },
-    });
+      {
+        onSuccess: () => {
+          reset();
+          setOpen(false);
+        },
+      },
+    );
   }
 
   return (
@@ -119,6 +126,37 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
                   <FormMessage />
                 </FormItem>
               )}
+            />
+
+            <FormField
+              control={form.control}
+              name="overs"
+              rules={{
+                min: { value: 1, message: "Enter Mininum 1 over" },
+                max: { value: 50, message: "Enter Maximum 50 overs" },
+              }}
+              render={({ field }) => {
+                const { onChange, ...rest } = field;
+                return (
+                  <FormItem>
+                    <FormLabel>Overs</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Match Overs"
+                        type="number"
+                        onChange={(e) =>
+                          setValue(
+                            "overs",
+                            parseInt(e.target.value as unknown as string),
+                          )
+                        }
+                        {...rest}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <DialogFooter>

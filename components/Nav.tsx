@@ -44,20 +44,18 @@ function Nav() {
           </Link>
         </ul>
 
-        <div className="size-10">
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{
-              baseTheme: theme === "dark" ? dark : undefined,
-              elements: {
-                avatarBox: {
-                  width: "100%",
-                  height: "100%",
-                },
+        <UserButton
+          afterSignOutUrl="/"
+          appearance={{
+            baseTheme: theme === "dark" ? dark : undefined,
+            elements: {
+              avatarBox: {
+                width: "2.5rem",
+                height: "2.5rem",
               },
-            }}
-          />
-        </div>
+            },
+          }}
+        />
       </div>
     </nav>
   );

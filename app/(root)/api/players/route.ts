@@ -6,14 +6,13 @@ import {
 } from "@/lib/validation/player";
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
-import { toast } from "sonner";
 
 export async function GET() {
   try {
     const { userId } = auth();
 
     if (!userId) {
-      toast.error("User Unauthorized");
+      console.log("User Unauthorized");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

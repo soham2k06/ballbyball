@@ -1,11 +1,10 @@
-import Image from "next/image";
 import DarkModeToggle from "./DarkModeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 function Footer() {
   return (
-    <div className="text-muted-foreground border-t mt-4 text-sm p-2 md:fixed w-full md:bottom-0">
-      <div className="max-w-7xl mx-auto flex justify-between w-full items-center">
+    <div className="mt-4 w-full border-t p-2 text-sm text-muted-foreground md:fixed md:bottom-0">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
         <ul className="flex gap-4">
           <a href="https://github.com/rudrabhikadiya3">
             <Avatar>
@@ -21,7 +20,7 @@ function Footer() {
           </a>
         </ul>
 
-        <h2 className="text-xl tracking-tight font-semibold">
+        <h2 className="text-xl font-semibold tracking-tight">
           &copy; BallByBall.
         </h2>
         <DarkModeToggle />

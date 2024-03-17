@@ -1,5 +1,4 @@
 import MatchList from "@/components/match/MatchList";
-import StartMatchButton from "@/components/match/StartMatch";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

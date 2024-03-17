@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import { createTeamSchema, updateTeamSchema } from "@/lib/validation/team";
+import { createTeamSchema } from "@/lib/validation/team";
 
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
@@ -43,6 +43,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ team }, { status: 201 });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
