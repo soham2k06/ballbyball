@@ -75,6 +75,7 @@ function BallSummary({
             | "-1"
             | "-2"
             | "-3",
+          size,
         }),
       )}
     >
