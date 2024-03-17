@@ -18,20 +18,24 @@ function FooterSummary({
   chartSummaryData: { runs: number }[];
   overSummaries: EventType[][];
 }) {
+  // manual batman selection
+  // manual bowler selection
+  // all over summaries
+  // run per over chart
   return (
-    <div className="bg-muted w-full text-lg text-muted-foreground rounded-md flex items-center p-2 justify-between">
-      <div className="flex items-center">
+    <div className="flex w-full items-center justify-between rounded-md bg-muted p-2 text-lg text-muted-foreground">
+      {/* <div className="flex items-center">
         <span>Extras: {extras}</span>
         <Separator
           orientation="vertical"
-          className="bg-muted-foreground h-6 mx-2"
+          className="mx-2 h-6 bg-muted-foreground"
         />
         <span>
           This Over: {curOverRuns || 0}/{curOverWickets || 0}
         </span>
-      </div>
+      </div> */}
 
-      <div className="gap-2 flex">
+      <div className="flex gap-2">
         <OverStats
           runRate={runRate as number}
           chartSummaryData={chartSummaryData}

@@ -26,6 +26,7 @@ import BatsmanScores from "./BatsmanScores";
 import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
 import SelectBowler from "../players-selection/SelectBowler";
 import { strikeChangers } from "@/lib/constants";
+import Tools from "./Tools";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -196,7 +197,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           ),
       });
     }
-
     if (updatedCurPlayers) {
       udpateMatch({
         id: matchId,
@@ -258,13 +258,23 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             }
             events={events as BallEvent[]}
           />
-          <FooterSummary
+          {/* <FooterSummary
             extras={extras}
             curOverRuns={curOverRuns}
             curOverWickets={curOverWickets}
             runRate={runRate}
             chartSummaryData={chartSummaryData}
             overSummaries={overSummaries}
+          /> */}
+          <Tools
+            chartSummaryData={chartSummaryData}
+            overSummaries={overSummaries}
+            runRate={runRate}
+            curPlayers={curPlayers}
+            setCurPlayers={setCurPlayers}
+            events={events}
+            handleSave={handleSave}
+            match={match!}
           />
         </CardContent>
         <Separator className="my-4 sm:my-4" />
