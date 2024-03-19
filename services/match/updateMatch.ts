@@ -6,7 +6,7 @@ export const udpateMatch = async (data: UpdateMatchSchema) => {
 
   const dataWithSortedCurPlayers = {
     ...data,
-    curPlayers: data.curPlayers.sort(
+    curPlayers: data.curPlayers?.sort(
       (a, b) => a?.type.localeCompare(b?.type!)!,
     ),
   };

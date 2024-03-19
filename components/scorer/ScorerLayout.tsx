@@ -10,7 +10,6 @@ import DangerActions from "./DangerActions";
 import ScoreDisplay from "./ScoreDisplay";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
-import FooterSummary from "./FooterSummary";
 import { BallEvent, CurPlayer } from "@prisma/client";
 import { useSaveBallEvents } from "@/hooks/api/ballEvent/useCreateBallEvent";
 import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
@@ -27,6 +26,8 @@ import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
 import SelectBowler from "../players-selection/SelectBowler";
 import { strikeChangers } from "@/lib/constants";
 import Tools from "./Tools";
+import { useTeamById } from "@/hooks/api/team/useTeamById";
+import { TypographyH4 } from "../ui/typography";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -44,6 +45,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const { events: fetchedEvents } = useEventsById(matchId);
 
   const { match } = useMatchById(matchId);
+
+  const { team } = useTeamById(match?.teamIds?.[match.curTeam]!);
 
   const { createBallEvent, isPending } = useSaveBallEvents();
   const { udpateMatch } = useUpdateMatch();
@@ -89,9 +92,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const runs = calcRuns(balls);
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
-  const extras = balls.filter(
-    (ball) => ball === "-2" || ball.includes("-3"),
-  ).length;
+  // const extras = balls.filter(
+  //   (ball) => ball === "-2" || ball.includes("-3"),
+  // ).length;
 
   const showSelectBatsman =
     curPlayers.filter((player) => player.type === "batsman").length !== 2;
@@ -134,8 +137,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }));
 
   const curOverIndex = Math.floor(totalBalls / 6);
-  const curOverRuns = calcRuns(overSummaries[curOverIndex]);
-  const curOverWickets = calcWickets(overSummaries[curOverIndex]);
 
   // ** Handlers
   function handleStrikeChange(ballEventType: EventType) {
@@ -167,8 +168,19 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       (event.includes("-3") ? event.slice(-1) : event) as EventType,
     );
 
-    const isLastBallOfOver = totalBalls % 6 === 5 && totalBalls > 0;
+    const matchBalls = match?.overs! * 6;
+    const isLastBallOfOver =
+      totalBalls % 6 === 5 && totalBalls > 0 && matchBalls - 1 !== totalBalls;
     if (isLastBallOfOver) setIsBowlerSelected(false);
+    else if (totalBalls === matchBalls - 1 && totalBalls > 0)
+      udpateMatch(
+        {
+          id: matchId,
+          curPlayers: [],
+          curTeam: Number(Boolean(match?.curTeam)),
+        },
+        { onSuccess: () => toast.success("Auto saved and inning changed") },
+      );
   }
 
   const handleUndo = () => {
@@ -186,6 +198,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     setEvents(events.slice(0, -1));
   };
 
+  console.log("curTeam", match?.curTeam);
   function handleSave(_: unknown, updatedCurPlayers?: CurPlayer[]) {
     if (balls.length) {
       createBallEvent(events, {
@@ -215,6 +228,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     udpateMatch({
       id: matchId,
       curPlayers: [],
+      curTeam: 0,
     });
     setOnStrikeBatsman(0);
   }
@@ -238,6 +252,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           />
         </div>
         <CardContent className="space-y-4 max-sm:p-0">
+          <TypographyH4 className="mt-10">{team?.name}</TypographyH4>
           <ScoreDisplay
             runs={runs}
             wickets={wickets}
@@ -258,14 +273,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             }
             events={events as BallEvent[]}
           />
-          {/* <FooterSummary
-            extras={extras}
-            curOverRuns={curOverRuns}
-            curOverWickets={curOverWickets}
-            runRate={runRate}
-            chartSummaryData={chartSummaryData}
-            overSummaries={overSummaries}
-          /> */}
           <Tools
             chartSummaryData={chartSummaryData}
             overSummaries={overSummaries}

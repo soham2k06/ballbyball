@@ -24,8 +24,8 @@ export const updateMatchSchema = z.object({
   // desc: z.string().optional(),
   // teamIds: z.array(z.string()).min(2, { message: "Select exact two teams" }),
   // overs: z.number().min(1).max(50).optional(),
-  curPlayers: z.array(curPlayer.nullable()),
-  // curTeam: z.number().min(0).max(1),
+  curPlayers: z.array(curPlayer.nullable()).optional(),
+  curTeam: z.number().optional(),
   // date: z.date().optional(),
   // time: z.date().optional(),
 });

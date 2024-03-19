@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
 
-import { BarChartBig, ListOrdered } from "lucide-react";
+import { BarChartBig, ListOrdered, Pencil } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -23,6 +23,7 @@ import SelectBatsman from "../players-selection/SelectBatsman";
 import { BallEvent, CurPlayer, Match } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import SelectBowler from "../players-selection/SelectBowler";
+import Image from "next/image";
 
 interface StatsAndSettingsProps {
   runRate: number;
@@ -53,7 +54,7 @@ function StatsAndSettings({
   return (
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
-        <Button className="w-full">Stats & Selection</Button>
+        <Button className="w-full">Stats & Settings</Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader className="text-left">
@@ -67,13 +68,21 @@ function StatsAndSettings({
         </TypographyP>
 
         <Button
-          className="mb-2 w-full"
+          className="mb-2 w-full space-x-2"
           onClick={() => setShowSelectBatsman(true)}
         >
-          Select Batsman
+          <Image
+            src="/icons/bat.png"
+            alt="bat icon"
+            width={24}
+            height={24}
+            className="invert"
+          />
+          <span>Select Batsman</span>
         </Button>
         <SelectBatsman
           open={showSelectBatsman}
+          setOpen={setShowSelectBatsman}
           curPlayers={curPlayers}
           setCurPlayers={setCurPlayers}
           match={match}
@@ -85,11 +94,22 @@ function StatsAndSettings({
           }}
           isManualMode
         />
-        <Button className="w-full" onClick={() => setShowSelectBowler(true)}>
-          Select Bowler
+        <Button
+          className="w-full space-x-2"
+          onClick={() => setShowSelectBowler(true)}
+        >
+          <Image
+            src="/icons/ball.png"
+            alt="ball icon"
+            width={24}
+            height={24}
+            className="invert"
+          />{" "}
+          <span>Select Bowler</span>
         </Button>
         <SelectBowler
           open={showSelectBowler}
+          setOpen={setShowSelectBowler}
           curPlayers={curPlayers}
           setCurPlayers={setCurPlayers}
           match={match}
@@ -136,6 +156,12 @@ function StatsAndSettings({
             <FullOverSummary overSummaries={overSummaries} />
           </DrawerContent>
         </Drawer>
+        <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
+          Settings
+        </TypographyP>
+        <Button className="w-full space-x-2">
+          <Pencil /> <span>Match Settings</span>
+        </Button>
       </SheetContent>
     </Sheet>
   );

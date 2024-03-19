@@ -18,10 +18,13 @@ import { cn } from "@/lib/utils";
 import { TypographyH3 } from "../ui/typography";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { X } from "lucide-react";
 
 interface SelectBowlerProps {
   match: Match;
   open: boolean;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
+  onClose?: () => void;
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
@@ -31,6 +34,7 @@ interface SelectBowlerProps {
 
 function SelectBowler({
   open,
+  setOpen,
   match,
   handleSave,
   handleUndo,
@@ -96,19 +100,24 @@ function SelectBowler({
   // TODO: New reusable component for player label
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <TypographyH3 className="text-2xl font-bold">
-              Select Bowler
+              Select Bowler - {team?.name}
             </TypographyH3>
-            {!!match?.curPlayers.find((player) => player.type === "bowler") &&
-              !isManualMode && (
-                <Button variant="destructive" onClick={handleUndo}>
-                  Undo
-                </Button>
-              )}
+            {!!match?.curPlayers.find((player) => player.type === "bowler") && (
+              <Button
+                variant={isManualMode ? "ghost" : "destructive"}
+                size={isManualMode ? "icon" : "default"}
+                onClick={
+                  isManualMode ? () => setOpen && setOpen(false) : handleUndo
+                }
+              >
+                {isManualMode ? <X /> : "Undo"}
+              </Button>
+            )}
           </div>
           <Form {...form}>
             {/* TODO: Search field HERE to filter players */}

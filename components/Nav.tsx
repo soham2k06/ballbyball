@@ -40,7 +40,9 @@ function Nav() {
         </Link>
         <ul className="hidden md:flex">
           {navItems.map((item) => (
-            <NavItem href={item.href}>{item.name}</NavItem>
+            <NavItem key={item.name} href={item.href}>
+              {item.name}
+            </NavItem>
           ))}
         </ul>
 
@@ -58,7 +60,11 @@ function Nav() {
             </SheetHeader>
             <ul>
               {navItems.map((item) => (
-                <NavItem href={item.href} onClick={() => setIsSheetOpen(false)}>
+                <NavItem
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsSheetOpen(false)}
+                >
                   {item.name}
                 </NavItem>
               ))}

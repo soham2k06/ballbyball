@@ -58,8 +58,6 @@ function BowlerScores({ playerId, events }: BowlerScoresProps) {
     return Object.values(bowlerStats);
   }
 
-  console.log(getBowlerStats(events));
-
   return (
     <div className="flex w-full items-center justify-between rounded-md bg-muted p-2 text-lg">
       {player?.name}
