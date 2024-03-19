@@ -64,7 +64,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
-  const balls = events?.map((event) => event.type as EventType);
+  const balls = events
+    ?.filter((event) => team?.playerIds.includes(event.batsmanId))
+    .map((event) => event.type as EventType);
 
   const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
 
@@ -86,10 +88,45 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     if (isLastBallOfOver) changeStrike();
   }, [totalBalls]);
 
+  // Handling after last ball
+  useEffect(() => {
+    const matchBalls = match?.overs! * 6;
+    const isLastBallOfOver =
+      totalBalls % 6 === 6 && totalBalls > 0 && matchBalls !== totalBalls;
+
+    if (isLastBallOfOver) {
+      setIsBowlerSelected(false);
+
+      if (totalBalls === matchBalls && totalBalls) {
+        const playerIds = new Set(team?.playerIds);
+        let isInSecondInning = false;
+
+        for (const event of events) {
+          if (!playerIds?.has(event.batsmanId)) {
+            isInSecondInning = true;
+            break;
+          }
+        }
+
+        if (!isInSecondInning)
+          handleSave(0, [], Number(!Boolean(match?.curTeam)));
+        else {
+          toast.info("Match finished!");
+          handleSave(0, match?.curPlayers);
+        }
+      }
+    }
+  }, [totalBalls, match?.overs, events, team?.playerIds, match?.curTeam]);
+
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
   // ** Calculations & Derived states
   const runs = calcRuns(balls);
+  const opponentRuns = calcRuns(
+    events
+      ?.filter((event) => team?.playerIds.includes(event.bowlerId))
+      .map((event) => event.type as EventType),
+  );
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
   // const extras = balls.filter(
@@ -143,6 +180,51 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     if (strikeChangers.includes(ballEventType)) changeStrike();
   }
 
+  const handleUndo = () => {
+    const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
+    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
+    setIsModified(true);
+    // TODO: Improve this logic
+    // Explanation: Changing strike twice to tackle strike change on first ball of over
+    if (isLastBallOfOver) changeStrike();
+    if (strikeChangers.includes(events[events.length - 1]?.type)) {
+      if (isFirstBallOfOver) changeStrike();
+      changeStrike();
+    }
+
+    setEvents(events.slice(0, -1));
+  };
+
+  function handleSave(
+    _: unknown,
+    updatedCurPlayers?: CurPlayer[],
+    curTeam?: number,
+  ) {
+    if (balls.length) {
+      createBallEvent(events, {
+        onSuccess: () =>
+          toast.success(
+            !!updatedCurPlayers
+              ? "Score auto saved"
+              : "Score saved successfully",
+          ),
+      });
+    }
+
+    if (updatedCurPlayers) {
+      udpateMatch({
+        id: matchId,
+        curPlayers: updatedCurPlayers,
+        ...(curTeam && { curTeam }),
+      });
+
+      if (updatedCurPlayers.some((player) => player.type === "bowler"))
+        setIsBowlerSelected(true);
+    }
+
+    setIsModified(false);
+  }
+
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     setIsModified(true);
 
@@ -167,60 +249,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     handleStrikeChange(
       (event.includes("-3") ? event.slice(-1) : event) as EventType,
     );
-
-    const matchBalls = match?.overs! * 6;
-    const isLastBallOfOver =
-      totalBalls % 6 === 5 && totalBalls > 0 && matchBalls - 1 !== totalBalls;
-    if (isLastBallOfOver) setIsBowlerSelected(false);
-    else if (totalBalls === matchBalls - 1 && totalBalls > 0)
-      udpateMatch(
-        {
-          id: matchId,
-          curPlayers: [],
-          curTeam: Number(!Boolean(match?.curTeam)),
-        },
-        { onSuccess: () => toast.success("Auto saved and inning changed") },
-      );
-  }
-
-  const handleUndo = () => {
-    const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
-    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-    setIsModified(true);
-    // TODO: Improve this logic
-    // Explanation: Changing strike twice to tackle strike change on first ball of over
-    if (isLastBallOfOver) changeStrike();
-    if (strikeChangers.includes(events[events.length - 1]?.type)) {
-      if (isFirstBallOfOver) changeStrike();
-      changeStrike();
-    }
-
-    setEvents(events.slice(0, -1));
-  };
-
-  console.log("curTeam", match?.curTeam);
-  function handleSave(_: unknown, updatedCurPlayers?: CurPlayer[]) {
-    if (balls.length) {
-      createBallEvent(events, {
-        onSuccess: () =>
-          toast.success(
-            !!updatedCurPlayers
-              ? "Score auto saved"
-              : "Score saved successfully",
-          ),
-      });
-    }
-    if (updatedCurPlayers) {
-      udpateMatch({
-        id: matchId,
-        curPlayers: updatedCurPlayers,
-      });
-
-      if (updatedCurPlayers.some((player) => player.type === "bowler"))
-        setIsBowlerSelected(true);
-    }
-
-    setIsModified(false);
   }
 
   function handleRestart() {
@@ -259,6 +287,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             totalBalls={totalBalls}
             runRate={runRate}
           />
+          <p>Opponent: {opponentRuns}</p>
           <ul className="flex justify-start gap-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
