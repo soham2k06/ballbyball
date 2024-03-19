@@ -1,7 +1,6 @@
 import { EventType } from "@/types";
-import { Separator } from "../ui/separator";
-import FullOverSummary from "./FullOverSummary";
-import OverStats from "./OverStats";
+// import FullOverSummary from "./FullOverSummary";
+// import OverStats from "./OverStats";
 
 function FooterSummary({
   curOverRuns,
@@ -36,11 +35,11 @@ function FooterSummary({
       </div> */}
 
       <div className="flex gap-2">
-        <OverStats
+        {/* <OverStats
           runRate={runRate as number}
           chartSummaryData={chartSummaryData}
         />
-        <FullOverSummary overSummaries={overSummaries} />
+        <FullOverSummary overSummaries={overSummaries} /> */}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { usePlayerById } from "@/hooks/api/player/usePlayerById";
 import { calcRuns, getIsInvalidBall } from "@/lib/utils";
-import { EventType } from "@/types";
+// import { EventType } from "@/types";
 
 import { BallEvent, Player } from "@prisma/client";
 
@@ -10,11 +10,11 @@ interface BatsmanScoresProps {
   events: BallEvent[];
 }
 
-interface BatsmanStats {
-  batsmanId: string;
-  events: EventType[];
-  outBy?: string;
-}
+// interface BatsmanStats {
+//   batsmanId: string;
+//   events: EventType[];
+//   outBy?: string;
+// }
 
 function BatsmanScores({
   playerIds,
@@ -25,30 +25,30 @@ function BatsmanScores({
   const player1 = usePlayerById(playerIds[0]);
   const player2 = usePlayerById(playerIds[1]);
 
-  function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
-    const batsmanStats: { [batsmanId: string]: BatsmanStats } = {};
+  // function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
+  //   const batsmanStats: { [batsmanId: string]: BatsmanStats } = {};
 
-    events.forEach((event) => {
-      const { batsmanId, type, bowlerId } = event;
+  //   events.forEach((event) => {
+  //     const { batsmanId, type, bowlerId } = event;
 
-      if (!batsmanStats[batsmanId]) {
-        batsmanStats[batsmanId] = {
-          batsmanId: batsmanId,
-          events: [],
-        };
-      }
+  //     if (!batsmanStats[batsmanId]) {
+  //       batsmanStats[batsmanId] = {
+  //         batsmanId: batsmanId,
+  //         events: [],
+  //       };
+  //     }
 
-      batsmanStats[batsmanId].events.push(type);
+  //     batsmanStats[batsmanId].events.push(type);
 
-      if (type === "-1") {
-        batsmanStats[batsmanId].outBy = bowlerId;
-      }
-    });
+  //     if (type === "-1") {
+  //       batsmanStats[batsmanId].outBy = bowlerId;
+  //     }
+  //   });
 
-    return Object.values(batsmanStats);
-  }
+  //   return Object.values(batsmanStats);
+  // }
 
-  const batsmanStats = getBatsmanStats(events);
+  // const batsmanStats = getBatsmanStats(events);
 
   return (
     <div className="flex w-full flex-col items-center justify-between rounded-md bg-muted p-2 text-lg">

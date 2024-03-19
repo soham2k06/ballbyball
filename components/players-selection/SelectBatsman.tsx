@@ -19,10 +19,12 @@ import { Dispatch, SetStateAction, useEffect } from "react";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { toast } from "sonner";
 import PlayerLabel from "./PlayerLabel";
+import { X } from "lucide-react";
 
 interface SelectBatsmanProps {
   match: Match;
   open: boolean;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
@@ -40,6 +42,7 @@ function SelectBatsman({
   match,
   events,
   open,
+  setOpen,
   handleSave,
   handleUndo,
   setCurPlayers,
@@ -111,14 +114,20 @@ function SelectBatsman({
   // TODO: New reusable component for player label // DONE
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <TypographyH3>Select Batsman</TypographyH3>
-            {!!curPlayers.length && !isManualMode && (
-              <Button variant="destructive" onClick={handleUndo}>
-                Undo
+            <TypographyH3>Select Batsman - {team?.name}</TypographyH3>
+            {!!curPlayers.length && (
+              <Button
+                variant={isManualMode ? "ghost" : "destructive"}
+                size={isManualMode ? "icon" : "default"}
+                onClick={
+                  isManualMode ? () => setOpen && setOpen(false) : handleUndo
+                }
+              >
+                {isManualMode ? <X /> : "Undo"}
               </Button>
             )}
           </div>

@@ -10,7 +10,6 @@ import DangerActions from "./DangerActions";
 import ScoreDisplay from "./ScoreDisplay";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
-import FooterSummary from "./FooterSummary";
 import { BallEvent, CurPlayer } from "@prisma/client";
 import { useSaveBallEvents } from "@/hooks/api/ballEvent/useCreateBallEvent";
 import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
@@ -27,6 +26,8 @@ import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
 import SelectBowler from "../players-selection/SelectBowler";
 import { strikeChangers } from "@/lib/constants";
 import Tools from "./Tools";
+import { useTeamById } from "@/hooks/api/team/useTeamById";
+import { TypographyH4 } from "../ui/typography";
 
 export const ballEvents: Record<BallEvent["type"], string> = {
   "-3": "NB",
@@ -45,6 +46,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   const { match } = useMatchById(matchId);
 
+  const { team } = useTeamById(match?.teamIds?.[match.curTeam]!);
+
   const { createBallEvent, isPending } = useSaveBallEvents();
   const { udpateMatch } = useUpdateMatch();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
@@ -61,7 +64,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
-  const balls = events?.map((event) => event.type as EventType);
+  const balls = events
+    ?.filter((event) => team?.playerIds.includes(event.batsmanId))
+    .map((event) => event.type as EventType);
 
   const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
 
@@ -83,15 +88,50 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     if (isLastBallOfOver) changeStrike();
   }, [totalBalls]);
 
+  // Handling after last ball
+  useEffect(() => {
+    const matchBalls = match?.overs! * 6;
+    const isLastBallOfOver =
+      totalBalls % 6 === 6 && totalBalls > 0 && matchBalls !== totalBalls;
+
+    if (isLastBallOfOver) {
+      setIsBowlerSelected(false);
+
+      if (totalBalls === matchBalls && totalBalls) {
+        const playerIds = new Set(team?.playerIds);
+        let isInSecondInning = false;
+
+        for (const event of events) {
+          if (!playerIds?.has(event.batsmanId)) {
+            isInSecondInning = true;
+            break;
+          }
+        }
+
+        if (!isInSecondInning)
+          handleSave(0, [], Number(!Boolean(match?.curTeam)));
+        else {
+          toast.info("Match finished!");
+          handleSave(0, match?.curPlayers);
+        }
+      }
+    }
+  }, [totalBalls, match?.overs, events, team?.playerIds, match?.curTeam]);
+
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
   // ** Calculations & Derived states
   const runs = calcRuns(balls);
+  const opponentRuns = calcRuns(
+    events
+      ?.filter((event) => team?.playerIds.includes(event.bowlerId))
+      .map((event) => event.type as EventType),
+  );
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
-  const extras = balls.filter(
-    (ball) => ball === "-2" || ball.includes("-3"),
-  ).length;
+  // const extras = balls.filter(
+  //   (ball) => ball === "-2" || ball.includes("-3"),
+  // ).length;
 
   const showSelectBatsman =
     curPlayers.filter((player) => player.type === "batsman").length !== 2;
@@ -134,12 +174,55 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }));
 
   const curOverIndex = Math.floor(totalBalls / 6);
-  const curOverRuns = calcRuns(overSummaries[curOverIndex]);
-  const curOverWickets = calcWickets(overSummaries[curOverIndex]);
 
   // ** Handlers
   function handleStrikeChange(ballEventType: EventType) {
     if (strikeChangers.includes(ballEventType)) changeStrike();
+  }
+
+  const handleUndo = () => {
+    const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
+    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
+    setIsModified(true);
+    // TODO: Improve this logic
+    // Explanation: Changing strike twice to tackle strike change on first ball of over
+    if (isLastBallOfOver) changeStrike();
+    if (strikeChangers.includes(events[events.length - 1]?.type)) {
+      if (isFirstBallOfOver) changeStrike();
+      changeStrike();
+    }
+
+    setEvents(events.slice(0, -1));
+  };
+
+  function handleSave(
+    _: unknown,
+    updatedCurPlayers?: CurPlayer[],
+    curTeam?: number,
+  ) {
+    if (balls.length) {
+      createBallEvent(events, {
+        onSuccess: () =>
+          toast.success(
+            !!updatedCurPlayers
+              ? "Score auto saved"
+              : "Score saved successfully",
+          ),
+      });
+    }
+
+    if (updatedCurPlayers) {
+      udpateMatch({
+        id: matchId,
+        curPlayers: updatedCurPlayers,
+        ...(curTeam && { curTeam }),
+      });
+
+      if (updatedCurPlayers.some((player) => player.type === "bowler"))
+        setIsBowlerSelected(true);
+    }
+
+    setIsModified(false);
   }
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
@@ -166,48 +249,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     handleStrikeChange(
       (event.includes("-3") ? event.slice(-1) : event) as EventType,
     );
-
-    const isLastBallOfOver = totalBalls % 6 === 5 && totalBalls > 0;
-    if (isLastBallOfOver) setIsBowlerSelected(false);
-  }
-
-  const handleUndo = () => {
-    const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
-    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-    setIsModified(true);
-    // TODO: Improve this logic
-    // Explanation: Changing strike twice to tackle strike change on first ball of over
-    if (isLastBallOfOver) changeStrike();
-    if (strikeChangers.includes(events[events.length - 1]?.type)) {
-      if (isFirstBallOfOver) changeStrike();
-      changeStrike();
-    }
-
-    setEvents(events.slice(0, -1));
-  };
-
-  function handleSave(_: unknown, updatedCurPlayers?: CurPlayer[]) {
-    if (balls.length) {
-      createBallEvent(events, {
-        onSuccess: () =>
-          toast.success(
-            !!updatedCurPlayers
-              ? "Score auto saved"
-              : "Score saved successfully",
-          ),
-      });
-    }
-    if (updatedCurPlayers) {
-      udpateMatch({
-        id: matchId,
-        curPlayers: updatedCurPlayers,
-      });
-
-      if (updatedCurPlayers.some((player) => player.type === "bowler"))
-        setIsBowlerSelected(true);
-    }
-
-    setIsModified(false);
   }
 
   function handleRestart() {
@@ -215,6 +256,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     udpateMatch({
       id: matchId,
       curPlayers: [],
+      curTeam: 0,
     });
     setOnStrikeBatsman(0);
   }
@@ -238,12 +280,14 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           />
         </div>
         <CardContent className="space-y-4 max-sm:p-0">
+          <TypographyH4 className="mt-10">{team?.name}</TypographyH4>
           <ScoreDisplay
             runs={runs}
             wickets={wickets}
             totalBalls={totalBalls}
             runRate={runRate}
           />
+          <p>Opponent: {opponentRuns}</p>
           <ul className="flex justify-start gap-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
@@ -258,14 +302,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             }
             events={events as BallEvent[]}
           />
-          {/* <FooterSummary
-            extras={extras}
-            curOverRuns={curOverRuns}
-            curOverWickets={curOverWickets}
-            runRate={runRate}
-            chartSummaryData={chartSummaryData}
-            overSummaries={overSummaries}
-          /> */}
           <Tools
             chartSummaryData={chartSummaryData}
             overSummaries={overSummaries}
