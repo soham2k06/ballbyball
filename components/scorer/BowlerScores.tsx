@@ -7,11 +7,11 @@ interface BowlerScoresProps {
   events: BallEvent[];
 }
 
-interface BowlerStats {
-  bowlerId: string;
-  runs: number;
-  balls: number;
-}
+// interface BowlerStats {
+//   bowlerId: string;
+//   runs: number;
+//   balls: number;
+// }
 
 function BowlerScores({ playerId, events }: BowlerScoresProps) {
   // TODO: Skeleton here
@@ -37,26 +37,26 @@ function BowlerScores({ playerId, events }: BowlerScoresProps) {
 
   const totalWickets = calcWickets(legalBallTypes);
 
-  function getBowlerStats(events: BallEvent[]): BowlerStats[] {
-    const bowlerStats: { [batsmanId: string]: BowlerStats } = {};
+  // function getBowlerStats(events: BallEvent[]): BowlerStats[] {
+  //   const bowlerStats: { [batsmanId: string]: BowlerStats } = {};
 
-    events.forEach((event) => {
-      const { type, bowlerId } = event;
+  //   events.forEach((event) => {
+  //     const { type, bowlerId } = event;
 
-      if (!bowlerStats[bowlerId]) {
-        bowlerStats[bowlerId] = {
-          bowlerId,
-          runs: 0,
-          balls: 0,
-        };
-      }
+  //     if (!bowlerStats[bowlerId]) {
+  //       bowlerStats[bowlerId] = {
+  //         bowlerId,
+  //         runs: 0,
+  //         balls: 0,
+  //       };
+  //     }
 
-      bowlerStats[bowlerId].runs += Number(type);
-      bowlerStats[bowlerId].balls++;
-    });
+  //     bowlerStats[bowlerId].runs += Number(type);
+  //     bowlerStats[bowlerId].balls++;
+  //   });
 
-    return Object.values(bowlerStats);
-  }
+  //   return Object.values(bowlerStats);
+  // }
 
   return (
     <div className="flex w-full items-center justify-between rounded-md bg-muted p-2 text-lg">
