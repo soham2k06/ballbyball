@@ -177,7 +177,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         {
           id: matchId,
           curPlayers: [],
-          curTeam: Number(Boolean(match?.curTeam)),
+          curTeam: Number(!Boolean(match?.curTeam)),
         },
         { onSuccess: () => toast.success("Auto saved and inning changed") },
       );
