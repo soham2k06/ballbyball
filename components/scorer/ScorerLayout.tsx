@@ -1,7 +1,12 @@
 "use client";
 
 import { EventType } from "@/types";
-import { calcRuns, calcWickets, getIsInvalidBall } from "@/lib/utils";
+import {
+  calcRuns,
+  calcWickets,
+  generateOverSummary,
+  getScore,
+} from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -25,19 +30,7 @@ import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
 import SelectBowler from "../players-selection/SelectBowler";
-import { strikeChangers } from "@/lib/constants";
-
-export const ballEvents: Record<BallEvent["type"], string> = {
-  "-3": "NB",
-  "-2": "WD",
-  "-1": "W",
-  "0": "0",
-  "1": "1",
-  "2": "2",
-  "3": "3",
-  "4": "4",
-  "6": "6",
-};
+import { ballEvents, strikeChangers } from "@/lib/constants";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { events: fetchedEvents } = useEventsById(matchId);
@@ -62,11 +55,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   const balls = events?.map((event) => event.type as EventType);
 
-  const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
-
   const [isBowlerSelected, setIsBowlerSelected] = useState(true);
 
   const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));
+
+  const { runs, totalBalls, wickets, extras, runRate } = getScore(balls);
 
   // ** Effects
   useEffect(() => {
@@ -84,14 +77,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
-  // ** Calculations & Derived states
-  const runs = calcRuns(balls);
-  const wickets = calcWickets(balls);
-  const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
-  const extras = balls.filter(
-    (ball) => ball === "-2" || ball.includes("-3"),
-  ).length;
-
   const showSelectBatsman =
     curPlayers.filter((player) => player.type === "batsman").length !== 2;
   const showSelectBowler =
@@ -101,31 +86,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // ** Over Summary
   let ballLimitInOver = 6;
-  function generateOverSummary(ballEvents: EventType[]) {
-    const overSummaries: EventType[][] = [];
-    let validBallCount = 0;
-    let currentOver: EventType[] = [];
-    for (const ballEvent of ballEvents) {
-      const isInvalidBall = getIsInvalidBall(ballEvent);
-      currentOver.push(ballEvent);
-      if (isInvalidBall) {
-        validBallCount++;
-        if (validBallCount === 6) {
-          overSummaries.push(currentOver);
-          currentOver = [];
-          validBallCount = 0;
-          ballLimitInOver = 6;
-        }
-      } else ballLimitInOver++;
-    }
 
-    if (validBallCount >= 0 && currentOver.length > 0) {
-      overSummaries.push(currentOver);
-    }
-
-    return overSummaries;
-  }
-  const overSummaries: EventType[][] = generateOverSummary(balls);
+  const overSummaries: EventType[][] = generateOverSummary({
+    ballEvents: balls,
+    ballLimitInOver,
+  });
 
   const chartSummaryData = overSummaries.map((summary, i) => ({
     name: i < 9 ? `Over ${i + 1}` : i + 1,

@@ -1,6 +1,6 @@
 import { Separator } from "../ui/separator";
 
-function ScoreWrapper({
+function ScoreDisplay({
   runs,
   wickets,
   totalBalls,
@@ -31,4 +31,4 @@ function ScoreWrapper({
   );
 }
 
-export default ScoreWrapper;
+export default ScoreDisplay;

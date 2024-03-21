@@ -4,14 +4,9 @@ import { UserButton } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { dark } from "@clerk/themes";
-import { usePathname } from "next/navigation";
 
 function Nav() {
-  const pathName = usePathname();
   const { theme } = useTheme();
-
-  const blankRoutes = ["/start-a-match", "/scorer"];
-  if (blankRoutes.includes(pathName)) return null;
 
   return (
     <nav className="border-b py-4 max-xl:p-4">

@@ -1,4 +1,4 @@
-import ScorerLayout from "@/components/scorer/ScorerLayout";
+import ScorerLayout from "@/components/scorer/NormalScorerLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,10 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  // TODO: remove full features for normal scoring
-  return (
-    <div className="flex h-full flex-col items-center md:justify-center">
-      <ScorerLayout matchId="none" />
-    </div>
-  );
+  return <ScorerLayout />;
 }
