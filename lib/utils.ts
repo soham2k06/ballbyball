@@ -1,6 +1,7 @@
-import { EventType } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+import { EventType } from "@/types";
 import { invalidBalls } from "./constants";
 
 // ** FRONTEND ** //

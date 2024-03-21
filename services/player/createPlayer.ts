@@ -1,5 +1,5 @@
-import { axiosInstance } from "../axiosInstance";
 import { CreatePlayerSchema } from "@/lib/validation/player";
+import { axiosInstance } from "../axiosInstance";
 
 export const createPlayer = async (data: CreatePlayerSchema) => {
   try {

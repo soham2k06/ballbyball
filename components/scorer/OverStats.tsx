@@ -1,4 +1,6 @@
 import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis } from "recharts";
+import { BarChart3 } from "lucide-react";
+
 import { Button } from "../ui/button";
 import {
   Drawer,
@@ -7,7 +9,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
-import { BarChart3 } from "lucide-react";
 
 function OverStats({
   chartSummaryData,

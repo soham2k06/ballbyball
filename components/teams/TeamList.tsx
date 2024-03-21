@@ -1,12 +1,13 @@
 "use client";
 
+import { LoaderIcon } from "lucide-react";
+
+import { useAllTeams } from "@/hooks/api/team/useAllTeams";
+import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
+
 import CreateTeam from "@/components/teams/CreateTeam";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TypographyP } from "@/components/ui/typography";
-import { useAllTeams } from "@/hooks/api/team/useAllTeams";
-
-import { LoaderIcon } from "lucide-react";
-import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
 
 function TeamList() {
   const { allTeams: teams, isFetching } = useAllTeams();

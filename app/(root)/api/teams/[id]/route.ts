@@ -1,6 +1,6 @@
-import prisma from "@/lib/db/prisma";
-import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+import prisma from "@/lib/db/prisma";
 import { toast } from "sonner";
 
 export async function GET(

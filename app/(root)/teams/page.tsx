@@ -1,6 +1,6 @@
-import TeamList from "@/components/teams/TeamList";
 import { auth } from "@clerk/nextjs";
 import { toast } from "sonner";
+import TeamList from "@/components/teams/TeamList";
 
 async function Teams() {
   const { userId } = auth();

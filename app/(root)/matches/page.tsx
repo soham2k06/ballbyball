@@ -1,5 +1,5 @@
-import MatchList from "@/components/match/MatchList";
 import { Metadata } from "next";
+import MatchList from "@/components/match/MatchList";
 
 export const metadata: Metadata = {
   title: "Matches - Ball By Ball",

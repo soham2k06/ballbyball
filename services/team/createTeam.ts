@@ -1,5 +1,5 @@
-import { axiosInstance } from "../axiosInstance";
 import { CreateTeamSchema } from "@/lib/validation/team";
+import { axiosInstance } from "../axiosInstance";
 
 export const createTeam = async (data: CreateTeamSchema) => {
   try {

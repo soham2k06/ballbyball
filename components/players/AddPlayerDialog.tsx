@@ -1,3 +1,13 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import { OverlayStateProps } from "@/types";
+import {
+  CreatePlayerSchema,
+  createPlayerSchema,
+} from "@/lib/validation/player";
+import { useCreatePlayer } from "@/hooks/api/player/useCreatePlayer";
+
 import {
   Dialog,
   DialogContent,
@@ -14,14 +24,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
-import { useCreatePlayer } from "@/hooks/api/player/useCreatePlayer";
-import {
-  CreatePlayerSchema,
-  createPlayerSchema,
-} from "@/lib/validation/player";
-import { OverlayStateProps } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 
 function AddPlayerFormDialog({ open, setOpen }: OverlayStateProps) {
   const form = useForm<CreatePlayerSchema>({

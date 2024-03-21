@@ -1,5 +1,5 @@
-import ScorerLayout from "@/components/scorer/ScorerLayout";
 import { Metadata } from "next";
+import ScorerLayout from "@/components/scorer/ScorerLayout";
 
 export const metadata: Metadata = {
   title: "Normal scoring - Ball By Ball",

@@ -1,6 +1,6 @@
-import { getPlayersByIds } from "@/services/player/getPlayersByIds";
 import { Player } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+import { getPlayersByIds } from "@/services/player/getPlayersByIds";
 
 export function usePlayersByIds(ids: Player["id"][][]) {
   const {

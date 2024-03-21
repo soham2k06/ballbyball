@@ -1,9 +1,8 @@
-import prisma from "@/lib/db/prisma";
-import { createMatchSchema, updateMatchSchema } from "@/lib/validation/match";
-
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs";
 import { CurPlayer } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/db/prisma";
+import { createMatchSchema, updateMatchSchema } from "@/lib/validation/match";
 
 export async function GET() {
   try {

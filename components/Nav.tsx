@@ -1,9 +1,10 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
-import { useTheme } from "next-themes";
 import Link from "next/link";
+
+import { UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { useTheme } from "next-themes";
 
 function Nav() {
   const { theme } = useTheme();

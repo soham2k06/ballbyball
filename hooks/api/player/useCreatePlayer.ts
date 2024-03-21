@@ -1,6 +1,6 @@
-import { createPlayer as createPlayerAPI } from "@/services/player/createPlayer";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { createPlayer as createPlayerAPI } from "@/services/player/createPlayer";
 
 export function useCreatePlayer() {
   const queryClient = useQueryClient();

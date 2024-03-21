@@ -1,6 +1,7 @@
+import { ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 import { FormLabel } from "../ui/form";
-import { ReactNode } from "react";
 
 interface PlayerLabelProps {
   title: string;

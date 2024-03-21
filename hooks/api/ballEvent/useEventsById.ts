@@ -1,5 +1,5 @@
-import { getEventsById } from "@/services/ballEvent/getEventsById";
 import { useQuery } from "@tanstack/react-query";
+import { getEventsById } from "@/services/ballEvent/getEventsById";
 
 export function useEventsById(id: string) {
   const {

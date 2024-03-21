@@ -5,6 +5,7 @@ import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 import { EventType } from "@/types";
 import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
+import { ballEvents } from "@/lib/constants";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -14,7 +15,6 @@ import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
 import FooterSummary from "./FooterSummary";
 import ScoreWrapper from "./ScoreDisplay";
-import { ballEvents } from "@/lib/constants";
 
 function ScorerLayout() {
   const [balls, setBalls] = useState<EventType[]>(

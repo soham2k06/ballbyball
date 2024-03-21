@@ -1,6 +1,6 @@
-import { deleteAllBallEvents as deleteAllBallEventsAPI } from "@/services/ballEvent/deleteAllBallEvents";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { deleteAllBallEvents as deleteAllBallEventsAPI } from "@/services/ballEvent/deleteAllBallEvents";
 
 export function useDeleteAllBallEvents() {
   const queryClient = useQueryClient();
