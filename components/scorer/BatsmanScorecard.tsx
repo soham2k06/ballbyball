@@ -3,6 +3,7 @@ import { BallEvent } from "@prisma/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getScore } from "@/lib/utils";
 import { EventType, MatchWithTeams, TeamWithPlayers } from "@/types";
+import { usePlayerById } from "@/apiHooks/player";
 
 interface BatsmanScorecardProps {
   match: MatchWithTeams;
@@ -62,12 +63,16 @@ function BatsmanScorecard({ match, ballEvents }: BatsmanScorecardProps) {
       <Tabs defaultValue="1-bat">
         <TabsList>
           {tabs.map((tab) => (
-            <TabsTrigger value={tab.id}>{tab.name}</TabsTrigger>
+            <TabsTrigger key={tab.id} value={tab.id}>
+              {tab.name}
+            </TabsTrigger>
           ))}
         </TabsList>
-        {tabs.map((tab, i) => {
-          return <TabsContent value={tab.id}>{tab.content}</TabsContent>;
-        })}
+        {tabs.map((tab) => (
+          <TabsContent key={tab.id} value={tab.id}>
+            {tab.content}
+          </TabsContent>
+        ))}
       </Tabs>
     </div>
   );
@@ -87,12 +92,12 @@ function BattingScore({
       {!isCurrentBatting && <p>Yet to bat</p>}
       {team.players.map((player) => {
         const outBy = ballEvents
-          .filter((event) => event.batsmanId === player.id)
-          .map((event) => {
-            const { type, bowlerId } = event;
+          .filter(
+            (event) => event.batsmanId === player.id && event.type === "-1",
+          )
+          .map(({ bowlerId }) => bowlerId);
 
-            if (type === "-1") return bowlerId;
-          });
+        const { player: playerOutBy } = usePlayerById(outBy[0]);
 
         const legalEvents = ballEvents.filter(
           (ball) => ball.type !== "-2" && player.id === ball.batsmanId,
@@ -115,9 +120,9 @@ function BattingScore({
         );
 
         return (
-          <div>
+          <div key={player.id}>
             <p>
-              {player.name} {outBy}
+              {player.name} {playerOutBy?.name}
             </p>
             <div className="space-x-2">
               <span>{runs}</span>
