@@ -4,7 +4,6 @@ import Link from "next/link";
 import { LoaderIcon } from "lucide-react";
 
 import { useAllMatches } from "@/apiHooks/match";
-import { useTeamsByIds } from "@/apiHooks/team";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
@@ -15,11 +14,9 @@ import StartMatchButton from "./StartMatch";
 function MatchList() {
   const { matches, isFetching } = useAllMatches();
 
-  const { teams, areTeamsFetching } = useTeamsByIds(
-    matches?.map((match) => match.teamIds)!,
-  );
+  const teams = matches?.map((match) => match.teams);
 
-  if (isFetching || areTeamsFetching)
+  if (isFetching)
     return (
       <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
         <LoaderIcon className="animate-spin" />

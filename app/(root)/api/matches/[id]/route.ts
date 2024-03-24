@@ -10,7 +10,10 @@ export async function GET(
     const { userId } = auth();
     if (!userId) throw new Error("User not authenticated");
 
-    const ballEvents = await prisma.match.findFirst({ where: { id } });
+    const ballEvents = await prisma.match.findFirst({
+      where: { id },
+      include: { teams: { include: { players: true } } },
+    });
 
     return NextResponse.json(ballEvents, { status: 200 });
   } catch (error) {

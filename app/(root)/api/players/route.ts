@@ -6,13 +6,14 @@ import {
   deletePlayerSchema,
   updatePlayerSchema,
 } from "@/lib/validation/player";
+import { toast } from "sonner";
 
 export async function GET() {
   try {
     const { userId } = auth();
 
     if (!userId) {
-      console.log("User Unauthorized");
+      toast.error("User Unauthorized");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

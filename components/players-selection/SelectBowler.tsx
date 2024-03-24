@@ -1,13 +1,11 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-import { CurPlayer, Match } from "@prisma/client";
+import { CurPlayer } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
-import { useTeamById } from "@/apiHooks/team";
-import { usePlayersByIds } from "@/apiHooks/player";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {
@@ -22,9 +20,10 @@ import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
+import { MatchWithTeams } from "@/types";
 
 interface SelectBowlerProps {
-  match: Match;
+  match: MatchWithTeams;
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   onClose?: () => void;
@@ -45,14 +44,11 @@ function SelectBowler({
   setCurPlayers,
   isManualMode,
 }: SelectBowlerProps) {
-  const { team } = useTeamById(match?.teamIds[Number(!match.curTeam)]!);
-  const { players } = usePlayersByIds([team?.playerIds!]);
+  const team = match?.teams[match?.curTeam === 0 ? 1 : 0];
+  const players = team?.players;
 
   const schema = z.object({
-    playerId: z.enum(team?.playerIds as any, {
-      required_error: "You need to select a notification type.",
-      invalid_type_error: "invalid_type_error",
-    }),
+    playerId: z.string(),
   });
 
   const defaultBowler = curPlayers.find(
@@ -135,7 +131,7 @@ function SelectBowler({
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        {players?.[0].map((player) => {
+                        {players?.map((player) => {
                           const isSelected = field.value?.includes(player.id);
                           const isBothSelected = field.value?.length === 1;
                           return (

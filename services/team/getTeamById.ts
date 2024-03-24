@@ -1,5 +1,6 @@
 import { Team } from "@prisma/client";
 import { axiosInstance } from "../axiosInstance";
+import { TeamWithPlayers } from "@/types";
 
 export const getTeamById = async (id: Team["id"]) => {
   try {
@@ -11,7 +12,7 @@ export const getTeamById = async (id: Team["id"]) => {
       throw new Error("Network response was not ok");
     }
 
-    return res.data as Team;
+    return res.data as TeamWithPlayers;
   } catch (error) {
     console.error("Error while fetching a team:", error);
     throw new Error((error as Error).message);

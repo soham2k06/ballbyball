@@ -1,11 +1,8 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-import { BallEvent, CurPlayer, Match } from "@prisma/client";
+import { BallEvent, CurPlayer } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-import { useTeamById } from "@/apiHooks/team";
-import { usePlayersByIds } from "@/apiHooks/player";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {
@@ -25,9 +22,10 @@ import { TypographyH3 } from "../ui/typography";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import PlayerLabel from "./PlayerLabel";
 import { X } from "lucide-react";
+import { MatchWithTeams } from "@/types";
 
 interface SelectBatsmanProps {
-  match: Match;
+  match: MatchWithTeams;
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   events: BallEvent[] | CreateBallEventSchema[];
@@ -72,8 +70,8 @@ function SelectBatsman({
 
   const { handleSubmit, control, getValues, watch, reset } = form;
 
-  const { team } = useTeamById(match?.teamIds[match.curTeam]!);
-  const { players } = usePlayersByIds([team?.playerIds!]);
+  const team = match?.teams[match.curTeam];
+  const players = team?.players;
 
   const playerPositions = ["Striker", "Non-Striker"];
 
@@ -145,7 +143,7 @@ function SelectBatsman({
                 name="playerIds"
                 render={() => (
                   <FormItem>
-                    {players?.[0]?.map((item) => (
+                    {players?.map((item) => (
                       <FormField
                         key={item.id}
                         control={control}

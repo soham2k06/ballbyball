@@ -1,5 +1,5 @@
-import { Match } from "@prisma/client";
 import { axiosInstance } from "../axiosInstance";
+import { MatchWithTeams } from "@/types";
 
 export const getMatchById = async (id: string) => {
   try {
@@ -9,7 +9,7 @@ export const getMatchById = async (id: string) => {
     if (res.status !== 200) {
       throw new Error("Network response was not ok");
     }
-    return res.data as Match;
+    return res.data as MatchWithTeams;
   } catch (error) {
     console.error("Error while fetching a match:", error);
     throw new Error((error as Error).message);

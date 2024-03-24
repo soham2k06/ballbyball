@@ -15,6 +15,8 @@ model Player {
   desc      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Team      Team?    @relation(fields: [teamId], references: [id])
+  teamId    String?  @db.ObjectId
 
   @@map("players")
 }
@@ -23,13 +25,10 @@ model Match {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   userId     String
   name       String
-  teamIds    String[]    @db.ObjectId
+  teams      Team[]
   overs      Int
   curTeam    Int
   curPlayers CurPlayer[]
-  // desc      String?
-  // date      DateTime?
-  // time      DateTime?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
@@ -50,10 +49,12 @@ model Team {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String
   name      String
-  playerIds String[] @db.ObjectId
+  players   Player[]
   captain   String?  @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Match     Match?   @relation(fields: [matchId], references: [id])
+  matchId   String?  @db.ObjectId
 
   @@map("teams")
 }

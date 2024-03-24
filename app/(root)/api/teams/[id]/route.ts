@@ -15,9 +15,12 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const players = await prisma.team.findFirst({ where: { id } });
+    const team = await prisma.team.findFirst({
+      where: { id },
+      include: { players: true },
+    });
 
-    return NextResponse.json(players, { status: 200 });
+    return NextResponse.json(team, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
