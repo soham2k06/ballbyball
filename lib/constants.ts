@@ -2,7 +2,7 @@ import { EventType } from "@/types";
 
 const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without run
 
-export const invalidBalls = ["-3", "-2"];
+const invalidBalls = ["-3", "-2"];
 
 export const ballEvents: Record<EventType, string> = {
   "-3": "NB",
@@ -16,4 +16,23 @@ export const ballEvents: Record<EventType, string> = {
   "6": "6",
 };
 
-export { strikeChangers };
+const navItems = [
+  {
+    name: "Matches",
+    href: "/matches",
+  },
+  {
+    name: "Players",
+    href: "/players",
+  },
+  {
+    name: "Teams",
+    href: "/teams",
+  },
+  {
+    name: "Normal Scoring",
+    href: "/scorer",
+  },
+];
+
+export { strikeChangers, invalidBalls, navItems };

@@ -1,9 +1,19 @@
+import { BarChart3, ListOrdered } from "lucide-react";
+
 import { EventType } from "@/types";
 
 import { Separator } from "../ui/separator";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../ui/drawer";
 
 import FullOverSummary from "./FullOverSummary";
 import OverStats from "./OverStats";
+import { Button } from "../ui/button";
 
 function FooterSummary({
   curOverRuns,
@@ -34,11 +44,36 @@ function FooterSummary({
       </div>
 
       <div className="flex gap-2">
-        <OverStats
-          runRate={runRate as number}
-          chartSummaryData={chartSummaryData}
-        />
-        <FullOverSummary overSummaries={overSummaries} />
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button size="icon">
+              <BarChart3 />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader className="mb-2 pb-4 pt-6 ">
+              <DrawerTitle className="text-center text-2xl">
+                CRR: {runRate}
+              </DrawerTitle>
+            </DrawerHeader>
+            <OverStats chartSummaryData={chartSummaryData} />
+          </DrawerContent>
+        </Drawer>
+        <Drawer preventScrollRestoration>
+          <DrawerTrigger asChild>
+            <Button size="icon">
+              <ListOrdered />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader className="mb-2 pb-4 pt-6 shadow shadow-muted">
+              <DrawerTitle className="text-center text-2xl">
+                Overs Summary
+              </DrawerTitle>
+            </DrawerHeader>
+            <FullOverSummary overSummaries={overSummaries} />
+          </DrawerContent>
+        </Drawer>
       </div>
     </div>
   );

@@ -71,13 +71,13 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" }, { status: 422 });
     }
 
-    const { id: matchId, curPlayers } = parsedRes.data;
+    const { id: matchId, curPlayers, curTeam } = parsedRes.data;
 
     if (!matchId) {
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
     }
 
-    const curPlayersToSave = curPlayers.filter(
+    const curPlayersToSave = curPlayers?.filter(
       (player) => player,
     ) as CurPlayer[];
 
@@ -85,10 +85,7 @@ export async function PUT(req: NextRequest) {
       where: { id: matchId },
       data: {
         curPlayers: curPlayersToSave,
-        // name,
-        // teamIds,
-        // curTeam,
-        // overs,
+        curTeam,
       },
     });
 

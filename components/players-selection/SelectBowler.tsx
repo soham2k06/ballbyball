@@ -21,23 +21,29 @@ import {
 import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { X } from "lucide-react";
 
 interface SelectBowlerProps {
   match: Match;
   open: boolean;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
+  onClose?: () => void;
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
-  handleUndo: () => void;
+  handleUndo?: () => void;
+  isManualMode?: boolean;
 }
 
 function SelectBowler({
   open,
+  setOpen,
   match,
   handleSave,
   handleUndo,
   curPlayers,
   setCurPlayers,
+  isManualMode,
 }: SelectBowlerProps) {
   const { team } = useTeamById(match?.teamIds[Number(!match.curTeam)]!);
   const { players } = usePlayersByIds([team?.playerIds!]);
@@ -97,16 +103,22 @@ function SelectBowler({
   // TODO: New reusable component for player label
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <TypographyH3 className="text-2xl font-bold">
-              Select Bowler
+              Select Bowler - {team?.name}
             </TypographyH3>
             {!!match?.curPlayers.find((player) => player.type === "bowler") && (
-              <Button variant="destructive" onClick={handleUndo}>
-                Undo
+              <Button
+                variant={isManualMode ? "ghost" : "destructive"}
+                size={isManualMode ? "icon" : "default"}
+                onClick={
+                  isManualMode ? () => setOpen && setOpen(false) : handleUndo
+                }
+              >
+                {isManualMode ? <X /> : "Undo"}
               </Button>
             )}
           </div>

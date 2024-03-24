@@ -36,7 +36,7 @@ function ScorerLayout() {
 
   const curOverIndex = Math.floor(totalBalls / 6);
   const { runs: curOverRuns, wickets: curOverWickets } = getScore(
-    overSummaries[curOverIndex],
+    overSummaries[curOverIndex] || [],
   );
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {

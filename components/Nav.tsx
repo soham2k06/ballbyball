@@ -6,8 +6,25 @@ import { UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
 
+import { Menu } from "lucide-react";
+
+import { navItems } from "@/lib/constants";
+
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { TypographyH2 } from "./ui/typography";
+
+import NavItem from "./NavItem";
+import { useState } from "react";
+
 function Nav() {
   const { theme } = useTheme();
+
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   return (
     <nav className="border-b py-4 max-xl:p-4">
@@ -17,41 +34,67 @@ function Nav() {
             ballbyball.
           </h1>
         </Link>
-        <ul className="flex">
-          <Link href="/matches">
-            <li className="rounded-md p-3 font-normal transition-colors hover:bg-secondary">
-              Matches
-            </li>
-          </Link>
-          <Link href="/players">
-            <li className="rounded-md p-3 font-normal transition-colors hover:bg-secondary">
-              Players
-            </li>
-          </Link>
-          <Link href="/teams">
-            <li className="rounded-md p-3 font-normal transition-colors hover:bg-secondary">
-              Teams
-            </li>
-          </Link>
-          <Link href="/scorer">
-            <li className="rounded-md p-3 font-normal transition-colors hover:bg-secondary">
-              Normal Scoring
-            </li>
-          </Link>
+        <ul className="hidden md:flex">
+          {navItems.map((item) => (
+            <NavItem key={item.name} href={item.href}>
+              {item.name}
+            </NavItem>
+          ))}
         </ul>
 
-        <UserButton
-          afterSignOutUrl="/"
-          appearance={{
-            baseTheme: theme === "dark" ? dark : undefined,
-            elements: {
-              avatarBox: {
-                width: "2.5rem",
-                height: "2.5rem",
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTrigger className="ml-auto mr-4 md:hidden">
+            <Menu />
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader className="text-left">
+              <Link href="/">
+                <TypographyH2 className="text-2xl font-semibold tracking-tighter">
+                  ballbyball.
+                </TypographyH2>
+              </Link>
+            </SheetHeader>
+            <ul>
+              {navItems.map((item) => (
+                <NavItem
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsSheetOpen(false)}
+                >
+                  {item.name}
+                </NavItem>
+              ))}
+            </ul>
+            <UserButton
+              showName
+              afterSignOutUrl="/"
+              appearance={{
+                baseTheme: theme === "dark" ? dark : undefined,
+                elements: {
+                  avatarBox: {
+                    width: "2.5rem",
+                    height: "2.5rem",
+                  },
+                },
+              }}
+            />
+          </SheetContent>
+        </Sheet>
+
+        <div className="max-md:hidden">
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              baseTheme: theme === "dark" ? dark : undefined,
+              elements: {
+                avatarBox: {
+                  width: "2.5rem",
+                  height: "2.5rem",
+                },
               },
-            },
-          }}
-        />
+            }}
+          />
+        </div>
       </div>
     </nav>
   );

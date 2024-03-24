@@ -24,15 +24,18 @@ import { TypographyH3 } from "../ui/typography";
 
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import PlayerLabel from "./PlayerLabel";
+import { X } from "lucide-react";
 
 interface SelectBatsmanProps {
   match: Match;
   open: boolean;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
-  handleUndo: () => void;
+  handleUndo?: () => void;
+  isManualMode?: boolean;
 }
 
 interface SelectBatsmanForm {
@@ -44,9 +47,11 @@ function SelectBatsman({
   match,
   events,
   open,
+  setOpen,
   handleSave,
   handleUndo,
   setCurPlayers,
+  isManualMode,
 }: SelectBatsmanProps) {
   const schema = z.object({
     playerIds: z.array(z.string()).max(2),
@@ -79,10 +84,21 @@ function SelectBatsman({
       )
       .map((id) => ({ id, type: "batsman" }));
 
-    setCurPlayers([...curPlayers, ...newCurPlayers]);
+    const prevBowler = curPlayers.find((player) => player.type === "bowler");
+    const payload = prevBowler
+      ? [
+          ...newCurPlayers,
+          ...curPlayers.filter((player) => data.playerIds.includes(player.id)),
+          prevBowler,
+        ]
+      : [
+          ...newCurPlayers,
+          ...curPlayers.filter((player) => data.playerIds.includes(player.id)),
+        ];
+    setCurPlayers(payload);
 
     // 0 is trash value
-    handleSave(0, [...curPlayers, ...newCurPlayers]);
+    handleSave(0, payload);
 
     setTimeout(reset, 500);
   }
@@ -99,18 +115,24 @@ function SelectBatsman({
   }, [watch("playerIds")]);
 
   // TODO: Fix strike after out
-  // TODO: Openable manually
-  // TODO: New reusable component for player label
+  // TODO: Openable manually // DONE
+  // TODO: New reusable component for player label // DONE
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <TypographyH3>Select Batsman</TypographyH3>
+            <TypographyH3>Select Batsman - {team?.name}</TypographyH3>
             {!!curPlayers.length && (
-              <Button variant="destructive" onClick={handleUndo}>
-                Undo
+              <Button
+                variant={isManualMode ? "ghost" : "destructive"}
+                size={isManualMode ? "icon" : "default"}
+                onClick={
+                  isManualMode ? () => setOpen && setOpen(false) : handleUndo
+                }
+              >
+                {isManualMode ? <X /> : "Undo"}
               </Button>
             )}
           </div>
@@ -146,7 +168,7 @@ function SelectBatsman({
                                   className="sr-only"
                                   checked={field.value?.includes(item.id)}
                                   onCheckedChange={(checked) => {
-                                    if (isAlreadyPlaying) {
+                                    if (isAlreadyPlaying && !isManualMode) {
                                       toast.info("Player is already playing", {
                                         description:
                                           "Go to manual mode to hard change",
@@ -178,7 +200,7 @@ function SelectBatsman({
                                 isSelected={isSelected}
                                 isOpacityDown={
                                   (isBothSelected && !isSelected) ||
-                                  isAlreadyPlaying
+                                  (isAlreadyPlaying && !isManualMode)
                                 }
                                 isBrightnessDown={isOut}
                                 subTitle={
