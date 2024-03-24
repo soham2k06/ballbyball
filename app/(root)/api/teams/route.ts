@@ -1,8 +1,7 @@
+import { NextResponse, NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs";
 import prisma from "@/lib/db/prisma";
 import { createTeamSchema } from "@/lib/validation/team";
-
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {

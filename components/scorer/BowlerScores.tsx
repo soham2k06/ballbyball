@@ -1,6 +1,8 @@
-import { usePlayerById } from "@/hooks/api/player/usePlayerById";
-import { calcRuns, calcWickets, getIsInvalidBall } from "@/lib/utils";
 import { BallEvent, Player } from "@prisma/client";
+
+import { usePlayerById } from "@/apiHooks/player";
+import { calcRuns, calcWickets, getIsInvalidBall } from "@/lib/utils";
+import { EventType } from "@/types";
 
 interface BowlerScoresProps {
   playerId: Player["id"];
@@ -29,10 +31,9 @@ function BowlerScores({ playerId, events }: BowlerScoresProps) {
       .filter((event) => event.bowlerId === playerId)
       .map(({ type }) => type),
     false,
-    true,
   );
   const totalBalls = legalEvents.filter((ball) =>
-    getIsInvalidBall(ball.type),
+    getIsInvalidBall(ball.type as EventType),
   ).length;
 
   const totalWickets = calcWickets(legalBallTypes);

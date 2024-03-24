@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -9,9 +10,7 @@ import { type ThemeProviderProps } from "next-themes/dist/types";
 
 import { Toaster } from "./ui/sonner";
 
-interface ProviderProps extends ThemeProviderProps {}
-
-export function Provider({ children, ...props }: ProviderProps) {
+export function Provider({ children, ...props }: ThemeProviderProps) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {

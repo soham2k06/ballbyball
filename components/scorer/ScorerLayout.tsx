@@ -1,48 +1,42 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+import { BallEvent, CurPlayer } from "@prisma/client";
+import { toast } from "sonner";
+
 import { EventType } from "@/types";
-import { calcRuns, calcWickets, getIsInvalidBall } from "@/lib/utils";
+
+import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
+import { ballEvents, strikeChangers } from "@/lib/constants";
+import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
+
+import {
+  useDeleteAllBallEvents,
+  useEventsByMatchId,
+  useSaveBallEvents,
+} from "@/apiHooks/ballEvent/";
+import { useMatchById } from "@/apiHooks/match";
+import { useUpdateMatch } from "@/apiHooks/match";
+import { useTeamById } from "@/apiHooks/team";
 
 import { Card, CardContent } from "@/components/ui/card";
+import LoadingButton from "@/components/ui/loading-button";
 import { Separator } from "@/components/ui/separator";
+
+import { SelectBatsman, SelectBowler } from "@/components/players-selection";
 
 import DangerActions from "./DangerActions";
 import ScoreDisplay from "./ScoreDisplay";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
-import { BallEvent, CurPlayer } from "@prisma/client";
-import { useSaveBallEvents } from "@/hooks/api/ballEvent/useCreateBallEvent";
-import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
-import { useEffect, useState } from "react";
-import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
-import LoadingButton from "../ui/loading-button";
-import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
-import { toast } from "sonner";
-import { useMatchById } from "@/hooks/api/match/useMatchById";
-import SelectBatsman from "../players-selection/SelectBatsman";
 import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
-import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
-import SelectBowler from "../players-selection/SelectBowler";
-import { strikeChangers } from "@/lib/constants";
 import Tools from "./Tools";
-import { useTeamById } from "@/hooks/api/team/useTeamById";
 import { TypographyH4 } from "../ui/typography";
 
-export const ballEvents: Record<BallEvent["type"], string> = {
-  "-3": "NB",
-  "-2": "WD",
-  "-1": "W",
-  "0": "0",
-  "1": "1",
-  "2": "2",
-  "3": "3",
-  "4": "4",
-  "6": "6",
-};
-
 function ScorerLayout({ matchId }: { matchId: string }) {
-  const { events: fetchedEvents } = useEventsById(matchId);
+  const { events: fetchedEvents } = useEventsByMatchId(matchId);
 
   const { match } = useMatchById(matchId);
 
@@ -68,11 +62,17 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     ?.filter((event) => team?.playerIds.includes(event.batsmanId))
     .map((event) => event.type as EventType);
 
-  const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
-
   const [isBowlerSelected, setIsBowlerSelected] = useState(true);
 
   const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));
+
+  const { runs, totalBalls, wickets, runRate } = getScore(balls || []);
+
+  const opponentRuns = calcRuns(
+    events
+      ?.filter((event) => team?.playerIds.includes(event.bowlerId))
+      .map((event) => event.type as EventType),
+  );
 
   // ** Effects
   useEffect(() => {
@@ -120,19 +120,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
-  // ** Calculations & Derived states
-  const runs = calcRuns(balls);
-  const opponentRuns = calcRuns(
-    events
-      ?.filter((event) => team?.playerIds.includes(event.bowlerId))
-      .map((event) => event.type as EventType),
-  );
-  const wickets = calcWickets(balls);
-  const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
-  // const extras = balls.filter(
-  //   (ball) => ball === "-2" || ball.includes("-3"),
-  // ).length;
-
   const showSelectBatsman =
     curPlayers.filter((player) => player.type === "batsman").length !== 2;
   const showSelectBowler =
@@ -142,31 +129,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // ** Over Summary
   let ballLimitInOver = 6;
-  function generateOverSummary(ballEvents: EventType[]) {
-    const overSummaries: EventType[][] = [];
-    let validBallCount = 0;
-    let currentOver: EventType[] = [];
-    for (const ballEvent of ballEvents) {
-      const isInvalidBall = getIsInvalidBall(ballEvent);
-      currentOver.push(ballEvent);
-      if (isInvalidBall) {
-        validBallCount++;
-        if (validBallCount === 6) {
-          overSummaries.push(currentOver);
-          currentOver = [];
-          validBallCount = 0;
-          ballLimitInOver = 6;
-        }
-      } else ballLimitInOver++;
-    }
 
-    if (validBallCount >= 0 && currentOver.length > 0) {
-      overSummaries.push(currentOver);
-    }
-
-    return overSummaries;
-  }
-  const overSummaries: EventType[][] = generateOverSummary(balls);
+  const overSummaries: EventType[][] = generateOverSummary({
+    ballEvents: balls,
+    ballLimitInOver,
+  });
 
   const chartSummaryData = overSummaries.map((summary, i) => ({
     name: i < 9 ? `Over ${i + 1}` : i + 1,

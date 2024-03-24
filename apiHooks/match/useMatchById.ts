@@ -1,5 +1,5 @@
-import { getMatchById } from "@/services/match/getMatchById";
 import { useQuery } from "@tanstack/react-query";
+import { getMatchById } from "@/services/match";
 
 export function useMatchById(id: string) {
   const {

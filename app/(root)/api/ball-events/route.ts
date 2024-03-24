@@ -1,8 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
 import prisma from "@/lib/db/prisma";
 import { createBallEventSchema } from "@/lib/validation/ballEvent";
-
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   try {

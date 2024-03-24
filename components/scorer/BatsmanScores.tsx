@@ -1,8 +1,8 @@
-import { usePlayerById } from "@/hooks/api/player/usePlayerById";
-import { calcRuns, getIsInvalidBall } from "@/lib/utils";
-// import { EventType } from "@/types";
-
 import { BallEvent, Player } from "@prisma/client";
+
+import { usePlayerById } from "@/apiHooks/player";
+import { calcRuns, getIsInvalidBall } from "@/lib/utils";
+import { EventType } from "@/types";
 
 interface BatsmanScoresProps {
   onStrikeBatsman: number;
@@ -38,7 +38,7 @@ function BatsmanScores({
   //       };
   //     }
 
-  //     batsmanStats[batsmanId].events.push(type);
+  // batsmanStats[batsmanId].events.push(type as EventType);
 
   //     if (type === "-1") {
   //       batsmanStats[batsmanId].outBy = bowlerId;
@@ -65,7 +65,7 @@ function BatsmanScores({
           true,
         );
         const totalBalls = legalEvents.filter((ball) =>
-          getIsInvalidBall(ball.type),
+          getIsInvalidBall(ball.type as EventType),
         ).length;
 
         const scoreByState = legalEvents?.reduce(

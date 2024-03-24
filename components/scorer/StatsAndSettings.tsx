@@ -76,7 +76,7 @@ function StatsAndSettings({
             alt="bat icon"
             width={24}
             height={24}
-            className="invert"
+            className="invert dark:invert-0"
           />
           <span>Select Batsman</span>
         </Button>
@@ -103,8 +103,8 @@ function StatsAndSettings({
             alt="ball icon"
             width={24}
             height={24}
-            className="invert"
-          />{" "}
+            className="invert dark:invert-0"
+          />
           <span>Select Bowler</span>
         </Button>
         <SelectBowler

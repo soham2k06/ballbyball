@@ -1,7 +1,9 @@
 import { BallEvent, Match } from "@prisma/client";
 import { axiosInstance } from "../axiosInstance";
 
-export const getEventsById = async (id: Match["id"] | null | undefined) => {
+export const getEventsByMatchId = async (
+  id: Match["id"] | null | undefined,
+) => {
   try {
     if (!id) throw new Error("Ball Events not found");
 

@@ -1,7 +1,15 @@
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dispatch, SetStateAction, useEffect } from "react";
+
 import { CurPlayer, Match } from "@prisma/client";
-import { useTeamById } from "@/hooks/api/team/useTeamById";
-import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { cn } from "@/lib/utils";
+import { useTeamById } from "@/apiHooks/team";
+import { usePlayersByIds } from "@/apiHooks/player";
+
+import { Dialog, DialogContent } from "../ui/dialog";
 import {
   Form,
   FormControl,
@@ -10,13 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
 import { TypographyH3 } from "../ui/typography";
-import { Dispatch, SetStateAction, useEffect } from "react";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
 

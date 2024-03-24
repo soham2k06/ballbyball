@@ -1,8 +1,9 @@
 "use client";
 
-import { useAllPlayers } from "@/hooks/api/player/useAllPlayers";
-import { Card, CardHeader, CardTitle } from "../ui/card";
+import { useAllPlayers } from "@/apiHooks/player";
 import { truncStr } from "@/lib/utils";
+
+import { Card, CardHeader, CardTitle } from "../ui/card";
 
 function PlayerList() {
   const { players } = useAllPlayers();

@@ -1,13 +1,16 @@
 "use client";
 
-import { useAllMatches } from "@/hooks/api/match/useAllMatches";
-import StartMatchButton from "./StartMatch";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { useTeamsByIds } from "@/hooks/api/team/useTeamsByIds";
-import { LoaderIcon } from "lucide-react";
-import { TypographyP } from "../ui/typography";
-import { Button } from "../ui/button";
 import Link from "next/link";
+import { LoaderIcon } from "lucide-react";
+
+import { useAllMatches } from "@/apiHooks/match";
+import { useTeamsByIds } from "@/apiHooks/team";
+
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { TypographyP } from "../ui/typography";
+
+import StartMatchButton from "./StartMatch";
 
 function MatchList() {
   const { matches, isFetching } = useAllMatches();

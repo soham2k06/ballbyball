@@ -1,5 +1,5 @@
-import DarkModeToggle from "./DarkModeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import DarkModeToggle from "./DarkModeToggle";
 
 function Footer() {
   return (

@@ -1,5 +1,4 @@
 import { Provider } from "@/components/Provider";
-
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 

@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { MoreVertical } from "lucide-react";
+
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+
 import RestartButton from "../RestartButton";
-import { useState } from "react";
 
 function DangerActions({
   handleRestart,

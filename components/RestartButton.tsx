@@ -1,3 +1,5 @@
+import { MouseEventHandler } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -10,7 +12,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import { MouseEventHandler } from "react";
 function RestartButton({
   onClick,
   handleCloseMenu,

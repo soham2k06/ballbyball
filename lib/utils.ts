@@ -1,6 +1,7 @@
-import { EventType } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+import { EventType } from "@/types";
 import { invalidBalls } from "./constants";
 
 // ** FRONTEND ** //
@@ -16,7 +17,6 @@ export function cn(...inputs: ClassValue[]) {
 export const calcRuns = (
   ballEvents: EventType[] | string[],
   forPlayer?: boolean,
-  isBowling?: boolean,
 ) =>
   ballEvents
     ?.filter((ball) => ball !== "-1")
@@ -32,6 +32,49 @@ export const calcWickets = (ballEvents: EventType[] | string[]) =>
 
 export const getIsInvalidBall = (ball: EventType) =>
   !invalidBalls.includes(ball) && !ball.includes("-3");
+
+export function getScore(balls: EventType[]) {
+  const runs = calcRuns(balls);
+  const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
+  const wickets = calcWickets(balls);
+  const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
+  const extras = balls.filter(
+    (ball) => ball === "-2" || ball.includes("-3"),
+  ).length;
+
+  return { runs, totalBalls, wickets, runRate, extras };
+}
+
+export function generateOverSummary({
+  ballEvents,
+  ballLimitInOver,
+}: {
+  ballEvents: EventType[];
+  ballLimitInOver: number;
+}) {
+  const overSummaries: EventType[][] = [];
+  let validBallCount = 0;
+  let currentOver: EventType[] = [];
+  for (const ballEvent of ballEvents) {
+    const isInvalidBall = getIsInvalidBall(ballEvent);
+    currentOver.push(ballEvent);
+    if (isInvalidBall) {
+      validBallCount++;
+      if (validBallCount === 6) {
+        overSummaries.push(currentOver);
+        currentOver = [];
+        validBallCount = 0;
+        ballLimitInOver = 6;
+      }
+    } else ballLimitInOver++;
+  }
+
+  if (validBallCount >= 0 && currentOver.length > 0) {
+    overSummaries.push(currentOver);
+  }
+
+  return overSummaries;
+}
 
 export const truncStr = (str: string, n: number) => {
   return str.length > n ? str.substring(0, n - 1) + "..." : str;

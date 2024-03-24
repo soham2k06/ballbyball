@@ -1,7 +1,7 @@
-import { getEventsById } from "@/services/ballEvent/getEventsById";
 import { useQuery } from "@tanstack/react-query";
+import { getEventsByMatchId } from "@/services/ballEvent";
 
-export function useEventsById(id: string) {
+export function useEventsByMatchId(id: string) {
   const {
     data: events,
     isLoading: eventsIsLoading,
@@ -10,7 +10,7 @@ export function useEventsById(id: string) {
     error: eventsError,
   } = useQuery({
     queryKey: ["eventsByMatchId", id],
-    queryFn: () => getEventsById(id),
+    queryFn: () => getEventsByMatchId(id),
   });
 
   return {

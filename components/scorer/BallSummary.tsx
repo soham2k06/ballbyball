@@ -1,7 +1,8 @@
-import { cn } from "@/lib/utils";
-import { EventType } from "@/types";
 import { cva } from "class-variance-authority";
 import { Dot } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { EventType } from "@/types";
 
 function BallSummary({
   event,

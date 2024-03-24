@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import { UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
+
 import { Menu } from "lucide-react";
 
 import { navItems } from "@/lib/constants";
@@ -20,15 +19,12 @@ import {
 import { TypographyH2 } from "./ui/typography";
 
 import NavItem from "./NavItem";
+import { useState } from "react";
 
 function Nav() {
-  const pathName = usePathname();
   const { theme } = useTheme();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-  const blankRoutes = ["/start-a-match", "/scorer"];
-  if (blankRoutes.includes(pathName)) return null;
 
   return (
     <nav className="border-b py-4 max-xl:p-4">

@@ -1,3 +1,11 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { OverlayStateProps } from "@/types";
+import { CreateMatchSchema, createMatchSchema } from "@/lib/validation/match";
+import { useAllTeams } from "@/apiHooks/team";
+import { useCreateMatch } from "@/apiHooks/match";
+
 import {
   Dialog,
   DialogContent,
@@ -16,13 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
-import { OverlayStateProps } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Checkbox } from "../ui/checkbox";
-import { useAllTeams } from "@/hooks/api/team/useAllTeams";
-import { CreateMatchSchema, createMatchSchema } from "@/lib/validation/match";
-import { useCreateMatch } from "@/hooks/api/match/useCreateMatch";
+import { Checkbox } from "@/components/ui/checkbox";
 
 function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
   const form = useForm<CreateMatchSchema>({

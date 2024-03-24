@@ -1,6 +1,6 @@
-import { createMultiplePlayers as createMultiplePlayersAPI } from "@/services/player/createMultiplePlayers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { createMultiplePlayers as createMultiplePlayersAPI } from "@/services/player";
 
 export function useCreateMultiplePlayers() {
   const queryClient = useQueryClient();

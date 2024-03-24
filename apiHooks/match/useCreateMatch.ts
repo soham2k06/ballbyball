@@ -1,6 +1,6 @@
-import { createMatch as createMatchAPI } from "@/services/match/createMatch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { createMatch as createMatchAPI } from "@/services/match";
 
 export function useCreateMatch() {
   const queryClient = useQueryClient();
