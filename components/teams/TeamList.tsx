@@ -3,7 +3,6 @@
 import { LoaderIcon } from "lucide-react";
 
 import { useAllTeams } from "@/apiHooks/team";
-import { usePlayersByIds } from "@/apiHooks/player";
 
 import CreateTeam from "@/components/teams/CreateTeam";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +11,9 @@ import { TypographyP } from "@/components/ui/typography";
 function TeamList() {
   const { allTeams: teams, isFetching } = useAllTeams();
 
-  const { players: playersArr, arePlayerFetching } = usePlayersByIds(
-    teams?.map((team) => team.playerIds)!,
-  );
+  const playersArr = teams?.map((team) => team.players);
 
-  if (isFetching || arePlayerFetching)
+  if (isFetching)
     return (
       <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
         <LoaderIcon className="animate-spin" />

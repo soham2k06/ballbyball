@@ -54,7 +54,6 @@ function AddTeamFormDialog({ open, setOpen }: OverlayStateProps) {
   );
 
   function onSubmit(data: CreateTeamSchema) {
-    console.log(data);
     createTeam(data, {
       onSuccess: () => {
         reset();

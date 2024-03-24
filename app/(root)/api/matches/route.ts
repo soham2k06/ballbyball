@@ -9,7 +9,10 @@ export async function GET() {
     const { userId } = auth();
     if (!userId) throw new Error("User not authenticated");
 
-    const matches = await prisma.match.findMany({ where: { userId } });
+    const matches = await prisma.match.findMany({
+      where: { userId },
+      include: { teams: true },
+    });
 
     return NextResponse.json(matches, { status: 200 });
   } catch (error) {
@@ -41,10 +44,13 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         name,
-        teamIds: { set: teamIds! },
+        teams: { connect: teamIds.map((id) => ({ id })) },
         curPlayers,
         curTeam: curTeam!,
         overs,
+      },
+      include: {
+        teams: true,
       },
     });
 

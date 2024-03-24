@@ -18,7 +18,6 @@ import {
 } from "@/apiHooks/ballEvent/";
 import { useMatchById } from "@/apiHooks/match";
 import { useUpdateMatch } from "@/apiHooks/match";
-import { useTeamById } from "@/apiHooks/team";
 
 import { Card, CardContent } from "@/components/ui/card";
 import LoadingButton from "@/components/ui/loading-button";
@@ -40,7 +39,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   const { match } = useMatchById(matchId);
 
-  const { team } = useTeamById(match?.teamIds?.[match.curTeam]!);
+  const team = match?.teams[match?.curTeam === 0 ? 0 : 1];
+
+  const teamPlayerIds = team?.players.map((player) => player.id);
 
   const { createBallEvent, isPending } = useSaveBallEvents();
   const { udpateMatch } = useUpdateMatch();
@@ -58,8 +59,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
+  const playerIds = team?.players.map((player) => player.id) || [];
+
   const balls = events
-    ?.filter((event) => team?.playerIds.includes(event.batsmanId))
+    ?.filter((event) => playerIds.includes(event.batsmanId))
     .map((event) => event.type as EventType);
 
   const [isBowlerSelected, setIsBowlerSelected] = useState(true);
@@ -70,7 +73,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   const opponentRuns = calcRuns(
     events
-      ?.filter((event) => team?.playerIds.includes(event.bowlerId))
+      ?.filter((event) => playerIds.includes(event.bowlerId))
       .map((event) => event.type as EventType),
   );
 
@@ -98,7 +101,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       setIsBowlerSelected(false);
 
       if (totalBalls === matchBalls && totalBalls) {
-        const playerIds = new Set(team?.playerIds);
+        const playerIds = new Set(teamPlayerIds);
         let isInSecondInning = false;
 
         for (const event of events) {
@@ -116,7 +119,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         }
       }
     }
-  }, [totalBalls, match?.overs, events, team?.playerIds, match?.curTeam]);
+  }, [totalBalls, match?.overs, events, teamPlayerIds, match?.curTeam]);
 
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
@@ -167,29 +170,32 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     updatedCurPlayers?: CurPlayer[],
     curTeam?: number,
   ) {
-    if (balls.length) {
+    if (!updatedCurPlayers) {
       createBallEvent(events, {
-        onSuccess: () =>
+        onSuccess: () => {
+          setIsModified(false);
           toast.success(
             !!updatedCurPlayers
               ? "Score auto saved"
               : "Score saved successfully",
-          ),
+          );
+        },
       });
     }
 
     if (updatedCurPlayers) {
-      udpateMatch({
-        id: matchId,
-        curPlayers: updatedCurPlayers,
-        ...(curTeam && { curTeam }),
-      });
+      udpateMatch(
+        {
+          id: matchId,
+          curPlayers: updatedCurPlayers,
+          ...(curTeam && { curTeam }),
+        },
+        { onSuccess: () => setIsModified(false) },
+      );
 
       if (updatedCurPlayers.some((player) => player.type === "bowler"))
         setIsBowlerSelected(true);
     }
-
-    setIsModified(false);
   }
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {

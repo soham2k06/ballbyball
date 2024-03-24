@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import { type ThemeProviderProps } from "next-themes/dist/types";
@@ -29,7 +28,6 @@ export function Provider({ children, ...props }: ThemeProviderProps) {
         {children}
         <ToasterComponent />
       </NextThemesProvider>
-      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     </QueryClientProvider>
   );
 }

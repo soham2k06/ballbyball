@@ -8,7 +8,10 @@ export async function GET() {
     const { userId } = auth();
     if (!userId) throw new Error("User not authenticated");
 
-    const players = await prisma.team.findMany({ where: { userId } });
+    const players = await prisma.team.findMany({
+      where: { userId },
+      include: { players: true },
+    });
 
     return NextResponse.json(players, { status: 200 });
   } catch (error) {
@@ -35,9 +38,10 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         name,
-        playerIds,
+        players: { connect: playerIds.map((id) => ({ id })) },
         captain,
       },
+      include: { players: true },
     });
     return NextResponse.json({ team }, { status: 201 });
   } catch (error) {
