@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 import { EventType } from "@/types";
@@ -30,10 +30,14 @@ export const ballEvents: Record<string, string> = {
 };
 
 function ScorerLayout() {
-  const [balls, setBalls] = useState<EventType[]>(
-    JSON.parse((getCookie("balls") as string) || "[]") || []
-  );
+  const [balls, setBalls] = useState<EventType[]>([]);
   const invalidBalls = ["-3", "-2"];
+
+  useEffect(() => {
+    setBalls(
+      JSON.parse((getCookie("balls") as string) || "[]") || []
+    )
+  }, [])
 
   const runs = calcRuns(balls);
   const wickets = calcWickets(balls);
