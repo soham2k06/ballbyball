@@ -26,38 +26,43 @@ function BatsmanScorecard({ match, ballEvents }: BatsmanScorecardProps) {
   const firstBattingTeam = teams[firstBattingTeamIndex];
   const secondBattingTeam = teams[secondBattingTeamIndex];
 
+  function getScoreProps(team: TeamWithPlayers, isBowlingScore?: boolean) {
+    return {
+      ballEvents: ballEvents.filter((event) =>
+        team.players
+          .map(({ id }) => id)
+          .includes(event[isBowlingScore ? "bowlerId" : "batsmanId"]),
+      ),
+      isBowlingScore,
+      team,
+    };
+  }
+
   const tabs = [
     {
       id: "1-bat",
       name: `${firstBattingTeam.name} - Batting`,
-      content: (
-        <BattingScore
-          ballEvents={ballEvents.filter(
-            (event) => event.batsmanId !== firstBattingTeam.id,
-          )}
-          isCurrentBatting={curTeam === firstBattingTeamIndex}
-          team={firstBattingTeam}
-        />
-      ),
+      content: <BattingScore {...getScoreProps(firstBattingTeam)} />,
     },
-    { id: "2-bowl", name: `${firstBattingTeam.name} - Bowling` },
+    {
+      id: "2-bowl",
+      name: `${secondBattingTeam.name} - Bowling`,
+      content: <BattingScore {...getScoreProps(secondBattingTeam, true)} />,
+    },
     {
       id: "2-bat",
       name: `${secondBattingTeam.name} - Batting`,
-      content: (
-        <BattingScore
-          ballEvents={ballEvents.filter(
-            (event) => event.batsmanId !== secondBattingTeam.id,
-          )}
-          isCurrentBatting={curTeam === secondBattingTeamIndex}
-          team={secondBattingTeam}
-        />
-      ),
+      content: <BattingScore {...getScoreProps(secondBattingTeam)} />,
     },
-    { id: "1-bowl", name: `${secondBattingTeam.name} - Bowling` },
+    {
+      id: "1-bowl",
+      name: `${firstBattingTeam.name} - Bowling`,
+      content: <BattingScore {...getScoreProps(firstBattingTeam, true)} />,
+    },
   ];
 
   if (!teams) return <p>loading...</p>;
+
   return (
     <div>
       <Tabs defaultValue="1-bat">
@@ -81,16 +86,22 @@ function BatsmanScorecard({ match, ballEvents }: BatsmanScorecardProps) {
 function BattingScore({
   team,
   ballEvents,
-  isCurrentBatting,
+  isBowlingScore,
 }: {
   team: TeamWithPlayers;
   ballEvents: BallEvent[];
-  isCurrentBatting?: boolean;
+  isBowlingScore?: boolean;
 }) {
   return (
     <>
-      {!isCurrentBatting && <p>Yet to bat</p>}
+      {/* {!isCurrentBatting && <p>Yet to bat</p>} */}
+
       {team.players.map((player) => {
+        if (
+          isBowlingScore &&
+          !ballEvents.map((event) => event.bowlerId).includes(player.id)
+        )
+          return null;
         const outBy = ballEvents
           .filter(
             (event) => event.batsmanId === player.id && event.type === "-1",
@@ -100,7 +111,9 @@ function BattingScore({
         const { player: playerOutBy } = usePlayerById(outBy[0]);
 
         const legalEvents = ballEvents.filter(
-          (ball) => ball.type !== "-2" && player.id === ball.batsmanId,
+          (ball) =>
+            ball.type !== "-2" &&
+            player.id === ball[isBowlingScore ? "bowlerId" : "batsmanId"],
         );
 
         const scoreByState = legalEvents?.reduce(
@@ -115,7 +128,10 @@ function BattingScore({
 
         const { runs, totalBalls } = getScore(
           legalEvents
-            ?.filter((event) => event.batsmanId === player.id)
+            ?.filter(
+              (event) =>
+                event[isBowlingScore ? "bowlerId" : "batsmanId"] === player.id,
+            )
             .map((event) => event.type as EventType),
         );
 
@@ -126,7 +142,16 @@ function BattingScore({
             </p>
             <div className="space-x-2">
               <span>{runs}</span>
-              <span>{totalBalls}</span>
+              <span>
+                {isBowlingScore ? (
+                  <>
+                    {Math.floor(totalBalls / 6)}
+                    {totalBalls % 6 ? `.${totalBalls % 6}` : ""}
+                  </>
+                ) : (
+                  totalBalls
+                )}
+              </span>
               <span>4s: {scoreByState?.fours}</span>
               <span>6s: {scoreByState?.sixes}</span>
             </div>
