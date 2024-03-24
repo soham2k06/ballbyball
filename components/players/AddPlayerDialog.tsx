@@ -6,7 +6,7 @@ import {
   CreatePlayerSchema,
   createPlayerSchema,
 } from "@/lib/validation/player";
-import { useCreatePlayer } from "@/hooks/api/player/useCreatePlayer";
+import { useCreatePlayer } from "@/apiHooks/player";
 
 import {
   Dialog,

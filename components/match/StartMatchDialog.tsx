@@ -3,8 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { OverlayStateProps } from "@/types";
 import { CreateMatchSchema, createMatchSchema } from "@/lib/validation/match";
-import { useAllTeams } from "@/hooks/api/team/useAllTeams";
-import { useCreateMatch } from "@/hooks/api/match/useCreateMatch";
+import { useAllTeams } from "@/apiHooks/team";
+import { useCreateMatch } from "@/apiHooks/match";
 
 import {
   Dialog,

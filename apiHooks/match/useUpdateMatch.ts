@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { udpateMatch as udpateMatchAPI } from "@/services/match/updateMatch";
+import { udpateMatch as udpateMatchAPI } from "@/services/match";
 
 export function useUpdateMatch() {
   const queryClient = useQueryClient();

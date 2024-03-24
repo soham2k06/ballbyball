@@ -3,8 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { OverlayStateProps } from "@/types";
 import { CreateTeamSchema, createTeamSchema } from "@/lib/validation/team";
-import { useAllPlayers } from "@/hooks/api/player/useAllPlayers";
-import { useCreateTeam } from "@/hooks/api/team/useCreateTeam";
+import { useAllPlayers } from "@/apiHooks/player";
+import { useCreateTeam } from "@/apiHooks/team";
 
 import {
   Dialog,

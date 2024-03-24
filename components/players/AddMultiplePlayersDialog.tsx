@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Minus, Plus } from "lucide-react";
 
 import { OverlayStateProps } from "@/types";
-import { useAllPlayers } from "@/hooks/api/player/useAllPlayers";
-import { useCreateMultiplePlayers } from "@/hooks/api/player/useCreateMultiplePlayers";
+import { useAllPlayers } from "@/apiHooks/player";
+import { useCreateMultiplePlayers } from "@/apiHooks/player";
 
 import {
   Drawer,

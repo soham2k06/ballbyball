@@ -1,6 +1,6 @@
 import { Team } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { getTeamById } from "@/services/team/getTeamById";
+import { getTeamById } from "@/services/team";
 
 export function useTeamById(id: Team["id"]) {
   const {

@@ -1,6 +1,6 @@
 import { BallEvent, Player } from "@prisma/client";
 
-import { usePlayerById } from "@/hooks/api/player/usePlayerById";
+import { usePlayerById } from "@/apiHooks/player";
 import { calcRuns, getIsInvalidBall } from "@/lib/utils";
 import { EventType } from "@/types";
 

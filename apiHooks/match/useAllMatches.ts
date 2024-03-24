@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllMatches } from "@/services/match/getAllMatches";
+import { getAllMatches } from "@/services/match";
 
 export function useAllMatches() {
   const {

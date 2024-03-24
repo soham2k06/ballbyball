@@ -2,8 +2,8 @@
 
 import { LoaderIcon } from "lucide-react";
 
-import { useAllTeams } from "@/hooks/api/team/useAllTeams";
-import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
+import { useAllTeams } from "@/apiHooks/team";
+import { usePlayersByIds } from "@/apiHooks/player";
 
 import CreateTeam from "@/components/teams/CreateTeam";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

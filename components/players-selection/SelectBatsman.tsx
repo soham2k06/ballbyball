@@ -4,8 +4,8 @@ import { BallEvent, CurPlayer, Match } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { useTeamById } from "@/hooks/api/team/useTeamById";
-import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
+import { useTeamById } from "@/apiHooks/team";
+import { usePlayersByIds } from "@/apiHooks/player";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {

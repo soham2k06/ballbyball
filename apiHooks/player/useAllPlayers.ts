@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllPlayers } from "@/services/player/getAllPlayers";
+import { getAllPlayers } from "@/services/player";
 
 export function useAllPlayers() {
   const {

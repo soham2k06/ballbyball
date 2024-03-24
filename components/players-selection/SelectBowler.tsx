@@ -6,8 +6,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
-import { useTeamById } from "@/hooks/api/team/useTeamById";
-import { usePlayersByIds } from "@/hooks/api/player/usePlayersByIds";
+import { useTeamById } from "@/apiHooks/team";
+import { usePlayersByIds } from "@/apiHooks/player";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {

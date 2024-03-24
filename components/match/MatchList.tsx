@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { LoaderIcon } from "lucide-react";
 
-import { useAllMatches } from "@/hooks/api/match/useAllMatches";
-import { useTeamsByIds } from "@/hooks/api/team/useTeamsByIds";
+import { useAllMatches } from "@/apiHooks/match";
+import { useTeamsByIds } from "@/apiHooks/team";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";

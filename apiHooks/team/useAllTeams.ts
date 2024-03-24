@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllTeams } from "@/services/team/getAllTeams";
+import { getAllTeams } from "@/services/team";
 
 export function useAllTeams() {
   const {

@@ -16,18 +16,19 @@ import {
 import { ballEvents, strikeChangers } from "@/lib/constants";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
-import { useEventsById } from "@/hooks/api/ballEvent/useEventsById";
-import { useSaveBallEvents } from "@/hooks/api/ballEvent/useCreateBallEvent";
-import { useDeleteAllBallEvents } from "@/hooks/api/ballEvent/useDeleteAllBallEvents";
-import { useMatchById } from "@/hooks/api/match/useMatchById";
-import { useUpdateMatch } from "@/hooks/api/match/useUpdateMatch";
+import {
+  useDeleteAllBallEvents,
+  useEventsByMatchId,
+  useSaveBallEvents,
+} from "@/apiHooks/ballEvent/";
+import { useMatchById } from "@/apiHooks/match";
+import { useUpdateMatch } from "@/apiHooks/match";
 
 import { Card, CardContent } from "@/components/ui/card";
 import LoadingButton from "@/components/ui/loading-button";
 import { Separator } from "@/components/ui/separator";
 
-import SelectBatsman from "../players-selection/SelectBatsman";
-import SelectBowler from "../players-selection/SelectBowler";
+import { SelectBatsman, SelectBowler } from "@/components/players-selection";
 
 import DangerActions from "./DangerActions";
 import ScoreDisplay from "./ScoreDisplay";
@@ -38,7 +39,7 @@ import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
-  const { events: fetchedEvents } = useEventsById(matchId);
+  const { events: fetchedEvents } = useEventsByMatchId(matchId);
 
   const { match } = useMatchById(matchId);
 
