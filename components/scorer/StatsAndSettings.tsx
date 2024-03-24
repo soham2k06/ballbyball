@@ -1,16 +1,14 @@
 import { Dispatch, SetStateAction, useState } from "react";
-
+import Image from "next/image";
+import { BallEvent, CurPlayer } from "@prisma/client";
 import { BarChartBig, ListOrdered, Pencil } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+
+import { EventType, MatchWithTeams } from "@/types";
+import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
+
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
 import { TypographyH2, TypographyP } from "../ui/typography";
 import { Button } from "../ui/button";
-import OverStats from "./OverStats";
-import { EventType } from "@/types";
 import {
   Drawer,
   DrawerContent,
@@ -18,18 +16,16 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
+
+import { SelectBowler, SelectBatsman } from "../players-selection";
+import OverStats from "./OverStats";
 import FullOverSummary from "./FullOverSummary";
-import SelectBatsman from "../players-selection/SelectBatsman";
-import { BallEvent, CurPlayer, Match } from "@prisma/client";
-import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
-import SelectBowler from "../players-selection/SelectBowler";
-import Image from "next/image";
 
 interface StatsAndSettingsProps {
   runRate: number;
   chartSummaryData: { runs: number }[];
   overSummaries: EventType[][];
-  match: Match;
+  match: MatchWithTeams;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;

@@ -94,11 +94,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   // Handling after last ball
   useEffect(() => {
     const matchBalls = match?.overs! * 6;
-    const isLastBallOfOver =
-      totalBalls % 6 === 6 && totalBalls > 0 && matchBalls !== totalBalls;
-
+    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
     if (isLastBallOfOver) {
-      setIsBowlerSelected(false);
+      if (matchBalls !== totalBalls) setIsBowlerSelected(false);
 
       if (totalBalls === matchBalls && totalBalls) {
         const playerIds = new Set(teamPlayerIds);
@@ -119,7 +117,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         }
       }
     }
-  }, [totalBalls, match?.overs, events, teamPlayerIds, match?.curTeam]);
+  }, [totalBalls]);
 
   if (!fetchedEvents || !balls) return <p>loading...</p>;
 
@@ -170,7 +168,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     updatedCurPlayers?: CurPlayer[],
     curTeam?: number,
   ) {
-    if (!updatedCurPlayers) {
+    if (events.length > 0) {
       createBallEvent(events, {
         onSuccess: () => {
           setIsModified(false);
