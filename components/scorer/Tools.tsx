@@ -13,7 +13,8 @@ import {
 } from "../ui/drawer";
 import { Button } from "../ui/button";
 import StatsAndSettings from "./StatsAndSettings";
-import BatsmanScorecard from "./BatsmanScorecard";
+import Scorecard from "../player-scores/ScoreCard";
+import { processTeamName } from "@/lib/utils";
 
 interface ToolsProps {
   runRate: number;
@@ -37,6 +38,12 @@ function Tools({
   match,
   setCurPlayers,
 }: ToolsProps) {
+  const processConditionally = (name: string) =>
+    name.length > 10 ? processTeamName(name) : name;
+
+  const team1Name = processConditionally(match?.teams[0]?.name);
+  const team2Name = processConditionally(match?.teams[1]?.name);
+
   return (
     <div className="flex w-full items-center gap-2 rounded-md bg-muted p-2 text-lg text-muted-foreground">
       <StatsAndSettings
@@ -56,10 +63,10 @@ function Tools({
         <DrawerContent>
           <DrawerHeader className="mb-2 pb-4 pt-6 ">
             <DrawerTitle className="text-center text-2xl">
-              CRR: {runRate}
+              {team1Name} vs {team2Name}
             </DrawerTitle>
           </DrawerHeader>
-          <BatsmanScorecard ballEvents={events as BallEvent[]} match={match} />
+          <Scorecard ballEvents={events as BallEvent[]} match={match} />
         </DrawerContent>
       </Drawer>
     </div>

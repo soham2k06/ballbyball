@@ -1,9 +1,9 @@
+import { BallEvent, Player } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import { EventType } from "@/types";
 import { invalidBalls } from "./constants";
-import { BallEvent } from "@prisma/client";
 
 interface BatsmanStats {
   batsmanId: string;
@@ -101,9 +101,70 @@ function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
   return Object.values(batsmanStats);
 }
 
+function getBattingStats(events: BallEvent[]) {
+  const score = events.reduce(
+    (acc: { fours: number; sixes: number }, ballEvent: BallEvent) => {
+      if (ballEvent.type === "4") acc.fours++;
+      else if (ballEvent.type === "6") acc.sixes++;
+
+      return acc;
+    },
+    { fours: 0, sixes: 0 },
+  );
+
+  return { fours: score.fours, sixes: score.sixes };
+}
+
+function getOverStr(numBalls: number) {
+  return `${Math.floor(numBalls / 6)}${numBalls % 6 ? `.${numBalls % 6}` : ""}`;
+}
+
 const truncStr = (str: string, n: number) => {
   return str.length > n ? str.substring(0, n - 1) + "..." : str;
 };
+
+function abbreviateName(fullName: string) {
+  fullName = fullName.trim();
+  const parts = fullName.split(" ");
+  if (parts.length === 1) return fullName;
+
+  const firstNameInitial = parts[0][0] + ".";
+  const abbreviatedName = firstNameInitial + " " + parts[parts.length - 1];
+  return abbreviatedName;
+}
+
+function processTeamName(input: string) {
+  const words = input.trim().split(/\s+/);
+
+  if (words.length === 1) return input.substring(0, 3);
+  else {
+    let initials = "";
+    words.forEach((word) => (initials += word[0]));
+    return initials;
+  }
+}
+
+function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
+  const fallOfWickets = [];
+
+  for (let i = 0; i < ballsThrown.length; i++) {
+    const ball = ballsThrown[i];
+    if (ball.type === "-1") {
+      const scoreAtWicket = calcRuns(
+        ballsThrown.map(({ type }) => type).slice(0, i + 1),
+      );
+      const outBatsman = players.find(
+        (player) => player.id === ball.batsmanId,
+      )?.name;
+      fallOfWickets.push({
+        score: scoreAtWicket,
+        ball: i + 1,
+        batsman: outBatsman,
+      });
+    }
+  }
+  return fallOfWickets;
+}
 
 export {
   cn,
@@ -114,4 +175,9 @@ export {
   calcRuns,
   calcWickets,
   getIsInvalidBall,
+  getOverStr,
+  getBattingStats,
+  processTeamName,
+  abbreviateName,
+  calculateFallOfWickets,
 };
