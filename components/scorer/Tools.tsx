@@ -38,6 +38,8 @@ function Tools({
   match,
   setCurPlayers,
 }: ToolsProps) {
+  if (!match || !match.teams) return <p>loading...</p>;
+
   const processConditionally = (name: string) =>
     name.length > 10 ? processTeamName(name) : name;
 
