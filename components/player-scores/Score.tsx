@@ -82,13 +82,11 @@ function Score({
             )
               return null;
 
-            const outBy = ballEvents
-              .filter(
-                (event) => event.batsmanId === player.id && event.type === "-1",
-              )
-              .map(({ bowlerId }) => bowlerId)[0];
+            const outBy = ballEvents.find(
+              (event) => event.batsmanId === player.id && event.type === "-1",
+            )?.bowlerId;
 
-            const { player: playerOutBy } = usePlayerById(outBy);
+            const { player: playerOutBy } = usePlayerById(outBy!);
 
             const legalEvents = ballEvents.filter(
               (ball) =>
