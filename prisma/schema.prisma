@@ -31,6 +31,7 @@ model Match {
   curPlayers CurPlayer[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  ballEvents BallEvent[]
 
   @@map("matches")
 }
@@ -62,12 +63,13 @@ model Team {
 model BallEvent {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String
-  matchId   String   @db.ObjectId
   batsmanId String   @db.ObjectId
   bowlerId  String   @db.ObjectId
   type      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Match     Match?   @relation(fields: [matchId], references: [id])
+  matchId   String?  @db.ObjectId
 
   @@map("ballEvents")
 }

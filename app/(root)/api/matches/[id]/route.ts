@@ -12,7 +12,7 @@ export async function GET(
 
     const ballEvents = await prisma.match.findFirst({
       where: { id },
-      include: { teams: { include: { players: true } } },
+      include: { teams: { include: { players: true } }, ballEvents: true },
     });
 
     return NextResponse.json(ballEvents, { status: 200 });
