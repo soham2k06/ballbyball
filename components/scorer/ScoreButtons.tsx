@@ -12,7 +12,7 @@ function ScoreButtons({
   handleWicket,
 }: {
   handleScore: MouseEventHandler<HTMLButtonElement>;
-  handleWicket: MouseEventHandler<HTMLButtonElement>;
+  handleWicket?: MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
     <CardContent className="space-y-4 max-sm:p-0">
@@ -28,7 +28,18 @@ function ScoreButtons({
         </Button>
         <NoballPopver ballEvents={ballEvents} handleScore={handleScore} />
 
-        <WicketPopover handleWicket={handleWicket} />
+        {handleWicket ? (
+          <WicketPopover handleWicket={handleWicket} />
+        ) : (
+          <Button
+            size="lg"
+            variant="destructive"
+            className="h-20 w-full text-lg font-bold"
+            onClick={handleScore}
+          >
+            OUT
+          </Button>
+        )}
       </div>
 
       <div className="flex w-full justify-center gap-2">
