@@ -31,7 +31,12 @@ interface SelectBatsmanProps {
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
+  handleSave: (
+    _: unknown,
+    updatedCurPlayers?: CurPlayer[],
+    curTeam?: number,
+    dontSaveBallEvents?: boolean,
+  ) => void;
   handleUndo?: () => void;
   isManualMode?: boolean;
 }
@@ -65,7 +70,7 @@ function SelectBatsman({
   });
 
   const outPlayers = events
-    ?.filter((event) => event.type === "-1")
+    ?.filter((event) => event.type.includes("-1"))
     .map((event) => event.batsmanId);
 
   const { handleSubmit, control, getValues, watch, reset } = form;
@@ -96,7 +101,12 @@ function SelectBatsman({
     setCurPlayers(payload);
 
     // 0 is trash value
-    handleSave(0, payload);
+    handleSave(
+      0,
+      payload,
+      undefined,
+      curPlayers.filter((player) => player.type === "batsman").length === 0,
+    );
 
     setTimeout(reset, 500);
   }

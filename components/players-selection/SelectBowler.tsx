@@ -29,7 +29,12 @@ interface SelectBowlerProps {
   onClose?: () => void;
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
+  handleSave: (
+    _: unknown,
+    updatedCurPlayers?: CurPlayer[],
+    curTeam?: number,
+    dontSaveBallEvents?: boolean,
+  ) => void;
   handleUndo?: () => void;
   isManualMode?: boolean;
 }
@@ -77,7 +82,12 @@ function SelectBowler({
 
     setCurPlayers(newCurPlayers);
 
-    handleSave(0, newCurPlayers);
+    handleSave(
+      0,
+      newCurPlayers,
+      undefined,
+      curPlayers.filter((player) => player.type === "bowler").length === 0,
+    );
 
     setTimeout(reset, 500);
   }

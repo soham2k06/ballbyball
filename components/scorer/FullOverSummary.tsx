@@ -8,7 +8,7 @@ function FullOverSummary({ overSummaries }: { overSummaries: EventType[][] }) {
     <ul className="max-h-[calc(100dvh-120px)] min-h-96 divide-y overflow-y-auto p-2">
       {overSummaries.map((over, overI) => {
         const runs = calcRuns(over);
-        const wickets = over.filter((ball) => ball === "-1").length;
+        const wickets = over.filter((ball) => ball.includes("-1")).length;
         return (
           <div key={overI} className="flex items-center gap-4 py-4 first:pt-0">
             <div className="flex min-w-24 gap-2 whitespace-nowrap text-sm font-bold">

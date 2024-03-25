@@ -1,6 +1,6 @@
 import { BallEvent, Player } from "@prisma/client";
 
-import { MatchWithTeams } from "@/types";
+import { MatchExtended } from "@/types";
 import { calculateFallOfWickets, processTeamName } from "@/lib/utils";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -9,7 +9,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import Score from "./Score";
 
 interface ScorecardProps {
-  match: MatchWithTeams;
+  match: MatchExtended;
   ballEvents: BallEvent[];
 }
 

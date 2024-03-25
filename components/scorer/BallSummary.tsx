@@ -12,6 +12,7 @@ function BallSummary({
   size?: "sm" | "default";
 }) {
   const isNoBall = event?.includes("-3");
+  const isWicket = event?.includes("-1");
   const summaryVariants = cva(
     "text-center rounded-full flex justify-center items-center",
     {
@@ -49,9 +50,6 @@ function BallSummary({
         />
       );
       break;
-    case "-1":
-      summaryToShow = "W";
-      break;
     case "-2":
       summaryToShow = "Wd";
       break;
@@ -61,22 +59,23 @@ function BallSummary({
       break;
   }
 
+  if (isWicket) {
+    const runsAlongWithRunOut = event.split("_")[3];
+    if (runsAlongWithRunOut && runsAlongWithRunOut !== "0")
+      summaryToShow = "W" + runsAlongWithRunOut;
+    else summaryToShow = "W";
+  }
   if (isNoBall) summaryToShow = event?.replace("-3", "NB");
+
+  const variant = (
+    isNoBall ? event.slice(2) : isWicket ? "-1" : event
+  ) as EventType;
 
   return (
     <li
       className={cn(
         summaryVariants({
-          variant: (isNoBall ? event.slice(2) : event) as
-            | "0"
-            | "1"
-            | "2"
-            | "3"
-            | "4"
-            | "6"
-            | "-1"
-            | "-2"
-            | "-3",
+          variant,
           size,
         }),
       )}
