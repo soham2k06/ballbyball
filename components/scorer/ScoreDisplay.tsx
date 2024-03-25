@@ -1,3 +1,4 @@
+import { getOverStr } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 
 function ScoreDisplay({
@@ -17,10 +18,7 @@ function ScoreDisplay({
         {runs}/{wickets}
       </h2>
       <div className="flex items-center justify-center text-center text-xl opacity-50">
-        <span>
-          ({Math.floor(totalBalls / 6)}
-          {totalBalls % 6 ? `.${totalBalls % 6}` : ""})
-        </span>
+        <span>({getOverStr(totalBalls)})</span>
         <Separator
           orientation="vertical"
           className="mx-2 h-6 bg-muted-foreground"

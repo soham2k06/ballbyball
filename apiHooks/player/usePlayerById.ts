@@ -12,6 +12,7 @@ export function usePlayerById(id: Player["id"]) {
   } = useQuery({
     queryKey: ["playerById", id],
     queryFn: () => getPlayerById(id),
+    enabled: !!id,
   });
 
   return {

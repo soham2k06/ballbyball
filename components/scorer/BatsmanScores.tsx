@@ -1,7 +1,7 @@
 import { BallEvent, Player } from "@prisma/client";
 
 import { usePlayerById } from "@/apiHooks/player";
-import { calcRuns, getIsInvalidBall } from "@/lib/utils";
+import { calcRuns, getBattingStats, getIsInvalidBall } from "@/lib/utils";
 import { EventType } from "@/types";
 
 interface BatsmanScoresProps {
@@ -68,15 +68,7 @@ function BatsmanScores({
           getIsInvalidBall(ball.type as EventType),
         ).length;
 
-        const scoreByState = legalEvents?.reduce(
-          (acc: any, ballEvent: BallEvent) => {
-            if (ballEvent.type === "4") acc.fours++;
-            else if (ballEvent.type === "6") acc.sixes++;
-
-            return acc;
-          },
-          { fours: 0, sixes: 0 },
-        );
+        const { fours, sixes } = getBattingStats(legalEvents);
 
         if (!player) return;
 
@@ -87,8 +79,8 @@ function BatsmanScores({
             <div className="flex gap-2">
               <div>Runs: {totalRuns}</div>
               <div>Balls: {totalBalls}</div>
-              <div>4s: {scoreByState?.fours}</div>
-              <div>6s: {scoreByState?.sixes}</div>
+              <div>4s: {fours}</div>
+              <div>6s: {sixes}</div>
             </div>
           </div>
         );
