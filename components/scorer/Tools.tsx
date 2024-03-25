@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { BallEvent, CurPlayer } from "@prisma/client";
 
-import { EventType, MatchWithTeams } from "@/types";
+import { EventType, MatchExtended } from "@/types";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import {
@@ -21,7 +21,7 @@ interface ToolsProps {
   chartSummaryData: { runs: number }[];
   overSummaries: EventType[][];
 
-  match: MatchWithTeams;
+  match: MatchExtended;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;

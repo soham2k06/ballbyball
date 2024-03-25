@@ -4,13 +4,15 @@ import { Button } from "../ui/button";
 import { CardContent } from "../ui/card";
 
 import NoballPopver from "./NoballPopver";
+import WicketPopover from "./WicketPopover";
+import { ballEvents } from "@/lib/constants";
 
 function ScoreButtons({
   handleScore,
-  ballEvents,
+  handleWicket,
 }: {
   handleScore: MouseEventHandler<HTMLButtonElement>;
-  ballEvents: Record<string, string>;
+  handleWicket?: MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
     <CardContent className="space-y-4 max-sm:p-0">
@@ -26,15 +28,18 @@ function ScoreButtons({
         </Button>
         <NoballPopver ballEvents={ballEvents} handleScore={handleScore} />
 
-        <Button
-          size="lg"
-          className="h-20 w-full text-lg font-bold"
-          variant="destructive"
-          value="-1"
-          onClick={handleScore}
-        >
-          OUT
-        </Button>
+        {handleWicket ? (
+          <WicketPopover handleWicket={handleWicket} />
+        ) : (
+          <Button
+            size="lg"
+            variant="destructive"
+            className="h-20 w-full text-lg font-bold"
+            onClick={handleScore}
+          >
+            OUT
+          </Button>
+        )}
       </div>
 
       <div className="flex w-full justify-center gap-2">

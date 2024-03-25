@@ -31,7 +31,9 @@ function NoballPopver({
       <PopoverContent className="w-60">
         <div className="grid w-full grid-cols-3 gap-2">
           {Object.keys(ballEvents)
-            .filter((ball) => ball !== "-1" && ball !== "-2" && ball !== "-3")
+            .filter(
+              (ball) => ball.includes("-1") && ball !== "-2" && ball !== "-3",
+            )
             .map((event, i) => (
               <Button
                 key={i}

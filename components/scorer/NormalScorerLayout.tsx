@@ -5,7 +5,6 @@ import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 import { EventType } from "@/types";
 import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
-import { ballEvents } from "@/lib/constants";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -85,7 +84,7 @@ function ScorerLayout() {
           />
         </CardContent>
         <Separator className="my-4" />
-        <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
+        <ScoreButtons handleScore={handleScore} />
       </Card>
     </div>
   );

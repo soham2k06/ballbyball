@@ -3,7 +3,7 @@ import Image from "next/image";
 import { BallEvent, CurPlayer } from "@prisma/client";
 import { BarChartBig, ListOrdered, Pencil } from "lucide-react";
 
-import { EventType, MatchWithTeams } from "@/types";
+import { EventType, MatchExtended } from "@/types";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
@@ -25,7 +25,7 @@ interface StatsAndSettingsProps {
   runRate: number;
   chartSummaryData: { runs: number }[];
   overSummaries: EventType[][];
-  match: MatchWithTeams;
+  match: MatchExtended;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;

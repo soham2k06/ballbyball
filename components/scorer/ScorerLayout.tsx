@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { EventType } from "@/types";
 
 import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
-import { ballEvents, strikeChangers } from "@/lib/constants";
+import { strikeChangers } from "@/lib/constants";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import {
@@ -32,13 +32,14 @@ import ScoreButtons from "./ScoreButtons";
 import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 import Tools from "./Tools";
+import FieldersDialog from "./FieldersDialog";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { match } = useMatchById(matchId);
 
   const ballEventsFromMatch = match?.ballEvents;
 
-  const team = match?.teams[match?.curTeam === 0 ? 0 : 1];
+  const team = match?.teams[match?.curTeam];
 
   const teamPlayerIds = team?.players.map((player) => player.id);
 
@@ -67,6 +68,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const [isBowlerSelected, setIsBowlerSelected] = useState(true);
 
   const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));
+
+  const [wicketTypeId, setWicketTypeId] = useState<string | null>(null);
 
   const { runs, totalBalls, wickets, runRate } = getScore(balls || []);
 
@@ -166,8 +169,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     _: unknown,
     updatedCurPlayers?: CurPlayer[],
     curTeam?: number,
+    dontSaveBallEvents?: boolean,
   ) {
-    if (!updatedCurPlayers) {
+    if (!dontSaveBallEvents)
       createBallEvent(events as CreateBallEventSchema[], {
         onSuccess: () => {
           setIsModified(false);
@@ -178,7 +182,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           );
         },
       });
-    }
 
     if (updatedCurPlayers) {
       udpateMatch(
@@ -199,6 +202,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     setIsModified(true);
 
     const event = e.currentTarget.value;
+
     setEvents([
       ...events,
       {
@@ -209,7 +213,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       },
     ] as CreateBallEventSchema[]);
 
-    if (event === "-1") {
+    if (event.includes("-1")) {
       const updatedPlayers = curPlayers.filter((player) => {
         return player.id !== curPlayers?.[onStrikeBatsman].id;
       });
@@ -219,6 +223,41 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     handleStrikeChange(
       (event.includes("-3") ? event.slice(-1) : event) as EventType,
     );
+  }
+
+  function handleWicket(e: React.MouseEvent<HTMLButtonElement>) {
+    const event = e.currentTarget.value;
+
+    const wicketType = JSON.parse(event);
+    let eventToAdd;
+
+    if (!wicketType.isOtherPlayerInvolved) {
+      switch (wicketType.id) {
+        case 1:
+          eventToAdd = "-1";
+          break;
+        case 2:
+          eventToAdd = "-1_2";
+        case 4:
+          eventToAdd = "-1_4";
+          break;
+      }
+      handleScore({
+        currentTarget: { value: eventToAdd },
+      } as React.MouseEvent<HTMLButtonElement>);
+    } else setWicketTypeId(wicketType.id);
+  }
+
+  function handleScoreWithFielder(
+    wicketTypeId: number,
+    fielderId: string,
+    runsAlongWithRunOut?: number,
+  ) {
+    handleScore({
+      currentTarget: {
+        value: `-1_${wicketTypeId}_${fielderId}_${runsAlongWithRunOut}`,
+      },
+    } as React.MouseEvent<HTMLButtonElement>);
   }
 
   function handleRestart() {
@@ -284,7 +323,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           />
         </CardContent>
         <Separator className="my-4 sm:my-4" />
-        <ScoreButtons handleScore={handleScore} ballEvents={ballEvents} />
+        <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
         <Separator className="my-4 sm:my-4" />
 
         <BowlerScores
@@ -318,6 +357,12 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             handleUndo();
             setIsBowlerSelected(true);
           }}
+        />
+        <FieldersDialog
+          wicketTypeId={wicketTypeId}
+          setWicketTypeId={setWicketTypeId}
+          fielders={match.teams[match.curTeam === 0 ? 1 : 0].players}
+          handleScore={handleScoreWithFielder}
         />
       </Card>
     </>

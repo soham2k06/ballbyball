@@ -15,22 +15,22 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Filtered out wicket(-1)
-// If event is no ball(-3), add run along with no ball and 1 run for no ball
+// Filtered out wicket(-1), do not filter run out
+// If event is no ball(-3), add run along with no ball and 1 run for no ball, split the last char to calculate runs along with run out
 // Else return an event and ensure to convert wide(-2) to 1 run
 // Sum all the runs
 const calcRuns = (ballEvents: EventType[] | string[], forPlayer?: boolean) =>
   ballEvents
-    ?.filter((ball) => ball !== "-1")
+    ?.filter((ball) => !(ball.includes("-1") && !ball.split("_")[3]))
     ?.map((event) =>
       event.includes("-3")
         ? (Number(event.slice(2)) + Number(!forPlayer)).toString()
-        : event.replace("-2", "1"),
+        : event.replace("-2", "1").slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
 const calcWickets = (ballEvents: EventType[] | string[]) =>
-  ballEvents?.filter((ball) => ball === "-1").length;
+  ballEvents?.filter((ball) => ball.includes("-1")).length;
 
 const getIsInvalidBall = (ball: EventType) =>
   !invalidBalls.includes(ball) && !ball.includes("-3");
@@ -93,7 +93,7 @@ function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
 
     batsmanStats[batsmanId].events.push(type as EventType);
 
-    if (type === "-1") {
+    if (type.includes("-1")) {
       batsmanStats[batsmanId].outBy = bowlerId;
     }
   });
@@ -149,7 +149,7 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
 
   for (let i = 0; i < ballsThrown.length; i++) {
     const ball = ballsThrown[i];
-    if (ball.type === "-1") {
+    if (ball.type.includes("-1")) {
       const scoreAtWicket = calcRuns(
         ballsThrown.map(({ type }) => type).slice(0, i + 1),
       );

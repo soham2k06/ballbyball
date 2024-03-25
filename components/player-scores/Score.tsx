@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { wicketTypes } from "../scorer/WicketPopover";
 
 function Score({
   players,
@@ -84,11 +85,28 @@ function Score({
 
             const outBy = ballEvents
               .filter(
-                (event) => event.batsmanId === player.id && event.type === "-1",
+                (event) =>
+                  event.batsmanId === player.id && event.type.includes("-1"),
               )
-              .map(({ bowlerId }) => bowlerId)[0];
+              .map(({ bowlerId, type }) => {
+                const typeId = Number(type.split("_")[1]);
 
-            const { player: playerOutBy } = usePlayerById(outBy);
+                const wicketType = wicketTypes.find(
+                  (item) => item.id === typeId,
+                );
+
+                return {
+                  bowlerId,
+                  fielderId: type.split("_")[2],
+                  wicketType: wicketType?.shortName,
+                  isNotBowlersWicket: wicketType?.isNotBowlersWicket,
+                  typeStr:
+                    !wicketType?.isNotBowlersWicket &&
+                    `${[1, 2, 4].includes(Number(wicketType?.id)) ? "" : "b."} ${usePlayerById(bowlerId).player?.name}`,
+                };
+              })[0];
+
+            const { player: fielder } = usePlayerById(outBy?.fielderId);
 
             const legalEvents = ballEvents.filter(
               (ball) =>
@@ -121,8 +139,11 @@ function Score({
                 const ball = ballsThrown[i];
                 ballsInCurrentOver++;
 
-                const dotBalls: EventType[] = ["0", "-1"];
-                if (!dotBalls.includes(ball)) didRunCome = true;
+                if (
+                  ball === "0" ||
+                  (ball.includes("-1") && ball.split("_")[3] === "0")
+                )
+                  didRunCome = true;
 
                 if (ballsInCurrentOver === 6) {
                   if (!didRunCome) maidenOvers++;
@@ -148,7 +169,7 @@ function Score({
                     </p>
                     {outBy && (
                       <span className="mt-0.5 text-[13px] text-muted-foreground">
-                        b. {playerOutBy?.name}
+                        {outBy.wicketType} {fielder?.name} {outBy.typeStr}
                       </span>
                     )}
                   </TableCell>
