@@ -1,4 +1,4 @@
-import { Match, Player, Team } from "@prisma/client";
+import { BallEvent, Match, Player, Team } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
 
 type EventType = "0" | "1" | "2" | "3" | "4" | "6" | "-1" | "-2" | "-3";
@@ -10,6 +10,9 @@ type OverlayStateProps = {
 
 type TeamWithPlayers = Team & { players: Player[] };
 
-type MatchWithTeams = Match & { teams: TeamWithPlayers[] };
+type MatchExtended = Match & {
+  teams: TeamWithPlayers[];
+  ballEvents: BallEvent[];
+};
 
-export type { EventType, OverlayStateProps, TeamWithPlayers, MatchWithTeams };
+export type { EventType, OverlayStateProps, TeamWithPlayers, MatchExtended };

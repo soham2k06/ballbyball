@@ -13,7 +13,6 @@ import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import {
   useDeleteAllBallEvents,
-  useEventsByMatchId,
   useSaveBallEvents,
 } from "@/apiHooks/ballEvent/";
 import { useMatchById } from "@/apiHooks/match";
@@ -22,6 +21,7 @@ import { useUpdateMatch } from "@/apiHooks/match";
 import { Card, CardContent } from "@/components/ui/card";
 import LoadingButton from "@/components/ui/loading-button";
 import { Separator } from "@/components/ui/separator";
+import { TypographyH4 } from "@/components/ui/typography";
 
 import { SelectBatsman, SelectBowler } from "@/components/players-selection";
 
@@ -32,12 +32,11 @@ import ScoreButtons from "./ScoreButtons";
 import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 import Tools from "./Tools";
-import { TypographyH4 } from "../ui/typography";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
-  const { events: fetchedEvents } = useEventsByMatchId(matchId);
-
   const { match } = useMatchById(matchId);
+
+  const ballEventsFromMatch = match?.ballEvents;
 
   const team = match?.teams[match?.curTeam === 0 ? 0 : 1];
 
@@ -79,8 +78,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // ** Effects
   useEffect(() => {
-    setEvents(fetchedEvents as BallEvent[]);
-  }, [fetchedEvents]);
+    setEvents(ballEventsFromMatch as BallEvent[]);
+  }, [ballEventsFromMatch]);
 
   useEffect(() => {
     if (match?.curPlayers) setCurPlayers(match.curPlayers);
@@ -119,7 +118,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     }
   }, [totalBalls]);
 
-  if (!fetchedEvents || !balls) return <p>loading...</p>;
+  if (!ballEventsFromMatch || !balls) return <p>loading...</p>;
 
   const showSelectBatsman =
     curPlayers.filter((player) => player.type === "batsman").length !== 2;
@@ -168,8 +167,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     updatedCurPlayers?: CurPlayer[],
     curTeam?: number,
   ) {
-    if (events.length > 0) {
-      createBallEvent(events, {
+    if (!updatedCurPlayers) {
+      createBallEvent(events as CreateBallEventSchema[], {
         onSuccess: () => {
           setIsModified(false);
           toast.success(
@@ -208,7 +207,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         bowlerId: curPlayers?.[2]?.id,
         matchId,
       },
-    ]);
+    ] as CreateBallEventSchema[]);
 
     if (event === "-1") {
       const updatedPlayers = curPlayers.filter((player) => {
