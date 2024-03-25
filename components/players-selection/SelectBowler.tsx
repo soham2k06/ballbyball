@@ -20,10 +20,10 @@ import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
-import { MatchWithTeams } from "@/types";
+import { MatchExtended } from "@/types";
 
 interface SelectBowlerProps {
-  match: MatchWithTeams;
+  match: MatchExtended;
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   onClose?: () => void;

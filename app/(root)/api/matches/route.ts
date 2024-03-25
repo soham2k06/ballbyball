@@ -11,7 +11,7 @@ export async function GET() {
 
     const matches = await prisma.match.findMany({
       where: { userId },
-      include: { teams: true },
+      include: { teams: true, ballEvents: true },
     });
 
     return NextResponse.json(matches, { status: 200 });
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       },
       include: {
         teams: true,
+        ballEvents: true,
       },
     });
 

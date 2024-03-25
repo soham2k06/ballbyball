@@ -22,10 +22,10 @@ import { TypographyH3 } from "../ui/typography";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import PlayerLabel from "./PlayerLabel";
 import { X } from "lucide-react";
-import { MatchWithTeams } from "@/types";
+import { MatchExtended } from "@/types";
 
 interface SelectBatsmanProps {
-  match: MatchWithTeams;
+  match: MatchExtended;
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   events: BallEvent[] | CreateBallEventSchema[];
