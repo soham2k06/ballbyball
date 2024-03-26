@@ -8,7 +8,10 @@ const curPlayer = z.object({
 export const createMatchSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   desc: z.string().optional(),
-  teamIds: z.array(z.string()).min(2, { message: "Select exact two teams" }),
+  teamIds: z
+    .array(z.string())
+    .min(2, { message: "Select exact two teams" })
+    .max(2, { message: "Select exact two teams" }),
   overs: z.number().min(1).max(50),
   curPlayers: z.array(curPlayer).optional(),
   curTeam: z.number().min(0).max(1).optional(),

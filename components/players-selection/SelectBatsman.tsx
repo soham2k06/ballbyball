@@ -59,9 +59,11 @@ function SelectBatsman({
   const schema = z.object({
     playerIds: z.array(z.string()).max(2),
   });
+
   const defaultPlayerIds = curPlayers
     .filter((player) => player.type === "batsman")
     .map((player) => player.id);
+
   const form = useForm<SelectBatsmanForm>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -105,7 +107,7 @@ function SelectBatsman({
       0,
       payload,
       undefined,
-      curPlayers.filter((player) => player.type === "batsman").length === 0,
+      curPlayers.filter((player) => player.type === "batsman").length !== 0,
     );
 
     setTimeout(reset, 500);
@@ -148,7 +150,7 @@ function SelectBatsman({
             {/* TODO: Search field HERE to filter players */}
             <form onSubmit={handleSubmit(onSubmit)}>
               <FormField
-                disabled={getValues("playerIds")?.length !== 2}
+                disabled={!getValues("playerIds")?.length}
                 control={form.control}
                 name="playerIds"
                 render={() => (
