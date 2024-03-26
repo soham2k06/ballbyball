@@ -95,14 +95,28 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // Handling after last ball
   useEffect(() => {
-    const matchBalls = match?.overs! * 6;
+    const matchBalls = (match?.overs || 0) * 6;
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
+
+    const isAllOut = wickets === team?.players.length;
+    let isInSecondInning = false;
+
+    if (isAllOut) {
+      toast.info("All out!");
+
+      if (isInSecondInning)
+        udpateMatch({
+          id: matchId,
+          curPlayers: [],
+          curTeam: Number(!Boolean(match?.curTeam)),
+        });
+    }
+
     if (isLastBallOfOver) {
       if (matchBalls !== totalBalls) setIsBowlerSelected(false);
 
       if (totalBalls === matchBalls && totalBalls) {
         const playerIds = new Set(teamPlayerIds);
-        let isInSecondInning = false;
 
         for (const event of events) {
           if (!playerIds?.has(event.batsmanId)) {
@@ -123,8 +137,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   if (!ballEventsFromMatch || !balls) return <p>loading...</p>;
 
-  const showSelectBatsman =
-    curPlayers.filter((player) => player.type === "batsman").length !== 2;
+  const showSelectBatsman = !curPlayers.filter(
+    (player) => player.type === "batsman",
+  ).length;
   const showSelectBowler =
     (!curPlayers.find((player) => player.type === "bowler") &&
       !showSelectBatsman) ||
@@ -147,7 +162,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // ** Handlers
   function handleStrikeChange(ballEventType: EventType) {
-    if (strikeChangers.includes(ballEventType)) changeStrike();
+    if (
+      strikeChangers.includes(ballEventType) &&
+      curPlayers.filter((player) => player.type === "batsman").length === 2
+    )
+      changeStrike();
   }
 
   const handleUndo = () => {
@@ -171,7 +190,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     curTeam?: number,
     dontSaveBallEvents?: boolean,
   ) {
-    if (!dontSaveBallEvents)
+    if (!dontSaveBallEvents && balls.length)
       createBallEvent(events as CreateBallEventSchema[], {
         onSuccess: () => {
           setIsModified(false);
@@ -208,7 +227,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       {
         type: event,
         batsmanId: curPlayers?.[onStrikeBatsman].id!,
-        bowlerId: curPlayers?.[2]?.id,
+        bowlerId: curPlayers.find((player) => player.type === "bowler")?.id,
         matchId,
       },
     ] as CreateBallEventSchema[]);
