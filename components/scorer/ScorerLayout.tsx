@@ -34,10 +34,8 @@ function ScorerLayout() {
   const invalidBalls = ["-3", "-2"];
 
   useEffect(() => {
-    setBalls(
-      JSON.parse((getCookie("balls") as string) || "[]") || []
-    )
-  }, [])
+    setBalls(JSON.parse((getCookie("balls") as string) || "[]") || []);
+  }, []);
 
   const runs = calcRuns(balls);
   const wickets = calcWickets(balls);
@@ -88,8 +86,30 @@ function ScorerLayout() {
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     const event = e.currentTarget.value;
-    setBalls((prev) => [...prev, event as EventType]);
-    setCookie("balls", JSON.stringify([...balls, event]));
+    setBalls((prev) => {
+      if (
+        prev.length > 0 &&
+        prev[prev.length - 1].includes("-3") &&
+        event === "-1"
+      ) {
+        return [...prev, "0" as EventType];
+      }
+
+      return [...prev, event as EventType];
+    });
+
+    setCookie(
+      "balls",
+      JSON.stringify([
+        ...balls,
+        balls.length > 0 &&
+        balls[balls.length - 1].includes("-3") &&
+        event === "-1"
+          ? "0"
+          : event,
+      ])
+    );
+    console.log(getCookie("balls"));
   }
 
   const handleUndo = () => {
