@@ -11,10 +11,21 @@ export async function GET() {
 
     const matches = await prisma.match.findMany({
       where: { userId },
-      include: { teams: true, ballEvents: true },
+      include: {
+        ballEvents: true,
+        matchTeams: { include: { team: { include: { teamPlayers: true } } } },
+      },
     });
 
-    return NextResponse.json(matches, { status: 200 });
+    const matchesSimplified = matches.map((match) => {
+      const teams = match.matchTeams.map((matchTeam) => matchTeam.team);
+
+      const { matchTeams, ...matchWithoutMatchTeams } = match;
+
+      return { ...matchWithoutMatchTeams, teams };
+    });
+
+    return NextResponse.json(matchesSimplified, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -44,13 +55,17 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         name,
-        teams: { connect: teamIds.map((id) => ({ id })) },
+        matchTeams: {
+          create: teamIds.map((teamId: string) => ({
+            team: { connect: { id: teamId } },
+          })),
+        },
         curPlayers,
         curTeam: curTeam!,
         overs,
       },
       include: {
-        teams: true,
+        matchTeams: { include: { team: true } },
         ballEvents: true,
       },
     });

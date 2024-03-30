@@ -29,7 +29,7 @@ function TeamList() {
       <CreateTeam />
       <ul className="flex gap-4">
         {teams.map((team, i) => {
-          const players = playersArr?.[i].map((player) => player);
+          const players = playersArr?.[i];
           const captainIndex = players?.findIndex(
             (player) => player.id === team.captain,
           );

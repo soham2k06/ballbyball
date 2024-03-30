@@ -7,57 +7,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Player {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
-  name      String
-  image     String?
-  desc      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Team      Team?    @relation(fields: [teamId], references: [id])
-  teamId    String?  @db.ObjectId
-
-  @@map("players")
-}
-
 model Match {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   userId     String
   name       String
-  teams      Team[]
   overs      Int
   curTeam    Int
   curPlayers CurPlayer[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   ballEvents BallEvent[]
+  matchTeams MatchTeam[]
 
   @@map("matches")
 }
 
-type CurPlayer {
-  id   String     @db.ObjectId
-  type PlayerType
-}
+model Player {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  name        String
+  image       String?
+  desc        String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  teamId      String?      @db.ObjectId
+  teamPlayers TeamPlayer[]
 
-enum PlayerType {
-  batsman
-  bowler
+  @@map("players")
 }
 
 model Team {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
-  name      String
-  players   Player[]
-  captain   String?  @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Match     Match?   @relation(fields: [matchId], references: [id])
-  matchId   String?  @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  name        String
+  captain     String?      @db.ObjectId
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  matchId     String?      @db.ObjectId
+  matchTeams  MatchTeam[]
+  teamPlayers TeamPlayer[]
 
   @@map("teams")
+}
+
+model TeamPlayer {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  team     Team   @relation(fields: [teamId], references: [id])
+  teamId   String @db.ObjectId
+  player   Player @relation(fields: [playerId], references: [id])
+  playerId String @db.ObjectId
+
+  @@map("teamPlayers")
+}
+
+model MatchTeam {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  team    Team   @relation(fields: [teamId], references: [id])
+  teamId  String @db.ObjectId
+  match   Match  @relation(fields: [matchId], references: [id])
+  matchId String @db.ObjectId
+
+  @@map("matchTeams")
 }
 
 model BallEvent {
@@ -72,4 +82,14 @@ model BallEvent {
   matchId   String?  @db.ObjectId
 
   @@map("ballEvents")
+}
+
+type CurPlayer {
+  id   String     @db.ObjectId
+  type PlayerType
+}
+
+enum PlayerType {
+  batsman
+  bowler
 }

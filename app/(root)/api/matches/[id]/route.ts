@@ -10,12 +10,22 @@ export async function GET(
     const { userId } = auth();
     if (!userId) throw new Error("User not authenticated");
 
-    const ballEvents = await prisma.match.findFirst({
+    const match = await prisma.match.findFirst({
       where: { id },
-      include: { teams: { include: { players: true } }, ballEvents: true },
+      include: {
+        ballEvents: true,
+        matchTeams: { include: { team: { include: { teamPlayers: true } } } },
+      },
     });
 
-    return NextResponse.json(ballEvents, { status: 200 });
+    const matchSimplified = {
+      teams: match?.matchTeams.map((team) => team.team),
+      ...match,
+    };
+
+    delete matchSimplified.matchTeams;
+
+    return NextResponse.json(matchSimplified, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
