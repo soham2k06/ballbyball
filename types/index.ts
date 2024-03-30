@@ -8,6 +8,18 @@ type OverlayStateProps = {
   setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
+type PlayerPerformance = {
+  playerId: string;
+  runsScored: number;
+  ballsFaced: number;
+  runConceded: number;
+  ballsBowled: number;
+  wicketsTaken: number;
+  team: string;
+};
+
+// ** Schema relations types
+
 type TeamWithPlayers = Team & { players: Player[] };
 
 type MatchExtended = Match & {
@@ -15,4 +27,10 @@ type MatchExtended = Match & {
   ballEvents: BallEvent[];
 };
 
-export type { EventType, OverlayStateProps, TeamWithPlayers, MatchExtended };
+export type {
+  EventType,
+  OverlayStateProps,
+  TeamWithPlayers,
+  MatchExtended,
+  PlayerPerformance,
+};

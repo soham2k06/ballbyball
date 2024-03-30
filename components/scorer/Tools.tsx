@@ -26,6 +26,8 @@ interface ToolsProps {
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
+  showScorecard: boolean;
+  setShowScorecard: Dispatch<SetStateAction<boolean>>;
 }
 
 function Tools({
@@ -37,6 +39,8 @@ function Tools({
   handleSave,
   match,
   setCurPlayers,
+  showScorecard,
+  setShowScorecard,
 }: ToolsProps) {
   if (!match || !match.teams) return <p>loading...</p>;
 
@@ -58,7 +62,7 @@ function Tools({
         curPlayers={curPlayers}
         setCurPlayers={setCurPlayers}
       />
-      <Drawer>
+      <Drawer open={showScorecard} onOpenChange={setShowScorecard}>
         <DrawerTrigger asChild>
           <Button className="w-full">Scorecard</Button>
         </DrawerTrigger>

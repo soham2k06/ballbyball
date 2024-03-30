@@ -2,7 +2,7 @@ import { BallEvent, Player } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { EventType } from "@/types";
+import { EventType, PlayerPerformance } from "@/types";
 import { invalidBalls } from "./constants";
 
 interface BatsmanStats {
@@ -32,10 +32,10 @@ const calcRuns = (ballEvents: EventType[] | string[], forPlayer?: boolean) =>
 const calcWickets = (ballEvents: EventType[] | string[]) =>
   ballEvents?.filter((ball) => ball.includes("-1")).length;
 
-const getIsInvalidBall = (ball: EventType) =>
+const getIsInvalidBall = (ball: EventType | string) =>
   !invalidBalls.includes(ball) && !ball.includes("-3");
 
-function getScore(balls: EventType[]) {
+function getScore(balls: (EventType | string)[]) {
   const runs = calcRuns(balls);
   const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
   const wickets = calcWickets(balls);
@@ -50,9 +50,11 @@ function getScore(balls: EventType[]) {
 function generateOverSummary({
   ballEvents,
   ballLimitInOver,
+  returnRunsOnly,
 }: {
   ballEvents: EventType[];
-  ballLimitInOver: number;
+  ballLimitInOver?: number;
+  returnRunsOnly?: boolean;
 }) {
   const overSummaries: EventType[][] = [];
   let validBallCount = 0;
@@ -68,14 +70,16 @@ function generateOverSummary({
         validBallCount = 0;
         ballLimitInOver = 6;
       }
-    } else ballLimitInOver++;
+    } else if (ballLimitInOver !== undefined) ballLimitInOver++;
   }
 
   if (validBallCount >= 0 && currentOver.length > 0) {
     overSummaries.push(currentOver);
   }
 
-  return overSummaries;
+  return !returnRunsOnly
+    ? overSummaries
+    : overSummaries.map((over) => calcRuns(over));
 }
 
 function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
@@ -166,6 +170,52 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
   return fallOfWickets;
 }
 
+function calculatePlayerOfTheMatch({
+  playersPerformance,
+  totalOpponentPlayers,
+}: {
+  playersPerformance: PlayerPerformance[];
+  totalOpponentPlayers: number;
+}) {
+  let bestPerformance = -1;
+  let playerOfTheMatch: PlayerPerformance = {
+    playerId: "",
+    runsScored: 0,
+    ballsFaced: 0,
+    wicketsTaken: 0,
+    runConceded: 0,
+    ballsBowled: 0,
+    team: "",
+  };
+
+  const wicketPoint = 100 / totalOpponentPlayers;
+
+  playersPerformance.forEach((player) => {
+    const strikeRate = (player.runsScored / player.ballsFaced) * 100;
+
+    const performanceScore =
+      player.runsScored * 1 + player.wicketsTaken * wicketPoint;
+
+    const adjustedPerformanceScore =
+      performanceScore * ((strikeRate || 100) / 100);
+
+    if (adjustedPerformanceScore > bestPerformance) {
+      bestPerformance = adjustedPerformanceScore;
+      playerOfTheMatch = {
+        playerId: player.playerId,
+        runsScored: player.runsScored,
+        ballsFaced: player.ballsFaced,
+        runConceded: player.runConceded,
+        wicketsTaken: player.wicketsTaken,
+        ballsBowled: player.ballsBowled,
+        team: player.team,
+      };
+    }
+  });
+
+  return playerOfTheMatch;
+}
+
 export {
   cn,
   getScore,
@@ -180,4 +230,5 @@ export {
   processTeamName,
   abbreviateName,
   calculateFallOfWickets,
+  calculatePlayerOfTheMatch,
 };

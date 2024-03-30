@@ -33,6 +33,8 @@ import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 import Tools from "./Tools";
 import FieldersDialog from "./FieldersDialog";
+import MatchSummary from "./MatchSummary";
+import { StatsOpenProvider } from "@/contexts/StatsOpenContext";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { match } = useMatchById(matchId);
@@ -58,6 +60,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
+
+  const [showScorecard, setShowScorecard] = useState(false);
+  const [showMatchSummary, setShowMatchSummary] = useState(false);
 
   const playerIds = team?.players.map((player) => player.id) || [];
 
@@ -103,21 +108,24 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
     if (isAllOut) {
       toast.info("All out!");
+      setShowScorecard(true);
 
-      if (isInSecondInning)
+      if (isInSecondInning) {
+        setShowMatchSummary(true);
         udpateMatch({
           id: matchId,
           curPlayers: [],
           curTeam: Number(!Boolean(match?.curTeam)),
         });
+      }
     }
 
     if (isLastBallOfOver) {
       if (matchBalls !== totalBalls) setIsBowlerSelected(false);
 
+      // Check if inning is finished
       if (totalBalls === matchBalls && totalBalls) {
         const playerIds = new Set(teamPlayerIds);
-
         for (const event of events) {
           if (!playerIds?.has(event.batsmanId)) {
             isInSecondInning = true;
@@ -125,33 +133,37 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           }
         }
 
-        if (!isInSecondInning)
+        if (!isInSecondInning) {
           handleSave(0, [], Number(!Boolean(match?.curTeam)));
-        else {
+        } else {
           toast.info("Match finished!");
           handleSave(0, match?.curPlayers);
         }
+        setShowMatchSummary(true);
+        setShowMatchSummary(true);
       }
     }
   }, [totalBalls]);
 
   if (!ballEventsFromMatch || !balls) return <p>loading...</p>;
 
-  const showSelectBatsman = !curPlayers.filter(
-    (player) => player.type === "batsman",
-  ).length;
+  const showSelectBatsman =
+    !curPlayers.filter((player) => player.type === "batsman").length &&
+    !showScorecard;
+
   const showSelectBowler =
-    (!curPlayers.find((player) => player.type === "bowler") &&
+    ((!curPlayers.find((player) => player.type === "bowler") &&
       !showSelectBatsman) ||
-    !isBowlerSelected;
+      !isBowlerSelected) &&
+    !showScorecard;
 
   // ** Over Summary
   let ballLimitInOver = 6;
 
-  const overSummaries: EventType[][] = generateOverSummary({
+  const overSummaries = generateOverSummary({
     ballEvents: balls,
     ballLimitInOver,
-  });
+  }) as EventType[][];
 
   const chartSummaryData = overSummaries.map((summary, i) => ({
     name: i < 9 ? `Over ${i + 1}` : i + 1,
@@ -169,7 +181,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       changeStrike();
   }
 
-  const handleUndo = () => {
+  function handleUndo() {
     const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
     setIsModified(true);
@@ -182,7 +194,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     }
 
     setEvents(events.slice(0, -1));
-  };
+  }
 
   function handleSave(
     _: unknown,
@@ -290,7 +302,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }
 
   return (
-    <>
+    <StatsOpenProvider>
       <Card className="relative p-2 max-sm:w-full max-sm:border-0 sm:w-96">
         <div className="absolute left-0 top-0 flex w-full items-center justify-between p-2">
           <div>
@@ -339,6 +351,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             events={events}
             handleSave={handleSave}
             match={match!}
+            showScorecard={showScorecard}
+            setShowScorecard={setShowScorecard}
           />
         </CardContent>
         <Separator className="my-4 sm:my-4" />
@@ -383,8 +397,32 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           fielders={match.teams[match.curTeam === 0 ? 1 : 0].players}
           handleScore={handleScoreWithFielder}
         />
+        <MatchSummary
+          teams={[
+            {
+              name: match.teams[0].name,
+              playerIds: match.teams[0].players.map(({ id }) => id),
+            },
+            {
+              name: match.teams[1].name,
+              playerIds: match.teams[1].players.map(({ id }) => id),
+            },
+          ]}
+          ballEvents={events}
+          totalPlayers={
+            (match.teams[0].players.length + match.teams[1].players.length) / 2
+          }
+          open={showMatchSummary}
+          isSecondInning={
+            !new Set(team?.players.map((player) => player.id)).has(
+              events[0]?.batsmanId,
+            )
+          }
+          setOpen={setShowMatchSummary}
+          setShowScorecard={setShowScorecard}
+        />
       </Card>
-    </>
+    </StatsOpenProvider>
   );
 }
 
