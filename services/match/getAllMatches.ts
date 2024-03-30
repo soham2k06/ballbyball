@@ -7,7 +7,7 @@ export const getAllMatches = async () => {
     if (res.status !== 200) {
       throw new Error("Network response was not ok");
     }
-    return res.data as MatchExtended[];
+    return res.data as MatchExtended[] | undefined;
   } catch (error) {
     console.error("Error while fetching teams:", error);
     throw new Error((error as Error).message);

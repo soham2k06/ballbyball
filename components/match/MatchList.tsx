@@ -10,11 +10,11 @@ import { Button } from "../ui/button";
 import { TypographyP } from "../ui/typography";
 
 import StartMatchButton from "./StartMatch";
+import { getOverStr, getScore } from "@/lib/utils";
+import { EventType } from "@/types";
 
 function MatchList() {
   const { matches, isFetching } = useAllMatches();
-
-  const teams = matches?.map((match) => match.teams);
 
   if (isFetching)
     return (
@@ -23,15 +23,16 @@ function MatchList() {
       </div>
     );
 
-  if (!matches) throw new Error("Matches not found");
+  // const runs = generateOverSummary({
+  //   ballEvents: matches[0].ballEvents.map((event) => event.type as EventType),
+  //   returnRunsOnly: true,
+  // });
 
   return (
     <div>
       <StartMatchButton />
       <ul>
-        {matches?.map((match, i) => {
-          const players = teams?.[i].map((player) => player);
-
+        {matches?.map((match) => {
           return (
             <Card>
               <CardHeader className="flex-row items-center justify-between">
@@ -41,7 +42,29 @@ function MatchList() {
                 </Link>
               </CardHeader>
               <CardContent>
-                {players?.map(({ name }) => <TypographyP>{name}</TypographyP>)}
+                {match.teams.map(({ name, players }) => {
+                  const ballEventsByTeam = match.ballEvents
+                    .filter((event) =>
+                      players.map(({ id }) => id).includes(event.batsmanId),
+                    )
+                    .map((event) => event.type as EventType);
+
+                  const { runs, totalBalls, wickets } =
+                    getScore(ballEventsByTeam);
+
+                  return (
+                    <TypographyP>
+                      {name}:{" "}
+                      {ballEventsByTeam.length ? (
+                        <>
+                          runs - {runs}/{wickets} ({getOverStr(totalBalls)})
+                        </>
+                      ) : (
+                        "Yet to bat"
+                      )}
+                    </TypographyP>
+                  );
+                })}
               </CardContent>
             </Card>
           );
