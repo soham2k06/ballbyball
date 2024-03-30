@@ -10,10 +10,18 @@ export async function GET() {
 
     const players = await prisma.team.findMany({
       where: { userId },
-      include: { players: true },
+      include: { teamPlayers: { include: { player: true } } },
     });
 
-    return NextResponse.json(players, { status: 200 });
+    const playersSimplified = players.map((player) => {
+      const players = player.teamPlayers.map((teamPlayer) => teamPlayer.player);
+
+      const { teamPlayers, ...playerWithoutTeamPlayers } = player;
+
+      return { ...playerWithoutTeamPlayers, players };
+    });
+
+    return NextResponse.json(playersSimplified, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
@@ -31,17 +39,23 @@ export async function POST(req: NextRequest) {
     }
 
     const { name, playerIds, captain } = parsedRes.data;
+
     const { userId } = auth();
     if (!userId)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const team = await prisma.team.create({
       data: {
         userId,
         name,
-        players: { connect: playerIds.map((id) => ({ id })) },
+        teamPlayers: {
+          create: playerIds.map((playerId: string) => ({
+            player: { connect: { id: playerId } },
+          })),
+        },
         captain,
       },
-      include: { players: true },
+      include: { teamPlayers: true },
     });
     return NextResponse.json({ team }, { status: 201 });
   } catch (error) {
