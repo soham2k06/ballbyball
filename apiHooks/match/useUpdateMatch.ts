@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { udpateMatch as udpateMatchAPI } from "@/services/match";
+import { updateMatch as updateMatchAPI } from "@/services/match";
 
 export function useUpdateMatch() {
   const queryClient = useQueryClient();
 
-  const { mutate: udpateMatch, isPending } = useMutation({
-    mutationFn: udpateMatchAPI,
+  const { mutate: updateMatch, isPending } = useMutation({
+    mutationFn: updateMatchAPI,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["matchById"] }),
     onError: (err) => toast.error(err.message),
   });
 
-  return { udpateMatch, isPending };
+  return { updateMatch, isPending };
 }

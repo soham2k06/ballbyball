@@ -2,6 +2,6 @@ import { createMatch } from "./createMatch";
 import { deleteMatch } from "./deleteMatch";
 import { getAllMatches } from "./getAllMatches";
 import { getMatchById } from "./getMatchById";
-import { udpateMatch } from "./updateMatch";
+import { updateMatch } from "./updateMatch";
 
-export { createMatch, getAllMatches, getMatchById, udpateMatch, deleteMatch };
+export { createMatch, getAllMatches, getMatchById, updateMatch, deleteMatch };

@@ -1,7 +1,7 @@
 import { UpdateMatchSchema } from "@/lib/validation/match";
 import { axiosInstance } from "../axiosInstance";
 
-export const udpateMatch = async (data: UpdateMatchSchema) => {
+export const updateMatch = async (data: UpdateMatchSchema) => {
   if (!data) return;
 
   const dataWithSortedCurPlayers = {

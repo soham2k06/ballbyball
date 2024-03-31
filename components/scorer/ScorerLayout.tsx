@@ -46,7 +46,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   const teamPlayerIds = team?.players.map((player) => player.id);
 
   const { createBallEvent, isPending } = useSaveBallEvents();
-  const { udpateMatch } = useUpdateMatch();
+  const { updateMatch } = useUpdateMatch();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
 
   // ** States
@@ -112,7 +112,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
       if (isInSecondInning) {
         setShowMatchSummary(true);
-        udpateMatch({
+        updateMatch({
           id: matchId,
           curPlayers: [],
           curTeam: Number(!Boolean(match?.curTeam)),
@@ -218,7 +218,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       );
 
     if (updatedCurPlayers) {
-      udpateMatch(
+      updateMatch(
         {
           id: matchId,
           curPlayers: updatedCurPlayers,
@@ -296,7 +296,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   function handleRestart() {
     deleteAllBallEvents(matchId);
-    udpateMatch({
+    updateMatch({
       id: matchId,
       curPlayers: [],
       curTeam: 0,
