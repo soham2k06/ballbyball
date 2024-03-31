@@ -5,16 +5,16 @@ import { updatePlayer as updatePlayerAPI } from "@/services/player";
 export function useUpdatePlayer() {
   const queryClient = useQueryClient();
 
-  const { mutate: udpateMatch, isPending } = useMutation({
+  const { mutate: udpatePlayer, isPending } = useMutation({
     mutationFn: updatePlayerAPI,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["allPlayers", "playerById"],
+        queryKey: ["allPlayers"],
       });
       toast.success("Player updated successfully");
     },
     onError: (err) => toast.error(err.message),
   });
 
-  return { udpateMatch, isPending };
+  return { udpatePlayer, isPending };
 }

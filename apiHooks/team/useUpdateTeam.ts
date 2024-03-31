@@ -9,7 +9,7 @@ export function useUpdateTeam() {
     mutationFn: updateTeamAPI,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["allTeams", "teamById"],
+        queryKey: ["allTeams"],
       });
       toast.success("Team updated successfully");
     },

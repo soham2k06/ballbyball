@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import AddPlayerFormDialog from "./AddPlayerDialog";
+import AddPlayerFormDialog from "./AddEditPlayerDialog";
 import AddMultiplePlayersDialog from "./AddMultiplePlayersDialog";
 
 function AddPlayerButton() {
