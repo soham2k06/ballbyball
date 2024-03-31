@@ -42,10 +42,13 @@ function MatchList() {
                 </Link>
               </CardHeader>
               <CardContent>
-                {match.teams.map(({ name, players }) => {
+                {match.teams.map(({ name, teamPlayers }) => {
+                  console.log(teamPlayers);
                   const ballEventsByTeam = match.ballEvents
                     .filter((event) =>
-                      players.map(({ id }) => id).includes(event.batsmanId),
+                      teamPlayers
+                        .map(({ playerId }) => playerId)
+                        .includes(event.batsmanId),
                     )
                     .map((event) => event.type as EventType);
 

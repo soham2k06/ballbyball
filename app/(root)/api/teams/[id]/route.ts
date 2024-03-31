@@ -17,10 +17,17 @@ export async function GET(
 
     const team = await prisma.team.findFirst({
       where: { id },
-      include: { players: true },
+      include: { teamPlayers: { include: { player: true } } },
     });
 
-    return NextResponse.json(team, { status: 200 });
+    const teamSimplified = {
+      players: team?.teamPlayers.map((team) => team.player),
+      ...team,
+    };
+
+    delete teamSimplified.teamPlayers;
+
+    return NextResponse.json(teamSimplified, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
