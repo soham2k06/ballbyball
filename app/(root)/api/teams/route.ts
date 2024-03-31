@@ -1,12 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
-import { auth } from "@clerk/nextjs";
+
 import prisma from "@/lib/db/prisma";
 import { createTeamSchema } from "@/lib/validation/team";
+import { validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
-    const { userId } = auth();
-    if (!userId) throw new Error("User not authenticated");
+    const userId = validateUser();
 
     const teams = await prisma.team.findMany({
       where: { userId },
@@ -14,7 +14,9 @@ export async function GET() {
     });
 
     const teamsSimplified = teams.map((team) => {
-      const players = team.teamPlayers.map((teamPlayer) => teamPlayer.player);
+      const players = team.teamPlayers
+        .map((teamPlayer) => teamPlayer.player)
+        .reverse();
 
       const { teamPlayers, ...playerWithoutTeamPlayers } = team;
 
@@ -30,6 +32,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = validateUser();
+
     const body = await req.json();
     const parsedRes = createTeamSchema.safeParse(body);
 
@@ -40,10 +44,6 @@ export async function POST(req: NextRequest) {
 
     const { name, playerIds, captain } = parsedRes.data;
 
-    const { userId } = auth();
-    if (!userId)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
     const team = await prisma.team.create({
       data: {
         userId,
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
             player: { connect: { id: playerId } },
           })),
         },
-        captain,
+        ...(captain && { captain }),
       },
       include: { teamPlayers: true },
     });

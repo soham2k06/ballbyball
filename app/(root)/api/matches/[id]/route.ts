@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
+
 import prisma from "@/lib/db/prisma";
+import { validateUser } from "@/lib/utils";
 
 export async function GET(
   _: unknown,
   { params: { id } }: { params: { id: string } },
 ) {
   try {
-    const { userId } = auth();
-    if (!userId) throw new Error("User not authenticated");
+    validateUser();
 
     const match = await prisma.match.findFirst({
       where: { id },
@@ -35,9 +35,28 @@ export async function GET(
 
     delete matchSimplified.matchTeams;
 
-    console.log(matchSimplified.teams?.[0]);
-
     return NextResponse.json(matchSimplified, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(
+  _: any,
+  { params: { id } }: { params: { id: string } },
+) {
+  try {
+    validateUser();
+
+    await prisma.matchTeam.deleteMany({ where: { matchId: id } });
+    await prisma.ballEvent.deleteMany({ where: { matchId: id } });
+    await prisma.match.delete({ where: { id } });
+
+    return NextResponse.json({ message: "Match deleted" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

@@ -203,16 +203,19 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     dontSaveBallEvents?: boolean,
   ) {
     if (!dontSaveBallEvents && balls.length)
-      createBallEvent(events as CreateBallEventSchema[], {
-        onSuccess: () => {
-          setIsModified(false);
-          toast.success(
-            !!updatedCurPlayers
-              ? "Score auto saved"
-              : "Score saved successfully",
-          );
+      createBallEvent(
+        events.map((event) => ({ ...event, matchId })),
+        {
+          onSuccess: () => {
+            setIsModified(false);
+            toast.success(
+              !!updatedCurPlayers
+                ? "Score auto saved"
+                : "Score saved successfully",
+            );
+          },
         },
-      });
+      );
 
     if (updatedCurPlayers) {
       udpateMatch(

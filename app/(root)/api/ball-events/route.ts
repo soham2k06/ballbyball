@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
+
 import prisma from "@/lib/db/prisma";
 import { createBallEventSchema } from "@/lib/validation/ballEvent";
+import { validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
-    const { userId } = auth();
-    if (!userId) throw new Error("User not authenticated");
+    const userId = validateUser();
 
     const ballEvents = await prisma.ballEvent.findMany({ where: { userId } });
 
@@ -22,8 +22,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth();
-    if (!userId) throw new Error("User not authenticated");
+    const userId = validateUser();
 
     const body = await req.json();
     const parsedRes = createBallEventSchema.array().safeParse(body);

@@ -12,9 +12,9 @@ export const TeamSchema = z.object({
 });
 
 export const createTeamSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1),
   playerIds: z.array(z.string()).refine((value) => value.some((item) => item)),
-  captain: z.string(),
+  captain: z.string().optional(),
 });
 
 export type CreateTeamSchema = z.infer<typeof createTeamSchema>;
