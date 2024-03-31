@@ -1,9 +1,9 @@
 import { axiosInstance } from "../axiosInstance";
-import { CreateTeamSchema } from "@/lib/validation/team";
+import { UpdateTeamSchema } from "@/lib/validation/team";
 
-export const updateTeam = async (data: CreateTeamSchema) => {
+export const updateTeam = async (data: UpdateTeamSchema) => {
   try {
-    const res = await axiosInstance.put("/teams", data);
+    const res = await axiosInstance.put("/teams/" + data.id, data);
 
     if (res.status !== 200) throw new Error("Network response was not ok");
 

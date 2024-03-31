@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -25,18 +26,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
-import { useEffect } from "react";
-import { Player } from "@prisma/client";
 
-interface AddEditPlayerFormDialogProps extends OverlayStateProps {
-  playerToUpdate?: Player;
+interface AddUpdatePlayerDialogProps extends OverlayStateProps {
+  playerToUpdate?: UpdatePlayerSchema;
 }
 
-function AddEditPlayerFormDialog({
+function AddUpdatePlayerDialog({
   open,
   setOpen,
   playerToUpdate,
-}: AddEditPlayerFormDialogProps) {
+}: AddUpdatePlayerDialogProps) {
   const form = useForm<CreatePlayerSchema>({
     resolver: zodResolver(createPlayerSchema),
   });
@@ -126,4 +125,4 @@ function AddEditPlayerFormDialog({
   );
 }
 
-export default AddEditPlayerFormDialog;
+export default AddUpdatePlayerDialog;
