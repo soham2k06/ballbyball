@@ -50,11 +50,9 @@ function getScore(balls: (EventType | string)[]) {
 function generateOverSummary({
   ballEvents,
   ballLimitInOver,
-  returnRunsOnly,
 }: {
   ballEvents: EventType[];
   ballLimitInOver?: number;
-  returnRunsOnly?: boolean;
 }) {
   const overSummaries: EventType[][] = [];
   let validBallCount = 0;
@@ -77,9 +75,7 @@ function generateOverSummary({
     overSummaries.push(currentOver);
   }
 
-  return !returnRunsOnly
-    ? overSummaries
-    : overSummaries.map((over) => calcRuns(over));
+  return overSummaries;
 }
 
 function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
