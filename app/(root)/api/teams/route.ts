@@ -8,20 +8,20 @@ export async function GET() {
     const { userId } = auth();
     if (!userId) throw new Error("User not authenticated");
 
-    const players = await prisma.team.findMany({
+    const teams = await prisma.team.findMany({
       where: { userId },
       include: { teamPlayers: { include: { player: true } } },
     });
 
-    const playersSimplified = players.map((player) => {
-      const players = player.teamPlayers.map((teamPlayer) => teamPlayer.player);
+    const teamsSimplified = teams.map((team) => {
+      const players = team.teamPlayers.map((teamPlayer) => teamPlayer.player);
 
-      const { teamPlayers, ...playerWithoutTeamPlayers } = player;
+      const { teamPlayers, ...playerWithoutTeamPlayers } = team;
 
       return { ...playerWithoutTeamPlayers, players };
     });
 
-    return NextResponse.json(playersSimplified, { status: 200 });
+    return NextResponse.json(teamsSimplified, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

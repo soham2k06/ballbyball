@@ -14,16 +14,28 @@ export async function GET(
       where: { id },
       include: {
         ballEvents: true,
-        matchTeams: { include: { team: { include: { teamPlayers: true } } } },
+        matchTeams: {
+          include: {
+            team: { include: { teamPlayers: { include: { player: true } } } },
+          },
+        },
       },
     });
 
     const matchSimplified = {
-      teams: match?.matchTeams.map((team) => team.team),
+      teams: match?.matchTeams.map((team) => {
+        const { teamPlayers, ...rest } = team.team;
+        return {
+          ...rest,
+          players: teamPlayers.map((teamPlayer) => teamPlayer.player),
+        };
+      }),
       ...match,
     };
 
     delete matchSimplified.matchTeams;
+
+    console.log(matchSimplified.teams?.[0]);
 
     return NextResponse.json(matchSimplified, { status: 200 });
   } catch (error) {
