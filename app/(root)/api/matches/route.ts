@@ -18,7 +18,9 @@ export async function GET() {
     });
 
     const matchesSimplified = matches.map((match) => {
-      const teams = match.matchTeams.map((matchTeam) => matchTeam.team);
+      const teams = match.matchTeams
+        .map((matchTeam) => matchTeam.team)
+        .reverse();
 
       const { matchTeams, ...matchWithoutMatchTeams } = match;
 
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
         userId,
         name,
         matchTeams: {
-          create: teamIds.map((teamId: string) => ({
+          create: teamIds.map((teamId) => ({
             team: { connect: { id: teamId } },
           })),
         },

@@ -14,7 +14,9 @@ export async function GET() {
     });
 
     const teamsSimplified = teams.map((team) => {
-      const players = team.teamPlayers.map((teamPlayer) => teamPlayer.player);
+      const players = team.teamPlayers
+        .map((teamPlayer) => teamPlayer.player)
+        .reverse();
 
       const { teamPlayers, ...playerWithoutTeamPlayers } = team;
 
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest) {
             player: { connect: { id: playerId } },
           })),
         },
-        captain,
+        ...(captain && { captain }),
       },
       include: { teamPlayers: true },
     });
