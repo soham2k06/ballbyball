@@ -1,10 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
-import { auth } from "@clerk/nextjs";
-import { toast } from "sonner";
 import prisma from "@/lib/db/prisma";
+import { validateUser } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = validateUser();
+
     const body = await req.json();
 
     if (!Array.isArray(body)) {
@@ -12,13 +13,6 @@ export async function POST(req: NextRequest) {
         { error: "Invalid input format, expected an array" },
         { status: 400 },
       );
-    }
-
-    const { userId } = auth();
-
-    if (!userId) {
-      toast.error("User Unauthorized");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const playersData = body.map((playerData) => ({

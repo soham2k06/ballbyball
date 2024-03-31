@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
 import { CurPlayer } from "@prisma/client";
+
 import prisma from "@/lib/db/prisma";
 import { createMatchSchema, updateMatchSchema } from "@/lib/validation/match";
+import { validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
-    const { userId } = auth();
-    if (!userId) throw new Error("User not authenticated");
+    const userId = validateUser();
 
     const matches = await prisma.match.findMany({
       where: { userId },
@@ -47,9 +47,7 @@ export async function POST(req: NextRequest) {
 
     const { name, teamIds, curTeam, overs, curPlayers } = parsedRes.data;
 
-    const { userId } = auth();
-    if (!userId)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = validateUser();
 
     const match = await prisma.match.create({
       data: {
@@ -61,7 +59,7 @@ export async function POST(req: NextRequest) {
           })),
         },
         curPlayers,
-        curTeam: curTeam!,
+        curTeam: curTeam ?? 0,
         overs,
       },
       include: {
@@ -82,8 +80,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const { userId } = auth();
-    if (!userId) throw new Error("User not authenticated");
+    validateUser();
 
     const body = await req.json();
     const parsedRes = updateMatchSchema.safeParse(body);
@@ -93,7 +90,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" }, { status: 422 });
     }
 
-    const { id: matchId, curPlayers, curTeam } = parsedRes.data;
+    const { id: matchId, curPlayers, curTeam, name, overs } = parsedRes.data;
 
     if (!matchId) {
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
@@ -106,6 +103,8 @@ export async function PUT(req: NextRequest) {
     const updatedMatch = await prisma.match.update({
       where: { id: matchId },
       data: {
+        name,
+        overs,
         curPlayers: curPlayersToSave,
         curTeam,
       },

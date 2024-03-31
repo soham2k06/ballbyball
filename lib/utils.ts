@@ -1,4 +1,5 @@
 import { BallEvent, Player } from "@prisma/client";
+import { auth } from "@clerk/nextjs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -10,6 +11,8 @@ interface BatsmanStats {
   events: EventType[];
   outBy?: string;
 }
+
+// ** Front-end
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -212,6 +215,16 @@ function calculatePlayerOfTheMatch({
   return playerOfTheMatch;
 }
 
+// ** Backend
+
+function validateUser() {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+  return userId;
+}
+
 export {
   cn,
   getScore,
@@ -227,4 +240,6 @@ export {
   abbreviateName,
   calculateFallOfWickets,
   calculatePlayerOfTheMatch,
+  // Backend
+  validateUser,
 };

@@ -1,23 +1,79 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
-import { toast } from "sonner";
+import { createPlayerSchema } from "@/lib/validation/player";
+import { validateUser } from "@/lib/utils";
 
 export async function GET(
-  _: any,
+  _: unknown,
   { params: { id } }: { params: { id: string } },
 ) {
   try {
-    const { userId } = auth();
-
-    if (!userId) {
-      toast.error("User Unauthorized");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    validateUser();
 
     const players = await prisma.player.findUnique({ where: { id } });
 
     return NextResponse.json(players, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function PUT(
+  req: NextRequest,
+  { params: { id } }: { params: { id: string } },
+) {
+  try {
+    validateUser();
+
+    const body = await req.json();
+    const parsedRes = createPlayerSchema.safeParse(body);
+
+    if (!parsedRes.success) {
+      console.error(parsedRes.error);
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    }
+
+    const { name } = parsedRes.data;
+
+    const player = await prisma.player.findUnique({ where: { id } });
+
+    if (!player)
+      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+
+    await prisma.player.update({ where: { id }, data: { name } });
+
+    return NextResponse.json({ message: "Player updated" }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(
+  _: unknown,
+  { params: { id } }: { params: { id: string } },
+) {
+  try {
+    validateUser();
+
+    if (!id)
+      return NextResponse.json(
+        { error: "Player id is not valid" },
+        { status: 401 },
+      );
+
+    const playerToDelete = await prisma.player.findUnique({ where: { id } });
+
+    if (!playerToDelete)
+      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+
+    await prisma.player.delete({ where: { id } });
+
+    return NextResponse.json({ message: "Player deleted" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
