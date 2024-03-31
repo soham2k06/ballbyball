@@ -6,18 +6,15 @@ export const udpateMatch = async (data: UpdateMatchSchema) => {
 
   const dataWithSortedCurPlayers = {
     ...data,
-    curPlayers: data.curPlayers?.sort(
-      (a, b) => a?.type.localeCompare(b?.type!)!,
+    curPlayers: data.curPlayers?.sort((a, b) =>
+      (a?.type || "batsman").localeCompare(b?.type || "batsman"),
     ),
   };
 
   try {
     const res = await axiosInstance.put("/matches", dataWithSortedCurPlayers);
 
-    if (res.status !== 202) {
-      throw new Error("Network response was not ok");
-    }
-
+    if (res.status !== 200) throw new Error("Network response was not ok");
     return res.data;
   } catch (error) {
     console.error("Error while updating a Match:", error);

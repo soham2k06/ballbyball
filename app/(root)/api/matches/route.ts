@@ -112,7 +112,7 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ match: updatedMatch }, { status: 202 });
+    return NextResponse.json({ match: updatedMatch }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

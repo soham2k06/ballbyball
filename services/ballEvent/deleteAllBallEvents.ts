@@ -4,7 +4,7 @@ export const deleteAllBallEvents = async (matchId: string) => {
   try {
     const res = await axiosInstance.delete(`/ball-events/${matchId}`);
 
-    if (res.status !== 202) {
+    if (res.status !== 200) {
       throw new Error("Network response was not ok");
     }
 

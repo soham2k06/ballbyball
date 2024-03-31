@@ -19,7 +19,7 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Ball events deleted" },
-      { status: 202 },
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error deleting ball events:", error);
