@@ -1,12 +1,14 @@
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { OverlayStateProps } from "@/types";
 import {
   CreatePlayerSchema,
+  UpdatePlayerSchema,
   createPlayerSchema,
 } from "@/lib/validation/player";
-import { useCreatePlayer } from "@/apiHooks/player";
+import { useCreatePlayer, useUpdatePlayer } from "@/apiHooks/player";
 
 import {
   Dialog,
@@ -25,16 +27,44 @@ import {
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 
-function AddPlayerFormDialog({ open, setOpen }: OverlayStateProps) {
+interface AddUpdatePlayerDialogProps extends OverlayStateProps {
+  playerToUpdate?: UpdatePlayerSchema;
+}
+
+function AddUpdatePlayerDialog({
+  open,
+  setOpen,
+  playerToUpdate,
+}: AddUpdatePlayerDialogProps) {
   const form = useForm<CreatePlayerSchema>({
     resolver: zodResolver(createPlayerSchema),
   });
 
-  const { handleSubmit, control, reset } = form;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isDirty },
+  } = form;
 
-  const { createPlayer, isPending } = useCreatePlayer();
+  const { createPlayer, isPending: isCreating } = useCreatePlayer();
+  const { udpatePlayer, isPending: isUpdating } = useUpdatePlayer();
 
-  function onSubmit(data: CreatePlayerSchema) {
+  const isPending = isCreating || isUpdating;
+
+  function onSubmit(data: CreatePlayerSchema | UpdatePlayerSchema) {
+    if (!!playerToUpdate) {
+      udpatePlayer(
+        { id: playerToUpdate.id, ...data },
+        {
+          onSuccess: () => {
+            reset();
+            setOpen(false);
+          },
+        },
+      );
+      return;
+    }
     createPlayer(data, {
       onSuccess: () => {
         reset();
@@ -43,11 +73,20 @@ function AddPlayerFormDialog({ open, setOpen }: OverlayStateProps) {
     });
   }
 
+  useEffect(() => {
+    if (open && playerToUpdate?.name)
+      reset({
+        name: playerToUpdate?.name,
+      });
+  }, [open, playerToUpdate]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="rounded-md p-4">
         <DialogHeader>
-          <DialogTitle>Add Player</DialogTitle>
+          <DialogTitle>
+            {!!playerToUpdate ? "Update" : "Add"} Player
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
@@ -67,10 +106,16 @@ function AddPlayerFormDialog({ open, setOpen }: OverlayStateProps) {
             <DialogFooter>
               <LoadingButton
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || !isDirty}
                 loading={isPending}
               >
-                {isPending ? "Adding..." : "Add"}
+                {isPending
+                  ? !!playerToUpdate
+                    ? "Updating..."
+                    : "Adding..."
+                  : !!playerToUpdate
+                    ? "Update"
+                    : "Add"}
               </LoadingButton>
             </DialogFooter>
           </form>
@@ -80,4 +125,4 @@ function AddPlayerFormDialog({ open, setOpen }: OverlayStateProps) {
   );
 }
 
-export default AddPlayerFormDialog;
+export default AddUpdatePlayerDialog;

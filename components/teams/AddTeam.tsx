@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import CreateTeamDialog from "./CreateTeamDialog";
+import CreateTeamDialog from "./AddUpdateTeamDialog";
 
 function AddPlayerButton() {
   const [open, setOpen] = useState(false);

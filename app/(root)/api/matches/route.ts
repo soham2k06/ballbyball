@@ -70,6 +70,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await prisma.team.updateMany({
+      where: { id: { in: teamIds } },
+      data: {
+        matchId: match.id,
+      },
+    });
+
     return NextResponse.json({ match }, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -112,7 +119,7 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ match: updatedMatch }, { status: 202 });
+    return NextResponse.json({ match: updatedMatch }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

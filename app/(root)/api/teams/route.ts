@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
             player: { connect: { id: playerId } },
           })),
         },
-        ...(captain && { captain }),
+        captain,
       },
       include: { teamPlayers: true },
     });
