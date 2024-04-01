@@ -9,11 +9,14 @@ import { Button } from "../ui/button";
 import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
 import LoadingButton from "../ui/loading-button";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
+import AlertNote from "../AlertNote";
 
 function PlayerList() {
   const { players } = useAllPlayers();
   const { deletePlayer, isPending } = useDeletePlayer();
-  const [playerToDelete, setPlayerToDelete] = useState<string | null>(null);
+  const [playerToDelete, setPlayerToDelete] = useState<string | undefined>(
+    undefined,
+  );
 
   const [playerToUpdate, setPlayerToUpdate] = useState<
     UpdatePlayerSchema | undefined
@@ -21,7 +24,7 @@ function PlayerList() {
 
   const handleDelete = (playerId: string) => {
     setPlayerToDelete(playerId);
-    deletePlayer(playerId);
+    // deletePlayer(playerId);
   };
 
   return (
@@ -53,6 +56,14 @@ function PlayerList() {
           setPlayerToUpdate(playerToUpdate ? undefined : playerToUpdate)
         }
         playerToUpdate={playerToUpdate}
+      />
+      <AlertNote
+        open={!!playerToDelete}
+        setOpen={() =>
+          setPlayerToDelete(playerToDelete ? undefined : playerToDelete)
+        }
+        content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
+        onConfirm={() => playerToDelete && deletePlayer(playerToDelete)}
       />
     </div>
   );

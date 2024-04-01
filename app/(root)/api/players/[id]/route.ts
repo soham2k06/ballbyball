@@ -71,6 +71,7 @@ export async function DELETE(
     if (!playerToDelete)
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
 
+    await prisma.teamPlayer.deleteMany({ where: { playerId: id } });
     await prisma.player.delete({ where: { id } });
 
     return NextResponse.json({ message: "Player deleted" }, { status: 200 });
