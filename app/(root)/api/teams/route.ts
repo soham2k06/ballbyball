@@ -53,11 +53,21 @@ export async function POST(req: NextRequest) {
             player: { connect: { id: playerId } },
           })),
         },
-        captain,
+        ...(captain && { captain }),
       },
-      include: { teamPlayers: true },
+      include: {
+        teamPlayers: { include: { player: true } },
+        matchTeams: { include: { team: true } },
+      },
     });
-    return NextResponse.json({ team }, { status: 201 });
+
+    const { teamPlayers, ...teamToReturn } = team;
+    const teamSimplified = {
+      players: team?.teamPlayers.map((team) => team.player),
+      ...teamToReturn,
+    };
+
+    return NextResponse.json(teamSimplified, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

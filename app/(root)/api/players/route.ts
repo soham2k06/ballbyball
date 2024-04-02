@@ -8,7 +8,10 @@ export async function GET() {
   try {
     const userId = validateUser();
 
-    const players = await prisma.player.findMany({ where: { userId } });
+    const players = await prisma.player.findMany({
+      where: { userId },
+      orderBy: { id: "asc" },
+    });
 
     return NextResponse.json(players, { status: 200 });
   } catch (error) {

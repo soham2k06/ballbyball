@@ -120,7 +120,7 @@ function AddUpdateTeamDialog({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="h-full rounded-md p-0">
           <DialogHeader className="p-4">
-            <DialogTitle>Add Team</DialogTitle>
+            <DialogTitle>{teamToUpdate ? "Update" : "Add"} Team</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
