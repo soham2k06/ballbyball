@@ -10,9 +10,10 @@ import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
 import LoadingButton from "../ui/loading-button";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 import AlertNote from "../AlertNote";
+import { LoaderIcon } from "lucide-react";
 
 function PlayerList() {
-  const { players } = useAllPlayers();
+  const { players, isFetching } = useAllPlayers();
   const { deletePlayer, isPending } = useDeletePlayer();
   const [playerToDelete, setPlayerToDelete] = useState<string | undefined>(
     undefined,
@@ -26,6 +27,13 @@ function PlayerList() {
     setPlayerToDelete(playerId);
     // deletePlayer(playerId);
   };
+
+  if (isFetching)
+    return (
+      <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+        <LoaderIcon className="animate-spin" />
+      </div>
+    );
 
   return (
     <div className="grid grid-cols-6 gap-2">

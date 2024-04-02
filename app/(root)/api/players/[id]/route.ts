@@ -10,7 +10,7 @@ export async function GET(
   try {
     validateUser();
 
-    const players = await prisma.player.findUnique({ where: { id } });
+    const players = await prisma.player.findFirst({ where: { id } });
 
     return NextResponse.json(players, { status: 200 });
   } catch (error) {
@@ -36,7 +36,7 @@ export async function PUT(
 
     const { name } = parsedRes.data;
 
-    const player = await prisma.player.findUnique({ where: { id } });
+    const player = await prisma.player.findFirst({ where: { id } });
 
     if (!player)
       return NextResponse.json({ error: "Player not found" }, { status: 404 });

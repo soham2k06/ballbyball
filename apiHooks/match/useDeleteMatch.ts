@@ -8,7 +8,7 @@ export function useDeleteMatch() {
   const { mutate: deleteMatch, isPending } = useMutation({
     mutationFn: deleteMatchAPI,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["matchById", "allMatches"] });
+      queryClient.invalidateQueries({ queryKey: ["allMatches"] });
       toast.success("Match deleted successfully");
     },
     onError: () => toast.error("Error deleting a match"),

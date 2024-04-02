@@ -74,10 +74,7 @@ function AddUpdatePlayerDialog({
   }
 
   useEffect(() => {
-    if (open && playerToUpdate?.name)
-      reset({
-        name: playerToUpdate?.name,
-      });
+    if (open && playerToUpdate) reset(playerToUpdate);
   }, [open, playerToUpdate]);
 
   return (

@@ -2,9 +2,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { OverlayStateProps } from "@/types";
-import { CreateMatchSchema, createMatchSchema } from "@/lib/validation/match";
+import {
+  CreateMatchSchema,
+  UpdateMatchSchema,
+  createMatchSchema,
+} from "@/lib/validation/match";
 import { useAllTeams } from "@/apiHooks/team";
-import { useCreateMatch } from "@/apiHooks/match";
+import { useCreateMatch, useUpdateMatch } from "@/apiHooks/match";
 
 import {
   Dialog,
@@ -25,9 +29,18 @@ import {
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useEffect, useState } from "react";
 
-function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
-  const form = useForm<CreateMatchSchema>({
+interface StartUpdateMatchDialogProps extends OverlayStateProps {
+  matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
+}
+
+function StartUpdateMatchDialog({
+  open,
+  setOpen,
+  matchToUpdate,
+}: StartUpdateMatchDialogProps) {
+  const form = useForm<CreateMatchSchema | UpdateMatchSchema>({
     resolver: zodResolver(createMatchSchema),
     defaultValues: {
       name: "",
@@ -38,15 +51,41 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
 
   const { allTeams: teams } = useAllTeams();
 
-  const { handleSubmit, control, reset, setValue } = form;
-  const { createMatch, isPending } = useCreateMatch();
+  const {
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    formState: { isDirty },
+  } = form;
 
-  async function onSubmit(data: CreateMatchSchema) {
+  const [isOversDirty, setIsOversDirty] = useState(false);
+
+  const { createMatch, isPending: isCreating } = useCreateMatch();
+  const { updateMatch, isPending: isUpdating } = useUpdateMatch();
+
+  const isPending = isCreating || isUpdating;
+
+  async function onSubmit(data: CreateMatchSchema | UpdateMatchSchema) {
     // TODO: Create Input for curTeam
+
+    if (matchToUpdate) {
+      updateMatch(
+        { ...data, id: matchToUpdate.id },
+        {
+          onSuccess: () => {
+            reset();
+            setOpen(false);
+          },
+        },
+      );
+
+      return;
+    }
     createMatch(
       {
-        ...data,
         curTeam: 0,
+        ...(data as CreateMatchSchema),
       },
       {
         onSuccess: () => {
@@ -57,11 +96,24 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
     );
   }
 
+  useEffect(() => {
+    if (open && matchToUpdate) reset(matchToUpdate);
+  }, [open, matchToUpdate]);
+
+  useEffect(() => {
+    if (matchToUpdate) {
+      setIsOversDirty(form.watch("overs") !== matchToUpdate?.overs);
+      console.log("run");
+    }
+  }, [form.watch("overs")]);
+
+  console.log(isOversDirty);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="h-full rounded-md p-0">
         <DialogHeader className="p-4">
-          <DialogTitle>Add Team</DialogTitle>
+          <DialogTitle>{matchToUpdate ? "Update" : "Add"} Team</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -108,7 +160,7 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
                                 checked={field.value?.includes(item.id)}
                                 onCheckedChange={(checked) => {
                                   return checked
-                                    ? field.onChange([...field.value, item.id])
+                                    ? field.onChange([...field.value!, item.id])
                                     : field.onChange(
                                         field.value?.filter(
                                           (value) => value !== item.id,
@@ -147,10 +199,7 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
                         placeholder="Match Overs"
                         type="number"
                         onChange={(e) =>
-                          setValue(
-                            "overs",
-                            parseInt(e.target.value as unknown as string),
-                          )
+                          setValue("overs", parseInt(e.target.value))
                         }
                         {...rest}
                       />
@@ -164,10 +213,16 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
             <DialogFooter>
               <LoadingButton
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || (!isDirty && !isOversDirty)}
                 loading={isPending}
               >
-                {isPending ? "Adding..." : "Add"}
+                {isPending
+                  ? !!matchToUpdate
+                    ? "Updating..."
+                    : "Adding..."
+                  : !!matchToUpdate
+                    ? "Update"
+                    : "Add"}
               </LoadingButton>
             </DialogFooter>
           </form>
@@ -177,4 +232,4 @@ function StartMatchDialog({ open, setOpen }: OverlayStateProps) {
   );
 }
 
-export default StartMatchDialog;
+export default StartUpdateMatchDialog;

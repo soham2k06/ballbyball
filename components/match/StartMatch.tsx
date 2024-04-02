@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import StartMatchDialog from "./StartMatchDialog";
+import StartMatchDialog from "./StartUpdateMatchDialog";
 
 function StartMatchButton() {
   const [open, setOpen] = useState(false);
