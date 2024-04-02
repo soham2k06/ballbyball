@@ -13,6 +13,9 @@ export async function GET() {
       orderBy: { id: "asc" },
     });
 
+    if (!players)
+      return NextResponse.json({ error: "No data found" }, { status: 404 });
+
     return NextResponse.json(players, { status: 200 });
   } catch (error) {
     console.error(error);

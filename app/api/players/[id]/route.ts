@@ -10,9 +10,12 @@ export async function GET(
   try {
     validateUser();
 
-    const players = await prisma.player.findFirst({ where: { id } });
+    const player = await prisma.player.findFirst({ where: { id } });
 
-    return NextResponse.json(players, { status: 200 });
+    if (!player)
+      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+
+    return NextResponse.json(player, { status: 200 });
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

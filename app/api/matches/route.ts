@@ -27,6 +27,9 @@ export async function GET() {
       return { ...matchWithoutMatchTeams, teams };
     });
 
+    if (!matches)
+      return NextResponse.json({ error: "No data found" }, { status: 404 });
+
     return NextResponse.json(matchesSimplified, { status: 200 });
   } catch (error) {
     console.error(error);

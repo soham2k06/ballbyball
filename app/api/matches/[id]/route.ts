@@ -37,6 +37,9 @@ export async function GET(
 
     delete matchSimplified.matchTeams;
 
+    if (!match)
+      return NextResponse.json({ error: "No data found" }, { status: 404 });
+
     return NextResponse.json(matchSimplified, { status: 200 });
   } catch (error) {
     console.error(error);
