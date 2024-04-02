@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
@@ -58,6 +58,8 @@ function StartUpdateMatchDialog({
     setValue,
     formState: { isDirty },
   } = form;
+
+  const [isOversDirty, setIsOversDirty] = useState(false);
 
   const { createMatch, isPending: isCreating } = useCreateMatch();
   const { updateMatch, isPending: isUpdating } = useUpdateMatch();
@@ -97,6 +99,15 @@ function StartUpdateMatchDialog({
   useEffect(() => {
     if (open && matchToUpdate) reset(matchToUpdate);
   }, [open, matchToUpdate]);
+
+  useEffect(() => {
+    if (matchToUpdate) {
+      setIsOversDirty(form.watch("overs") !== matchToUpdate?.overs);
+      console.log("run");
+    }
+  }, [form.watch("overs")]);
+
+  console.log(isOversDirty);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -202,7 +213,7 @@ function StartUpdateMatchDialog({
             <DialogFooter>
               <LoadingButton
                 type="submit"
-                disabled={isPending || !isDirty}
+                disabled={isPending || (!isDirty && !isOversDirty)}
                 loading={isPending}
               >
                 {isPending

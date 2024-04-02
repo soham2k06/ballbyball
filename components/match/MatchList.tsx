@@ -16,7 +16,6 @@ import StartUpdateMatchDialog from "./StartUpdateMatchDialog";
 import { useState } from "react";
 import { UpdateMatchSchema } from "@/lib/validation/match";
 import AlertNote from "../AlertNote";
-import LoadingButton from "../ui/loading-button";
 
 function MatchList() {
   const { matches, isLoading } = useAllMatches();
@@ -49,7 +48,6 @@ function MatchList() {
           };
 
           const isThisDeleting = isDeleting && matchToDelete === match.id;
-          console.log(isThisDeleting, isDeleting, matchToDelete, match.id);
           return (
             <Card>
               <CardHeader className="flex-row items-center justify-between">
@@ -60,13 +58,12 @@ function MatchList() {
                 <Button onClick={() => setMatchToUpdate(matchToUpdateVar)}>
                   Edit
                 </Button>
-                <LoadingButton
-                  loading={isThisDeleting}
+                <Button
                   disabled={isThisDeleting}
                   onClick={() => setMatchToDelete(match.id)}
                 >
-                  {isThisDeleting ? "Deleting..." : "Delete"}
-                </LoadingButton>
+                  Delete
+                </Button>
               </CardHeader>
               <CardContent>
                 {match.teams.map(({ name, teamPlayers }) => {

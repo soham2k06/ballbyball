@@ -99,14 +99,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" }, { status: 422 });
     }
 
-    const {
-      id: matchId,
-      curPlayers,
-      curTeam,
-      name,
-      overs,
-      teamIds,
-    } = parsedRes.data;
+    const { id: matchId, curPlayers, curTeam, name, overs } = parsedRes.data;
 
     if (!matchId) {
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
@@ -123,14 +116,6 @@ export async function PUT(req: NextRequest) {
         overs,
         curPlayers: curPlayersToSave,
         curTeam,
-        ...(teamIds && {
-          matchTeams: {
-            deleteMany: {},
-            create: teamIds?.map((playerId: string) => ({
-              team: { connect: { id: playerId } },
-            })),
-          },
-        }),
       },
     });
 
