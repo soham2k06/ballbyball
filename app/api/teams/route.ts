@@ -23,6 +23,9 @@ export async function GET() {
       return { ...playerWithoutTeamPlayers, players };
     });
 
+    if (!teams)
+      return NextResponse.json({ error: "No data found" }, { status: 404 });
+
     return NextResponse.json(teamsSimplified, { status: 200 });
   } catch (error) {
     console.error(error);

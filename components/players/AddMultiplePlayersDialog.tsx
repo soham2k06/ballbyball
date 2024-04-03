@@ -98,6 +98,7 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
                     <FormItem className="w-full">
                       <FormControl>
                         <Input
+                          autoFocus
                           id={`player-input-${index}`}
                           placeholder="Player name"
                           className="w-full"

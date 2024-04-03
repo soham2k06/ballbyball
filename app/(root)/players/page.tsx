@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import AddPlayerButton from "@/components/players/AddPlayer";
+
 import PlayerList from "@/components/players/PlayerList";
 
 export const metadata: Metadata = {
@@ -8,12 +8,7 @@ export const metadata: Metadata = {
 };
 
 async function page() {
-  return (
-    <>
-      <PlayerList />
-      <AddPlayerButton />
-    </>
-  );
+  return <PlayerList />;
 }
 
 export default page;

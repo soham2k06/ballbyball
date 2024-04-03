@@ -23,6 +23,9 @@ export async function GET(
 
     delete teamSimplified.teamPlayers;
 
+    if (!team)
+      return NextResponse.json({ error: "No data found" }, { status: 404 });
+
     return NextResponse.json(teamSimplified, { status: 200 });
   } catch (error) {
     console.error(error);

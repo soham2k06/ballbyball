@@ -12,13 +12,15 @@ function AddPlayerButton() {
   const [openMultiple, setOpenMultiple] = useState(false);
 
   return (
-    <>
+    <div className="space-x-2">
       <Button onClick={() => setOpen(true)}>Add Player</Button>
-      <Button onClick={() => setOpenMultiple(true)}>Add Multiple Player</Button>
+      <Button onClick={() => setOpenMultiple(true)} className="relative">
+        Add Multiple Players
+      </Button>
 
       <AddPlayerFormDialog open={open} setOpen={setOpen} />
       <AddMultiplePlayersDialog open={openMultiple} setOpen={setOpenMultiple} />
-    </>
+    </div>
   );
 }
 

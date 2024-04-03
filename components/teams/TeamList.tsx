@@ -14,6 +14,8 @@ import { Button } from "../ui/button";
 import AddUpdateTeamDialog from "./AddUpdateTeamDialog";
 import { UpdateTeamSchema } from "@/lib/validation/team";
 import { TeamWithPlayers } from "@/types";
+import EmptyState from "../EmptyState";
+import { cn } from "@/lib/utils";
 
 function TeamList() {
   const { allTeams: teams, isFetching } = useAllTeams();
@@ -34,8 +36,6 @@ function TeamList() {
         <LoaderIcon className="animate-spin" />
       </div>
     );
-
-  if (!teams) throw new Error("Team Not Found");
 
   function handleDelete(id: string) {
     setTeamToDelete(id);
@@ -59,41 +59,52 @@ function TeamList() {
   }
 
   return (
-    <div>
+    <div
+      className={cn("md:p-8", {
+        "flex flex-col items-center": !teams?.length,
+      })}
+    >
+      {teams?.length ? (
+        <ul className="flex gap-4 pb-4">
+          {teams.map((team, i) => {
+            const players = playersArr?.[i];
+            const captainIndex = players?.findIndex(
+              (player) => player.id === team.captain,
+            );
+
+            const isLoading = isPending && teamToDelete === team.id;
+
+            return (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{team.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {players?.map(({ name }, playerIndex) => (
+                    <TypographyP>
+                      {name} {captainIndex === playerIndex && "(C)"}
+                    </TypographyP>
+                  ))}
+                  <Button onClick={() => handleUpdateClick(0, team)}>
+                    Edit
+                  </Button>
+                  <LoadingButton
+                    loading={isLoading}
+                    disabled={isLoading}
+                    onClick={() => handleDelete(team.id)}
+                  >
+                    {isLoading ? "Deleting..." : "Delete"}
+                  </LoadingButton>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </ul>
+      ) : (
+        <EmptyState document="teams" />
+      )}
       <CreateTeam />
-      <ul className="flex gap-4">
-        {teams.map((team, i) => {
-          const players = playersArr?.[i];
-          const captainIndex = players?.findIndex(
-            (player) => player.id === team.captain,
-          );
 
-          const isLoading = isPending && teamToDelete === team.id;
-
-          return (
-            <Card>
-              <CardHeader>
-                <CardTitle>{team.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {players?.map(({ name }, playerIndex) => (
-                  <TypographyP>
-                    {name} {captainIndex === playerIndex && "(C)"}
-                  </TypographyP>
-                ))}
-                <Button onClick={() => handleUpdateClick(0, team)}>Edit</Button>
-                <LoadingButton
-                  loading={isLoading}
-                  disabled={isLoading}
-                  onClick={() => handleDelete(team.id)}
-                >
-                  {isLoading ? "Deleting..." : "Delete"}
-                </LoadingButton>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </ul>
       <AddUpdateTeamDialog
         open={!!teamToUpdate}
         setOpen={() => setTeamToUpdate(teamToUpdate ? undefined : teamToUpdate)}

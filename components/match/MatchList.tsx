@@ -10,12 +10,13 @@ import { Button } from "../ui/button";
 import { TypographyP } from "../ui/typography";
 
 import StartMatchButton from "./StartMatch";
-import { getOverStr, getScore } from "@/lib/utils";
+import { cn, getOverStr, getScore } from "@/lib/utils";
 import { EventType } from "@/types";
 import StartUpdateMatchDialog from "./StartUpdateMatchDialog";
 import { useState } from "react";
 import { UpdateMatchSchema } from "@/lib/validation/match";
 import AlertNote from "../AlertNote";
+import EmptyState from "../EmptyState";
 
 function MatchList() {
   const { matches, isLoading } = useAllMatches();
@@ -35,67 +36,74 @@ function MatchList() {
       </div>
     );
 
-  if (!matches) throw new Error("Team Not Found");
-
   return (
-    <div>
+    <div
+      className={cn("md:p-8", {
+        "flex flex-col items-center": !matches?.length,
+      })}
+    >
+      {matches?.length ? (
+        <ul>
+          {matches?.map((match) => {
+            const matchToUpdateVar = {
+              ...match,
+              teamIds: match.teams.map((team) => team.id),
+            };
+
+            const isThisDeleting = isDeleting && matchToDelete === match.id;
+            return (
+              <Card>
+                <CardHeader className="flex-row items-center justify-between">
+                  <CardTitle>{match.name}</CardTitle>
+                  <Button asChild>
+                    <Link href={`/match/${match.id}`}>Play</Link>
+                  </Button>
+                  <Button onClick={() => setMatchToUpdate(matchToUpdateVar)}>
+                    Edit
+                  </Button>
+                  <Button
+                    disabled={isThisDeleting}
+                    onClick={() => setMatchToDelete(match.id)}
+                  >
+                    Delete
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {match.teams.map(({ name, teamPlayers }) => {
+                    const ballEventsByTeam = match.ballEvents
+                      .filter((event) =>
+                        teamPlayers
+                          .map(({ playerId }) => playerId)
+                          .includes(event.batsmanId),
+                      )
+                      .map((event) => event.type as EventType);
+
+                    const { runs, totalBalls, wickets } =
+                      getScore(ballEventsByTeam);
+
+                    return (
+                      <TypographyP>
+                        {name}:{" "}
+                        {ballEventsByTeam.length ? (
+                          <>
+                            runs - {runs}/{wickets} ({getOverStr(totalBalls)})
+                          </>
+                        ) : (
+                          "Yet to bat"
+                        )}
+                      </TypographyP>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </ul>
+      ) : (
+        <EmptyState document="matches" />
+      )}
       <StartMatchButton />
-      <ul>
-        {matches?.map((match) => {
-          const matchToUpdateVar = {
-            ...match,
-            teamIds: match.teams.map((team) => team.id),
-          };
 
-          const isThisDeleting = isDeleting && matchToDelete === match.id;
-          return (
-            <Card>
-              <CardHeader className="flex-row items-center justify-between">
-                <CardTitle>{match.name}</CardTitle>
-                <Button asChild>
-                  <Link href={`/match/${match.id}`}>Play</Link>
-                </Button>
-                <Button onClick={() => setMatchToUpdate(matchToUpdateVar)}>
-                  Edit
-                </Button>
-                <Button
-                  disabled={isThisDeleting}
-                  onClick={() => setMatchToDelete(match.id)}
-                >
-                  Delete
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {match.teams.map(({ name, teamPlayers }) => {
-                  const ballEventsByTeam = match.ballEvents
-                    .filter((event) =>
-                      teamPlayers
-                        .map(({ playerId }) => playerId)
-                        .includes(event.batsmanId),
-                    )
-                    .map((event) => event.type as EventType);
-
-                  const { runs, totalBalls, wickets } =
-                    getScore(ballEventsByTeam);
-
-                  return (
-                    <TypographyP>
-                      {name}:{" "}
-                      {ballEventsByTeam.length ? (
-                        <>
-                          runs - {runs}/{wickets} ({getOverStr(totalBalls)})
-                        </>
-                      ) : (
-                        "Yet to bat"
-                      )}
-                    </TypographyP>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </ul>
       <StartUpdateMatchDialog
         open={!!matchToUpdate}
         setOpen={() => setMatchToUpdate(undefined)}

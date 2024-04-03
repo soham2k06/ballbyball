@@ -10,6 +10,9 @@ export async function GET() {
 
     const ballEvents = await prisma.ballEvent.findMany({ where: { userId } });
 
+    if (!ballEvents)
+      return NextResponse.json({ error: "No data found" }, { status: 404 });
+
     return NextResponse.json(ballEvents, { status: 200 });
   } catch (error) {
     console.error(error);
