@@ -12,8 +12,6 @@ function page() {
       <h2 className="text-3xl font-semibold tracking-tight max-sm:text-xl">
         Matches
       </h2>
-      <p>Start adding matches. They will be saved here.</p>
-
       <MatchList />
     </div>
   );
