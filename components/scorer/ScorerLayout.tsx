@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import { BallEvent, CurPlayer } from "@prisma/client";
 import { toast } from "sonner";
+import { FileSearch } from "lucide-react";
 
 import { EventType } from "@/types";
+
+import { StatsOpenProvider } from "@/contexts/StatsOpenContext";
 
 import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
 import { strikeChangers } from "@/lib/constants";
@@ -34,11 +38,7 @@ import BatsmanScores from "./BatsmanScores";
 import Tools from "./Tools";
 import FieldersDialog from "./FieldersDialog";
 import MatchSummary from "./MatchSummary";
-import { StatsOpenProvider } from "@/contexts/StatsOpenContext";
-import EmptyState from "../EmptyState";
-import { FileSearch } from "lucide-react";
 import { Button } from "../ui/button";
-import Link from "next/link";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { match, matchIsFetching } = useMatchById(matchId);

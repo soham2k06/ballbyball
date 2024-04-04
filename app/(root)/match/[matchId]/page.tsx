@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import ScorerLayout from "@/components/scorer/ScorerLayout";
 
 export const metadata: Metadata = {
-  title: "Normal scoring - Ball By Ball",
+  title: "Match - Ball By Ball",
   description: "List of players",
 };
 
