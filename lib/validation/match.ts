@@ -31,8 +31,9 @@ export const updateMatchSchema = z.object({
   teamIds: z.array(z.string()).optional(),
 });
 
-export type UpdateMatchSchema = z.infer<typeof updateMatchSchema>;
-
-export const deleteMatchSchema = z.object({
-  id: z.string().min(1),
+export const updateMatchPlayersSchema = z.object({
+  curPlayers: z.array(curPlayer),
 });
+
+export type UpdateMatchSchema = z.infer<typeof updateMatchSchema>;
+export type UpdateMatchPlayersSchema = z.infer<typeof updateMatchPlayersSchema>;

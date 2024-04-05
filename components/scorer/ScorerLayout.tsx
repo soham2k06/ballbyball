@@ -41,11 +41,13 @@ import MatchSummary from "./MatchSummary";
 import { Button } from "../ui/button";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
-  const { match, matchIsFetching } = useMatchById(matchId);
+  const { match, matchIsLoading, matchIsFetching, isSuccess } =
+    useMatchById(matchId);
 
   const ballEventsFromMatch = match?.ballEvents;
 
   const team = match?.teams[match?.curTeam];
+  const opposingTeam = match?.teams[match?.curTeam === 0 ? 1 : 0];
 
   const teamPlayerIds = team?.players.map((player) => player.id);
 
@@ -75,7 +77,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       ?.filter((event) => playerIds.includes(event.batsmanId))
       .map((event) => event.type as EventType) || [];
 
-  const [isBowlerSelected, setIsBowlerSelected] = useState(true);
+  const [showSelectBatsman, setShowSelectBatsman] = useState(false);
+  const [showSelectBowler, setShowSelectBowler] = useState(false);
 
   const changeStrike = () => setOnStrikeBatsman((prev) => (prev === 0 ? 1 : 0));
 
@@ -101,7 +104,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   useEffect(() => {
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-    if (isLastBallOfOver) changeStrike();
+    if (
+      isLastBallOfOver &&
+      curPlayers.filter((player) => player.type === "batsman").length === 2
+    )
+      changeStrike();
   }, [totalBalls]);
 
   // Handling after last ball
@@ -127,7 +134,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     }
 
     if (isLastBallOfOver) {
-      if (matchBalls !== totalBalls) setIsBowlerSelected(false);
+      if (matchBalls !== totalBalls) setShowSelectBowler(true);
 
       // Check if inning is finished
       if (totalBalls === matchBalls && totalBalls) {
@@ -140,24 +147,42 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         }
 
         if (!isInSecondInning) {
-          handleSave(0, [], Number(!Boolean(match?.curTeam)));
+          updateMatch({
+            id: matchId,
+            curTeam: Number(!Boolean(match?.curTeam)),
+          });
         } else {
           toast.info("Match finished!");
-          handleSave(0, match?.curPlayers);
+          handleSave(0);
+          setShowMatchSummary(true);
         }
-        setShowMatchSummary(true);
-        setShowMatchSummary(true);
       }
     }
   }, [totalBalls]);
 
-  if (matchIsFetching) return <p>loading...</p>;
-  if (!match && !matchIsFetching)
+  // Handling initial player selection
+
+  useEffect(() => {
+    if (isSuccess) {
+      const getHasPlayer = (type: "batsman" | "bowler") =>
+        curPlayers.some((player) => player.type === type);
+
+      console.log(curPlayers);
+      const hasBatsman = getHasPlayer("batsman");
+      setShowSelectBatsman((prev) => prev || !hasBatsman);
+
+      const hasBowler = getHasPlayer("bowler");
+      setShowSelectBowler(!hasBowler && !showSelectBatsman);
+    }
+  }, [isSuccess, showSelectBatsman]);
+
+  if (matchIsLoading) return <p>loading...</p>;
+  if (!match && !matchIsLoading)
     return (
       <div className="flex items-center justify-center py-4 md:p-8">
         <div className="flex flex-col gap-4">
-          <div className="mx-auto inline-flex h-20 w-20 items-center justify-center rounded-full bg-muted shadow-sm">
-            <FileSearch className="h-10 w-10" />
+          <div className="mx-auto inline-flex size-20 items-center justify-center rounded-full bg-muted shadow-sm">
+            <FileSearch className="size-10" />
           </div>
           <div>
             <h2 className="pb-1 text-center text-base font-semibold leading-relaxed">
@@ -173,25 +198,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         </div>
       </div>
     );
+
   if (!match) return null;
 
-  const showSelectBatsman =
-    !curPlayers.filter((player) => player.type === "batsman").length &&
-    !showScorecard;
-
-  const showSelectBowler =
-    ((!curPlayers.find((player) => player.type === "bowler") &&
-      !showSelectBatsman) ||
-      !isBowlerSelected) &&
-    !showScorecard;
-
   // ** Over Summary
-  let ballLimitInOver = 6;
-
-  const overSummaries = generateOverSummary({
-    ballEvents: balls,
-    ballLimitInOver,
-  }) as EventType[][];
+  const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
 
   const chartSummaryData = overSummaries.map((summary, i) => ({
     name: i < 9 ? `Over ${i + 1}` : i + 1,
@@ -224,40 +235,30 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     setEvents(events.slice(0, -1));
   }
 
-  function handleSave(
-    _: unknown,
-    updatedCurPlayers?: CurPlayer[],
-    curTeam?: number,
-    dontSaveBallEvents?: boolean,
-  ) {
-    if (!dontSaveBallEvents && balls.length)
+  function handleSave(_: unknown) {
+    if (!balls.length)
       createBallEvent(
         events.map((event) => ({ ...event, matchId })),
         {
           onSuccess: () => {
             setIsModified(false);
-            toast.success(
-              !!updatedCurPlayers
-                ? "Score auto saved"
-                : "Score saved successfully",
-            );
+            toast.success("Score saved successfully");
           },
         },
       );
+  }
 
-    if (updatedCurPlayers) {
-      updateMatch(
-        {
-          id: matchId,
-          curPlayers: updatedCurPlayers,
-          ...(curTeam && { curTeam }),
+  function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
+    updateMatch(
+      { id: matchId, curPlayers: payload },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+          if (balls.length)
+            createBallEvent(events.map((event) => ({ ...event, matchId })));
         },
-        { onSuccess: () => setIsModified(false) },
-      );
-
-      if (updatedCurPlayers.some((player) => player.type === "bowler"))
-        setIsBowlerSelected(true);
-    }
+      },
+    );
   }
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
@@ -293,6 +294,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     const wicketType = JSON.parse(event);
     let eventToAdd;
 
+    setShowSelectBatsman(true);
+
     if (!wicketType.isOtherPlayerInvolved) {
       switch (wicketType.id) {
         case 1:
@@ -304,6 +307,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           eventToAdd = "-1_4";
           break;
       }
+
       handleScore({
         currentTarget: { value: eventToAdd },
       } as React.MouseEvent<HTMLButtonElement>);
@@ -324,6 +328,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   function handleRestart() {
     deleteAllBallEvents(matchId);
+    setEvents([]);
     updateMatch({
       id: matchId,
       curPlayers: [],
@@ -342,7 +347,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
               disabled={isPending || !isModified}
               onClick={handleSave}
             >
-              {isPending ? "Saving..." : "Save"}
+              {isPending || matchIsFetching ? "Saving..." : "Save"}
             </LoadingButton>
           </div>
           <DangerActions
@@ -400,28 +405,32 @@ function ScorerLayout({ matchId }: { matchId: string }) {
          */}
         <SelectBatsman
           open={showSelectBatsman}
+          setOpen={setShowSelectBatsman}
           curPlayers={curPlayers}
           setCurPlayers={setCurPlayers}
           events={events}
-          match={match!}
-          handleSave={handleSave}
+          team={{ name: team?.name, players: team?.players }}
           handleUndo={() => {
             handleUndo();
             setCurPlayers(match?.curPlayers || []);
             changeStrike();
+            setShowSelectBatsman(false);
           }}
+          handleSelectPlayer={handleSelectPlayer}
         />
         <SelectBowler
           open={showSelectBowler}
+          setOpen={setShowSelectBowler}
           curPlayers={curPlayers}
           setCurPlayers={setCurPlayers}
-          match={match!}
-          handleSave={handleSave}
+          handleSelectPlayer={handleSelectPlayer}
+          team={{ name: opposingTeam?.name, players: opposingTeam?.players }}
           handleUndo={() => {
             handleUndo();
-            setIsBowlerSelected(true);
+            setShowSelectBowler(false);
           }}
         />
+
         <FieldersDialog
           wicketTypeId={wicketTypeId}
           setWicketTypeId={setWicketTypeId}
@@ -440,17 +449,12 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             },
           ]}
           ballEvents={events}
-          totalPlayers={
-            (match.teams[0].players.length + match.teams[1].players.length) / 2
-          }
           open={showMatchSummary}
-          isSecondInning={
-            !new Set(team?.players.map((player) => player.id)).has(
-              events.length ? events[0]?.batsmanId : "",
-            )
-          }
-          setOpen={setShowMatchSummary}
           setShowScorecard={setShowScorecard}
+          handleUndo={() => {
+            handleUndo();
+            setShowMatchSummary(false);
+          }}
         />
       </Card>
     </StatsOpenProvider>

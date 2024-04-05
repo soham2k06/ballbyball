@@ -3,6 +3,7 @@ import { useCreateMatch } from "./useCreateMatch";
 import { useDeleteMatch } from "./useDeleteMatch";
 import { useMatchById } from "./useMatchById";
 import { useUpdateMatch } from "./useUpdateMatch";
+import { useUpdateMatchPlayers } from "./useUpdateMatchPlayers";
 
 export {
   useAllMatches,
@@ -10,4 +11,5 @@ export {
   useMatchById,
   useUpdateMatch,
   useDeleteMatch,
+  useUpdateMatchPlayers,
 };

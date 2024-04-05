@@ -20,23 +20,20 @@ import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { usePlayerById } from "@/apiHooks/player";
 
-interface MatchSummaryProps extends OverlayStateProps {
+interface MatchSummaryProps {
+  open: OverlayStateProps["open"];
   setShowScorecard: Dispatch<SetStateAction<boolean>>;
-
   teams: { name: string; playerIds: string[] }[];
   ballEvents: BallEvent[] | CreateBallEventSchema[];
-  isSecondInning: boolean;
-  totalPlayers: number;
+  handleUndo: () => void;
 }
 
 function MatchSummary({
   open,
-  setOpen,
-  isSecondInning,
   setShowScorecard,
   teams,
-  totalPlayers,
   ballEvents,
+  handleUndo,
 }: MatchSummaryProps) {
   const { setShowRunrateChart, setShowOverSummaries } = useStatsOpenContext();
 
@@ -131,7 +128,6 @@ function MatchSummary({
 
   const playerOfTheMatch = calculatePlayerOfTheMatch({
     playersPerformance,
-    totalOpponentPlayers: totalPlayers,
   });
 
   const { player } = usePlayerById(playerOfTheMatch.playerId);
@@ -139,41 +135,39 @@ function MatchSummary({
   return (
     <Dialog open={open}>
       <DialogContent removeCloseButton>
-        <DialogHeader className="w-fit border-b pb-6">
+        <DialogHeader className="w-full flex-row items-center justify-between border-b pb-6">
           <DialogTitle>Match Summary</DialogTitle>
+
+          <Button variant="destructive" onClick={handleUndo}>
+            Undo
+          </Button>
         </DialogHeader>
 
-        {isSecondInning && (
-          <>
-            <div className="rounded-md bg-muted p-2">
-              <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
-                Player of the Match
-              </h4>
-              <p>
-                <strong>{player?.name ?? "Loading..."}</strong> (
-                {processTeamName(playerOfTheMatch.team)}) ·{" "}
-                {!!playerOfTheMatch.ballsBowled && (
-                  <>
-                    {" "}
-                    {playerOfTheMatch.wicketsTaken}/
-                    {playerOfTheMatch.runConceded} (
-                    {getOverStr(playerOfTheMatch.ballsBowled)})
-                  </>
-                )}
-                {!!playerOfTheMatch.ballsBowled &&
-                  !!playerOfTheMatch.ballsFaced &&
-                  " & "}
-                {!!playerOfTheMatch.ballsFaced && (
-                  <>
-                    {playerOfTheMatch.runConceded} (
-                    {playerOfTheMatch.ballsBowled})
-                  </>
-                )}
-              </p>
-            </div>
-            <Separator className="my-2" />
-          </>
-        )}
+        <div className="rounded-md bg-muted p-2">
+          <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
+            Player of the Match
+          </h4>
+          <p>
+            <strong>{player?.name ?? "Loading..."}</strong> (
+            {processTeamName(playerOfTheMatch.team)}) ·{" "}
+            {!!playerOfTheMatch.ballsBowled && (
+              <>
+                {" "}
+                {playerOfTheMatch.wicketsTaken}/{playerOfTheMatch.runConceded} (
+                {getOverStr(playerOfTheMatch.ballsBowled)})
+              </>
+            )}
+            {!!playerOfTheMatch.ballsBowled &&
+              !!playerOfTheMatch.ballsFaced &&
+              " & "}
+            {playerOfTheMatch.ballsFaced && (
+              <>
+                {playerOfTheMatch.runsScored} ({playerOfTheMatch.ballsFaced})
+              </>
+            )}
+          </p>
+        </div>
+        <Separator className="my-2" />
         <div className="space-y-2">
           {teams.map((team, i) => {
             const { runs, totalBalls, wickets } = getScore(
@@ -192,7 +186,7 @@ function MatchSummary({
             );
           })}
         </div>
-        {isSecondInning && <p>{winInfo}</p>}
+        <p>{winInfo}</p>
         <Separator className="my-2" />
         <div className="flex gap-2">
           <Button onClick={() => setShowScorecard(true)} className="w-full">
@@ -207,11 +201,7 @@ function MatchSummary({
         </div>
         <Separator className="my-2" />
         <Button className="w-full" asChild>
-          {isSecondInning ? (
-            <Link href="/matches">Back & Finish</Link>
-          ) : (
-            <Button onClick={() => setOpen(false)}>Back</Button>
-          )}
+          <Link href="/matches">Back & Finish</Link>
         </Button>
       </DialogContent>
     </Dialog>

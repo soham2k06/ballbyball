@@ -50,13 +50,8 @@ function getScore(balls: (EventType | string)[]) {
   return { runs, totalBalls, wickets, runRate, extras };
 }
 
-function generateOverSummary({
-  ballEvents,
-  ballLimitInOver,
-}: {
-  ballEvents: EventType[];
-  ballLimitInOver?: number;
-}) {
+function generateOverSummary(ballEvents: EventType[]) {
+  let ballLimitInOver = 6;
   const overSummaries: EventType[][] = [];
   let validBallCount = 0;
   let currentOver: EventType[] = [];
@@ -78,7 +73,7 @@ function generateOverSummary({
     overSummaries.push(currentOver);
   }
 
-  return overSummaries;
+  return { overSummaries, ballLimitInOver };
 }
 
 function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
@@ -171,10 +166,8 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
 
 function calculatePlayerOfTheMatch({
   playersPerformance,
-  totalOpponentPlayers,
 }: {
   playersPerformance: PlayerPerformance[];
-  totalOpponentPlayers: number;
 }) {
   let bestPerformance = -1;
   let playerOfTheMatch: PlayerPerformance = {
@@ -187,7 +180,7 @@ function calculatePlayerOfTheMatch({
     team: "",
   };
 
-  const wicketPoint = 100 / totalOpponentPlayers;
+  const wicketPoint = 20;
 
   playersPerformance.forEach((player) => {
     const strikeRate = (player.runsScored / player.ballsFaced) * 100;

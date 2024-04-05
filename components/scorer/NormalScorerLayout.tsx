@@ -22,11 +22,7 @@ function ScorerLayout() {
 
   const { runs, totalBalls, wickets, extras, runRate } = getScore(balls);
 
-  let ballLimitInOver = 6;
-  const overSummaries: EventType[][] = generateOverSummary({
-    ballEvents: balls,
-    ballLimitInOver,
-  });
+  const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
 
   const chartSummaryData = overSummaries.map((summary, i) => ({
     name: `Over ${i + 1}`,

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-import { BallEvent, CurPlayer } from "@prisma/client";
+import { BallEvent, CurPlayer, Player } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -22,23 +22,21 @@ import { TypographyH3 } from "../ui/typography";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import PlayerLabel from "./PlayerLabel";
 import { X } from "lucide-react";
-import { MatchExtended } from "@/types";
+import { useUpdateMatchPlayers } from "@/apiHooks/match";
 
 interface SelectBatsmanProps {
-  match: MatchExtended;
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  handleSave: (
-    _: unknown,
-    updatedCurPlayers?: CurPlayer[],
-    curTeam?: number,
-    dontSaveBallEvents?: boolean,
-  ) => void;
   handleUndo?: () => void;
   isManualMode?: boolean;
+  team: {
+    name?: string;
+    players?: Player[];
+  };
+  handleSelectPlayer: (payload: CurPlayer[], onSuccess?: () => void) => void;
 }
 
 interface SelectBatsmanForm {
@@ -47,14 +45,14 @@ interface SelectBatsmanForm {
 
 function SelectBatsman({
   curPlayers,
-  match,
   events,
   open,
   setOpen,
-  handleSave,
   handleUndo,
   setCurPlayers,
   isManualMode,
+  team,
+  handleSelectPlayer,
 }: SelectBatsmanProps) {
   const schema = z.object({
     playerIds: z.array(z.string()).max(2),
@@ -77,10 +75,11 @@ function SelectBatsman({
 
   const { handleSubmit, control, getValues, watch, reset } = form;
 
-  const team = match?.teams[match.curTeam];
   const players = team?.players;
 
   const playerPositions = ["Striker", "Non-Striker"];
+
+  const { isPending } = useUpdateMatchPlayers();
 
   async function onSubmit(data: SelectBatsmanForm) {
     const newCurPlayers: CurPlayer[] = data.playerIds
@@ -102,15 +101,10 @@ function SelectBatsman({
         ];
     setCurPlayers(payload);
 
-    // 0 is trash value
-    handleSave(
-      0,
-      payload,
-      undefined,
-      curPlayers.filter((player) => player.type === "batsman").length !== 0,
-    );
-
-    setTimeout(reset, 500);
+    handleSelectPlayer(newCurPlayers, () => {
+      setOpen && setOpen(false);
+      setTimeout(reset, 500);
+    });
   }
 
   useEffect(() => {
@@ -233,7 +227,7 @@ function SelectBatsman({
                   </FormItem>
                 )}
               />
-              <Button>Submit</Button>
+              <Button>{isPending ? "Submitting" : "Submit"}</Button>
             </form>
           </Form>
         </div>

@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ match }, { status: 201 });
+    return NextResponse.json(match, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -108,16 +108,12 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
     }
 
-    const curPlayersToSave = curPlayers?.filter(
-      (player) => player,
-    ) as CurPlayer[];
-
     const updatedMatch = await prisma.match.update({
       where: { id: matchId },
       data: {
         name,
         overs,
-        curPlayers: curPlayersToSave,
+        curPlayers: curPlayers as CurPlayer[],
         curTeam,
       },
     });

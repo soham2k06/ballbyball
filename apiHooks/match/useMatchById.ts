@@ -8,6 +8,7 @@ export function useMatchById(id: string) {
     isFetching: matchIsFetching,
     refetch: matchRefetch,
     error: matchError,
+    isSuccess,
   } = useQuery({
     queryKey: ["matchById", id],
     queryFn: () => getMatchById(id),
@@ -19,5 +20,6 @@ export function useMatchById(id: string) {
     matchIsFetching,
     matchRefetch,
     matchError,
+    isSuccess,
   };
 }
