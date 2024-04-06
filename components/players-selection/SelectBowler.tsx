@@ -24,7 +24,6 @@ import { X } from "lucide-react";
 interface SelectBowlerProps {
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  onClose?: () => void;
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleUndo?: () => void;
@@ -64,8 +63,6 @@ function SelectBowler({
   });
 
   const { handleSubmit, watch, reset } = form;
-
-  // const { updateMatchPlayers, isPending } = useUpdateMatchPlayers();
 
   function onSubmit(data: z.infer<typeof schema>) {
     const newBowler: CurPlayer = {
@@ -178,6 +175,7 @@ function SelectBowler({
                   </FormItem>
                 )}
               />
+              {/* TODO: isPending state */}
               <Button>{false ? "Submitting" : "Submit"}</Button>
             </form>
           </Form>

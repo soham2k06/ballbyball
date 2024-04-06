@@ -22,7 +22,6 @@ import { TypographyH3 } from "../ui/typography";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import PlayerLabel from "./PlayerLabel";
 import { X } from "lucide-react";
-import { useUpdateMatchPlayers } from "@/apiHooks/match";
 
 interface SelectBatsmanProps {
   open: boolean;
@@ -79,8 +78,6 @@ function SelectBatsman({
 
   const playerPositions = ["Striker", "Non-Striker"];
 
-  const { isPending } = useUpdateMatchPlayers();
-
   async function onSubmit(data: SelectBatsmanForm) {
     const newCurPlayers: CurPlayer[] = data.playerIds
       .filter(
@@ -101,7 +98,7 @@ function SelectBatsman({
         ];
     setCurPlayers(payload);
 
-    handleSelectPlayer(newCurPlayers, () => {
+    handleSelectPlayer(payload, () => {
       setOpen && setOpen(false);
       setTimeout(reset, 500);
     });
@@ -155,11 +152,11 @@ function SelectBatsman({
                         control={control}
                         name="playerIds"
                         render={({ field }) => {
-                          const isSelected = field.value?.includes(item.id);
-                          const isBothSelected = field.value?.length === 2;
+                          const isSelected = field.value.includes(item.id);
+                          const isBothSelected = field.value.length === 2;
                           const isOut = outPlayers?.includes(item.id);
 
-                          const sortedCurPlayers = curPlayers.sort((a, b) =>
+                          const sortedCurPlayers = curPlayers?.sort((a, b) =>
                             a.type.localeCompare(b.type),
                           );
                           const isAlreadyPlaying =
@@ -170,7 +167,7 @@ function SelectBatsman({
                               <FormControl>
                                 <Checkbox
                                   className="sr-only"
-                                  checked={field.value?.includes(item.id)}
+                                  checked={field.value.includes(item.id)}
                                   onCheckedChange={(checked) => {
                                     if (isAlreadyPlaying && !isManualMode) {
                                       toast.info("Player is already playing", {
@@ -191,7 +188,7 @@ function SelectBatsman({
                                           item.id,
                                         ])
                                       : field.onChange(
-                                          field.value?.filter(
+                                          field.value.filter(
                                             (value) => value !== item.id,
                                           ),
                                         );
@@ -227,7 +224,8 @@ function SelectBatsman({
                   </FormItem>
                 )}
               />
-              <Button>{isPending ? "Submitting" : "Submit"}</Button>
+              {/* TODO: isPending state */}
+              <Button>{"" ? "Submitting" : "Submit"}</Button>
             </form>
           </Form>
         </div>

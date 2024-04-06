@@ -15,6 +15,8 @@ import { SelectBowler, SelectBatsman } from "../players-selection";
 import OverStats from "./OverStats";
 import FullOverSummary from "./FullOverSummary";
 import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
+import { useSaveBallEvents } from "@/apiHooks/ballEvent";
+import { useUpdateMatch } from "@/apiHooks/match";
 
 interface StatsAndSettingsProps {
   runRate: number;
@@ -49,6 +51,27 @@ function StatsAndSettings({
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
   const [showSelectBowler, setShowSelectBowler] = useState(false);
 
+  const curTeam = match.teams[match.curTeam];
+  const opposingTeam = match.teams[match.curTeam === 0 ? 1 : 0];
+
+  const { createBallEvent } = useSaveBallEvents();
+  const { updateMatch } = useUpdateMatch();
+
+  function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
+    updateMatch(
+      { id: match.id, curPlayers: payload },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+          if (events.length)
+            createBallEvent(
+              events.map((event) => ({ ...event, matchId: match.id })),
+            );
+        },
+      },
+    );
+  }
+
   return (
     <>
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -82,14 +105,15 @@ function StatsAndSettings({
             setOpen={setShowSelectBatsman}
             curPlayers={curPlayers}
             setCurPlayers={setCurPlayers}
-            match={match}
             events={events}
-            handleSave={(_, payload) => {
-              handleSave(0, payload);
-              setShowSelectBatsman(false);
-              setIsSheetOpen(false);
-            }}
             isManualMode
+            handleSelectPlayer={(payload) => {
+              handleSelectPlayer(payload, () => {
+                setShowSelectBatsman(false);
+                setIsSheetOpen(false);
+              });
+            }}
+            team={curTeam}
           />
           <Button
             className="w-full space-x-2"
@@ -109,13 +133,14 @@ function StatsAndSettings({
             setOpen={setShowSelectBowler}
             curPlayers={curPlayers}
             setCurPlayers={setCurPlayers}
-            match={match}
-            handleSave={(_, payload) => {
-              handleSave(0, payload);
-              setShowSelectBatsman(false);
-              setIsSheetOpen(false);
-            }}
             isManualMode
+            handleSelectPlayer={(payload) => {
+              handleSelectPlayer(payload, () => {
+                setShowSelectBatsman(false);
+                setIsSheetOpen(false);
+              });
+            }}
+            team={opposingTeam}
           />
           <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
             Stats

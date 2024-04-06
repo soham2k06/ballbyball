@@ -51,6 +51,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   const teamPlayerIds = team?.players.map((player) => player.id);
 
+  // ** React query hooks
   const { createBallEvent, isPending } = useSaveBallEvents();
   const { updateMatch } = useUpdateMatch();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
@@ -92,10 +93,12 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       .map((event) => event.type as EventType),
   );
 
+  // TODO: Uncomment this logic
   // ** Effects
   useEffect(() => {
-    if (ballEventsFromMatch?.length)
+    if (ballEventsFromMatch?.length) {
       setEvents(ballEventsFromMatch as BallEvent[]);
+    }
   }, [ballEventsFromMatch]);
 
   useEffect(() => {
@@ -161,20 +164,20 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }, [totalBalls]);
 
   // Handling initial player selection
-
   useEffect(() => {
     if (isSuccess) {
       const getHasPlayer = (type: "batsman" | "bowler") =>
-        curPlayers.some((player) => player.type === type);
+        (curPlayers.length ? curPlayers : match?.curPlayers)?.some(
+          (player) => player.type === type,
+        );
 
-      console.log(curPlayers);
       const hasBatsman = getHasPlayer("batsman");
-      setShowSelectBatsman((prev) => prev || !hasBatsman);
+      if (!hasBatsman) setShowSelectBatsman((prev) => prev || true);
 
       const hasBowler = getHasPlayer("bowler");
-      setShowSelectBowler(!hasBowler && !showSelectBatsman);
+      if (!hasBowler) setShowSelectBowler(!hasBowler && !showSelectBatsman);
     }
-  }, [isSuccess, showSelectBatsman]);
+  }, [showSelectBatsman, isSuccess]);
 
   if (matchIsLoading) return <p>loading...</p>;
   if (!match && !matchIsLoading)
@@ -236,7 +239,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }
 
   function handleSave(_: unknown) {
-    if (!balls.length)
+    if (balls.length)
       createBallEvent(
         events.map((event) => ({ ...event, matchId })),
         {
@@ -256,6 +259,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           onSuccess?.();
           if (balls.length)
             createBallEvent(events.map((event) => ({ ...event, matchId })));
+          setIsModified(false);
         },
       },
     );
@@ -294,9 +298,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     const wicketType = JSON.parse(event);
     let eventToAdd;
 
-    setShowSelectBatsman(true);
-
     if (!wicketType.isOtherPlayerInvolved) {
+      setShowSelectBatsman(true);
       switch (wicketType.id) {
         case 1:
           eventToAdd = "-1";
@@ -319,6 +322,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     fielderId: string,
     runsAlongWithRunOut?: number,
   ) {
+    setShowSelectBatsman(true);
     handleScore({
       currentTarget: {
         value: `-1_${wicketTypeId}_${fielderId}_${runsAlongWithRunOut}`,
@@ -386,7 +390,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             setCurPlayers={setCurPlayers}
             events={events}
             handleSave={handleSave}
-            match={match!}
+            match={match}
             showScorecard={showScorecard}
             setShowScorecard={setShowScorecard}
           />
@@ -413,7 +417,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           handleUndo={() => {
             handleUndo();
             setCurPlayers(match?.curPlayers || []);
-            changeStrike();
             setShowSelectBatsman(false);
           }}
           handleSelectPlayer={handleSelectPlayer}
@@ -434,7 +437,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         <FieldersDialog
           wicketTypeId={wicketTypeId}
           setWicketTypeId={setWicketTypeId}
-          fielders={match.teams[match.curTeam === 0 ? 1 : 0].players}
+          fielders={opposingTeam?.players}
           handleScore={handleScoreWithFielder}
         />
         <MatchSummary

@@ -8,8 +8,7 @@ export function useSaveBallEvents() {
 
   const { mutate: createBallEvent, isPending } = useMutation({
     mutationFn: saveBallEventsAPI,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["eventsByMatchId"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["matchById"] }),
     onError: (err) => toast.error(err.message),
   });
 

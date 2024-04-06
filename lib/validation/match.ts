@@ -31,9 +31,4 @@ export const updateMatchSchema = z.object({
   teamIds: z.array(z.string()).optional(),
 });
 
-export const updateMatchPlayersSchema = z.object({
-  curPlayers: z.array(curPlayer),
-});
-
 export type UpdateMatchSchema = z.infer<typeof updateMatchSchema>;
-export type UpdateMatchPlayersSchema = z.infer<typeof updateMatchPlayersSchema>;
