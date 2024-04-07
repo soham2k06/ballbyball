@@ -133,7 +133,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           curPlayers: [],
           curTeam: Number(!Boolean(match?.curTeam)),
         });
-      }
+      } else handleInningChange();
     }
 
     if (isLastBallOfOver) {
@@ -154,8 +154,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             id: matchId,
             curTeam: Number(!Boolean(match?.curTeam)),
           });
-          setShowSelectBatsman(true);
-          setCurPlayers([]);
+          handleInningChange();
         } else {
           toast.info("Match finished!");
           handleSave(0);
@@ -332,6 +331,12 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     } as React.MouseEvent<HTMLButtonElement>);
   }
 
+  function handleInningChange() {
+    setShowSelectBatsman(true);
+    setCurPlayers([]);
+    setOnStrikeBatsman(0);
+  }
+
   function handleRestart() {
     deleteAllBallEvents(matchId);
     setEvents([]);
@@ -343,6 +348,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     setOnStrikeBatsman(0);
 
     setShowSelectBatsman(true);
+    setCurPlayers([]);
   }
 
   return (
