@@ -321,6 +321,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           break;
         case 2:
           eventToAdd = "-1_2";
+          break;
         case 4:
           eventToAdd = "-1_4";
           break;
@@ -369,8 +370,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     setShowSelectBatsman(true);
     setCurPlayers([]);
   }
-
-  console.log(curPlayers);
 
   return (
     <StatsOpenProvider>
