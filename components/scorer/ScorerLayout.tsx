@@ -87,6 +87,9 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   const { runs, totalBalls, wickets, runRate } = getScore(balls || []);
 
+  const opponentEvents = events?.filter((event) =>
+    playerIds.includes(event.bowlerId),
+  );
   const opponentRuns = calcRuns(
     events
       ?.filter((event) => playerIds.includes(event.bowlerId))
@@ -134,14 +137,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       toast.info("All out!");
       setShowScorecard(true);
 
-      if (isInSecondInning) {
-        setShowMatchSummary(true);
-        updateMatch({
-          id: matchId,
-          curPlayers: [],
-          curTeam: Number(!Boolean(match?.curTeam)),
-        });
-      } else handleInningChange();
+      if (isInSecondInning) handleFinish();
+      else handleInningChange();
     }
 
     if (isLastBallOfOver) {
@@ -163,14 +160,18 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             curTeam: Number(!Boolean(match?.curTeam)),
           });
           handleInningChange();
-        } else {
-          toast.info("Match finished!");
-          handleSave(0);
-          setShowMatchSummary(true);
-        }
+        } else handleFinish();
       }
     }
   }, [totalBalls]);
+
+  // Handling Succesfull Chase
+  useEffect(() => {
+    const remainingRuns = opponentRuns - runs + 1;
+    console.log({ remainingRuns, opponentRuns, runs });
+    if (!opponentEvents.length) return;
+    if (remainingRuns <= 0) handleFinish();
+  }, [runs, opponentRuns]);
 
   // Handling initial player selection
   useEffect(() => {
@@ -230,39 +231,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       curPlayers.filter((player) => player.type === "batsman").length === 2
     )
       changeStrike();
-  }
-
-  function handleUndo() {
-    const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
-    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-    setIsModified(true);
-    // TODO: Improve this logic
-    // Explanation: Changing strike twice to tackle strike change on first ball of over
-    if (isLastBallOfOver) changeStrike();
-    if (strikeChangers.includes(events[events.length - 1]?.type)) {
-      if (isFirstBallOfOver) changeStrike();
-      changeStrike();
-    }
-
-    setEvents(events.slice(0, -1));
-  }
-
-  function handleSave(_: unknown) {
-    if (balls.length)
-      createBallEvent(
-        events.map((event) => ({ ...event, matchId })),
-        {
-          onSuccess: () => {
-            setIsModified(false);
-            toast.success("Score saved successfully");
-          },
-        },
-      );
-
-    updateMatch({
-      id: matchId,
-      strikeIndex: onStrikeBatsman,
-    });
   }
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
@@ -332,7 +300,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     } else setWicketTypeId(wicketType.id);
   }
 
-  function handleScoreWithFielder(
+  function handleWicketWithFielder(
     wicketTypeId: number,
     fielderId: string,
     runsAlongWithRunOut?: number,
@@ -345,7 +313,25 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     } as React.MouseEvent<HTMLButtonElement>);
   }
 
-  async function handleInningChange() {
+  function handleSave(_: unknown) {
+    if (balls.length)
+      createBallEvent(
+        events.map((event) => ({ ...event, matchId })),
+        {
+          onSuccess: () => {
+            setIsModified(false);
+            toast.success("Score saved successfully");
+          },
+        },
+      );
+
+    updateMatch({
+      id: matchId,
+      strikeIndex: onStrikeBatsman,
+    });
+  }
+
+  function handleInningChange() {
     setCurPlayers([]);
     setShowSelectBatsman(true);
     setOnStrikeBatsman(0);
@@ -354,6 +340,33 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       curPlayers: [],
       curTeam: Number(!Boolean(match?.curTeam)),
     });
+    handleSave(0);
+  }
+
+  function handleFinish() {
+    setShowMatchSummary(true);
+    updateMatch({
+      id: matchId,
+      curPlayers: [],
+      curTeam: Number(!Boolean(match?.curTeam)),
+    });
+    toast.info("Match finished!");
+    handleSave(0);
+  }
+
+  function handleUndo() {
+    const isFirstBallOfOver = totalBalls % 6 === 1 && totalBalls > 0;
+    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
+    setIsModified(true);
+    // TODO: Improve this logic
+    // Explanation: Changing strike twice to tackle strike change on first ball of over
+    if (isLastBallOfOver) changeStrike();
+    if (strikeChangers.includes(events[events.length - 1]?.type)) {
+      if (isFirstBallOfOver) changeStrike();
+      changeStrike();
+    }
+
+    setEvents(events.slice(0, -1));
   }
 
   function handleRestart() {
@@ -396,7 +409,12 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             totalBalls={totalBalls}
             runRate={runRate}
           />
-          <p>Opponent: {opponentRuns}</p>
+          {!!opponentEvents.length && (
+            <>
+              <p>{opponentRuns - runs + 1} remaining</p>
+            </>
+          )}
+
           <ul className="flex justify-start gap-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
@@ -467,7 +485,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           wicketTypeId={wicketTypeId}
           setWicketTypeId={setWicketTypeId}
           fielders={opposingTeam?.players}
-          handleScore={handleScoreWithFielder}
+          handleScore={handleWicketWithFielder}
         />
         <MatchSummary
           teams={[
