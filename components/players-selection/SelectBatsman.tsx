@@ -129,7 +129,7 @@ function SelectBatsman({
   // TODO: New reusable component for player label // DONE
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
@@ -138,9 +138,7 @@ function SelectBatsman({
               <Button
                 variant={isManualMode ? "ghost" : "destructive"}
                 size={isManualMode ? "icon" : "default"}
-                onClick={
-                  isManualMode ? () => setOpen && setOpen(false) : handleUndo
-                }
+                onClick={isManualMode ? () => setOpen?.(false) : handleUndo}
               >
                 {isManualMode ? <X /> : "Undo"}
               </Button>
