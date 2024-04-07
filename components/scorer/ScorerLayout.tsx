@@ -154,6 +154,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             id: matchId,
             curTeam: Number(!Boolean(match?.curTeam)),
           });
+          setShowSelectBatsman(true);
+          setCurPlayers([]);
         } else {
           toast.info("Match finished!");
           handleSave(0);
@@ -339,6 +341,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       curTeam: 0,
     });
     setOnStrikeBatsman(0);
+
+    setShowSelectBatsman(true);
   }
 
   return (
