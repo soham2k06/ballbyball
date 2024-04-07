@@ -102,6 +102,12 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }, [ballEventsFromMatch]);
 
   useEffect(() => {
+    if (match?.strikeIndex) {
+      setOnStrikeBatsman(match.strikeIndex || 0);
+    }
+  }, [match?.strikeIndex]);
+
+  useEffect(() => {
     if (match?.curPlayers) setCurPlayers(match.curPlayers);
   }, [match?.curPlayers]);
 
@@ -119,7 +125,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     const matchBalls = (match?.overs || 0) * 6;
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
 
-    const isAllOut = wickets === team?.players.length;
+    const isAllOut =
+      wickets ===
+      (team?.players.length || 0) - (match?.allowSinglePlayer ? 0 : 1);
+
     let isInSecondInning = false;
 
     if (isAllOut) {
@@ -250,6 +259,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           },
         },
       );
+
+    updateMatch({
+      id: matchId,
+      strikeIndex: onStrikeBatsman,
+    });
   }
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
@@ -331,10 +345,15 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     } as React.MouseEvent<HTMLButtonElement>);
   }
 
-  function handleInningChange() {
-    setShowSelectBatsman(true);
+  async function handleInningChange() {
     setCurPlayers([]);
+    setShowSelectBatsman(true);
     setOnStrikeBatsman(0);
+    updateMatch({
+      id: matchId,
+      curPlayers: [],
+      curTeam: Number(!Boolean(match?.curTeam)),
+    });
   }
 
   function handleRestart() {
@@ -350,6 +369,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     setShowSelectBatsman(true);
     setCurPlayers([]);
   }
+
+  console.log(curPlayers);
 
   return (
     <StatsOpenProvider>
@@ -399,7 +420,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             curPlayers={curPlayers}
             setCurPlayers={setCurPlayers}
             events={events}
-            handleSave={handleSave}
             match={match}
             showScorecard={showScorecard}
             setShowScorecard={setShowScorecard}
@@ -430,6 +450,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             setShowSelectBatsman(false);
           }}
           handleSelectPlayer={handleSelectPlayer}
+          allowSinglePlayer={match?.allowSinglePlayer}
         />
         <SelectBowler
           open={showSelectBowler}
@@ -461,6 +482,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
               playerIds: match.teams[1].players.map(({ id }) => id),
             },
           ]}
+          allowSinglePlayer={match.allowSinglePlayer}
           ballEvents={events}
           open={showMatchSummary}
           setShowScorecard={setShowScorecard}

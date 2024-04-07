@@ -1,8 +1,13 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
 import { BallEvent, CurPlayer, Player } from "@prisma/client";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { X } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {
@@ -12,16 +17,11 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
-
 import { Checkbox } from "../ui/checkbox";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 
-import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import PlayerLabel from "./PlayerLabel";
-import { X } from "lucide-react";
 
 interface SelectBatsmanProps {
   open: boolean;
@@ -36,6 +36,7 @@ interface SelectBatsmanProps {
     players?: Player[];
   };
   handleSelectPlayer: (payload: CurPlayer[], onSuccess?: () => void) => void;
+  allowSinglePlayer: boolean;
 }
 
 interface SelectBatsmanForm {
@@ -52,9 +53,17 @@ function SelectBatsman({
   isManualMode,
   team,
   handleSelectPlayer,
+  allowSinglePlayer,
 }: SelectBatsmanProps) {
   const schema = z.object({
-    playerIds: z.array(z.string()).max(2),
+    playerIds: z
+      .array(z.string(), {
+        errorMap: () => ({
+          message: "Select two players",
+        }),
+      })
+      .min(allowSinglePlayer ? 1 : 2, { message: "Select two players" })
+      .max(2),
   });
 
   const defaultPlayerIds = curPlayers
@@ -99,7 +108,7 @@ function SelectBatsman({
     setCurPlayers(payload);
 
     handleSelectPlayer(payload, () => {
-      setOpen && setOpen(false);
+      setOpen?.(false);
       setTimeout(reset, 500);
     });
   }
@@ -109,7 +118,7 @@ function SelectBatsman({
       reset({
         playerIds: defaultPlayerIds,
       });
-  }, [open]);
+  }, [open, curPlayers]);
 
   useEffect(() => {
     watch("playerIds");
@@ -225,7 +234,7 @@ function SelectBatsman({
                 )}
               />
               {/* TODO: isPending state */}
-              <Button>{"" ? "Submitting" : "Submit"}</Button>
+              <Button className="mt-4">{"" ? "Submitting" : "Submit"}</Button>
             </form>
           </Form>
         </div>

@@ -14,6 +14,8 @@ export const createMatchSchema = z.object({
     .max(2, { message: "Select exact two teams" }),
   overs: z.number().min(1).max(50),
   curPlayers: z.array(curPlayer).optional(),
+  allowSinglePlayer: z.boolean().optional(),
+
   // TODO: not optional in future when we add input for it
   curTeam: z.number().min(0).max(1).optional(),
   date: z.date().optional(),
@@ -29,6 +31,7 @@ export const updateMatchSchema = z.object({
   curPlayers: z.array(curPlayer.nullable()).optional(),
   curTeam: z.number().min(0).max(1).optional(),
   teamIds: z.array(z.string()).optional(),
+  strikeIndex: z.number().optional(),
 });
 
 export type UpdateMatchSchema = z.infer<typeof updateMatchSchema>;

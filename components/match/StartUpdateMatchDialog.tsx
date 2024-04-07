@@ -101,10 +101,8 @@ function StartUpdateMatchDialog({
   }, [open, matchToUpdate]);
 
   useEffect(() => {
-    if (matchToUpdate) {
+    if (matchToUpdate)
       setIsOversDirty(form.watch("overs") !== matchToUpdate?.overs);
-      console.log("run");
-    }
   }, [form.watch("overs")]);
 
   return (
@@ -206,6 +204,30 @@ function StartUpdateMatchDialog({
                   </FormItem>
                 );
               }}
+            />
+
+            <FormField
+              control={form.control}
+              name="allowSinglePlayer"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      Allow single player
+                      <FormDescription>
+                        It will not be declared all out if only one player is
+                        left
+                      </FormDescription>
+                    </div>
+                  </FormLabel>
+                </FormItem>
+              )}
             />
 
             <DialogFooter>

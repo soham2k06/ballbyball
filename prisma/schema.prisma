@@ -8,16 +8,18 @@ datasource db {
 }
 
 model Match {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String
-  name       String
-  overs      Int
-  curTeam    Int
-  curPlayers CurPlayer[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  ballEvents BallEvent[]
-  matchTeams MatchTeam[]
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String
+  name              String
+  overs             Int
+  curTeam           Int
+  allowSinglePlayer Boolean     @default(false)
+  strikeIndex       Int         @default(0)
+  curPlayers        CurPlayer[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  ballEvents        BallEvent[]
+  matchTeams        MatchTeam[]
 
   @@map("matches")
 }

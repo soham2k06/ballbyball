@@ -25,7 +25,6 @@ interface ToolsProps {
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
   showScorecard: boolean;
   setShowScorecard: Dispatch<SetStateAction<boolean>>;
 }
@@ -36,7 +35,6 @@ function Tools({
   runRate,
   curPlayers,
   events,
-  handleSave,
   match,
   setCurPlayers,
   showScorecard,
@@ -57,7 +55,6 @@ function Tools({
         overSummaries={overSummaries}
         runRate={runRate}
         events={events}
-        handleSave={handleSave}
         match={match}
         curPlayers={curPlayers}
         setCurPlayers={setCurPlayers}

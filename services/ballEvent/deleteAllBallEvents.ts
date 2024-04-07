@@ -1,7 +1,6 @@
 import { axiosInstance } from "../axiosInstance";
 
 export const deleteAllBallEvents = async (matchId: string) => {
-  console.log(matchId);
   try {
     const res = await axiosInstance.delete(`/ball-events/${matchId}`);
 

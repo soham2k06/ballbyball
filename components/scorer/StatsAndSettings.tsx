@@ -26,7 +26,6 @@ interface StatsAndSettingsProps {
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  handleSave: (_: unknown, updatedCurPlayers?: CurPlayer[]) => void;
 }
 
 function StatsAndSettings({
@@ -35,7 +34,6 @@ function StatsAndSettings({
   overSummaries,
   curPlayers,
   events,
-  handleSave,
   match,
   setCurPlayers,
 }: StatsAndSettingsProps) {
@@ -114,6 +112,7 @@ function StatsAndSettings({
               });
             }}
             team={curTeam}
+            allowSinglePlayer={match.allowSinglePlayer}
           />
           <Button
             className="w-full space-x-2"

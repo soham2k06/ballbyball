@@ -26,6 +26,7 @@ interface MatchSummaryProps {
   teams: { name: string; playerIds: string[] }[];
   ballEvents: BallEvent[] | CreateBallEventSchema[];
   handleUndo: () => void;
+  allowSinglePlayer: boolean;
 }
 
 function MatchSummary({
@@ -34,6 +35,7 @@ function MatchSummary({
   teams,
   ballEvents,
   handleUndo,
+  allowSinglePlayer,
 }: MatchSummaryProps) {
   const { setShowRunrateChart, setShowOverSummaries } = useStatsOpenContext();
 
@@ -46,19 +48,15 @@ function MatchSummary({
   const { runs: runs2, wickets: wickets2 } = getScore(ballEventsbyTeam(1));
   const totalWickets = teams[1].playerIds.length;
 
-  function calculateWinner(
-    runs1: number,
-    runs2: number,
-    wickets2: number,
-    totalWickets: number,
-  ) {
+  function calculateWinner() {
     let winInfo = "";
     let winner;
     if (runs1 > runs2) {
       winInfo = `${processTeamName(teams[0].name)} won by ${runs1 - runs2} runs`;
       winner = 0;
     } else if (runs2 > runs1) {
-      winInfo = `${processTeamName(teams[1].name)} won by ${totalWickets - wickets2} wickets`;
+      const wicketMargin = totalWickets - wickets2 - Number(!allowSinglePlayer);
+      winInfo = `${processTeamName(teams[1].name)} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""}`;
       winner = 1;
     } else {
       winInfo =
@@ -71,7 +69,7 @@ function MatchSummary({
       winner,
     };
   }
-  const { winInfo } = calculateWinner(runs1, runs2, wickets2, totalWickets);
+  const { winInfo } = calculateWinner();
 
   const groupedEvents: Record<
     string,
@@ -200,7 +198,7 @@ function MatchSummary({
           </Button>
         </div>
         <Separator className="my-2" />
-        <Button className="w-full" asChild>
+        <Button className="w-full" asChild variant="secondary">
           <Link href="/matches">Back & Finish</Link>
         </Button>
       </DialogContent>

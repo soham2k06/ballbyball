@@ -77,17 +77,6 @@ function SelectBowler({
 
     setCurPlayers(newCurPlayers);
 
-    // updateMatchPlayers(
-    //   { matchId, data: { curPlayers: newCurPlayers } },
-    //   {
-    //     onSuccess: () => {
-    //       setOpen && setOpen(false);
-    //       console.log("Bowler updated", open);
-    //       setTimeout(reset, 500);
-    //     },
-    //   },
-    // );
-
     handleSelectPlayer(newCurPlayers, () => {
       setOpen && setOpen(false);
       setTimeout(reset, 500);

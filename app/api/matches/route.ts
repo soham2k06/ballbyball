@@ -50,7 +50,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" });
     }
 
-    const { name, teamIds, curTeam, overs, curPlayers } = parsedRes.data;
+    const { name, teamIds, curTeam, overs, curPlayers, allowSinglePlayer } =
+      parsedRes.data;
 
     const userId = validateUser();
 
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
         curPlayers,
         curTeam: curTeam ?? 0,
         overs,
+        allowSinglePlayer,
       },
       include: {
         matchTeams: { include: { team: true } },
@@ -102,7 +104,14 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" }, { status: 422 });
     }
 
-    const { id: matchId, curPlayers, curTeam, name, overs } = parsedRes.data;
+    const {
+      id: matchId,
+      curPlayers,
+      curTeam,
+      name,
+      overs,
+      strikeIndex,
+    } = parsedRes.data;
 
     if (!matchId) {
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
@@ -115,6 +124,7 @@ export async function PUT(req: NextRequest) {
         overs,
         curPlayers: curPlayers as CurPlayer[],
         curTeam,
+        strikeIndex,
       },
     });
 
