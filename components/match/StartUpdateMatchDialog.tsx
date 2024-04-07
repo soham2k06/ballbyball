@@ -107,8 +107,6 @@ function StartUpdateMatchDialog({
     }
   }, [form.watch("overs")]);
 
-  console.log(isOversDirty);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="h-full rounded-md p-0">

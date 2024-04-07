@@ -1,4 +1,4 @@
-import { BallEvent, CurPlayer, Player } from "@prisma/client";
+import { BallEvent, Player } from "@prisma/client";
 
 import { EventType } from "@/types";
 import { usePlayerById } from "@/apiHooks/player";
@@ -25,16 +25,19 @@ function Score({
   ballEvents,
   isBowlingScore,
   fallOfWickets,
+  hasYetToBatTeam,
+  teamIndex,
 }: {
-  curPlayers: CurPlayer[];
   players: Player[];
   ballEvents: BallEvent[];
   isBowlingScore?: boolean;
+  hasYetToBatTeam: number | null;
   fallOfWickets: {
     score: number;
     ball: number;
     batsman: string | undefined;
   }[];
+  teamIndex: number;
 }) {
   const hasYetToBat = players.filter((player) => {
     const isBatsman = ballEvents
@@ -63,16 +66,22 @@ function Score({
         )}
         <TableHeader>
           <TableRow>
-            <TableHead></TableHead>
-            <TableHead>{isBowlingScore ? "O" : "R"}</TableHead>
-            <TableHead>{isBowlingScore ? "M" : "B"}</TableHead>
-            <TableHead className="capitalize">
-              {isBowlingScore ? "W" : "4s"}
+            <TableHead className="text-left">
+              {isBowlingScore ? "Bowling" : "Batting"}
             </TableHead>
-            <TableHead className="capitalize">
-              {isBowlingScore ? "R" : "6s"}
-            </TableHead>
-            <TableHead>{isBowlingScore ? "Econ" : "S/R"}</TableHead>
+            {hasYetToBatTeam !== teamIndex && (
+              <>
+                <TableHead>{isBowlingScore ? "O" : "R"}</TableHead>
+                <TableHead>{isBowlingScore ? "M" : "B"}</TableHead>
+                <TableHead className="capitalize">
+                  {isBowlingScore ? "W" : "4s"}
+                </TableHead>
+                <TableHead className="capitalize">
+                  {isBowlingScore ? "R" : "6s"}
+                </TableHead>
+                <TableHead>{isBowlingScore ? "Econ" : "S/R"}</TableHead>
+              </>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -126,8 +135,25 @@ function Score({
                 .map((event) => event.type as EventType),
             );
 
+            // if (!totalBalls && (hasYetToBatTeam ?? 0) === teamIndex)
+            //   return (
+            //     <TableRow>
+            //       <TableCell colSpan={6} className="text-left font-semibold">
+            //         {player.name}
+            //       </TableCell>
+            //     </TableRow>
+            //   );
+
             if (!totalBalls) return null;
-            // curPlayers.map(({ id }) => id).includes(player.id)
+
+            if (!totalBalls && hasYetToBatTeam === teamIndex)
+              return (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-left font-semibold">
+                    {player.name}
+                  </TableCell>
+                </TableRow>
+              );
 
             function calculateMaidenOvers(ballsThrown: EventType[]) {
               let maidenOvers = 0;
