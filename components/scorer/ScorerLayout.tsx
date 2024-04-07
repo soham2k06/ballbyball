@@ -93,7 +93,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       .map((event) => event.type as EventType),
   );
 
-  // TODO: Uncomment this logic
   // ** Effects
   useEffect(() => {
     if (ballEventsFromMatch?.length) {
