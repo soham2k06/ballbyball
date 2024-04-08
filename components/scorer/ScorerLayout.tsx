@@ -490,6 +490,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           handleScore={handleWicketWithFielder}
         />
         <MatchSummary
+          allowSinglePlayer={match.allowSinglePlayer}
+          ballEvents={events}
+          open={showMatchSummary}
+          setShowScorecard={setShowScorecard}
+          matchBalls={match.overs * 6}
           teams={[
             {
               name: match.teams[0].name,
@@ -500,10 +505,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
               playerIds: match.teams[1].players.map(({ id }) => id),
             },
           ]}
-          allowSinglePlayer={match.allowSinglePlayer}
-          ballEvents={events}
-          open={showMatchSummary}
-          setShowScorecard={setShowScorecard}
           handleUndo={() => {
             handleUndo();
             setShowMatchSummary(false);

@@ -27,6 +27,7 @@ interface MatchSummaryProps {
   ballEvents: BallEvent[] | CreateBallEventSchema[];
   handleUndo: () => void;
   allowSinglePlayer: boolean;
+  matchBalls: number;
 }
 
 function MatchSummary({
@@ -36,6 +37,7 @@ function MatchSummary({
   ballEvents,
   handleUndo,
   allowSinglePlayer,
+  matchBalls,
 }: MatchSummaryProps) {
   const { setShowRunrateChart, setShowOverSummaries } = useStatsOpenContext();
 
@@ -45,7 +47,11 @@ function MatchSummary({
       .map((event) => event.type);
 
   const { runs: runs1 } = getScore(ballEventsbyTeam(0));
-  const { runs: runs2, wickets: wickets2 } = getScore(ballEventsbyTeam(1));
+  const {
+    runs: runs2,
+    wickets: wickets2,
+    totalBalls,
+  } = getScore(ballEventsbyTeam(1));
   const totalWickets = teams[1].playerIds.length;
 
   function calculateWinner() {
@@ -56,7 +62,7 @@ function MatchSummary({
       winner = 0;
     } else if (runs2 > runs1) {
       const wicketMargin = totalWickets - wickets2 - Number(!allowSinglePlayer);
-      winInfo = `${processTeamName(teams[1].name)} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""}`;
+      winInfo = `${processTeamName(teams[1].name)} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
       winner = 1;
     } else {
       winInfo =
