@@ -208,8 +208,47 @@ function calculatePlayerOfTheMatch({
   return playerOfTheMatch;
 }
 
-// ** Backend
+function calculateWinner({
+  allowSinglePlayer,
+  matchBalls,
+  runs1,
+  runs2,
+  totalBalls,
+  totalWickets,
+  wickets2,
+  teams,
+}: {
+  runs1: number;
+  runs2: number;
+  totalWickets: number;
+  wickets2: number;
+  matchBalls: number;
+  totalBalls: number;
+  allowSinglePlayer: boolean;
+  teams: string[];
+}) {
+  let winInfo = "";
+  let winner;
+  if (runs1 > runs2) {
+    winInfo = `${processTeamName(teams[0])} won by ${runs1 - runs2} runs`;
+    winner = 0;
+  } else if (runs2 > runs1) {
+    const wicketMargin = totalWickets - wickets2 - Number(!allowSinglePlayer);
+    winInfo = `${processTeamName(teams[1])} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
+    winner = 1;
+  } else {
+    winInfo =
+      "Match Tied (Sorry for the inconvenience but we don't have super over feature yet)";
+    winner = -1;
+  }
 
+  return {
+    winInfo,
+    winner,
+  };
+}
+
+// ** Backend
 function validateUser() {
   const { userId } = auth();
   if (!userId) {
@@ -233,6 +272,7 @@ export {
   abbreviateName,
   calculateFallOfWickets,
   calculatePlayerOfTheMatch,
+  calculateWinner,
   // Backend
   validateUser,
 };
