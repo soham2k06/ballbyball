@@ -12,6 +12,7 @@ import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
 import { Separator } from "../ui/separator";
 import {
   calculatePlayerOfTheMatch,
+  calculateWinner,
   getOverStr,
   getScore,
   processTeamName,
@@ -54,28 +55,16 @@ function MatchSummary({
   } = getScore(ballEventsbyTeam(1));
   const totalWickets = teams[1].playerIds.length;
 
-  function calculateWinner() {
-    let winInfo = "";
-    let winner;
-    if (runs1 > runs2) {
-      winInfo = `${processTeamName(teams[0].name)} won by ${runs1 - runs2} runs`;
-      winner = 0;
-    } else if (runs2 > runs1) {
-      const wicketMargin = totalWickets - wickets2 - Number(!allowSinglePlayer);
-      winInfo = `${processTeamName(teams[1].name)} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
-      winner = 1;
-    } else {
-      winInfo =
-        "Match Tied (Sorry for the inconvenience but we don't have super over feature yet)";
-      winner = -1;
-    }
-
-    return {
-      winInfo,
-      winner,
-    };
-  }
-  const { winInfo } = calculateWinner();
+  const { winInfo } = calculateWinner({
+    allowSinglePlayer,
+    matchBalls,
+    runs1,
+    runs2,
+    teams: teams.map(({ name }) => name),
+    totalBalls,
+    totalWickets,
+    wickets2,
+  });
 
   const groupedEvents: Record<
     string,
