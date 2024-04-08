@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
+import { useContainsSamePlayers } from "@/lib/hooks";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
@@ -56,6 +57,7 @@ function StartUpdateMatchDialog({
     control,
     reset,
     setValue,
+    setError,
     formState: { isDirty },
   } = form;
 
@@ -64,10 +66,22 @@ function StartUpdateMatchDialog({
   const { createMatch, isPending: isCreating } = useCreateMatch();
   const { updateMatch, isPending: isUpdating } = useUpdateMatch();
 
+  const containsSamePlayer = useContainsSamePlayers(
+    form.watch("teamIds") || [],
+  );
+
   const isPending = isCreating || isUpdating;
 
   async function onSubmit(data: CreateMatchSchema | UpdateMatchSchema) {
     // TODO: Create Input for curTeam
+    if (containsSamePlayer) {
+      setError("teamIds", {
+        type: "manual",
+        message:
+          "Both teams can't have same player, please check and try again.",
+      });
+      return;
+    }
 
     if (matchToUpdate) {
       updateMatch(
