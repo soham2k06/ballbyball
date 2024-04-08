@@ -1,4 +1,4 @@
-import { BallEvent, Player } from "@prisma/client";
+import { BallEvent, Player, PrismaClient } from "@prisma/client";
 import { auth } from "@clerk/nextjs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -251,10 +251,40 @@ function calculateWinner({
 // ** Backend
 function validateUser() {
   const { userId } = auth();
-  if (!userId) {
-    throw new Error("User not authenticated");
-  }
+  if (!userId) throw new Error("User not authenticated");
+
   return userId;
+}
+
+async function createWithUniqueName(
+  name: string,
+  schema: PrismaClient["player"] | PrismaClient["team"] | PrismaClient["match"],
+) {
+  const { userId } = auth();
+
+  if (!userId) throw new Error("User not authenticated");
+
+  let newName = name;
+  let counter = 0;
+  let playerExists = true;
+
+  while (playerExists) {
+    const existingPlayer = await (schema as PrismaClient["player"]).findFirst({
+      where: {
+        userId: userId,
+        name: newName,
+      },
+    });
+
+    if (existingPlayer) {
+      counter++;
+      newName = `${name} (${counter})`;
+    } else {
+      playerExists = false;
+    }
+  }
+
+  return newName;
 }
 
 export {
@@ -275,4 +305,5 @@ export {
   calculateWinner,
   // Backend
   validateUser,
+  createWithUniqueName,
 };

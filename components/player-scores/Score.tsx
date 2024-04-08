@@ -186,8 +186,6 @@ function Score({
                 .map((ball) => ball.type as EventType),
             );
 
-            console.log(maidenOverCount);
-
             return (
               <>
                 <TableRow>

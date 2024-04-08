@@ -25,8 +25,15 @@ import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 import { Button } from "@/components/ui/button";
 
+const uniqueArray = (arr: string[]) => new Set(arr).size === arr.length;
+
 const schema = z.object({
-  names: z.array(z.string().min(1).max(20)).min(1),
+  names: z
+    .array(z.string().min(1).max(20))
+    .min(1)
+    .refine((value) => uniqueArray(value), {
+      message: "Player names must be unique.",
+    }),
 });
 
 function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
@@ -105,6 +112,11 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
                         />
                       </FormControl>
                       <FormMessage />
+                      {!!form.formState.errors.names?.root && (
+                        <p className="text-sm font-medium text-destructive">
+                          {form.formState.errors.names?.root.message}
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
