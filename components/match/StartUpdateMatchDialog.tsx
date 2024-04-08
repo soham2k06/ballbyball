@@ -121,6 +121,7 @@ function StartUpdateMatchDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Match Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Match name" {...field} />
                   </FormControl>
@@ -129,54 +130,59 @@ function StartUpdateMatchDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="teamIds"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-base">Teams</FormLabel>
-                    <FormDescription>
-                      Select the temas from your collection
-                    </FormDescription>
-                  </div>
-                  {teams?.map((item) => (
-                    <FormField
-                      key={item.id}
-                      control={form.control}
-                      name="teamIds"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value!, item.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== item.id,
-                                        ),
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {item.name}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!matchToUpdate && (
+              <FormField
+                control={form.control}
+                name="teamIds"
+                render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel className="text-base">Teams</FormLabel>
+                      <FormDescription>
+                        Select the temas from your collection
+                      </FormDescription>
+                    </div>
+                    {teams?.map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={form.control}
+                        name="teamIds"
+                        render={({ field }) => {
+                          return (
+                            <FormItem
+                              key={item.id}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([
+                                          ...field.value!,
+                                          item.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== item.id,
+                                          ),
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                {item.name}
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
