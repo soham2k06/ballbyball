@@ -153,7 +153,7 @@ function SelectBatsman({
                 name="playerIds"
                 render={() => (
                   <FormItem>
-                    {players?.map((item) => (
+                    {players?.toReversed().map((item) => (
                       <FormField
                         key={item.id}
                         control={control}

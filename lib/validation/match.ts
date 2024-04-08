@@ -32,6 +32,7 @@ export const updateMatchSchema = z.object({
   curTeam: z.number().min(0).max(1).optional(),
   teamIds: z.array(z.string()).optional(),
   strikeIndex: z.number().optional(),
+  hasEnded: z.boolean().optional(),
 });
 
 export type UpdateMatchSchema = z.infer<typeof updateMatchSchema>;

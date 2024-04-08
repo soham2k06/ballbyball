@@ -14,9 +14,7 @@ export async function GET() {
     });
 
     const teamsSimplified = teams.map((team) => {
-      const players = team.teamPlayers
-        .map((teamPlayer) => teamPlayer.player)
-        .reverse();
+      const players = team.teamPlayers.map((teamPlayer) => teamPlayer.player);
 
       const { teamPlayers, ...playerWithoutTeamPlayers } = team;
 

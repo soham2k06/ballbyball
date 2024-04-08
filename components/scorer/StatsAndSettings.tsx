@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
 import { BallEvent, CurPlayer } from "@prisma/client";
-import { BarChartBig, ListOrdered, Pencil } from "lucide-react";
+import { BarChartBig, ListOrdered } from "lucide-react";
 
 import { EventType, MatchExtended } from "@/types";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
@@ -157,13 +157,6 @@ function StatsAndSettings({
           >
             <ListOrdered />
             <span>Over Summaries</span>
-          </Button>
-
-          <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
-            Settings
-          </TypographyP>
-          <Button className="w-full space-x-2">
-            <Pencil /> <span>Match Settings</span>
           </Button>
         </SheetContent>
       </Sheet>

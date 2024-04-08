@@ -111,6 +111,7 @@ export async function PUT(req: NextRequest) {
       name,
       overs,
       strikeIndex,
+      hasEnded,
     } = parsedRes.data;
 
     if (!matchId) {
@@ -125,6 +126,7 @@ export async function PUT(req: NextRequest) {
         curPlayers: curPlayers as CurPlayer[],
         curTeam,
         strikeIndex,
+        hasEnded,
       },
     });
 

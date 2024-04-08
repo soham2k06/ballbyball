@@ -124,9 +124,8 @@ function MatchSummary({
     };
   });
 
-  const playerOfTheMatch = calculatePlayerOfTheMatch({
-    playersPerformance,
-  });
+  // TODO: Add winner factor
+  const playerOfTheMatch = calculatePlayerOfTheMatch({ playersPerformance });
 
   const { player } = usePlayerById(playerOfTheMatch.playerId);
 

@@ -68,6 +68,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
 
+  const [isInSecondInning, setIsInSecondInning] = useState(false);
+
   const [showScorecard, setShowScorecard] = useState(false);
   const [showMatchSummary, setShowMatchSummary] = useState(false);
 
@@ -97,22 +99,36 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   );
 
   // ** Effects
+
+  // Setting default values
   useEffect(() => {
-    if (ballEventsFromMatch?.length) {
-      setEvents(ballEventsFromMatch as BallEvent[]);
-    }
+    if (ballEventsFromMatch?.length) setEvents(ballEventsFromMatch);
   }, [ballEventsFromMatch]);
-
   useEffect(() => {
-    if (match?.strikeIndex) {
-      setOnStrikeBatsman(match.strikeIndex || 0);
-    }
+    if (match?.strikeIndex) setOnStrikeBatsman(match.strikeIndex || 0);
   }, [match?.strikeIndex]);
-
   useEffect(() => {
     if (match?.curPlayers) setCurPlayers(match.curPlayers);
   }, [match?.curPlayers]);
 
+  // Handling initial player selection
+  useEffect(() => {
+    if (!isSuccess || match?.hasEnded) return;
+    const getHasPlayer = (type: "batsman" | "bowler") =>
+      (curPlayers.length ? curPlayers : match?.curPlayers)?.some(
+        (player) => player.type === type,
+      );
+
+    const hasBatsman = getHasPlayer("batsman");
+    if (!hasBatsman) {
+      setShowSelectBatsman((prev) => prev || true);
+    }
+
+    const hasBowler = getHasPlayer("bowler");
+    if (!hasBowler) setShowSelectBowler(!hasBowler && !showSelectBatsman);
+  }, [showSelectBatsman, isSuccess, match?.hasEnded]);
+
+  // Handling strike change on last ball of over
   useEffect(() => {
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
     if (
@@ -122,72 +138,55 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       changeStrike();
   }, [totalBalls]);
 
+  // Check if second inning
+  useEffect(() => {
+    const playerIds = new Set(teamPlayerIds);
+    for (const event of events) {
+      if (!playerIds?.has(event.batsmanId)) {
+        setIsInSecondInning(true);
+        break;
+      }
+    }
+  }, [events]);
+
   // Handling after last ball
   useEffect(() => {
+    if (matchIsLoading && !match) return;
     const matchBalls = (match?.overs || 0) * 6;
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-
-    const isAllOut =
-      wickets ===
-      (team?.players.length || 0) - (match?.allowSinglePlayer ? 0 : 1);
-
-    let isInSecondInning = false;
-
-    if (isAllOut) {
-      toast.info("All out!");
-      setShowScorecard(true);
-
-      if (isInSecondInning) handleFinish();
-      else handleInningChange();
-    }
 
     if (isLastBallOfOver) {
       if (matchBalls !== totalBalls) setShowSelectBowler(true);
 
       // Check if inning is finished
       if (totalBalls === matchBalls && totalBalls) {
-        const playerIds = new Set(teamPlayerIds);
-        for (const event of events) {
-          if (!playerIds?.has(event.batsmanId)) {
-            isInSecondInning = true;
-            break;
-          }
-        }
-
-        if (!isInSecondInning) {
-          updateMatch({
-            id: matchId,
-            curTeam: Number(!Boolean(match?.curTeam)),
-          });
-          handleInningChange();
-        } else handleFinish();
+        if (isInSecondInning || match?.hasEnded) handleFinish();
+        else handleInningChange();
       }
     }
-  }, [totalBalls]);
+  }, [totalBalls, matchIsLoading]);
 
   // Handling Succesfull Chase
   useEffect(() => {
     const remainingRuns = opponentRuns - runs + 1;
-    console.log({ remainingRuns, opponentRuns, runs });
     if (!opponentEvents.length) return;
     if (remainingRuns <= 0) handleFinish();
   }, [runs, opponentRuns]);
 
-  // Handling initial player selection
+  // Handling All out win
   useEffect(() => {
-    if (isSuccess) {
-      const getHasPlayer = (type: "batsman" | "bowler") =>
-        (curPlayers.length ? curPlayers : match?.curPlayers)?.some(
-          (player) => player.type === type,
-        );
+    const isAllOut =
+      wickets ===
+      (team?.players.length || 0) - (match?.allowSinglePlayer ? 0 : 1);
 
-      const hasBatsman = getHasPlayer("batsman");
-      if (!hasBatsman) setShowSelectBatsman((prev) => prev || true);
-
-      const hasBowler = getHasPlayer("bowler");
-      if (!hasBowler) setShowSelectBowler(!hasBowler && !showSelectBatsman);
+    if (isAllOut) {
+      if (isInSecondInning || match?.hasEnded) handleFinish();
+      else {
+        toast.info("All out!");
+        handleInningChange();
+      }
     }
-  }, [showSelectBatsman, isSuccess]);
+  }, [wickets, match?.hasEnded]);
 
   if (matchIsLoading) return <p>loading...</p>;
   if (!match && !matchIsLoading)
@@ -344,14 +343,16 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }
 
   function handleFinish() {
+    if (!match?.hasEnded) {
+      setShowSelectBatsman(false);
+      handleSave(0);
+      updateMatch({
+        id: matchId,
+        hasEnded: true,
+      });
+      toast.info("Match finished!");
+    }
     setShowMatchSummary(true);
-    updateMatch({
-      id: matchId,
-      curPlayers: [],
-      curTeam: Number(!Boolean(match?.curTeam)),
-    });
-    toast.info("Match finished!");
-    handleSave(0);
   }
 
   function handleUndo() {
@@ -376,6 +377,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
       id: matchId,
       curPlayers: [],
       curTeam: 0,
+      ...(match?.hasEnded && { hasEnded: false }),
     });
     setOnStrikeBatsman(0);
 
@@ -505,6 +507,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           handleUndo={() => {
             handleUndo();
             setShowMatchSummary(false);
+            updateMatch({
+              id: matchId,
+              hasEnded: false,
+            });
           }}
         />
       </Card>

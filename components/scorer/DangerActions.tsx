@@ -32,9 +32,7 @@ function DangerActions({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40 space-y-2 p-4" align="end">
         <RestartButton
-          onClick={() => {
-            handleRestart();
-          }}
+          onClick={handleRestart}
           handleCloseMenu={() => setShowMenu(false)}
         />
         <Button
