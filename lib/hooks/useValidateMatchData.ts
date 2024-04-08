@@ -1,8 +1,10 @@
 import { useTeamById } from "@/apiHooks/team";
 import { useState, useEffect } from "react";
 
-function useContainsSamePlayers(teamIds: string[]) {
-  const [hasMatch, setHasMatch] = useState(false);
+function useValidateMatchData(teamIds: string[]) {
+  const [containsSamePlayer, setContainsSamePlayer] = useState(false);
+  const [isDifferentPlayerLengthTeams, setIsDifferentPlayerLengthTeams] =
+    useState(false);
 
   const { team: team1 } = useTeamById(teamIds[0]);
   const { team: team2 } = useTeamById(teamIds[1]);
@@ -14,14 +16,18 @@ function useContainsSamePlayers(teamIds: string[]) {
     const idSet = new Set(team2Ids);
     for (const id of team1Ids) {
       if (idSet.has(id)) {
-        setHasMatch(true);
+        setContainsSamePlayer(true);
         return;
       }
     }
-    setHasMatch(false);
+    setContainsSamePlayer(false);
   }, [team1Ids, team2Ids]);
 
-  return hasMatch;
+  useEffect(() => {
+    setIsDifferentPlayerLengthTeams(team1Ids.length !== team2Ids.length);
+  }, [team1Ids, team2Ids]);
+
+  return { isDifferentPlayerLengthTeams, containsSamePlayer };
 }
 
-export { useContainsSamePlayers };
+export { useValidateMatchData };

@@ -1,3 +1,3 @@
-import { useContainsSamePlayers } from "./useContainsSamePlayers";
+import { useValidateMatchData } from "./useValidateMatchData";
 
-export { useContainsSamePlayers };
+export { useValidateMatchData };
