@@ -135,15 +135,6 @@ function Score({
                 .map((event) => event.type as EventType),
             );
 
-            // if (!totalBalls && (hasYetToBatTeam ?? 0) === teamIndex)
-            //   return (
-            //     <TableRow>
-            //       <TableCell colSpan={6} className="text-left font-semibold">
-            //         {player.name}
-            //       </TableCell>
-            //     </TableRow>
-            //   );
-
             if (!totalBalls) return null;
 
             if (!totalBalls && hasYetToBatTeam === teamIndex)
@@ -166,8 +157,10 @@ function Score({
                 ballsInCurrentOver++;
 
                 if (
-                  ball === "0" ||
-                  (ball.includes("-1") && ball.split("_")[3] === "0")
+                  !(
+                    ball === "0" ||
+                    (ball.includes("-1") && ball.split("_")[3] === "0")
+                  )
                 )
                   didRunCome = true;
 
@@ -175,7 +168,7 @@ function Score({
                   if (!didRunCome) maidenOvers++;
 
                   ballsInCurrentOver = 0;
-                  didRunCome = true;
+                  didRunCome = false;
                 }
               }
 
@@ -183,8 +176,18 @@ function Score({
             }
 
             const maidenOverCount = calculateMaidenOvers(
-              legalEvents.map((event) => event.type as EventType),
+              ballEvents
+                .filter(
+                  (ball) =>
+                    ball.type !== "-2" &&
+                    player.id ===
+                      ball[isBowlingScore ? "bowlerId" : "batsmanId"],
+                )
+                .map((ball) => ball.type as EventType),
+              // ["0", "0", "0", "0", "0", "0", "0", "-2", "0", "0", "0", "0"],
             );
+
+            console.log(maidenOverCount);
 
             return (
               <>
