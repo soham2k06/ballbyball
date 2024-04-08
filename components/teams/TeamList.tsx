@@ -74,6 +74,7 @@ function TeamList() {
 
             const isLoading = isPending && teamToDelete === team.id;
 
+            console.log(team);
             return (
               <Card>
                 <CardHeader>
