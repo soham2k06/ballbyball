@@ -184,7 +184,6 @@ function Score({
                       ball[isBowlingScore ? "bowlerId" : "batsmanId"],
                 )
                 .map((ball) => ball.type as EventType),
-              // ["0", "0", "0", "0", "0", "0", "0", "-2", "0", "0", "0", "0"],
             );
 
             console.log(maidenOverCount);
