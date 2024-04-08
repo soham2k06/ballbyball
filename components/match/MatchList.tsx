@@ -139,6 +139,7 @@ function MatchList() {
         setOpen={() => setMatchToDelete(matchToDelete ? null : matchToDelete)}
         onConfirm={() => matchToDelete && deleteMatch(matchToDelete)}
         content="Removing matches will lead to removing all team and player stats connected with the match. Do you still want to continue?"
+        isLoading={isDeleting}
       />
     </div>
   );
