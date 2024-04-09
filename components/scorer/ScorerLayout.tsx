@@ -35,7 +35,7 @@ import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
 import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
-import Tools from "./Tools";
+import Tools from "../match-stats/Tools";
 import FieldersDialog from "./FieldersDialog";
 import MatchSummary from "./MatchSummary";
 import { Button } from "../ui/button";
@@ -215,11 +215,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // ** Over Summary
   const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
-
-  const chartSummaryData = overSummaries.map((summary, i) => ({
-    name: i < 9 ? `Over ${i + 1}` : i + 1,
-    runs: calcRuns(summary),
-  }));
 
   const curOverIndex = Math.floor(totalBalls / 6);
 
@@ -432,8 +427,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             events={events as BallEvent[]}
           />
           <Tools
-            chartSummaryData={chartSummaryData}
-            overSummaries={overSummaries}
             runRate={runRate}
             curPlayers={curPlayers}
             setCurPlayers={setCurPlayers}

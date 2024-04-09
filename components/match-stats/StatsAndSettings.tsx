@@ -9,7 +9,7 @@ import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
 import { TypographyH2, TypographyP } from "../ui/typography";
 import { Button } from "../ui/button";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
+import { Drawer, DrawerContent } from "../ui/drawer";
 
 import { SelectBowler, SelectBatsman } from "../players-selection";
 import OverStats from "./OverStats";
@@ -17,11 +17,10 @@ import FullOverSummary from "./FullOverSummary";
 import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
 import { useSaveBallEvents } from "@/apiHooks/ballEvent";
 import { useUpdateMatch } from "@/apiHooks/match";
+import StatsDrawerHeader from "./StatsDrawerHeader";
 
 interface StatsAndSettingsProps {
   runRate: number;
-  chartSummaryData: { runs: number }[];
-  overSummaries: EventType[][];
   match: MatchExtended;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
@@ -29,9 +28,7 @@ interface StatsAndSettingsProps {
 }
 
 function StatsAndSettings({
-  chartSummaryData,
   runRate,
-  overSummaries,
   curPlayers,
   events,
   match,
@@ -49,8 +46,28 @@ function StatsAndSettings({
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
   const [showSelectBowler, setShowSelectBowler] = useState(false);
 
+  const [selectedTeam, setSelectedTeam] = useState<{
+    index: number;
+    name: string;
+  }>({
+    index: 0,
+    name: match.teams?.[0].name,
+  });
+
   const curTeam = match.teams[match.curTeam];
   const opposingTeam = match.teams[match.curTeam === 0 ? 1 : 0];
+
+  const playerIds = curTeam?.players.map((player) => player.id) || [];
+
+  const fTeamEvents = events
+    .filter((event) => playerIds.includes(event.bowlerId))
+    .map((event) => event.type as EventType);
+
+  const sTeamEvents = events
+    .filter((event) => playerIds.includes(event.batsmanId))
+    .map((event) => event.type as EventType);
+
+  const ballEventsArr = [fTeamEvents, sTeamEvents];
 
   const { createBallEvent } = useSaveBallEvents();
   const { updateMatch } = useUpdateMatch();
@@ -162,22 +179,24 @@ function StatsAndSettings({
       </Sheet>
       <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
         <DrawerContent>
-          <DrawerHeader className="mb-2 pb-4 pt-6 ">
-            <DrawerTitle className="text-center text-2xl">
-              CRR: {runRate}
-            </DrawerTitle>
-          </DrawerHeader>
-          <OverStats chartSummaryData={chartSummaryData} />
+          <StatsDrawerHeader
+            match={match}
+            runRate={runRate}
+            selectedTeam={selectedTeam}
+            setSelectedTeam={setSelectedTeam}
+          />
+          <OverStats ballEvents={ballEventsArr[selectedTeam.index]} />
         </DrawerContent>
       </Drawer>
       <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>
         <DrawerContent>
-          <DrawerHeader className="mb-2 pb-4 pt-6 ">
-            <DrawerTitle className="text-center text-2xl">
-              CRR: {runRate}
-            </DrawerTitle>
-          </DrawerHeader>
-          <FullOverSummary overSummaries={overSummaries} />
+          <StatsDrawerHeader
+            match={match}
+            runRate={runRate}
+            selectedTeam={selectedTeam}
+            setSelectedTeam={setSelectedTeam}
+          />
+          <FullOverSummary ballEvents={ballEventsArr[selectedTeam.index]} />
         </DrawerContent>
       </Drawer>
     </>

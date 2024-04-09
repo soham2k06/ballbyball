@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { BallEvent, CurPlayer } from "@prisma/client";
 
-import { EventType, MatchExtended } from "@/types";
+import { MatchExtended } from "@/types";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import {
@@ -18,9 +18,6 @@ import { processTeamName } from "@/lib/utils";
 
 interface ToolsProps {
   runRate: number;
-  chartSummaryData: { runs: number }[];
-  overSummaries: EventType[][];
-
   match: MatchExtended;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
@@ -30,8 +27,6 @@ interface ToolsProps {
 }
 
 function Tools({
-  chartSummaryData,
-  overSummaries,
   runRate,
   curPlayers,
   events,
@@ -51,8 +46,6 @@ function Tools({
   return (
     <div className="flex w-full items-center gap-2 rounded-md bg-muted p-2 text-lg text-muted-foreground">
       <StatsAndSettings
-        chartSummaryData={chartSummaryData}
-        overSummaries={overSummaries}
         runRate={runRate}
         events={events}
         match={match}
