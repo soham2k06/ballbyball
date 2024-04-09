@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
+import { useValidateMatchData } from "@/lib/hooks";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
@@ -63,6 +64,9 @@ function StartUpdateMatchDialog({
 
   const { createMatch, isPending: isCreating } = useCreateMatch();
   const { updateMatch, isPending: isUpdating } = useUpdateMatch();
+
+  const { containsSamePlayer, isDifferentPlayerLengthTeams } =
+    useValidateMatchData(form.watch("teamIds") || []);
 
   const isPending = isCreating || isUpdating;
 
@@ -101,13 +105,9 @@ function StartUpdateMatchDialog({
   }, [open, matchToUpdate]);
 
   useEffect(() => {
-    if (matchToUpdate) {
+    if (matchToUpdate)
       setIsOversDirty(form.watch("overs") !== matchToUpdate?.overs);
-      console.log("run");
-    }
   }, [form.watch("overs")]);
-
-  console.log(isOversDirty);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -125,6 +125,7 @@ function StartUpdateMatchDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Match Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Match name" {...field} />
                   </FormControl>
@@ -133,54 +134,59 @@ function StartUpdateMatchDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="teamIds"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-base">Teams</FormLabel>
-                    <FormDescription>
-                      Select the temas from your collection
-                    </FormDescription>
-                  </div>
-                  {teams?.map((item) => (
-                    <FormField
-                      key={item.id}
-                      control={form.control}
-                      name="teamIds"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value!, item.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== item.id,
-                                        ),
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {item.name}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!matchToUpdate && (
+              <FormField
+                control={form.control}
+                name="teamIds"
+                render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel className="text-base">Teams</FormLabel>
+                      <FormDescription>
+                        Select the temas from your collection
+                      </FormDescription>
+                    </div>
+                    {teams?.map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={form.control}
+                        name="teamIds"
+                        render={({ field }) => {
+                          return (
+                            <FormItem
+                              key={item.id}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([
+                                          ...field.value!,
+                                          item.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== item.id,
+                                          ),
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                {item.name}
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
@@ -210,6 +216,30 @@ function StartUpdateMatchDialog({
               }}
             />
 
+            <FormField
+              control={form.control}
+              name="allowSinglePlayer"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      Allow single player
+                      <FormDescription>
+                        It will not be declared all out if only one player is
+                        left
+                      </FormDescription>
+                    </div>
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
+
             <DialogFooter>
               <LoadingButton
                 type="submit"
@@ -227,6 +257,15 @@ function StartUpdateMatchDialog({
             </DialogFooter>
           </form>
         </Form>
+
+        {(form.watch("teamIds")?.length ?? 0) >= 2 && (
+          <>
+            {containsSamePlayer &&
+              "Both teams can't have same player, please look into it."}
+            {isDifferentPlayerLengthTeams &&
+              "Both teams should have same number of players, please look into it."}
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

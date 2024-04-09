@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { TypographyP } from "../ui/typography";
 
 import StartMatchButton from "./StartMatch";
-import { cn, getOverStr, getScore } from "@/lib/utils";
+import { calculateWinner, cn, getOverStr, getScore } from "@/lib/utils";
 import { EventType } from "@/types";
 import StartUpdateMatchDialog from "./StartUpdateMatchDialog";
 import { useState } from "react";
@@ -50,7 +50,34 @@ function MatchList() {
               teamIds: match.teams.map((team) => team.id),
             };
 
-            const isThisDeleting = isDeleting && matchToDelete === match.id;
+            const ballEventsbyTeam = (i: number) =>
+              match.ballEvents
+                .filter((event) =>
+                  match.teams[i].teamPlayers
+                    .map(({ playerId }) => playerId)
+                    .includes(event.batsmanId),
+                )
+                .map((event) => event.type);
+
+            const { runs: runs1 } = getScore(ballEventsbyTeam(0));
+            const {
+              runs: runs2,
+              wickets: wickets2,
+              totalBalls: totalBalls2,
+            } = getScore(ballEventsbyTeam(1));
+            const totalWickets = match.teams[1].teamPlayers.length;
+
+            const { winInfo } = calculateWinner({
+              allowSinglePlayer: match.allowSinglePlayer,
+              matchBalls: match.overs * 6,
+              runs1,
+              runs2,
+              teams: match.teams.map(({ name }) => name),
+              totalBalls: totalBalls2,
+              totalWickets,
+              wickets2,
+            });
+
             return (
               <Card>
                 <CardHeader className="flex-row items-center justify-between">
@@ -61,10 +88,7 @@ function MatchList() {
                   <Button onClick={() => setMatchToUpdate(matchToUpdateVar)}>
                     Edit
                   </Button>
-                  <Button
-                    disabled={isThisDeleting}
-                    onClick={() => setMatchToDelete(match.id)}
-                  >
+                  <Button onClick={() => setMatchToDelete(match.id)}>
                     Delete
                   </Button>
                 </CardHeader>
@@ -94,6 +118,7 @@ function MatchList() {
                       </TypographyP>
                     );
                   })}
+                  {match.hasEnded && winInfo}
                 </CardContent>
               </Card>
             );
@@ -114,6 +139,7 @@ function MatchList() {
         setOpen={() => setMatchToDelete(matchToDelete ? null : matchToDelete)}
         onConfirm={() => matchToDelete && deleteMatch(matchToDelete)}
         content="Removing matches will lead to removing all team and player stats connected with the match. Do you still want to continue?"
+        isLoading={isDeleting}
       />
     </div>
   );

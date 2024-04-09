@@ -28,8 +28,13 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
 
   const firstBattingTeam = teams[firstBattingTeamIndex];
   const secondBattingTeam = teams[secondBattingTeamIndex];
+  const hasYetToBatTeam = isInSecondInning ? null : secondBattingTeamIndex;
 
-  function getScoreProps(players: Player[], isBowlingScore?: boolean) {
+  function getScoreProps(
+    players: Player[],
+    i: number,
+    isBowlingScore?: boolean,
+  ) {
     const ballEventsToPass = ballEvents.filter((event) =>
       players
         .map(({ id }) => id)
@@ -40,13 +45,14 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
       ballEvents: ballEventsToPass,
       isBowlingScore,
       players,
-      curPlayers: match.curPlayers,
+      hasYetToBatTeam,
       fallOfWickets: !isBowlingScore
         ? []
         : calculateFallOfWickets(
             ballEventsToPass,
             teams.map((team) => team.players).flat(),
           ),
+      teamIndex: i,
     };
   }
 
@@ -54,22 +60,22 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
     {
       id: "1-bat",
       name: `${processTeamName(firstBattingTeam.name)} - Bat`,
-      content: <Score {...getScoreProps(firstBattingTeam.players)} />,
+      content: <Score {...getScoreProps(firstBattingTeam.players, 0)} />,
     },
     {
       id: "2-bowl",
       name: `${processTeamName(secondBattingTeam.name)} - Bowl`,
-      content: <Score {...getScoreProps(secondBattingTeam.players, true)} />,
+      content: <Score {...getScoreProps(secondBattingTeam.players, 0, true)} />,
     },
     {
       id: "2-bat",
       name: `${processTeamName(secondBattingTeam.name)} - Bat`,
-      content: <Score {...getScoreProps(secondBattingTeam.players)} />,
+      content: <Score {...getScoreProps(secondBattingTeam.players, 1)} />,
     },
     {
       id: "1-bowl",
       name: `${processTeamName(firstBattingTeam.name)} - Bowl`,
-      content: <Score {...getScoreProps(firstBattingTeam.players, true)} />,
+      content: <Score {...getScoreProps(firstBattingTeam.players, 1, true)} />,
     },
   ];
 
@@ -79,9 +85,17 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
     <Tabs defaultValue="1-bat">
       <div className="px-2">
         <TabsList className="divide-x divide-foreground/40 px-0 max-md:w-full">
-          {tabs.map((tab) => (
+          {tabs.map((tab, i) => (
             <div className="px-1">
-              <TabsTrigger key={tab.id} value={tab.id} className="px-2 text-sm">
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="px-2 text-sm"
+                disabled={
+                  !!hasYetToBatTeam &&
+                  (hasYetToBatTeam * 2 === i || hasYetToBatTeam * 2 === i - 1)
+                }
+              >
                 {tab.name}
               </TabsTrigger>
             </div>

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-import { CurPlayer } from "@prisma/client";
+import { CurPlayer, Player } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,36 +20,31 @@ import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
-import { MatchExtended } from "@/types";
 
 interface SelectBowlerProps {
-  match: MatchExtended;
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  onClose?: () => void;
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  handleSave: (
-    _: unknown,
-    updatedCurPlayers?: CurPlayer[],
-    curTeam?: number,
-    dontSaveBallEvents?: boolean,
-  ) => void;
   handleUndo?: () => void;
   isManualMode?: boolean;
+  team: {
+    name?: string;
+    players?: Player[];
+  };
+  handleSelectPlayer: (payload: CurPlayer[], onSuccess?: () => void) => void;
 }
 
 function SelectBowler({
   open,
   setOpen,
-  match,
-  handleSave,
   handleUndo,
   curPlayers,
   setCurPlayers,
   isManualMode,
+  team,
+  handleSelectPlayer,
 }: SelectBowlerProps) {
-  const team = match?.teams[match?.curTeam === 0 ? 1 : 0];
   const players = team?.players;
 
   const schema = z.object({
@@ -82,14 +77,10 @@ function SelectBowler({
 
     setCurPlayers(newCurPlayers);
 
-    handleSave(
-      0,
-      newCurPlayers,
-      undefined,
-      curPlayers.filter((player) => player.type === "bowler").length === 0,
-    );
-
-    setTimeout(reset, 500);
+    handleSelectPlayer(newCurPlayers, () => {
+      setOpen && setOpen(false);
+      setTimeout(reset, 500);
+    });
   }
 
   useEffect(() => {
@@ -109,14 +100,14 @@ function SelectBowler({
   // TODO: New reusable component for player label
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <TypographyH3 className="text-2xl font-bold">
               Select Bowler - {team?.name}
             </TypographyH3>
-            {!!match?.curPlayers.find((player) => player.type === "bowler") && (
+            {!!curPlayers.find((player) => player.type === "bowler") && (
               <Button
                 variant={isManualMode ? "ghost" : "destructive"}
                 size={isManualMode ? "icon" : "default"}
@@ -173,7 +164,8 @@ function SelectBowler({
                   </FormItem>
                 )}
               />
-              <Button>Submit</Button>
+              {/* TODO: isPending state */}
+              <Button>{false ? "Submitting" : "Submit"}</Button>
             </form>
           </Form>
         </div>

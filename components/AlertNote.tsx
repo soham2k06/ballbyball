@@ -1,7 +1,6 @@
 import { OverlayStateProps } from "@/types";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -9,13 +8,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "./ui/button";
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 interface AlertNodeProps extends OverlayStateProps {
   onConfirm: () => void;
   content: string;
+  isLoading?: boolean;
 }
 
-function AlertNote({ open, setOpen, onConfirm, content }: AlertNodeProps) {
+function AlertNote({
+  open,
+  setOpen,
+  onConfirm,
+  content,
+  isLoading,
+}: AlertNodeProps) {
+  useEffect(() => {
+    if (!isLoading) setOpen(false);
+  }, [isLoading]);
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>
@@ -25,9 +38,13 @@ function AlertNote({ open, setOpen, onConfirm, content }: AlertNodeProps) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
-            Continue Anyway
-          </AlertDialogAction>
+          <Button onClick={onConfirm} disabled={isLoading} className="min-w-32">
+            {isLoading ? (
+              <Loader2 className="size-5 animate-spin" strokeWidth={3} />
+            ) : (
+              "Yes, I'm sure"
+            )}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

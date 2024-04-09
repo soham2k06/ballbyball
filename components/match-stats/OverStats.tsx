@@ -1,10 +1,15 @@
+import { calcRuns, generateOverSummary } from "@/lib/utils";
+import { EventType } from "@/types";
 import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis } from "recharts";
 
-function OverStats({
-  chartSummaryData,
-}: {
-  chartSummaryData: { runs: number }[];
-}) {
+function OverStats({ ballEvents }: { ballEvents: EventType[] }) {
+  const { overSummaries } = generateOverSummary(ballEvents);
+
+  const chartSummaryData = overSummaries.map((summary, i) => ({
+    name: i < 9 ? `Over ${i + 1}` : i + 1,
+    runs: calcRuns(summary),
+  }));
+
   const renderCustomizedLabel = (props: any) => {
     const { x, y, width, value } = props;
     const radius = 10;
@@ -36,10 +41,7 @@ function OverStats({
               <XAxis dataKey="name" />
               <Bar
                 dataKey="runs"
-                style={{
-                  fill: "hsl(var(--foreground))",
-                  opacity: 0.9,
-                }}
+                style={{ fill: "hsl(var(--foreground))", opacity: 0.9 }}
               >
                 {chartSummaryData.length <= 15 && (
                   <LabelList dataKey="runs" content={renderCustomizedLabel} />

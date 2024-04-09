@@ -1,4 +1,4 @@
-import { BallEvent, Player } from "@prisma/client";
+import { BallEvent, Player, PrismaClient } from "@prisma/client";
 import { auth } from "@clerk/nextjs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -50,13 +50,8 @@ function getScore(balls: (EventType | string)[]) {
   return { runs, totalBalls, wickets, runRate, extras };
 }
 
-function generateOverSummary({
-  ballEvents,
-  ballLimitInOver,
-}: {
-  ballEvents: EventType[];
-  ballLimitInOver?: number;
-}) {
+function generateOverSummary(ballEvents: EventType[]) {
+  let ballLimitInOver = 6;
   const overSummaries: EventType[][] = [];
   let validBallCount = 0;
   let currentOver: EventType[] = [];
@@ -78,7 +73,7 @@ function generateOverSummary({
     overSummaries.push(currentOver);
   }
 
-  return overSummaries;
+  return { overSummaries, ballLimitInOver };
 }
 
 function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
@@ -171,10 +166,8 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
 
 function calculatePlayerOfTheMatch({
   playersPerformance,
-  totalOpponentPlayers,
 }: {
   playersPerformance: PlayerPerformance[];
-  totalOpponentPlayers: number;
 }) {
   let bestPerformance = -1;
   let playerOfTheMatch: PlayerPerformance = {
@@ -187,7 +180,7 @@ function calculatePlayerOfTheMatch({
     team: "",
   };
 
-  const wicketPoint = 100 / totalOpponentPlayers;
+  const wicketPoint = 20;
 
   playersPerformance.forEach((player) => {
     const strikeRate = (player.runsScored / player.ballsFaced) * 100;
@@ -215,14 +208,83 @@ function calculatePlayerOfTheMatch({
   return playerOfTheMatch;
 }
 
-// ** Backend
+function calculateWinner({
+  allowSinglePlayer,
+  matchBalls,
+  runs1,
+  runs2,
+  totalBalls,
+  totalWickets,
+  wickets2,
+  teams,
+}: {
+  runs1: number;
+  runs2: number;
+  totalWickets: number;
+  wickets2: number;
+  matchBalls: number;
+  totalBalls: number;
+  allowSinglePlayer: boolean;
+  teams: string[];
+}) {
+  let winInfo = "";
+  let winner;
+  if (runs1 > runs2) {
+    winInfo = `${processTeamName(teams[0])} won by ${runs1 - runs2} runs`;
+    winner = 0;
+  } else if (runs2 > runs1) {
+    const wicketMargin = totalWickets - wickets2 - Number(!allowSinglePlayer);
+    winInfo = `${processTeamName(teams[1])} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
+    winner = 1;
+  } else {
+    winInfo =
+      "Match Tied (Sorry for the inconvenience but we don't have super over feature yet)";
+    winner = -1;
+  }
 
+  return {
+    winInfo,
+    winner,
+  };
+}
+
+// ** Backend
 function validateUser() {
   const { userId } = auth();
-  if (!userId) {
-    throw new Error("User not authenticated");
-  }
+  if (!userId) throw new Error("User not authenticated");
+
   return userId;
+}
+
+async function createWithUniqueName(
+  name: string,
+  schema: PrismaClient["player"] | PrismaClient["team"] | PrismaClient["match"],
+) {
+  const { userId } = auth();
+
+  if (!userId) throw new Error("User not authenticated");
+
+  let newName = name;
+  let counter = 0;
+  let playerExists = true;
+
+  while (playerExists) {
+    const existingPlayer = await (schema as PrismaClient["player"]).findFirst({
+      where: {
+        userId: userId,
+        name: newName,
+      },
+    });
+
+    if (existingPlayer) {
+      counter++;
+      newName = `${name} (${counter})`;
+    } else {
+      playerExists = false;
+    }
+  }
+
+  return newName;
 }
 
 export {
@@ -240,6 +302,8 @@ export {
   abbreviateName,
   calculateFallOfWickets,
   calculatePlayerOfTheMatch,
+  calculateWinner,
   // Backend
   validateUser,
+  createWithUniqueName,
 };

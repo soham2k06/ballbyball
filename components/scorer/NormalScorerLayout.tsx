@@ -4,7 +4,7 @@ import { useState } from "react";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 import { EventType } from "@/types";
-import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
+import { generateOverSummary, getScore } from "@/lib/utils";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import DangerActions from "./DangerActions";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "./ScoreButtons";
-import FooterSummary from "./FooterSummary";
+import FooterSummary from "../match-stats/FooterSummary";
 import ScoreWrapper from "./ScoreDisplay";
 
 function ScorerLayout() {
@@ -22,16 +22,7 @@ function ScorerLayout() {
 
   const { runs, totalBalls, wickets, extras, runRate } = getScore(balls);
 
-  let ballLimitInOver = 6;
-  const overSummaries: EventType[][] = generateOverSummary({
-    ballEvents: balls,
-    ballLimitInOver,
-  });
-
-  const chartSummaryData = overSummaries.map((summary, i) => ({
-    name: `Over ${i + 1}`,
-    runs: calcRuns(summary),
-  }));
+  const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
 
   const curOverIndex = Math.floor(totalBalls / 6);
   const { runs: curOverRuns, wickets: curOverWickets } = getScore(
@@ -79,8 +70,7 @@ function ScorerLayout() {
             curOverRuns={curOverRuns}
             curOverWickets={curOverWickets}
             runRate={runRate}
-            chartSummaryData={chartSummaryData}
-            overSummaries={overSummaries}
+            ballEvents={balls}
           />
         </CardContent>
         <Separator className="my-4" />

@@ -23,11 +23,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
-import { TypographyP } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 
+const uniqueArray = (arr: string[]) => new Set(arr).size === arr.length;
+
 const schema = z.object({
-  names: z.array(z.string().min(1).max(20)).min(1).max(11),
+  names: z
+    .array(z.string().min(1).max(20))
+    .min(1)
+    .refine((value) => uniqueArray(value), {
+      message: "Player names must be unique.",
+    }),
 });
 
 function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
@@ -60,7 +66,6 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
   }
 
   function handleAdd(index: number) {
-    if (11 - fields.length === 0) return;
     append("");
     setTimeout(() => {
       const lastInput = document.getElementById(`player-input-${index + 1}`);
@@ -107,6 +112,11 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
                         />
                       </FormControl>
                       <FormMessage />
+                      {!!form.formState.errors.names?.root && (
+                        <p className="text-sm font-medium text-destructive">
+                          {form.formState.errors.names?.root.message}
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -123,14 +133,10 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
             ))}
 
             <DrawerFooter className="!mt-8 w-full flex-row items-end !justify-between">
-              <TypographyP className="text-sm text-muted-foreground">
-                Max: 11 players, {11 - fields.length} left
-              </TypographyP>
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   type="button"
-                  disabled={11 - fields.length === 0}
                   onClick={() => handleAdd(fields.length)}
                 >
                   <Plus /> Add Field

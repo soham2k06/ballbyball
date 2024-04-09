@@ -1,8 +1,13 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-import { BallEvent, CurPlayer } from "@prisma/client";
-import { useForm } from "react-hook-form";
+import { BallEvent, CurPlayer, Player } from "@prisma/client";
 import { toast } from "sonner";
+import { X } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {
@@ -12,33 +17,26 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
-
 import { Checkbox } from "../ui/checkbox";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 
-import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import PlayerLabel from "./PlayerLabel";
-import { X } from "lucide-react";
-import { MatchExtended } from "@/types";
 
 interface SelectBatsmanProps {
-  match: MatchExtended;
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  handleSave: (
-    _: unknown,
-    updatedCurPlayers?: CurPlayer[],
-    curTeam?: number,
-    dontSaveBallEvents?: boolean,
-  ) => void;
   handleUndo?: () => void;
   isManualMode?: boolean;
+  team: {
+    name?: string;
+    players?: Player[];
+  };
+  handleSelectPlayer: (payload: CurPlayer[], onSuccess?: () => void) => void;
+  allowSinglePlayer: boolean;
 }
 
 interface SelectBatsmanForm {
@@ -47,17 +45,25 @@ interface SelectBatsmanForm {
 
 function SelectBatsman({
   curPlayers,
-  match,
   events,
   open,
   setOpen,
-  handleSave,
   handleUndo,
   setCurPlayers,
   isManualMode,
+  team,
+  handleSelectPlayer,
+  allowSinglePlayer,
 }: SelectBatsmanProps) {
   const schema = z.object({
-    playerIds: z.array(z.string()).max(2),
+    playerIds: z
+      .array(z.string(), {
+        errorMap: () => ({
+          message: "Select two players",
+        }),
+      })
+      .min(allowSinglePlayer ? 1 : 2, { message: "Select two players" })
+      .max(2),
   });
 
   const defaultPlayerIds = curPlayers
@@ -77,7 +83,6 @@ function SelectBatsman({
 
   const { handleSubmit, control, getValues, watch, reset } = form;
 
-  const team = match?.teams[match.curTeam];
   const players = team?.players;
 
   const playerPositions = ["Striker", "Non-Striker"];
@@ -102,15 +107,10 @@ function SelectBatsman({
         ];
     setCurPlayers(payload);
 
-    // 0 is trash value
-    handleSave(
-      0,
-      payload,
-      undefined,
-      curPlayers.filter((player) => player.type === "batsman").length !== 0,
-    );
-
-    setTimeout(reset, 500);
+    handleSelectPlayer(payload, () => {
+      setOpen?.(false);
+      setTimeout(reset, 500);
+    });
   }
 
   useEffect(() => {
@@ -118,7 +118,7 @@ function SelectBatsman({
       reset({
         playerIds: defaultPlayerIds,
       });
-  }, [open]);
+  }, [open, curPlayers]);
 
   useEffect(() => {
     watch("playerIds");
@@ -129,7 +129,7 @@ function SelectBatsman({
   // TODO: New reusable component for player label // DONE
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
@@ -138,9 +138,7 @@ function SelectBatsman({
               <Button
                 variant={isManualMode ? "ghost" : "destructive"}
                 size={isManualMode ? "icon" : "default"}
-                onClick={
-                  isManualMode ? () => setOpen && setOpen(false) : handleUndo
-                }
+                onClick={isManualMode ? () => setOpen?.(false) : handleUndo}
               >
                 {isManualMode ? <X /> : "Undo"}
               </Button>
@@ -155,17 +153,17 @@ function SelectBatsman({
                 name="playerIds"
                 render={() => (
                   <FormItem>
-                    {players?.map((item) => (
+                    {players?.toReversed().map((item) => (
                       <FormField
                         key={item.id}
                         control={control}
                         name="playerIds"
                         render={({ field }) => {
-                          const isSelected = field.value?.includes(item.id);
-                          const isBothSelected = field.value?.length === 2;
+                          const isSelected = field.value.includes(item.id);
+                          const isBothSelected = field.value.length === 2;
                           const isOut = outPlayers?.includes(item.id);
 
-                          const sortedCurPlayers = curPlayers.sort((a, b) =>
+                          const sortedCurPlayers = curPlayers?.sort((a, b) =>
                             a.type.localeCompare(b.type),
                           );
                           const isAlreadyPlaying =
@@ -176,7 +174,7 @@ function SelectBatsman({
                               <FormControl>
                                 <Checkbox
                                   className="sr-only"
-                                  checked={field.value?.includes(item.id)}
+                                  checked={field.value.includes(item.id)}
                                   onCheckedChange={(checked) => {
                                     if (isAlreadyPlaying && !isManualMode) {
                                       toast.info("Player is already playing", {
@@ -197,7 +195,7 @@ function SelectBatsman({
                                           item.id,
                                         ])
                                       : field.onChange(
-                                          field.value?.filter(
+                                          field.value.filter(
                                             (value) => value !== item.id,
                                           ),
                                         );
@@ -233,7 +231,8 @@ function SelectBatsman({
                   </FormItem>
                 )}
               />
-              <Button>Submit</Button>
+              {/* TODO: isPending state */}
+              <Button className="mt-4">{"" ? "Submitting" : "Submit"}</Button>
             </form>
           </Form>
         </div>

@@ -12,6 +12,7 @@ import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
 import { Separator } from "../ui/separator";
 import {
   calculatePlayerOfTheMatch,
+  calculateWinner,
   getOverStr,
   getScore,
   processTeamName,
@@ -20,23 +21,24 @@ import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { usePlayerById } from "@/apiHooks/player";
 
-interface MatchSummaryProps extends OverlayStateProps {
+interface MatchSummaryProps {
+  open: OverlayStateProps["open"];
   setShowScorecard: Dispatch<SetStateAction<boolean>>;
-
   teams: { name: string; playerIds: string[] }[];
   ballEvents: BallEvent[] | CreateBallEventSchema[];
-  isSecondInning: boolean;
-  totalPlayers: number;
+  handleUndo: () => void;
+  allowSinglePlayer: boolean;
+  matchBalls: number;
 }
 
 function MatchSummary({
   open,
-  setOpen,
-  isSecondInning,
   setShowScorecard,
   teams,
-  totalPlayers,
   ballEvents,
+  handleUndo,
+  allowSinglePlayer,
+  matchBalls,
 }: MatchSummaryProps) {
   const { setShowRunrateChart, setShowOverSummaries } = useStatsOpenContext();
 
@@ -46,35 +48,23 @@ function MatchSummary({
       .map((event) => event.type);
 
   const { runs: runs1 } = getScore(ballEventsbyTeam(0));
-  const { runs: runs2, wickets: wickets2 } = getScore(ballEventsbyTeam(1));
+  const {
+    runs: runs2,
+    wickets: wickets2,
+    totalBalls,
+  } = getScore(ballEventsbyTeam(1));
   const totalWickets = teams[1].playerIds.length;
 
-  function calculateWinner(
-    runs1: number,
-    runs2: number,
-    wickets2: number,
-    totalWickets: number,
-  ) {
-    let winInfo = "";
-    let winner;
-    if (runs1 > runs2) {
-      winInfo = `${processTeamName(teams[0].name)} won by ${runs1 - runs2} runs`;
-      winner = 0;
-    } else if (runs2 > runs1) {
-      winInfo = `${processTeamName(teams[1].name)} won by ${totalWickets - wickets2} wickets`;
-      winner = 1;
-    } else {
-      winInfo =
-        "Match Tied (Sorry for the inconvenience but we don't have super over feature yet)";
-      winner = -1;
-    }
-
-    return {
-      winInfo,
-      winner,
-    };
-  }
-  const { winInfo } = calculateWinner(runs1, runs2, wickets2, totalWickets);
+  const { winInfo } = calculateWinner({
+    allowSinglePlayer,
+    matchBalls,
+    runs1,
+    runs2,
+    teams: teams.map(({ name }) => name),
+    totalBalls,
+    totalWickets,
+    wickets2,
+  });
 
   const groupedEvents: Record<
     string,
@@ -129,51 +119,47 @@ function MatchSummary({
     };
   });
 
-  const playerOfTheMatch = calculatePlayerOfTheMatch({
-    playersPerformance,
-    totalOpponentPlayers: totalPlayers,
-  });
+  // TODO: Add winner factor
+  const playerOfTheMatch = calculatePlayerOfTheMatch({ playersPerformance });
 
   const { player } = usePlayerById(playerOfTheMatch.playerId);
 
   return (
     <Dialog open={open}>
       <DialogContent removeCloseButton>
-        <DialogHeader className="w-fit border-b pb-6">
+        <DialogHeader className="w-full flex-row items-center justify-between border-b pb-6">
           <DialogTitle>Match Summary</DialogTitle>
+
+          <Button variant="destructive" onClick={handleUndo}>
+            Undo
+          </Button>
         </DialogHeader>
 
-        {isSecondInning && (
-          <>
-            <div className="rounded-md bg-muted p-2">
-              <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
-                Player of the Match
-              </h4>
-              <p>
-                <strong>{player?.name ?? "Loading..."}</strong> (
-                {processTeamName(playerOfTheMatch.team)}) ·{" "}
-                {!!playerOfTheMatch.ballsBowled && (
-                  <>
-                    {" "}
-                    {playerOfTheMatch.wicketsTaken}/
-                    {playerOfTheMatch.runConceded} (
-                    {getOverStr(playerOfTheMatch.ballsBowled)})
-                  </>
-                )}
-                {!!playerOfTheMatch.ballsBowled &&
-                  !!playerOfTheMatch.ballsFaced &&
-                  " & "}
-                {!!playerOfTheMatch.ballsFaced && (
-                  <>
-                    {playerOfTheMatch.runConceded} (
-                    {playerOfTheMatch.ballsBowled})
-                  </>
-                )}
-              </p>
-            </div>
-            <Separator className="my-2" />
-          </>
-        )}
+        <div className="rounded-md bg-muted p-2">
+          <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
+            Player of the Match
+          </h4>
+          <p>
+            <strong>{player?.name ?? "Loading..."}</strong> (
+            {processTeamName(playerOfTheMatch.team)}) ·{" "}
+            {!!playerOfTheMatch.ballsBowled && (
+              <>
+                {" "}
+                {playerOfTheMatch.wicketsTaken}/{playerOfTheMatch.runConceded} (
+                {getOverStr(playerOfTheMatch.ballsBowled)})
+              </>
+            )}
+            {!!playerOfTheMatch.ballsBowled &&
+              !!playerOfTheMatch.ballsFaced &&
+              " & "}
+            {playerOfTheMatch.ballsFaced && (
+              <>
+                {playerOfTheMatch.runsScored} ({playerOfTheMatch.ballsFaced})
+              </>
+            )}
+          </p>
+        </div>
+        <Separator className="my-2" />
         <div className="space-y-2">
           {teams.map((team, i) => {
             const { runs, totalBalls, wickets } = getScore(
@@ -192,7 +178,7 @@ function MatchSummary({
             );
           })}
         </div>
-        {isSecondInning && <p>{winInfo}</p>}
+        <p>{winInfo}</p>
         <Separator className="my-2" />
         <div className="flex gap-2">
           <Button onClick={() => setShowScorecard(true)} className="w-full">
@@ -206,12 +192,8 @@ function MatchSummary({
           </Button>
         </div>
         <Separator className="my-2" />
-        <Button className="w-full" asChild>
-          {isSecondInning ? (
-            <Link href="/matches">Back & Finish</Link>
-          ) : (
-            <Button onClick={() => setOpen(false)}>Back</Button>
-          )}
+        <Button className="w-full" asChild variant="secondary">
+          <Link href="/matches">Back & Finish</Link>
         </Button>
       </DialogContent>
     </Dialog>

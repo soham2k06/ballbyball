@@ -3,7 +3,7 @@ import { CurPlayer } from "@prisma/client";
 
 import prisma from "@/lib/db/prisma";
 import { createMatchSchema, updateMatchSchema } from "@/lib/validation/match";
-import { validateUser } from "@/lib/utils";
+import { createWithUniqueName, validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -42,6 +42,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = validateUser();
+
     const body = await req.json();
     const parsedRes = createMatchSchema.safeParse(body);
 
@@ -50,14 +52,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" });
     }
 
-    const { name, teamIds, curTeam, overs, curPlayers } = parsedRes.data;
+    const { name, teamIds, curTeam, overs, curPlayers, allowSinglePlayer } =
+      parsedRes.data;
 
-    const userId = validateUser();
+    const newName = await createWithUniqueName(name, prisma.team);
 
     const match = await prisma.match.create({
       data: {
         userId,
-        name,
+        name: newName,
         matchTeams: {
           create: teamIds.map((teamId) => ({
             team: { connect: { id: teamId } },
@@ -66,6 +69,7 @@ export async function POST(req: NextRequest) {
         curPlayers,
         curTeam: curTeam ?? 0,
         overs,
+        allowSinglePlayer,
       },
       include: {
         matchTeams: { include: { team: true } },
@@ -75,12 +79,10 @@ export async function POST(req: NextRequest) {
 
     await prisma.team.updateMany({
       where: { id: { in: teamIds } },
-      data: {
-        matchId: match.id,
-      },
+      data: { matchId: match.id },
     });
 
-    return NextResponse.json({ match }, { status: 201 });
+    return NextResponse.json(match, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -102,23 +104,30 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid inputs" }, { status: 422 });
     }
 
-    const { id: matchId, curPlayers, curTeam, name, overs } = parsedRes.data;
+    const {
+      id: matchId,
+      curPlayers,
+      curTeam,
+      name,
+      overs,
+      strikeIndex,
+      hasEnded,
+    } = parsedRes.data;
 
-    if (!matchId) {
+    if (!matchId)
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
-    }
 
-    const curPlayersToSave = curPlayers?.filter(
-      (player) => player,
-    ) as CurPlayer[];
+    const newName = await createWithUniqueName(name ?? "", prisma.match);
 
     const updatedMatch = await prisma.match.update({
       where: { id: matchId },
       data: {
-        name,
+        name: newName,
         overs,
-        curPlayers: curPlayersToSave,
+        curPlayers: curPlayers as CurPlayer[],
         curTeam,
+        strikeIndex,
+        hasEnded,
       },
     });
 

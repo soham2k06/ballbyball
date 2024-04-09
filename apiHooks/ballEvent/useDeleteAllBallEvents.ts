@@ -10,7 +10,7 @@ export function useDeleteAllBallEvents() {
     mutationFn: deleteAllBallEventsAPI,
     onSuccess: () => {
       toast.success("Match Restarted! All ball events undone.");
-      queryClient.invalidateQueries({ queryKey: ["eventsByMatchId"] });
+      queryClient.invalidateQueries({ queryKey: ["matchById"] });
     },
     onError: (err) => toast.error(err.message),
   });

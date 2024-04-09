@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/db/prisma";
-import { validateUser } from "@/lib/utils";
+import { createWithUniqueName, validateUser } from "@/lib/utils";
 import { createTeamSchema } from "@/lib/validation/team";
 
 export async function GET(
@@ -17,7 +17,7 @@ export async function GET(
     });
 
     const teamSimplified = {
-      players: team?.teamPlayers.map((team) => team.player),
+      players: team?.teamPlayers.map((team) => team.player).reverse(),
       ...team,
     };
 
@@ -61,10 +61,12 @@ export async function PUT(
     if (team.userId !== userId)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const newName = await createWithUniqueName(name, prisma.team);
+
     await prisma.team.update({
       where: { id },
       data: {
-        name,
+        name: newName,
         teamPlayers: {
           deleteMany: {},
           create: playerIds.map((playerId: string) => ({

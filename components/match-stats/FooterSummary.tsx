@@ -20,15 +20,13 @@ function FooterSummary({
   curOverWickets,
   extras,
   runRate,
-  chartSummaryData,
-  overSummaries,
+  ballEvents,
 }: {
   curOverRuns: number;
   curOverWickets: number;
   extras: number;
   runRate: number;
-  chartSummaryData: { runs: number }[];
-  overSummaries: EventType[][];
+  ballEvents: EventType[];
 }) {
   return (
     <div className="flex w-full items-center justify-between rounded-md bg-muted p-2 text-lg text-muted-foreground">
@@ -56,7 +54,7 @@ function FooterSummary({
                 CRR: {runRate}
               </DrawerTitle>
             </DrawerHeader>
-            <OverStats chartSummaryData={chartSummaryData} />
+            <OverStats ballEvents={ballEvents} />
           </DrawerContent>
         </Drawer>
         <Drawer preventScrollRestoration>
@@ -71,7 +69,7 @@ function FooterSummary({
                 Overs Summary
               </DrawerTitle>
             </DrawerHeader>
-            <FullOverSummary overSummaries={overSummaries} />
+            <FullOverSummary ballEvents={ballEvents} />
           </DrawerContent>
         </Drawer>
       </div>

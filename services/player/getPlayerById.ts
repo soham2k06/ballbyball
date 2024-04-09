@@ -3,7 +3,7 @@ import { axiosInstance } from "../axiosInstance";
 
 export const getPlayerById = async (id: Player["id"] | null | undefined) => {
   try {
-    if (!id) throw new Error("Player not found");
+    if (!id || id === "dummy") throw new Error("Player not found");
 
     const res = await axiosInstance.get(`/players/${id}`);
     if (res.status !== 200) {

@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 import prisma from "@/lib/db/prisma";
 import { createTeamSchema } from "@/lib/validation/team";
-import { validateUser } from "@/lib/utils";
+import { createWithUniqueName, validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -14,9 +14,7 @@ export async function GET() {
     });
 
     const teamsSimplified = teams.map((team) => {
-      const players = team.teamPlayers
-        .map((teamPlayer) => teamPlayer.player)
-        .reverse();
+      const players = team.teamPlayers.map((teamPlayer) => teamPlayer.player);
 
       const { teamPlayers, ...playerWithoutTeamPlayers } = team;
 
@@ -47,10 +45,12 @@ export async function POST(req: NextRequest) {
 
     const { name, playerIds, captain } = parsedRes.data;
 
+    const newName = await createWithUniqueName(name, prisma.team);
+
     const team = await prisma.team.create({
       data: {
         userId,
-        name,
+        name: newName,
         teamPlayers: {
           create: playerIds.map((playerId: string) => ({
             player: { connect: { id: playerId } },
