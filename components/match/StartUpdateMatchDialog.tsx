@@ -261,9 +261,9 @@ function StartUpdateMatchDialog({
         {(form.watch("teamIds")?.length ?? 0) >= 2 && (
           <>
             {containsSamePlayer &&
-              "Both teams can't have same player, please check and try again."}
+              "Both teams can't have same player, please look into it."}
             {isDifferentPlayerLengthTeams &&
-              "Both teams should have same number of players, please check and try again."}
+              "Both teams should have same number of players, please look into it."}
           </>
         )}
       </DialogContent>
