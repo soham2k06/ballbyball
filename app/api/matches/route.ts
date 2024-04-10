@@ -122,7 +122,7 @@ export async function PUT(req: NextRequest) {
     const updatedMatch = await prisma.match.update({
       where: { id: matchId },
       data: {
-        name: newName,
+        name: newName || name,
         overs,
         curPlayers: curPlayers as CurPlayer[],
         curTeam,
