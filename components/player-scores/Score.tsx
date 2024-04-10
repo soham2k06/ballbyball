@@ -208,7 +208,9 @@ function Score({
                   <TableCell>{isBowlingScore ? wickets : fours}</TableCell>
                   <TableCell>{isBowlingScore ? runs : sixes}</TableCell>
                   <TableCell>
-                    {runRate * (!isBowlingScore ? 100 / 6 : 1)}
+                    {Math.round(
+                      runRate * (!isBowlingScore ? 100 / 6 : 1) * 10,
+                    ) / 10}
                   </TableCell>
                 </TableRow>
               </>
