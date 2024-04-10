@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
 import { BallEvent, CurPlayer } from "@prisma/client";
-import { BarChartBig, ListOrdered } from "lucide-react";
+import { BarChartBig, LineChart, ListOrdered } from "lucide-react";
 
 import { EventType, MatchExtended } from "@/types";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
@@ -9,7 +9,7 @@ import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
 import { TypographyH2, TypographyP } from "../ui/typography";
 import { Button } from "../ui/button";
-import { Drawer, DrawerContent } from "../ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
 
 import { SelectBowler, SelectBatsman } from "../players-selection";
 import OverStats from "./OverStats";
@@ -18,6 +18,7 @@ import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
 import { useSaveBallEvents } from "@/apiHooks/ballEvent";
 import { useUpdateMatch } from "@/apiHooks/match";
 import StatsDrawerHeader from "./StatsDrawerHeader";
+import WormChart from "./WormChart";
 
 interface StatsAndSettingsProps {
   runRate: number;
@@ -41,6 +42,8 @@ function StatsAndSettings({
     showRunrateChart,
     setShowOverSummaries,
     showOverSummaries,
+    showWormChart,
+    setShowWormChart,
   } = useStatsOpenContext();
 
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
@@ -162,19 +165,28 @@ function StatsAndSettings({
             Stats
           </TypographyP>
 
-          <Button
-            className="mb-2 w-full space-x-2"
-            onClick={() => setShowRunrateChart(true)}
-          >
-            <BarChartBig /> <span>Run rate chart</span>
-          </Button>
-          <Button
-            className="w-full space-x-2"
-            onClick={() => setShowOverSummaries(true)}
-          >
-            <ListOrdered />
-            <span>Over Summaries</span>
-          </Button>
+          <div className="space-y-2">
+            <Button
+              className="w-full space-x-2"
+              onClick={() => setShowWormChart(true)}
+            >
+              <LineChart />
+              <span>Worm Chart</span>
+            </Button>
+            <Button
+              className="w-full space-x-2"
+              onClick={() => setShowRunrateChart(true)}
+            >
+              <BarChartBig /> <span>Run rate chart</span>
+            </Button>
+            <Button
+              className="w-full space-x-2"
+              onClick={() => setShowOverSummaries(true)}
+            >
+              <ListOrdered />
+              <span>Over Summaries</span>
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
       <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
@@ -197,6 +209,17 @@ function StatsAndSettings({
             setSelectedTeam={setSelectedTeam}
           />
           <FullOverSummary ballEvents={ballEventsArr[selectedTeam.index]} />
+        </DrawerContent>
+      </Drawer>
+      <Drawer open={showWormChart} onOpenChange={setShowWormChart}>
+        <DrawerContent>
+          <DrawerHeader className="mb-2 pb-4 pt-6">
+            <DrawerTitle className="text-center text-2xl">
+              {/* TODO: Show runs of both teams */}
+              CRR: {runRate}
+            </DrawerTitle>
+          </DrawerHeader>
+          <WormChart ballEvents={ballEventsArr} teams={match.teams} />
         </DrawerContent>
       </Drawer>
     </>

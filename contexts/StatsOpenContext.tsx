@@ -15,18 +15,23 @@ interface StatsOpenContextProps {
   setShowRunrateChart: SetOpenType;
   showOverSummaries: boolean;
   setShowOverSummaries: SetOpenType;
+  showWormChart: boolean;
+  setShowWormChart: SetOpenType;
 }
 
 const StatsOpenContext = createContext<StatsOpenContextProps>({
   showRunrateChart: false,
   showOverSummaries: false,
+  showWormChart: false,
   setShowRunrateChart: () => {},
   setShowOverSummaries: () => {},
+  setShowWormChart: () => {},
 });
 
 function StatsOpenProvider({ children }: { children: React.ReactNode }) {
   const [showRunrateChart, setShowRunrateChart] = useState(false);
   const [showOverSummaries, setShowOverSummaries] = useState(false);
+  const [showWormChart, setShowWormChart] = useState(false);
 
   return (
     <StatsOpenContext.Provider
@@ -35,6 +40,8 @@ function StatsOpenProvider({ children }: { children: React.ReactNode }) {
         setShowRunrateChart,
         showOverSummaries,
         setShowOverSummaries,
+        showWormChart,
+        setShowWormChart,
       }}
     >
       {children}
