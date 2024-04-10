@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 
 import DangerActions from "./DangerActions";
 import BallSummary from "./BallSummary";
-import ScoreButtons from "./ScoreButtons";
+import ScoreButtons from "../score-buttons/ScoreButtons";
 import FooterSummary from "../match-stats/FooterSummary";
 import ScoreWrapper from "./ScoreDisplay";
 

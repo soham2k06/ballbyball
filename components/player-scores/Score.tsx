@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { wicketTypes } from "../scorer/WicketPopover";
+import { wicketTypes } from "../score-buttons/WicketPopover";
 
 function Score({
   players,
