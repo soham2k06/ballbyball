@@ -19,6 +19,7 @@ import { useSaveBallEvents } from "@/apiHooks/ballEvent";
 import { useUpdateMatch } from "@/apiHooks/match";
 import StatsDrawerHeader from "./StatsDrawerHeader";
 import WormChart from "./WormChart";
+import { getOverStr, getScore } from "@/lib/utils";
 
 interface StatsAndSettingsProps {
   runRate: number;
@@ -71,6 +72,18 @@ function StatsAndSettings({
     .map((event) => event.type as EventType);
 
   const ballEventsArr = [fTeamEvents, sTeamEvents];
+
+  const {
+    runs: runs1,
+    totalBalls: totalBalls1,
+    wickets: wickets1,
+  } = getScore(fTeamEvents);
+
+  const {
+    runs: runs2,
+    totalBalls: totalBalls2,
+    wickets: wickets2,
+  } = getScore(sTeamEvents);
 
   const { createBallEvent } = useSaveBallEvents();
   const { updateMatch } = useUpdateMatch();
@@ -214,9 +227,14 @@ function StatsAndSettings({
       <Drawer open={showWormChart} onOpenChange={setShowWormChart}>
         <DrawerContent>
           <DrawerHeader className="mb-2 pb-4 pt-6">
-            <DrawerTitle className="text-center text-2xl">
-              {/* TODO: Show runs of both teams */}
-              CRR: {runRate}
+            <DrawerTitle className="space-x-4 text-center text-2xl">
+              <span className="text-sm text-muted-foreground">
+                {curTeam.name} {runs1}/{wickets1} ({getOverStr(totalBalls1)})
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {opposingTeam.name} {runs2}/{wickets2} (
+                {getOverStr(totalBalls2)})
+              </span>
             </DrawerTitle>
           </DrawerHeader>
           <WormChart ballEvents={ballEventsArr} teams={match.teams} />

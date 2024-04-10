@@ -1,4 +1,4 @@
-import { calcRuns, generateOverSummary } from "@/lib/utils";
+import { generateOverSummary, getScore } from "@/lib/utils";
 import { EventType } from "@/types";
 import { Team } from "@prisma/client";
 import {
@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 function WormChart({
   ballEvents,
@@ -21,32 +22,56 @@ function WormChart({
   const { overSummaries } = generateOverSummary(ballEvents[0]);
   const { overSummaries: overSummaries2 } = generateOverSummary(ballEvents[1]);
 
-  const team1Data = overSummaries.map((summary) => calcRuns(summary));
-  const team2Data = overSummaries2.map((summary) => calcRuns(summary));
+  const team1Score = overSummaries.map((summary) => {
+    const { runs, wickets } = getScore(summary);
+    return {
+      runs,
+      wickets,
+    };
+  });
+  const team2Score = overSummaries2.map((summary) => {
+    const { runs, wickets } = getScore(summary);
+    return {
+      runs,
+      wickets,
+    };
+  });
 
-  const combineData = (team1Data: number[], team2Data: number[]) => {
-    const maxOvers = Math.max(team1Data.length, team2Data.length);
+  const combineData = (
+    team1Score: { runs: number; wickets: number }[],
+    team2Score: { runs: number; wickets: number }[],
+  ) => {
+    const maxOvers = Math.max(team1Score.length, team2Score.length);
     const data = [];
 
-    let team1Total = 0;
-    let team2Total = 0;
+    let team1TotalRuns = 0;
+    let team2TotalRuns = 0;
+
+    let team1TotalWickets = 0;
+    let team2TotalWickets = 0;
 
     for (let i = 0; i < maxOvers; i++) {
-      const team1Runs = i < team1Data.length ? team1Data[i] : null;
-      const team2Runs = i < team2Data.length ? team2Data[i] : null;
+      const aggrTeam1Score = i < team1Score.length ? team1Score[i] : null;
+      const aggrTeam2Runs = i < team2Score.length ? team2Score[i] : null;
 
-      if (team1Runs !== null) {
-        team1Total += team1Runs;
+      if (aggrTeam1Score !== null) {
+        team1TotalRuns += aggrTeam1Score.runs;
+        team1TotalWickets += aggrTeam1Score.wickets;
       }
 
-      if (team2Runs !== null) {
-        team2Total += team2Runs;
+      if (aggrTeam2Runs !== null) {
+        team2TotalRuns += aggrTeam2Runs.runs;
+        team2TotalWickets += aggrTeam2Runs.wickets;
       }
 
       data.push({
         over: i + 1,
-        [teams[0].name]: team1Runs !== null ? team1Total : null,
-        [teams[1].name]: team2Runs !== null ? team2Total : null,
+        [teams[0].name]: aggrTeam1Score !== null ? team1TotalRuns : null,
+        [teams[1].name]: aggrTeam2Runs !== null ? team2TotalRuns : null,
+        wickets: {
+          [teams[0].name]: team1TotalWickets,
+          [teams[1].name]: team2TotalWickets,
+        },
       });
     }
 
@@ -58,8 +83,12 @@ function WormChart({
       over: "",
       [teams[0].name]: 0,
       [teams[1].name]: 0,
+      wickets: {
+        [teams[0].name]: 0,
+        [teams[1].name]: 0,
+      },
     },
-    ...combineData(team1Data, team2Data),
+    ...combineData(team1Score, team2Score),
   ];
 
   return (
@@ -73,7 +102,38 @@ function WormChart({
         >
           <XAxis dataKey="over" />
           <YAxis />
-          <Tooltip wrapperClassName="!bg-background !border-muted rounded-md" />
+          <Tooltip
+            // wrapperClassName="!bg-background !border-muted rounded-md"
+            content={({ payload, label }) => {
+              const wickets = payload?.map(
+                (payload) => payload.payload.wickets,
+              )[0];
+
+              return (
+                <Card>
+                  <CardContent>
+                    <CardTitle className="mb-2 text-lg">Over {label}</CardTitle>
+                    <div className="text-sm font-semibold text-muted-foreground">
+                      {payload?.[0] && (
+                        <>
+                          {payload?.[0].name} {payload?.[0].value}/
+                          {wickets?.[payload?.[0].name || ""]}
+                        </>
+                      )}
+                    </div>
+                    <div className="text-sm font-semibold text-muted-foreground">
+                      {payload?.[1] && (
+                        <>
+                          {payload?.[1].name} {payload?.[1].value}/
+                          {wickets?.[payload?.[1]?.name || ""]}
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }}
+          />
           <Legend />
           <Line
             type="monotone"
