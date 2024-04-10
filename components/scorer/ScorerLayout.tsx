@@ -32,7 +32,7 @@ import { SelectBatsman, SelectBowler } from "@/components/players-selection";
 import DangerActions from "./DangerActions";
 import ScoreDisplay from "./ScoreDisplay";
 import BallSummary from "./BallSummary";
-import ScoreButtons from "./ScoreButtons";
+import ScoreButtons from "../score-buttons/ScoreButtons";
 import BowlerScores from "./BowlerScores";
 import BatsmanScores from "./BatsmanScores";
 import Tools from "../match-stats/Tools";

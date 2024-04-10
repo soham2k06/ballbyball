@@ -6,6 +6,7 @@ import { CardContent } from "../ui/card";
 import NoballPopver from "./NoballPopver";
 import WicketPopover from "./WicketPopover";
 import { ballEvents } from "@/lib/constants";
+import ManualScorePopover from "./ManualScorePopover";
 
 function ScoreButtons({
   handleScore,
@@ -59,7 +60,7 @@ function ScoreButtons({
         </Button>
       </div>
       <div className="flex w-full justify-center gap-2">
-        {["0", "1", "2", "3"].map((event, i) => (
+        {["0", "1", "2"].map((event, i) => (
           <Button
             key={i}
             variant="secondary"
@@ -70,6 +71,7 @@ function ScoreButtons({
             {event}
           </Button>
         ))}
+        <ManualScorePopover handleScore={handleScore} />
       </div>
     </CardContent>
   );
