@@ -178,30 +178,27 @@ function calculatePlayerOfTheMatch({
     runConceded: 0,
     ballsBowled: 0,
     team: "",
+    isWinner: false,
   };
 
-  const wicketPoint = 20;
+  const WICKET_POINT = 20;
+  const STRIKE_RATE_POINT = 1;
+  const WINNER_POINT = 1.25;
 
   playersPerformance.forEach((player) => {
     const strikeRate = (player.runsScored / player.ballsFaced) * 100;
 
     const performanceScore =
-      player.runsScored * 1 + player.wicketsTaken * wicketPoint;
+      player.runsScored + player.wicketsTaken * WICKET_POINT;
 
     const adjustedPerformanceScore =
-      performanceScore * ((strikeRate || 100) / 100);
+      performanceScore *
+      (((strikeRate || 100) / 100) * STRIKE_RATE_POINT) *
+      (player.isWinner ? WINNER_POINT : 1);
 
     if (adjustedPerformanceScore > bestPerformance) {
       bestPerformance = adjustedPerformanceScore;
-      playerOfTheMatch = {
-        playerId: player.playerId,
-        runsScored: player.runsScored,
-        ballsFaced: player.ballsFaced,
-        runConceded: player.runConceded,
-        wicketsTaken: player.wicketsTaken,
-        ballsBowled: player.ballsBowled,
-        team: player.team,
-      };
+      playerOfTheMatch = player;
     }
   });
 
@@ -242,10 +239,7 @@ function calculateWinner({
     winner = -1;
   }
 
-  return {
-    winInfo,
-    winner,
-  };
+  return { winInfo, winner };
 }
 
 // ** Backend

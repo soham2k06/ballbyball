@@ -16,6 +16,7 @@ type PlayerPerformance = {
   ballsBowled: number;
   wicketsTaken: number;
   team: string;
+  isWinner: boolean;
 };
 
 // ** Schema relations types

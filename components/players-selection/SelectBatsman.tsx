@@ -22,6 +22,8 @@ import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 
 import PlayerLabel from "./PlayerLabel";
+import LoadingButton from "../ui/loading-button";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SelectBatsmanProps {
   open: boolean;
@@ -81,6 +83,10 @@ function SelectBatsman({
     ?.filter((event) => event.type.includes("-1"))
     .map((event) => event.batsmanId);
 
+  const queryClient = useQueryClient();
+
+  const isPending = !!queryClient.isMutating({ mutationKey: ["updateMatch"] });
+
   const { handleSubmit, control, getValues, watch, reset } = form;
 
   const players = team?.players;
@@ -125,8 +131,6 @@ function SelectBatsman({
   }, [watch("playerIds")]);
 
   // TODO: Fix strike after out
-  // TODO: Openable manually // DONE
-  // TODO: New reusable component for player label // DONE
 
   return (
     <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
@@ -231,8 +235,9 @@ function SelectBatsman({
                   </FormItem>
                 )}
               />
-              {/* TODO: isPending state */}
-              <Button className="mt-4">{"" ? "Submitting" : "Submit"}</Button>
+              <LoadingButton loading={isPending} disabled={isPending}>
+                {isPending ? "Submitting" : "Submit"}
+              </LoadingButton>
             </form>
           </Form>
         </div>

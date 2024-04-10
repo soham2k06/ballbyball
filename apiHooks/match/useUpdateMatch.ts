@@ -7,6 +7,7 @@ export function useUpdateMatch() {
 
   const { mutate: updateMatch, isPending } = useMutation({
     mutationFn: updateMatchAPI,
+    mutationKey: ["updateMatch"],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["matchById"] });
       queryClient.invalidateQueries({ queryKey: ["allMatches"] });

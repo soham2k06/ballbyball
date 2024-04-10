@@ -444,10 +444,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           playerId={curPlayers.find((player) => player.type === "bowler")?.id!}
           events={events as BallEvent[]}
         />
-        {/* TODO:
-         Create a single component and include both selection below
-         - Create a hook to tackle on submit
-         */}
         <SelectBatsman
           open={showSelectBatsman}
           setOpen={setShowSelectBatsman}

@@ -20,6 +20,8 @@ import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import LoadingButton from "../ui/loading-button";
 
 interface SelectBowlerProps {
   open: boolean;
@@ -62,6 +64,10 @@ function SelectBowler({
     },
   });
 
+  const queryClient = useQueryClient();
+
+  const isPending = !!queryClient.isMutating({ mutationKey: ["updateMatch"] });
+
   const { handleSubmit, watch, reset } = form;
 
   function onSubmit(data: z.infer<typeof schema>) {
@@ -95,9 +101,6 @@ function SelectBowler({
   }, [watch("playerId")]);
 
   // TODO: Bowled last over
-  // TODO: Update isModified state on submit
-  // TODO: Openable manually
-  // TODO: New reusable component for player label
 
   return (
     <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
@@ -164,8 +167,9 @@ function SelectBowler({
                   </FormItem>
                 )}
               />
-              {/* TODO: isPending state */}
-              <Button>{false ? "Submitting" : "Submit"}</Button>
+              <LoadingButton loading={isPending} disabled={isPending}>
+                {isPending ? "Submitting" : "Submit"}
+              </LoadingButton>
             </form>
           </Form>
         </div>

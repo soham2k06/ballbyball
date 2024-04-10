@@ -55,7 +55,7 @@ function MatchSummary({
   } = getScore(ballEventsbyTeam(1));
   const totalWickets = teams[1].playerIds.length;
 
-  const { winInfo } = calculateWinner({
+  const { winInfo, winner } = calculateWinner({
     allowSinglePlayer,
     matchBalls,
     runs1,
@@ -116,6 +116,7 @@ function MatchSummary({
         teams.find(({ playerIds }) =>
           playerIds.includes(playerId) ? playerIds : null,
         )?.name ?? "Loading...",
+      isWinner: teams[winner].playerIds.includes(playerId),
     };
   });
 
