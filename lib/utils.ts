@@ -28,7 +28,7 @@ const calcRuns = (ballEvents: EventType[] | string[], forPlayer?: boolean) =>
     ?.map((event) =>
       event.includes("-3")
         ? (Number(event.slice(2)) + Number(!forPlayer)).toString()
-        : event.replace("-2", "1").slice(-1),
+        : event.replace("-2", "1").replace("-4", "0").slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 

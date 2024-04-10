@@ -59,7 +59,7 @@ function ScoreButtons({
         </Button>
       </div>
       <div className="flex w-full justify-center gap-2">
-        {["0", "1", "2", "3"].map((event, i) => (
+        {["0", "1", "2", "-4"].map((event, i) => (
           <Button
             key={i}
             variant="secondary"

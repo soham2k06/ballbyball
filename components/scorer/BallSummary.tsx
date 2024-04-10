@@ -1,5 +1,4 @@
 import { cva } from "class-variance-authority";
-import { Dot } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { EventType } from "@/types";
@@ -20,6 +19,7 @@ function BallSummary({
         variant: {
           default: "bg-muted",
           "0": "bg-muted text-muted-foreground flex justify-center items-center",
+          "-4": "bg-muted text-muted-foreground flex justify-center items-center", // Manual Strike change without runs
           "1": "bg-muted text-primary",
           "2": "bg-muted text-primary",
           "3": "bg-muted text-primary",
@@ -42,11 +42,15 @@ function BallSummary({
 
   switch (event) {
     case "0":
+    case "-4":
       summaryToShow = (
-        <Dot
-          size={size === "sm" ? 20 : 32}
-          strokeWidth={6}
-          className="text-muted-foreground"
+        <span
+          className={cn("bg-muted-foreground", {
+            "size-3": size === "sm",
+            "size-4": size === "default",
+            "rounded-full": event === "0",
+            "rounded-[2px]": event === "-4",
+          })}
         />
       );
       break;
