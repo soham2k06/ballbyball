@@ -24,6 +24,7 @@ import { TypographyH3 } from "../ui/typography";
 import PlayerLabel from "./PlayerLabel";
 import LoadingButton from "../ui/loading-button";
 import { useQueryClient } from "@tanstack/react-query";
+import { processTeamName } from "@/lib/utils";
 
 interface SelectBatsmanProps {
   open: boolean;
@@ -137,7 +138,9 @@ function SelectBatsman({
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <TypographyH3>Select Batsman - {team?.name}</TypographyH3>
+            <TypographyH3>
+              Select Batsman - {processTeamName(team?.name ?? "")}
+            </TypographyH3>
             {!!curPlayers.length && (
               <Button
                 variant={isManualMode ? "ghost" : "destructive"}
