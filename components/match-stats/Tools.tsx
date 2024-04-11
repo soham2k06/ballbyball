@@ -18,7 +18,7 @@ import { processTeamName } from "@/lib/utils";
 
 interface ToolsProps {
   runRate: number;
-  match: MatchExtended;
+  match: MatchExtended | undefined;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
@@ -35,13 +35,11 @@ function Tools({
   showScorecard,
   setShowScorecard,
 }: ToolsProps) {
-  if (!match || !match.teams) return <p>loading...</p>;
-
   const processConditionally = (name: string) =>
     name.length > 10 ? processTeamName(name) : name;
 
-  const team1Name = processConditionally(match?.teams[0]?.name);
-  const team2Name = processConditionally(match?.teams[1]?.name);
+  const team1Name = processConditionally(match?.teams[0]?.name ?? "");
+  const team2Name = processConditionally(match?.teams[1]?.name ?? "");
 
   return (
     <div className="flex w-full items-center gap-2 text-lg text-muted-foreground">

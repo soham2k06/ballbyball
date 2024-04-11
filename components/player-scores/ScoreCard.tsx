@@ -9,11 +9,13 @@ import { ScrollArea } from "../ui/scroll-area";
 import Score from "./Score";
 
 interface ScorecardProps {
-  match: MatchExtended;
+  match: MatchExtended | undefined;
   ballEvents: BallEvent[];
 }
 
 function Scorecard({ match, ballEvents }: ScorecardProps) {
+  if (!match) return null;
+
   const teams = match.teams;
 
   const curTeam = match.curTeam;
@@ -78,8 +80,6 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
       content: <Score {...getScoreProps(firstBattingTeam.players, 1, true)} />,
     },
   ];
-
-  if (!teams) return <p>loading...</p>;
 
   return (
     <Tabs defaultValue="1-bat">

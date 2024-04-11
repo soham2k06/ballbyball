@@ -58,7 +58,7 @@ function BatsmanScores({
 
           if (!player)
             return (
-              <Skeleton key={id} className="h-[44px] w-full bg-foreground/10" />
+              <Skeleton key={id} className="h-5 w-full bg-foreground/10" />
             );
 
           return (

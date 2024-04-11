@@ -50,7 +50,7 @@ function BowlerScores({ playerId, events }: BowlerScoresProps) {
           </div>
         </div>
       ) : (
-        <Skeleton className="h-[22px] w-full bg-foreground/10" />
+        <Skeleton className="h-5 w-full bg-foreground/10" />
       )}
     </div>
   );

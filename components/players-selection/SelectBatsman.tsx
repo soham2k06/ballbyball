@@ -38,7 +38,7 @@ interface SelectBatsmanProps {
     players?: Player[];
   };
   handleSelectPlayer: (payload: CurPlayer[], onSuccess?: () => void) => void;
-  allowSinglePlayer: boolean;
+  allowSinglePlayer: boolean | undefined;
 }
 
 interface SelectBatsmanForm {
