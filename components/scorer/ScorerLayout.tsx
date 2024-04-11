@@ -33,8 +33,8 @@ import DangerActions from "./DangerActions";
 import ScoreDisplay from "./ScoreDisplay";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "../score-buttons/ScoreButtons";
-import BowlerScores from "./BowlerScores";
-import BatsmanScores from "./BatsmanScores";
+import BowlerScores from "../player-scores/BowlerScores";
+import BatsmanScores from "../player-scores/BatsmanScores";
 import Tools from "../match-stats/Tools";
 import FieldersDialog from "./FieldersDialog";
 import MatchSummary from "./MatchSummary";
@@ -417,33 +417,37 @@ function ScorerLayout({ matchId }: { matchId: string }) {
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
           </ul>
-          <BatsmanScores
-            onStrikeBatsman={onStrikeBatsman}
-            playerIds={
-              curPlayers
-                .filter(({ type }) => type === "batsman")
-                ?.map(({ id }) => id)!
-            }
-            events={events as BallEvent[]}
-          />
-          <Tools
-            runRate={runRate}
-            curPlayers={curPlayers}
-            setCurPlayers={setCurPlayers}
-            events={events}
-            match={match}
-            showScorecard={showScorecard}
-            setShowScorecard={setShowScorecard}
-          />
         </CardContent>
         <Separator className="my-4 sm:my-4" />
-        <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
-        <Separator className="my-4 sm:my-4" />
 
+        <BatsmanScores
+          onStrikeBatsman={onStrikeBatsman}
+          playerIds={
+            curPlayers
+              .filter(({ type }) => type === "batsman")
+              ?.map(({ id }) => id)!
+          }
+          events={events as BallEvent[]}
+        />
+        <div className="my-4" />
         <BowlerScores
           playerId={curPlayers.find((player) => player.type === "bowler")?.id!}
           events={events as BallEvent[]}
         />
+        <Separator className="my-3" />
+        <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
+        <div className="my-4" />
+        <Tools
+          runRate={runRate}
+          curPlayers={curPlayers}
+          setCurPlayers={setCurPlayers}
+          events={events}
+          match={match}
+          showScorecard={showScorecard}
+          setShowScorecard={setShowScorecard}
+        />
+
+        {/* DIALOGS */}
         <SelectBatsman
           open={showSelectBatsman}
           setOpen={setShowSelectBatsman}

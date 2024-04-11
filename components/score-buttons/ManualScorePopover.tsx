@@ -59,7 +59,7 @@ function ManualScorePopover({
       <PopoverTrigger asChild>
         <Button
           variant="secondary"
-          className="h-20 w-full text-lg text-muted-foreground"
+          className="size-20 w-full text-lg text-muted-foreground"
           value="-4"
         >
           {isPopoverOpen ? (

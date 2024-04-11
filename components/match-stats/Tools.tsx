@@ -44,7 +44,7 @@ function Tools({
   const team2Name = processConditionally(match?.teams[1]?.name);
 
   return (
-    <div className="flex w-full items-center gap-2 rounded-md bg-muted p-2 text-lg text-muted-foreground">
+    <div className="flex w-full items-center gap-2 text-lg text-muted-foreground">
       <StatsAndSettings
         runRate={runRate}
         events={events}
