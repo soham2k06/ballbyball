@@ -13,10 +13,10 @@ function ScoreDisplay({
   wickets: number;
   totalBalls: number;
   runRate: number;
-  curTeam: string | undefined;
+  curTeam?: string;
 }) {
   return (
-    <div className="relative flex items-end justify-center pb-4 pt-12">
+    <div className="relative flex items-end justify-center pb-2 pt-12">
       <TypographyH2 className="absolute left-0">
         {processTeamName(curTeam ?? "TEAM 1")}
       </TypographyH2>
