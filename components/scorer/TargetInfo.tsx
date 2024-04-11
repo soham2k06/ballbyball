@@ -42,7 +42,7 @@ function TargetInfo({
       <div
         onClick={toggleContent}
         className={cn(
-          "w-fit cursor-pointer text-sm font-semibold text-muted-foreground transition-opacity duration-500",
+          "cursor-pointer text-center text-sm font-semibold text-muted-foreground transition-opacity duration-500",
           {
             "opacity-0": !showTarget,
           },
@@ -54,7 +54,7 @@ function TargetInfo({
       <div
         onClick={toggleContent}
         className={cn(
-          "absolute top-0 w-fit cursor-pointer text-sm font-semibold text-muted-foreground transition-opacity duration-500",
+          "absolute left-1/2 top-0 -translate-x-1/2 cursor-pointer text-center text-sm font-semibold text-muted-foreground transition-opacity duration-500",
           {
             "opacity-0": showTarget,
           },
