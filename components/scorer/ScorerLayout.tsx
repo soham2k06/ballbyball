@@ -254,17 +254,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
     if (!wicketType.isOtherPlayerInvolved) {
       setShowSelectBatsman(true);
-      switch (wicketType.id) {
-        case 1:
-          eventToAdd = "-1";
-          break;
-        case 2:
-          eventToAdd = "-1_2";
-          break;
-        case 4:
-          eventToAdd = "-1_4";
-          break;
-      }
+      if (wicketType.id === 1) eventToAdd = `-1`;
+      eventToAdd = `-1_${wicketType.id}`;
 
       handleScore({
         currentTarget: { value: eventToAdd },
