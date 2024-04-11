@@ -5,6 +5,7 @@ const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without ru
 const invalidBalls = ["-3", "-2"];
 
 export const ballEvents: Record<EventType, string> = {
+  "-4": "0",
   "-3": "NB",
   "-2": "WD",
   "-1": "W",
