@@ -3,6 +3,7 @@ import { BallEvent, Player } from "@prisma/client";
 import { usePlayerById } from "@/apiHooks/player";
 import { calcRuns, getBattingStats, getIsInvalidBall } from "@/lib/utils";
 import { EventType } from "@/types";
+import { Skeleton } from "../ui/skeleton";
 
 interface BatsmanScoresProps {
   onStrikeBatsman: number;
@@ -22,15 +23,13 @@ function BatsmanScores({
   return (
     <div className="flex w-full flex-col justify-between gap-1 rounded-md bg-muted p-2 text-lg">
       <div className="flex border-b border-muted-foreground/20 pb-1 text-sm font-bold text-muted-foreground">
-        <div className="mr-4 w-full max-w-28 text-[13px] uppercase">
-          batting
-        </div>
+        <th className="mr-4 w-full max-w-28 text-[13px] uppercase">batting</th>
         <div className="grid w-full grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 text-xs">
-          <div className="text-center">R</div>
-          <div className="text-center">B</div>
-          <div className="text-center">4s</div>
-          <div className="text-center">6s</div>
-          <div className="min-w-8 text-center">SR</div>
+          <th className="text-center">R</th>
+          <th className="text-center">B</th>
+          <th className="text-center">4s</th>
+          <th className="text-center">6s</th>
+          <th className="min-w-8 text-center">SR</th>
         </div>
       </div>
       {playerIds.map((id, i) => {
@@ -55,23 +54,20 @@ function BatsmanScores({
 
         const { fours, sixes } = getBattingStats(legalEvents);
 
-        if (!player) return;
+        if (!player)
+          return <Skeleton className="h-[22px] w-full bg-foreground/10" />;
 
         return (
           <div key={player.id} className="flex items-center text-sm">
-            <div className="mr-4 w-full max-w-28 truncate text-[13px] font-bold">
+            <td className="mr-4 w-full max-w-28 truncate text-[13px] font-bold">
               {player.name}
               {isOnStrike && " **"}
-            </div>
+            </td>
             <div className="grid w-full grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
-              <div className="text-center text-xs tabular-nums">
-                {totalRuns}
-              </div>
-              <div className="text-center text-xs tabular-nums">
-                {totalBalls}
-              </div>
-              <div className="text-center text-xs tabular-nums">{fours}</div>
-              <div className="text-center text-xs tabular-nums">{sixes}</div>
+              <td className="text-center text-xs tabular-nums">{totalRuns}</td>
+              <td className="text-center text-xs tabular-nums">{totalBalls}</td>
+              <td className="text-center text-xs tabular-nums">{fours}</td>
+              <td className="text-center text-xs tabular-nums">{sixes}</td>
               <div className="min-w-8 text-center text-xs tabular-nums">
                 {222.2 || strikeRate}
               </div>
