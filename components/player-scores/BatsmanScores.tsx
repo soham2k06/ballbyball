@@ -23,7 +23,9 @@ function BatsmanScores({
   return (
     <div className="flex w-full flex-col justify-between gap-1 rounded-md bg-muted p-2 text-lg">
       <div className="flex border-b border-muted-foreground/20 pb-1 text-sm font-bold text-muted-foreground">
-        <th className="mr-4 w-full max-w-28 text-[13px] uppercase">batting</th>
+        <th className="mr-4 w-full max-w-28 text-left text-[13px] uppercase">
+          batting
+        </th>
         <div className="grid w-full grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 text-xs">
           <th className="text-center">R</th>
           <th className="text-center">B</th>
