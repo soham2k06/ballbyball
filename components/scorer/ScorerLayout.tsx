@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 import { BallEvent, CurPlayer } from "@prisma/client";
 import { toast } from "sonner";
-import { FileSearch } from "lucide-react";
 
 import { EventType } from "@/types";
 
