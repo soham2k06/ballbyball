@@ -84,13 +84,13 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
   return (
     <Tabs defaultValue="1-bat">
       <div className="px-2">
-        <TabsList className="divide-x divide-foreground/40 px-0 max-md:w-full">
+        <TabsList className="justify-normal divide-x divide-foreground/40 px-0 max-md:w-full">
           {tabs.map((tab, i) => (
-            <div className="px-1">
+            <div className="w-full px-1">
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="px-2 text-sm"
+                className="px-2 text-xs font-semibold md:text-sm"
                 disabled={
                   !!hasYetToBatTeam &&
                   (hasYetToBatTeam * 2 === i || hasYetToBatTeam * 2 === i - 1)
