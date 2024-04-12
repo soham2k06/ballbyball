@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { cn, processTeamName } from "@/lib/utils";
+import { processTeamName } from "@/lib/utils";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {
@@ -13,7 +13,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "../ui/form";
 import { Button } from "../ui/button";
@@ -22,6 +21,7 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import LoadingButton from "../ui/loading-button";
+import PlayerLabel from "./PlayerLabel";
 
 interface SelectBowlerProps {
   open: boolean;
@@ -103,7 +103,7 @@ function SelectBowler({
   // TODO: Bowled last over
 
   return (
-    <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
+    <Dialog open={true} onOpenChange={isManualMode ? setOpen : undefined}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
@@ -123,8 +123,7 @@ function SelectBowler({
             )}
           </div>
           <Form {...form}>
-            {/* TODO: Search field HERE to filter players */}
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="playerId"
@@ -134,8 +133,9 @@ function SelectBowler({
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        className="h-96 overflow-auto"
                       >
-                        {players?.map((player) => {
+                        {players?.toReversed()?.map((player) => {
                           const isSelected = field.value?.includes(player.id);
                           const isBothSelected = field.value?.length === 1;
                           return (
@@ -146,18 +146,11 @@ function SelectBowler({
                                   className="sr-only"
                                 />
                               </FormControl>
-                              <FormLabel
-                                className={cn(
-                                  "flex h-8 w-full items-center justify-between bg-muted p-2 font-normal",
-                                  {
-                                    "bg-emerald-500 font-bold text-emerald-950":
-                                      isSelected,
-                                    "opacity-50": isBothSelected && !isSelected,
-                                  },
-                                )}
-                              >
-                                {player.name}
-                              </FormLabel>
+                              <PlayerLabel
+                                title={player.name}
+                                isSelected={isSelected}
+                                isOpacityDown={isBothSelected && !isSelected}
+                              />
                             </FormItem>
                           );
                         })}

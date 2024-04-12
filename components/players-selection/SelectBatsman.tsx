@@ -1,12 +1,14 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
 import { BallEvent, CurPlayer, Player } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import { processTeamName } from "@/lib/utils";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -20,11 +22,9 @@ import {
 import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
+import LoadingButton from "../ui/loading-button";
 
 import PlayerLabel from "./PlayerLabel";
-import LoadingButton from "../ui/loading-button";
-import { useQueryClient } from "@tanstack/react-query";
-import { processTeamName } from "@/lib/utils";
 
 interface SelectBatsmanProps {
   open: boolean;
@@ -135,32 +135,33 @@ function SelectBatsman({
 
   return (
     <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
-      <DialogContent removeCloseButton>
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <TypographyH3>
-              Select Batsman - {processTeamName(team?.name ?? "")}
-            </TypographyH3>
-            {!!curPlayers.length && (
-              <Button
-                variant={isManualMode ? "ghost" : "destructive"}
-                size={isManualMode ? "icon" : "default"}
-                onClick={isManualMode ? () => setOpen?.(false) : handleUndo}
-              >
-                {isManualMode ? <X /> : "Undo"}
-              </Button>
-            )}
-          </div>
-          <Form {...form}>
-            {/* TODO: Search field HERE to filter players */}
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <FormField
-                disabled={!getValues("playerIds")?.length}
-                control={form.control}
-                name="playerIds"
-                render={() => (
-                  <FormItem>
-                    {players?.toReversed().map((item) => (
+      <DialogContent removeCloseButton className="flex flex-col gap-4">
+        {/* <div className="flex flex-col gap-4"> */}
+        <div className="flex items-center justify-between">
+          <TypographyH3>
+            Select Batsman - {processTeamName(team?.name ?? "")}
+          </TypographyH3>
+          {!!curPlayers.length && (
+            <Button
+              variant={isManualMode ? "ghost" : "destructive"}
+              size={isManualMode ? "icon" : "default"}
+              onClick={isManualMode ? () => setOpen?.(false) : handleUndo}
+            >
+              {isManualMode ? <X /> : "Undo"}
+            </Button>
+          )}
+        </div>
+        <Form {...form}>
+          {/* TODO: Search field HERE to filter players */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              disabled={!getValues("playerIds")?.length}
+              control={form.control}
+              name="playerIds"
+              render={() => (
+                <FormItem>
+                  <div className="h-96 overflow-auto">
+                    {players?.map((item) => (
                       <FormField
                         key={item.id}
                         control={control}
@@ -234,16 +235,17 @@ function SelectBatsman({
                         }}
                       />
                     ))}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <LoadingButton loading={isPending} disabled={isPending}>
-                {isPending ? "Submitting" : "Submit"}
-              </LoadingButton>
-            </form>
-          </Form>
-        </div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <LoadingButton loading={isPending} disabled={isPending}>
+              {isPending ? "Submitting" : "Submit"}
+            </LoadingButton>
+          </form>
+        </Form>
+        {/* </div> */}
       </DialogContent>
     </Dialog>
   );
