@@ -16,6 +16,48 @@ export const metadata: Metadata = {
   description: "Your cricket partner",
   creator: "Soham Bhikadiya & Rudra Bhikadiya",
   keywords: [
+    "ball by ball",
+    "ball",
+    "by",
+    "ball by ball cricket",
+    "ball by ball cricket score",
+    "ball by ball cricket scorecard",
+    "ball by ball cricket score card",
+    "ball by ball cricket scorecard maker",
+    "ball by ball cricket score card maker",
+    "ball by ball cricket scorecard generator",
+    "ball by ball cricket score card generator",
+    "ball by ball cricket scorecard creator",
+    "ball by ball cricket score card creator",
+    "ball by ball cricket scorecard builder",
+    "ball by ball cricket score card builder",
+    "ball by ball cricket scorecard template",
+    "ball by ball cricket score card template",
+    "ball by ball cricket scorecard format",
+    "cricket scorecard",
+    "cricket score card",
+    "cricket scorecard maker",
+    "cricket score card maker",
+    "cricket scorecard generator",
+    "cricket score card generator",
+    "cricket scorecard creator",
+    "cricket score card creator",
+    "cricket scorecard builder",
+    "cricket score card builder",
+    "cricket scorecard template",
+    "cricket score card template",
+    "cricket scorecard format",
+    "cricket score card format",
+    "cricket scorecard online",
+    "cricket score card online",
+    "cricket scorecard app",
+    "cricket score card app",
+    "cricket scorecard software",
+    "cricket score card software",
+    "cricket scorecard excel",
+    "cricket score card excel",
+    "cricket scorecard sheet",
+    "ball by ball cricket score card format",
     "cricket",
     "scorer",
     "score",
@@ -87,7 +129,13 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en">
+        <head>
+          <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎾</text></svg>"
+          />
+        </head>
         <body className={cn("font-IBMPlex antialiased", IBMPlex.variable)}>
           {children}
         </body>

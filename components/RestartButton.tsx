@@ -22,7 +22,7 @@ function RestartButton({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="destructive" className="w-full">
+        <Button variant="destructive" size="sm" >
           Restart
         </Button>
       </DialogTrigger>

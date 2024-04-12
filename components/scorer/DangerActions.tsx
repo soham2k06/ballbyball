@@ -38,7 +38,6 @@ function DangerActions({
         <Button
           size="sm"
           variant="destructive"
-          className="w-full"
           onClick={() => {
             setShowMenu(false);
             handleUndo();
