@@ -351,8 +351,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   return (
     <StatsOpenProvider>
-      <Card className="relative p-2 max-sm:w-full max-sm:border-0 sm:w-96">
-        <div className="absolute left-0 top-0 flex w-full items-center justify-between p-2">
+      <Card className="relative max-sm:w-full max-sm:border-0 sm:w-96 sm:p-2">
+        <div className="absolute left-0 top-0 flex w-full items-center justify-between sm:p-2">
           <div>
             <LoadingButton
               loading={isPending}
@@ -367,7 +367,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             handleUndo={handleUndo}
           />
         </div>
-        <CardContent className="space-y-4 max-sm:p-0">
+        <CardContent className="max-sm:p-0">
           <ScoreDisplay
             curTeam={team?.name}
             runs={runs}
@@ -384,13 +384,13 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             />
           )}
 
-          <ul className="flex justify-start gap-2 overflow-x-auto">
+          <ul className="mt-6 flex justify-start gap-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
           </ul>
         </CardContent>
-        <Separator className="my-4 sm:my-4" />
+        <div className="my-4" />
 
         <BatsmanScores
           onStrikeBatsman={onStrikeBatsman}
@@ -401,14 +401,14 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           }
           events={events as BallEvent[]}
         />
-        <div className="my-4" />
+        <div className="my-2 md:my-4" />
         <BowlerScores
           playerId={curPlayers.find((player) => player.type === "bowler")?.id!}
           events={events as BallEvent[]}
         />
         <Separator className="my-3" />
         <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
-        <div className="my-4" />
+        <div className="my-2 md:my-4" />
         <Tools
           runRate={runRate}
           curPlayers={curPlayers}

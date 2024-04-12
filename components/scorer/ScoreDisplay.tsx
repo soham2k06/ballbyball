@@ -16,7 +16,7 @@ function ScoreDisplay({
   curTeam?: string;
 }) {
   return (
-    <div className="relative mt-12 flex items-end justify-center pb-2">
+    <div className="relative mt-6 flex items-end justify-center pb-2">
       <TypographyH2 className="absolute left-0">
         {processTeamName(curTeam ?? "TEAM 1")}
       </TypographyH2>
@@ -24,7 +24,7 @@ function ScoreDisplay({
         <h2 className="mb-3 text-center text-6xl font-semibold tabular-nums">
           {runs}/{wickets}
         </h2>
-        <div className="flex items-center justify-center text-center text-lg text-muted-foreground">
+        <div className="flex items-center justify-center text-center text-base font-medium text-muted-foreground md:text-lg">
           <span>({getOverStr(totalBalls)})</span>
           <Separator
             orientation="vertical"
