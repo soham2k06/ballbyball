@@ -31,7 +31,7 @@ function BallSummary({
         },
         size: {
           sm: "h-8 min-w-8 text-sm",
-          default: "h-10 min-w-10",
+          default: "h-10 min-w-10 max-sm:min-w-8 max-sm:h-8",
         },
       },
       defaultVariants: { variant: "default" },
@@ -47,7 +47,7 @@ function BallSummary({
         <span
           className={cn("bg-muted-foreground", {
             "size-3": size === "sm",
-            "size-4": size === "default",
+            "size-4 max-sm:size-3": size === "default",
             "rounded-full": event === "0",
             "rounded-[2px]": event === "-4",
           })}

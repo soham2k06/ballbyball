@@ -23,7 +23,7 @@ import { getOverStr, getScore } from "@/lib/utils";
 
 interface StatsAndSettingsProps {
   runRate: number;
-  match: MatchExtended;
+  match: MatchExtended | undefined;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
@@ -55,11 +55,14 @@ function StatsAndSettings({
     name: string;
   }>({
     index: 0,
-    name: match.teams?.[0].name,
+    name: match?.teams?.[0].name ?? "",
   });
 
-  const curTeam = match.teams[match.curTeam];
-  const opposingTeam = match.teams[match.curTeam === 0 ? 1 : 0];
+  const { createBallEvent } = useSaveBallEvents();
+  const { updateMatch } = useUpdateMatch();
+
+  const curTeam = match?.teams[match.curTeam];
+  const opposingTeam = match?.teams[match.curTeam === 0 ? 1 : 0];
 
   const playerIds = curTeam?.players.map((player) => player.id) || [];
 
@@ -85,10 +88,9 @@ function StatsAndSettings({
     wickets: wickets2,
   } = getScore(sTeamEvents);
 
-  const { createBallEvent } = useSaveBallEvents();
-  const { updateMatch } = useUpdateMatch();
-
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
+    if (!match?.id) return;
+
     updateMatch(
       { id: match.id, curPlayers: payload },
       {
@@ -109,137 +111,144 @@ function StatsAndSettings({
         <SheetTrigger asChild>
           <Button className="w-full">Stats & Settings</Button>
         </SheetTrigger>
-        <SheetContent>
-          <SheetHeader className="text-left">
-            <TypographyH2 className="text-2xl font-semibold tracking-tighter">
-              Stats & Settings
-            </TypographyH2>
-          </SheetHeader>
-          <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
-            Manual Selection
-          </TypographyP>
-          <Button
-            className="mb-2 w-full space-x-2"
-            onClick={() => setShowSelectBatsman(true)}
-          >
-            <Image
-              src="/icons/bat.png"
-              alt="bat icon"
-              width={24}
-              height={24}
-              className="invert dark:invert-0"
+        {!match || !curTeam || !opposingTeam ? null : (
+          <SheetContent>
+            <SheetHeader className="text-left">
+              <TypographyH2 className="text-2xl font-semibold tracking-tighter">
+                Stats & Settings
+              </TypographyH2>
+            </SheetHeader>
+            <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
+              Manual Selection
+            </TypographyP>
+            <Button
+              className="mb-2 w-full space-x-2"
+              onClick={() => setShowSelectBatsman(true)}
+            >
+              <Image
+                src="/icons/bat.png"
+                alt="bat icon"
+                width={24}
+                height={24}
+                className="invert dark:invert-0"
+              />
+              <span>Select Batsman</span>
+            </Button>
+            <SelectBatsman
+              open={showSelectBatsman}
+              setOpen={setShowSelectBatsman}
+              curPlayers={curPlayers}
+              setCurPlayers={setCurPlayers}
+              events={events}
+              isManualMode
+              handleSelectPlayer={(payload) => {
+                handleSelectPlayer(payload, () => {
+                  setShowSelectBatsman(false);
+                  setIsSheetOpen(false);
+                });
+              }}
+              team={curTeam}
+              allowSinglePlayer={match.allowSinglePlayer}
             />
-            <span>Select Batsman</span>
-          </Button>
-          <SelectBatsman
-            open={showSelectBatsman}
-            setOpen={setShowSelectBatsman}
-            curPlayers={curPlayers}
-            setCurPlayers={setCurPlayers}
-            events={events}
-            isManualMode
-            handleSelectPlayer={(payload) => {
-              handleSelectPlayer(payload, () => {
-                setShowSelectBatsman(false);
-                setIsSheetOpen(false);
-              });
-            }}
-            team={curTeam}
-            allowSinglePlayer={match.allowSinglePlayer}
-          />
-          <Button
-            className="w-full space-x-2"
-            onClick={() => setShowSelectBowler(true)}
-          >
-            <Image
-              src="/icons/ball.png"
-              alt="ball icon"
-              width={24}
-              height={24}
-              className="invert dark:invert-0"
+            <Button
+              className="w-full space-x-2"
+              onClick={() => setShowSelectBowler(true)}
+            >
+              <Image
+                src="/icons/ball.png"
+                alt="ball icon"
+                width={24}
+                height={24}
+                className="invert dark:invert-0"
+              />
+              <span>Select Bowler</span>
+            </Button>
+            <SelectBowler
+              open={showSelectBowler}
+              setOpen={setShowSelectBowler}
+              curPlayers={curPlayers}
+              setCurPlayers={setCurPlayers}
+              isManualMode
+              handleSelectPlayer={(payload) => {
+                handleSelectPlayer(payload, () => {
+                  setShowSelectBatsman(false);
+                  setIsSheetOpen(false);
+                });
+              }}
+              team={opposingTeam}
             />
-            <span>Select Bowler</span>
-          </Button>
-          <SelectBowler
-            open={showSelectBowler}
-            setOpen={setShowSelectBowler}
-            curPlayers={curPlayers}
-            setCurPlayers={setCurPlayers}
-            isManualMode
-            handleSelectPlayer={(payload) => {
-              handleSelectPlayer(payload, () => {
-                setShowSelectBatsman(false);
-                setIsSheetOpen(false);
-              });
-            }}
-            team={opposingTeam}
-          />
-          <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
-            Stats
-          </TypographyP>
+            <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
+              Stats
+            </TypographyP>
 
-          <div className="space-y-2">
-            <Button
-              className="w-full space-x-2"
-              onClick={() => setShowWormChart(true)}
-            >
-              <LineChart />
-              <span>Worm Chart</span>
-            </Button>
-            <Button
-              className="w-full space-x-2"
-              onClick={() => setShowRunrateChart(true)}
-            >
-              <BarChartBig /> <span>Run rate chart</span>
-            </Button>
-            <Button
-              className="w-full space-x-2"
-              onClick={() => setShowOverSummaries(true)}
-            >
-              <ListOrdered />
-              <span>Over Summaries</span>
-            </Button>
-          </div>
-        </SheetContent>
+            <div className="space-y-2">
+              <Button
+                className="w-full space-x-2"
+                onClick={() => setShowWormChart(true)}
+              >
+                <LineChart />
+                <span>Worm Chart</span>
+              </Button>
+              <Button
+                className="w-full space-x-2"
+                onClick={() => setShowRunrateChart(true)}
+              >
+                <BarChartBig /> <span>Run rate chart</span>
+              </Button>
+              <Button
+                className="w-full space-x-2"
+                onClick={() => setShowOverSummaries(true)}
+              >
+                <ListOrdered />
+                <span>Over Summaries</span>
+              </Button>
+            </div>
+          </SheetContent>
+        )}
       </Sheet>
-      <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
-        <DrawerContent>
-          <StatsDrawerHeader
-            match={match}
-            runRate={runRate}
-            selectedTeam={selectedTeam}
-            setSelectedTeam={setSelectedTeam}
-          />
-          <OverStats ballEvents={ballEventsArr[selectedTeam.index]} />
-        </DrawerContent>
-      </Drawer>
-      <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>
-        <DrawerContent>
-          <StatsDrawerHeader
-            match={match}
-            runRate={runRate}
-            selectedTeam={selectedTeam}
-            setSelectedTeam={setSelectedTeam}
-          />
-          <FullOverSummary ballEvents={ballEventsArr[selectedTeam.index]} />
-        </DrawerContent>
-      </Drawer>
-      <Drawer open={showWormChart} onOpenChange={setShowWormChart}>
-        <DrawerContent>
-          <DrawerHeader className="mb-2 pb-4 pt-6">
-            <DrawerTitle className="space-x-4 text-center text-2xl">
-              <span className="text-sm text-muted-foreground">
-                {curTeam.name} {runs1}/{wickets1} ({getOverStr(totalBalls1)})
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {opposingTeam.name} {runs2}/{wickets2} (
-                {getOverStr(totalBalls2)})
-              </span>
-            </DrawerTitle>
-          </DrawerHeader>
-          <WormChart ballEvents={ballEventsArr} teams={match.teams} />
-        </DrawerContent>
-      </Drawer>
+      {match && curTeam && opposingTeam && (
+        <>
+          <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
+            <DrawerContent>
+              <StatsDrawerHeader
+                match={match}
+                runRate={runRate}
+                selectedTeam={selectedTeam}
+                setSelectedTeam={setSelectedTeam}
+              />
+              <OverStats ballEvents={ballEventsArr[selectedTeam.index]} />
+            </DrawerContent>
+          </Drawer>
+          <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>
+            <DrawerContent>
+              <StatsDrawerHeader
+                match={match}
+                runRate={runRate}
+                selectedTeam={selectedTeam}
+                setSelectedTeam={setSelectedTeam}
+              />
+              <FullOverSummary ballEvents={ballEventsArr[selectedTeam.index]} />
+            </DrawerContent>
+          </Drawer>
+          <Drawer open={showWormChart} onOpenChange={setShowWormChart}>
+            <DrawerContent>
+              <DrawerHeader className="mb-2 pb-4 pt-6">
+                <DrawerTitle className="space-x-4 text-center text-2xl">
+                  <span className="text-sm text-muted-foreground">
+                    {curTeam.name} {runs1}/{wickets1} ({getOverStr(totalBalls1)}
+                    )
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {opposingTeam.name} {runs2}/{wickets2} (
+                    {getOverStr(totalBalls2)})
+                  </span>
+                </DrawerTitle>
+              </DrawerHeader>
+              <WormChart ballEvents={ballEventsArr} teams={match.teams} />
+            </DrawerContent>
+          </Drawer>
+        </>
+      )}
     </>
   );
 }

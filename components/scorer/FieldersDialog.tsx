@@ -26,41 +26,43 @@ function FieldersDialog({
 }: FieldersDialogProps) {
   const [runs, setRuns] = useState(0);
 
-  if (!fielders) return <p>No fielders</p>;
-
   return (
-    <Dialog open={!!wicketTypeId} onOpenChange={setWicketTypeId as any}>
+    <Dialog open={!!wicketTypeId} onOpenChange={() => setWicketTypeId(null)}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Who was the fielder?</DialogTitle>
-        </DialogHeader>
-        {Number(wicketTypeId) === 5 && (
+        {fielders?.length ? (
           <>
-            <Label>Runs along with run out</Label>
-            <Input
-              type="number"
-              value={runs}
-              onChange={(e) => {
-                const value = Number(e.target.value);
-                if (value < 0) return;
-                setRuns(value);
-              }}
-            />
+            <DialogHeader>
+              <DialogTitle>Who was the fielder?</DialogTitle>
+            </DialogHeader>
+            {Number(wicketTypeId) === 5 && (
+              <>
+                <Label>Runs along with run out</Label>
+                <Input
+                  type="number"
+                  value={runs}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    if (value < 0) return;
+                    setRuns(value);
+                  }}
+                />
+              </>
+            )}
+            <div className="grid grid-cols-2 gap-2">
+              {fielders.map((fielder) => (
+                <Button
+                  key={fielder.id}
+                  onClick={() => {
+                    handleScore(Number(wicketTypeId), fielder.id, runs);
+                    setWicketTypeId(null);
+                  }}
+                >
+                  {fielder.name}
+                </Button>
+              ))}
+            </div>
           </>
-        )}
-        <div className="grid grid-cols-2 gap-2">
-          {fielders.map((fielder) => (
-            <Button
-              key={fielder.id}
-              onClick={() => {
-                handleScore(Number(wicketTypeId), fielder.id, runs);
-                setWicketTypeId(null);
-              }}
-            >
-              {fielder.name}
-            </Button>
-          ))}
-        </div>
+        ) : null}
       </DialogContent>
     </Dialog>
   );

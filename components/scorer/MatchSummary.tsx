@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { OverlayStateProps, PlayerPerformance } from "@/types";
+import { MatchExtended, OverlayStateProps, PlayerPerformance } from "@/types";
 import { Dispatch, SetStateAction } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
@@ -20,51 +20,31 @@ import {
 import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { usePlayerById } from "@/apiHooks/player";
+import { Skeleton } from "../ui/skeleton";
+import { TypographyH4 } from "../ui/typography";
 
 interface MatchSummaryProps {
   open: OverlayStateProps["open"];
   setShowScorecard: Dispatch<SetStateAction<boolean>>;
-  teams: { name: string; playerIds: string[] }[];
   ballEvents: BallEvent[] | CreateBallEventSchema[];
   handleUndo: () => void;
-  allowSinglePlayer: boolean;
-  matchBalls: number;
+  match: MatchExtended | undefined;
 }
 
 function MatchSummary({
   open,
   setShowScorecard,
-  teams,
   ballEvents,
   handleUndo,
-  allowSinglePlayer,
-  matchBalls,
+  match,
 }: MatchSummaryProps) {
   const { setShowRunrateChart, setShowOverSummaries } = useStatsOpenContext();
 
-  const ballEventsbyTeam = (i: number) =>
-    ballEvents
-      .filter((event) => teams[i].playerIds.includes(event.batsmanId))
-      .map((event) => event.type);
-
-  const { runs: runs1 } = getScore(ballEventsbyTeam(0));
-  const {
-    runs: runs2,
-    wickets: wickets2,
-    totalBalls,
-  } = getScore(ballEventsbyTeam(1));
-  const totalWickets = teams[1].playerIds.length;
-
-  const { winInfo, winner } = calculateWinner({
-    allowSinglePlayer,
-    matchBalls,
-    runs1,
-    runs2,
-    teams: teams.map(({ name }) => name),
-    totalBalls,
-    totalWickets,
-    wickets2,
-  });
+  const { allowSinglePlayer, overs } = match || {
+    allowSinglePlayer: false,
+    overs: 0,
+  };
+  const matchBalls = overs * 6;
 
   const groupedEvents: Record<
     string,
@@ -95,6 +75,41 @@ function MatchSummary({
     }
   });
 
+  const teams = [
+    {
+      name: match?.teams[0].name,
+      playerIds: match?.teams[0].players.map(({ id }) => id),
+    },
+    {
+      name: match?.teams[1].name,
+      playerIds: match?.teams[1].players.map(({ id }) => id),
+    },
+  ];
+
+  const ballEventsbyTeam = (i: number) =>
+    ballEvents
+      .filter((event) => teams[i]?.playerIds?.includes(event.batsmanId))
+      .map((event) => event.type);
+
+  const { runs: runs1 } = getScore(ballEventsbyTeam(0));
+  const {
+    runs: runs2,
+    wickets: wickets2,
+    totalBalls,
+  } = getScore(ballEventsbyTeam(1));
+  const totalWickets = teams[1]?.playerIds?.length ?? 0;
+
+  const { winInfo, winner } = calculateWinner({
+    allowSinglePlayer,
+    matchBalls,
+    runs1,
+    runs2,
+    teams: teams.map(({ name }) => name ?? ""),
+    totalBalls,
+    totalWickets,
+    wickets2,
+  });
+
   const playersPerformance: PlayerPerformance[] = Object.values(
     groupedEvents,
   ).map(({ playerId, batType, bowlType }) => {
@@ -113,17 +128,19 @@ function MatchSummary({
       ballsFaced,
       ballsBowled,
       team:
-        teams.find(({ playerIds }) =>
-          playerIds.includes(playerId) ? playerIds : null,
+        match?.teams.find(
+          ({ players }) =>
+            players.map((player) => player.id).includes(playerId) ?? null,
         )?.name ?? "Loading...",
-      isWinner: teams[winner].playerIds.includes(playerId),
+      isWinner: !!match?.teams[winner].players
+        .map((player) => player.id)
+        .includes(playerId),
     };
   });
 
-  // TODO: Add winner factor
   const playerOfTheMatch = calculatePlayerOfTheMatch({ playersPerformance });
 
-  const { player } = usePlayerById(playerOfTheMatch.playerId);
+  const { player, isLoading } = usePlayerById(playerOfTheMatch.playerId);
 
   return (
     <Dialog open={open}>
@@ -131,71 +148,93 @@ function MatchSummary({
         <DialogHeader className="w-full flex-row items-center justify-between border-b pb-6">
           <DialogTitle>Match Summary</DialogTitle>
 
-          <Button variant="destructive" onClick={handleUndo}>
-            Undo
-          </Button>
+          {match && (
+            <Button variant="destructive" onClick={handleUndo}>
+              Undo
+            </Button>
+          )}
         </DialogHeader>
 
-        <div className="rounded-md bg-muted p-2">
-          <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
-            Player of the Match
-          </h4>
-          <p>
-            <strong>{player?.name ?? "Loading..."}</strong> (
-            {processTeamName(playerOfTheMatch.team)}) ·{" "}
-            {!!playerOfTheMatch.ballsBowled && (
-              <>
-                {" "}
-                {playerOfTheMatch.wicketsTaken}/{playerOfTheMatch.runConceded} (
-                {getOverStr(playerOfTheMatch.ballsBowled)})
-              </>
-            )}
-            {!!playerOfTheMatch.ballsBowled &&
-              !!playerOfTheMatch.ballsFaced &&
-              " & "}
-            {playerOfTheMatch.ballsFaced && (
-              <>
-                {playerOfTheMatch.runsScored} ({playerOfTheMatch.ballsFaced})
-              </>
-            )}
-          </p>
-        </div>
-        <Separator className="my-2" />
-        <div className="space-y-2">
-          {teams.map((team, i) => {
-            const { runs, totalBalls, wickets } = getScore(
-              ballEventsbyTeam(i) || [],
-            );
-
-            return (
-              <div key={i} className="flex items-center justify-between">
-                <h4 className="text-lg font-semibold">
-                  {processTeamName(team.name)}
-                </h4>
+        {!match ? (
+          <div className="flex h-96 items-center justify-center">
+            <TypographyH4>Generating...</TypographyH4>
+          </div>
+        ) : (
+          <>
+            <div className="rounded-md bg-muted p-2">
+              <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
+                Player of the Match
+              </h4>
+              {!isLoading ? (
                 <p>
-                  {runs}/{wickets} ({getOverStr(totalBalls)})
+                  <strong>{player?.name ?? "Loading..."}</strong> (
+                  {processTeamName(playerOfTheMatch.team)}) ·{" "}
+                  {!!playerOfTheMatch.ballsBowled && (
+                    <>
+                      {" "}
+                      {playerOfTheMatch.wicketsTaken}/
+                      {playerOfTheMatch.runConceded} (
+                      {getOverStr(playerOfTheMatch.ballsBowled)})
+                    </>
+                  )}
+                  {!!playerOfTheMatch.ballsBowled &&
+                    !!playerOfTheMatch.ballsFaced &&
+                    " & "}
+                  {playerOfTheMatch.ballsFaced && (
+                    <>
+                      {playerOfTheMatch.runsScored} (
+                      {playerOfTheMatch.ballsFaced})
+                    </>
+                  )}
                 </p>
-              </div>
-            );
-          })}
-        </div>
-        <p>{winInfo}</p>
-        <Separator className="my-2" />
-        <div className="flex gap-2">
-          <Button onClick={() => setShowScorecard(true)} className="w-full">
-            Scorecard
-          </Button>
-          <Button onClick={() => setShowRunrateChart(true)} className="w-full">
-            Run rate chart
-          </Button>
-          <Button onClick={() => setShowOverSummaries(true)} className="w-full">
-            Over summaries
-          </Button>
-        </div>
-        <Separator className="my-2" />
-        <Button className="w-full" asChild variant="secondary">
-          <Link href="/matches">Back & Finish</Link>
-        </Button>
+              ) : (
+                <Skeleton className="h-6 w-48 bg-foreground/10" />
+              )}
+            </div>
+            <Separator className="my-2" />
+            <div className="space-y-2">
+              {teams.map((team, i) => {
+                const { runs, totalBalls, wickets } = getScore(
+                  ballEventsbyTeam(i) || [],
+                );
+
+                return (
+                  <div key={i} className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold">
+                      {processTeamName(team?.name ?? "")}
+                    </h4>
+                    <p>
+                      {runs}/{wickets} ({getOverStr(totalBalls)})
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+            <p>{winInfo}</p>
+            <Separator className="my-2" />
+            <div className="flex gap-2">
+              <Button onClick={() => setShowScorecard(true)} className="w-full">
+                Scorecard
+              </Button>
+              <Button
+                onClick={() => setShowRunrateChart(true)}
+                className="w-full"
+              >
+                Run rate chart
+              </Button>
+              <Button
+                onClick={() => setShowOverSummaries(true)}
+                className="w-full"
+              >
+                Over summaries
+              </Button>
+            </div>
+            <Separator className="my-2" />
+            <Button className="w-full" asChild variant="secondary">
+              <Link href="/matches">Back & Finish</Link>
+            </Button>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

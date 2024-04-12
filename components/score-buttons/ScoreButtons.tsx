@@ -1,7 +1,6 @@
 import { MouseEventHandler } from "react";
 
 import { Button } from "../ui/button";
-import { CardContent } from "../ui/card";
 
 import NoballPopver from "./NoballPopver";
 import WicketPopover from "./WicketPopover";
@@ -16,7 +15,7 @@ function ScoreButtons({
   handleWicket?: MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
-    <CardContent className="space-y-4 max-sm:p-0">
+    <div className="space-y-4">
       <div className="flex w-full justify-center gap-2">
         <Button
           variant="secondary"
@@ -73,7 +72,7 @@ function ScoreButtons({
         ))}
         <ManualScorePopover handleScore={handleScore} />
       </div>
-    </CardContent>
+    </div>
   );
 }
 

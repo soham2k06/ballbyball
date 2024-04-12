@@ -65,7 +65,7 @@ function TeamList() {
       })}
     >
       {teams?.length ? (
-        <ul className="flex gap-4 pb-4">
+        <ul className="grid grid-cols-2 gap-4 pb-4">
           {teams.map((team, i) => {
             const players = playersArr?.[i];
             const captainIndex = players?.findIndex(

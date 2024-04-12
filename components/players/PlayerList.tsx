@@ -42,7 +42,7 @@ function PlayerList() {
         })}
       >
         {players?.length ? (
-          <div className="grid grid-cols-6 gap-2 pb-4">
+          <div className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-6">
             {players.map((player) => {
               const isLoading = isPending && playerToDelete === player.id;
               return (
@@ -50,7 +50,7 @@ function PlayerList() {
                   <CardHeader>
                     <CardTitle>{truncStr(player.name as string, 10)}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-x-2">
                     <Button onClick={() => setPlayerToUpdate(player)}>
                       Edit
                     </Button>
