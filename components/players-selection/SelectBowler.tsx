@@ -103,7 +103,7 @@ function SelectBowler({
   // TODO: Bowled last over
 
   return (
-    <Dialog open={true} onOpenChange={isManualMode ? setOpen : undefined}>
+    <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
       <DialogContent removeCloseButton>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
