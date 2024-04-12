@@ -408,7 +408,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         />
         <Separator className="my-3" />
         <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
-        <div className="my-2 md:my-4" />
+        <div className="mt-4 md:mt-6" />
         <Tools
           runRate={runRate}
           curPlayers={curPlayers}
