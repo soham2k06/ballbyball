@@ -20,11 +20,16 @@ import { TypographyH2 } from "./ui/typography";
 
 import NavItem from "./NavItem";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 function Nav() {
   const { theme } = useTheme();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const pathName = usePathname();
+
+  if (pathName.includes("match/")) return;
 
   return (
     <nav className="border-b py-4 max-xl:p-4">
@@ -46,7 +51,7 @@ function Nav() {
           <SheetTrigger className="ml-auto mr-4 md:hidden">
             <Menu />
           </SheetTrigger>
-          <SheetContent>
+          <SheetContent className="space-y-4">
             <SheetHeader className="text-left">
               <Link href="/">
                 <TypographyH2 className="text-2xl font-semibold tracking-tighter">
