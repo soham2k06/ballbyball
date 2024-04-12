@@ -3,7 +3,7 @@ import DarkModeToggle from "./DarkModeToggle";
 
 function Footer() {
   return (
-    <div className="mt-4 w-full border-t p-2 text-sm text-muted-foreground md:fixed md:bottom-0">
+    <div className="sticky bottom-0 mt-4 w-full border-t bg-card/75 p-2 text-sm text-muted-foreground backdrop-blur-lg">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
         <ul className="flex gap-4">
           <a href="https://github.com/rudrabhikadiya3">

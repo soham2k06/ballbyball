@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 import { BallEvent, CurPlayer } from "@prisma/client";
 import { toast } from "sonner";
-import { FileSearch } from "lucide-react";
 
 import { EventType } from "@/types";
 
@@ -25,7 +23,6 @@ import { useUpdateMatch } from "@/apiHooks/match";
 import { Card, CardContent } from "@/components/ui/card";
 import LoadingButton from "@/components/ui/loading-button";
 import { Separator } from "@/components/ui/separator";
-import { TypographyH4 } from "@/components/ui/typography";
 
 import { SelectBatsman, SelectBowler } from "@/components/players-selection";
 
@@ -33,12 +30,13 @@ import DangerActions from "./DangerActions";
 import ScoreDisplay from "./ScoreDisplay";
 import BallSummary from "./BallSummary";
 import ScoreButtons from "../score-buttons/ScoreButtons";
-import BowlerScores from "./BowlerScores";
-import BatsmanScores from "./BatsmanScores";
+import BowlerScores from "../player-scores/BowlerScores";
+import BatsmanScores from "../player-scores/BatsmanScores";
 import Tools from "../match-stats/Tools";
 import FieldersDialog from "./FieldersDialog";
 import MatchSummary from "./MatchSummary";
-import { Button } from "../ui/button";
+import NoMatchFound from "./NoMatchFound";
+import TargetInfo from "./TargetInfo";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { match, matchIsLoading, matchIsFetching, isSuccess } =
@@ -188,30 +186,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     }
   }, [wickets, match?.hasEnded]);
 
-  if (matchIsLoading) return <p>loading...</p>;
-  if (!match && !matchIsLoading)
-    return (
-      <div className="flex items-center justify-center py-4 md:p-8">
-        <div className="flex flex-col gap-4">
-          <div className="mx-auto inline-flex size-20 items-center justify-center rounded-full bg-muted shadow-sm">
-            <FileSearch className="size-10" />
-          </div>
-          <div>
-            <h2 className="pb-1 text-center text-base font-semibold leading-relaxed">
-              Match not found
-            </h2>
-            <p className="pb-4 text-center text-sm font-normal leading-snug text-muted-foreground">
-              Try searching for another match
-            </p>
-          </div>
-          <Button asChild>
-            <Link href="/matches">Back to matches</Link>
-          </Button>
-        </div>
-      </div>
-    );
+  // if (matchIsLoading) return <p>loading...</p>;
+  if (!match && !matchIsLoading) return <NoMatchFound />;
 
-  if (!match) return null;
+  // if (!match) return null;
 
   // ** Over Summary
   const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
@@ -276,17 +254,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
     if (!wicketType.isOtherPlayerInvolved) {
       setShowSelectBatsman(true);
-      switch (wicketType.id) {
-        case 1:
-          eventToAdd = "-1";
-          break;
-        case 2:
-          eventToAdd = "-1_2";
-          break;
-        case 4:
-          eventToAdd = "-1_4";
-          break;
-      }
+      if (wicketType.id === 1) eventToAdd = `-1`;
+      eventToAdd = `-1_${wicketType.id}`;
 
       handleScore({
         currentTarget: { value: eventToAdd },
@@ -382,8 +351,8 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   return (
     <StatsOpenProvider>
-      <Card className="relative p-2 max-sm:w-full max-sm:border-0 sm:w-96">
-        <div className="absolute left-0 top-0 flex w-full items-center justify-between p-2">
+      <Card className="relative max-sm:w-full max-sm:border-0 sm:w-96 sm:p-2">
+        <div className="absolute left-0 top-0 flex w-full items-center justify-between sm:p-2">
           <div>
             <LoadingButton
               loading={isPending}
@@ -398,52 +367,59 @@ function ScorerLayout({ matchId }: { matchId: string }) {
             handleUndo={handleUndo}
           />
         </div>
-        <CardContent className="space-y-4 max-sm:p-0">
-          <TypographyH4 className="mt-10">{team?.name}</TypographyH4>
+        <CardContent className="max-sm:p-0">
           <ScoreDisplay
+            curTeam={team?.name}
             runs={runs}
             wickets={wickets}
             totalBalls={totalBalls}
             runRate={runRate}
           />
           {!!opponentEvents.length && (
-            <>
-              <p>{opponentRuns - runs + 1} remaining</p>
-            </>
+            <TargetInfo
+              runs={runs}
+              target={opponentRuns + 1}
+              ballsRemaining={(match?.overs ?? 0) * 6 - totalBalls || 0}
+              curTeam={team?.name}
+            />
           )}
 
-          <ul className="flex justify-start gap-2 overflow-x-auto">
+          <ul className="mt-6 flex justify-start gap-2 overflow-x-auto">
             {Array.from({ length: ballLimitInOver }, (_, i) => (
               <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
             ))}
           </ul>
-          <BatsmanScores
-            onStrikeBatsman={onStrikeBatsman}
-            playerIds={
-              curPlayers
-                .filter(({ type }) => type === "batsman")
-                ?.map(({ id }) => id)!
-            }
-            events={events as BallEvent[]}
-          />
-          <Tools
-            runRate={runRate}
-            curPlayers={curPlayers}
-            setCurPlayers={setCurPlayers}
-            events={events}
-            match={match}
-            showScorecard={showScorecard}
-            setShowScorecard={setShowScorecard}
-          />
         </CardContent>
-        <Separator className="my-4 sm:my-4" />
-        <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
-        <Separator className="my-4 sm:my-4" />
+        <div className="my-4" />
 
+        <BatsmanScores
+          onStrikeBatsman={onStrikeBatsman}
+          playerIds={
+            curPlayers
+              .filter(({ type }) => type === "batsman")
+              ?.map(({ id }) => id)!
+          }
+          events={events as BallEvent[]}
+        />
+        <div className="my-2 md:my-4" />
         <BowlerScores
           playerId={curPlayers.find((player) => player.type === "bowler")?.id!}
           events={events as BallEvent[]}
         />
+        <Separator className="my-3" />
+        <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
+        <div className="mt-4 md:mt-6" />
+        <Tools
+          runRate={runRate}
+          curPlayers={curPlayers}
+          setCurPlayers={setCurPlayers}
+          events={events}
+          match={match}
+          showScorecard={showScorecard}
+          setShowScorecard={setShowScorecard}
+        />
+
+        {/* DIALOGS */}
         <SelectBatsman
           open={showSelectBatsman}
           setOpen={setShowSelectBatsman}
@@ -479,21 +455,10 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           handleScore={handleWicketWithFielder}
         />
         <MatchSummary
-          allowSinglePlayer={match.allowSinglePlayer}
           ballEvents={events}
           open={showMatchSummary}
           setShowScorecard={setShowScorecard}
-          matchBalls={match.overs * 6}
-          teams={[
-            {
-              name: match.teams[0].name,
-              playerIds: match.teams[0].players.map(({ id }) => id),
-            },
-            {
-              name: match.teams[1].name,
-              playerIds: match.teams[1].players.map(({ id }) => id),
-            },
-          ]}
+          match={match}
           handleUndo={() => {
             handleUndo();
             setShowMatchSummary(false);

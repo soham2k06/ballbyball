@@ -187,33 +187,30 @@ function Score({
             );
 
             return (
-              <>
-                <TableRow>
-                  <TableCell className="text-left font-semibold">
-                    <p>
-                      {player.name} {!outBy && !isBowlingScore && "**"}
-                    </p>
-                    {outBy && (
-                      <span className="mt-0.5 text-[13px] text-muted-foreground">
-                        {outBy.wicketType} {fielder?.name} {outBy.typeStr}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {isBowlingScore ? getOverStr(totalBalls) : runs}
-                  </TableCell>
-                  <TableCell>
-                    {isBowlingScore ? maidenOverCount : totalBalls}
-                  </TableCell>
-                  <TableCell>{isBowlingScore ? wickets : fours}</TableCell>
-                  <TableCell>{isBowlingScore ? runs : sixes}</TableCell>
-                  <TableCell>
-                    {Math.round(
-                      runRate * (!isBowlingScore ? 100 / 6 : 1) * 10,
-                    ) / 10}
-                  </TableCell>
-                </TableRow>
-              </>
+              <TableRow>
+                <TableCell className="text-left font-semibold">
+                  <p>
+                    {player.name} {!outBy && !isBowlingScore && "**"}
+                  </p>
+                  {outBy && (
+                    <span className="mt-0.5 text-[13px] text-muted-foreground">
+                      {outBy.wicketType} {fielder?.name} {outBy.typeStr}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {isBowlingScore ? getOverStr(totalBalls) : runs}
+                </TableCell>
+                <TableCell>
+                  {isBowlingScore ? maidenOverCount : totalBalls}
+                </TableCell>
+                <TableCell>{isBowlingScore ? wickets : fours}</TableCell>
+                <TableCell>{isBowlingScore ? runs : sixes}</TableCell>
+                <TableCell>
+                  {Math.round(runRate * (!isBowlingScore ? 100 / 6 : 1) * 10) /
+                    10}
+                </TableCell>
+              </TableRow>
             );
           })}
         </TableBody>
