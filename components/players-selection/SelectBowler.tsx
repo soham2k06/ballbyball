@@ -133,7 +133,7 @@ function SelectBowler({
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="h-96 overflow-auto"
+                        className="max-h-96 overflow-auto"
                       >
                         {players?.toReversed()?.map((player) => {
                           const isSelected = field.value?.includes(player.id);
