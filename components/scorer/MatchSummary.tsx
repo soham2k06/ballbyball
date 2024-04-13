@@ -132,7 +132,7 @@ function MatchSummary({
           ({ players }) =>
             players.map((player) => player.id).includes(playerId) ?? null,
         )?.name ?? "Loading...",
-      isWinner: !!match?.teams[winner].players
+      isWinner: !!match?.teams[winner]?.players
         .map((player) => player.id)
         .includes(playerId),
     };
