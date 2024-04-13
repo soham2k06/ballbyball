@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Minus, Plus } from "lucide-react";
 
 import { OverlayStateProps } from "@/types";
-import { useAllPlayers } from "@/apiHooks/player";
 import { useCreateMultiplePlayers } from "@/apiHooks/player";
 
 import {
@@ -52,7 +51,6 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
     shouldUnregister: false,
   });
 
-  const { refetch } = useAllPlayers();
   const { createMultiplePlayers, isPending } = useCreateMultiplePlayers();
 
   function onSubmit(data: { names: string[] }) {
@@ -62,7 +60,6 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
         setOpen(false);
       },
     });
-    refetch();
   }
 
   function handleAdd(index: number) {
