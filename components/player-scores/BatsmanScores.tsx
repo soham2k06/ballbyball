@@ -1,7 +1,12 @@
 import { BallEvent, Player } from "@prisma/client";
 
 import { usePlayerById } from "@/apiHooks/player";
-import { calcRuns, getBattingStats, getIsInvalidBall } from "@/lib/utils";
+import {
+  calcRuns,
+  getBattingStats,
+  getIsInvalidBall,
+  getScore,
+} from "@/lib/utils";
 import { EventType } from "@/types";
 import { Skeleton } from "../ui/skeleton";
 
@@ -42,13 +47,18 @@ function BatsmanScores({
             (ball) => ball.type !== "-2" && id === ball.batsmanId,
           );
 
-          const totalRuns = calcRuns(
-            legalEvents.map(({ type }) => type),
-            true,
+          const { runs: totalRuns, totalBalls } = getScore(
+            events
+              .filter((evt) => evt.batsmanId === id)
+              .map(({ type }) => type),
           );
-          const totalBalls = legalEvents.filter((ball) =>
-            getIsInvalidBall(ball.type as EventType),
-          ).length;
+          // const totalRuns = calcRuns(
+          //   legalEvents.map(({ type }) => type),
+          //   true,
+          // );
+          // const totalBalls = legalEvents.filter((ball) =>
+          //   getIsInvalidBall(ball.type as EventType),
+          // ).length;
 
           const strikeRate =
             Math.round((totalBalls ? (totalRuns / totalBalls) * 100 : 0) * 10) /

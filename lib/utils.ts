@@ -40,7 +40,9 @@ const getIsInvalidBall = (ball: EventType | string) =>
 
 function getScore(balls: (EventType | string)[]) {
   const runs = calcRuns(balls);
-  const totalBalls = balls?.filter((ball) => getIsInvalidBall(ball)).length;
+  const totalBalls = balls?.filter(
+    (ball) => ball !== "-4" && getIsInvalidBall(ball),
+  ).length;
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
   const extras = balls.filter(
