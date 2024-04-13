@@ -30,7 +30,7 @@ function DangerActions({
           <MoreVertical size={20} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40 space-y-2 p-4" align="end">
+      <DropdownMenuContent className="grid w-40 gap-2 p-4" align="end">
         <RestartButton
           onClick={handleRestart}
           handleCloseMenu={() => setShowMenu(false)}
