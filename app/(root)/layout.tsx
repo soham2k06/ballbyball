@@ -11,7 +11,9 @@ function Layout({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       <Nav />
-      <div className="mx-auto max-w-7xl max-xl:p-4">{children}</div>
+      <div className="mx-auto w-full max-w-7xl flex-1 max-xl:p-4">
+        {children}
+      </div>
       <Footer />
     </Provider>
   );
