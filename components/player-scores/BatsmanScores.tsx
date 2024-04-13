@@ -63,9 +63,9 @@ function BatsmanScores({
 
           return (
             <div key={player?.id} className="flex items-center text-sm">
-              <div className="mr-4 w-full max-w-28 truncate text-[13px] font-bold">
-                {player?.name}
-                {isOnStrike && " **"}
+              <div className="mr-4 flex w-full max-w-28 text-[13px] font-bold">
+                <p className="w-full truncate">{player?.name}</p>
+                {isOnStrike && "*"}
               </div>
               <div className="grid w-full grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
                 <div className="text-center text-xs tabular-nums">
