@@ -144,7 +144,7 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
                   disabled={isPending}
                   loading={isPending}
                 >
-                  {isPending ? "Adding..." : "Add"}
+                  {isPending ? "Adding..." : "Add Players"}
                 </LoadingButton>
               </div>
             </DialogFooter>
