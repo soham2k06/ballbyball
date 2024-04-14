@@ -2,7 +2,7 @@ import { MouseEventHandler, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn } from "@/lib/utils";
+import { cn, getIsInvalidBall } from "@/lib/utils";
 
 function NoballPopver({
   handleScore,
@@ -31,9 +31,7 @@ function NoballPopver({
       <PopoverContent className="w-60">
         <div className="grid w-full grid-cols-3 gap-2">
           {Object.keys(ballEvents)
-            .filter(
-              (ball) => !ball.includes("-1") && ball !== "-2" && ball !== "-3",
-            )
+            .filter((event) => !event.includes("-1") && getIsInvalidBall(event))
             .map((event, i) => (
               <Button
                 key={i}
@@ -44,6 +42,7 @@ function NoballPopver({
                   "bg-emerald-500 text-emerald-50 dark:bg-emerald-600":
                     event === "4",
                   "hover:brightness-95": event === "6" || event === "4",
+                  "col-span-3": event === "-4",
                 })}
                 value={`-3${event}`}
                 onClick={(e) => {
@@ -51,7 +50,7 @@ function NoballPopver({
                   setIsPopoverOpen(false);
                 }}
               >
-                {event}
+                {event !== "-4" ? event : "Manual Strike"}
               </Button>
             ))}
         </div>
