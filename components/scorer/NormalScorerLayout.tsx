@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
 import { EventType } from "@/types";
@@ -16,9 +16,7 @@ import FooterSummary from "../match-stats/FooterSummary";
 import ScoreWrapper from "./ScoreDisplay";
 
 function ScorerLayout() {
-  const [balls, setBalls] = useState<EventType[]>(
-    JSON.parse((getCookie("balls") as string) || "[]") || [],
-  );
+  const [balls, setBalls] = useState<EventType[]>([]);
 
   const { runs, totalBalls, wickets, extras, runRate } = getScore(balls);
 
@@ -28,6 +26,13 @@ function ScorerLayout() {
   const { runs: curOverRuns, wickets: curOverWickets } = getScore(
     overSummaries[curOverIndex] || [],
   );
+
+  useEffect(() => {
+    const balls = getCookie("balls");
+    if (balls) {
+      setBalls(JSON.parse(balls));
+    }
+  }, []);
 
   function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
     const event = e.currentTarget.value;
