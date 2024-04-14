@@ -22,12 +22,6 @@ function TargetInfo({
 
   const toggleContent = () => setShowTarget(!showTarget);
 
-  //   useEffect(() => {
-  //     const intervalId = setInterval(toggleContent, 3000);
-
-  //     return () => clearInterval(intervalId);
-  //   }, []);
-
   useEffect(() => {
     const TOGGLE_INTERVAL = 15000;
     const intervalId = setInterval(() => {
