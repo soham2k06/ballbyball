@@ -45,14 +45,8 @@ function BatsmanScores({
             events
               .filter((evt) => evt.batsmanId === id)
               .map(({ type }) => type),
+            true,
           );
-          // const totalRuns = calcRuns(
-          //   legalEvents.map(({ type }) => type),
-          //   true,
-          // );
-          // const totalBalls = legalEvents.filter((ball) =>
-          //   getIsInvalidBall(ball.type as EventType),
-          // ).length;
 
           const strikeRate =
             Math.round((totalBalls ? (totalRuns / totalBalls) * 100 : 0) * 10) /
