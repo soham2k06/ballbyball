@@ -2,7 +2,7 @@ import { EventType } from "@/types";
 
 const strikeChangers = ["1", "3", "-4"]; // '-4' is for swap manually without run
 
-const invalidBalls = ["-3", "-2"];
+const invalidBalls = ["-4", "-3", "-2"];
 
 export const ballEvents: Record<EventType, string> = {
   "-4": "0",

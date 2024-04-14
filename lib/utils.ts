@@ -50,6 +50,7 @@ function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
   ).length;
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
+
   const extras = balls.filter(
     (ball) => ball === "-2" || ball.includes("-3"),
   ).length;
