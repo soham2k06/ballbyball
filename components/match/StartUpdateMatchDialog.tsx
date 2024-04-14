@@ -146,7 +146,7 @@ function StartUpdateMatchDialog({
                         First team selected will be batting first
                       </FormDescription>
                     </div>
-                    <ul className="max-h-48 space-y-4 overflow-y-auto">
+                    <ul className="max-h-48 space-y-4 overflow-y-auto p-1">
                       {teams?.map((item) => (
                         <FormField
                           key={item.id}
