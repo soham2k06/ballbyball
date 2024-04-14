@@ -35,6 +35,7 @@ function ScoreButtons({
             size="lg"
             variant="destructive"
             className="h-20 w-full text-lg font-bold"
+            value="-1"
             onClick={handleScore}
           >
             OUT
