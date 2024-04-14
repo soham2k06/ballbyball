@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
 
-const IBMPlex = IBM_Plex_Sans({
+import { Inter } from "next/font/google";
+
+// If loading a variable font, you don't need to specify the font weight
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-ibm-plex",
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -136,11 +137,7 @@ export default function RootLayout({
             href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎾</text></svg>"
           />
         </head>
-        <body
-          className={cn("font-IBMPlex h-screen antialiased", IBMPlex.variable)}
-        >
-          {children}
-        </body>
+        <body className={cn("antialiased", inter.className)}>{children}</body>
       </html>
     </ClerkProvider>
   );
