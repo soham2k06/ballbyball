@@ -7,12 +7,12 @@ import { OverlayStateProps } from "@/types";
 import { useCreateMultiplePlayers } from "@/apiHooks/player";
 
 import {
-  Drawer,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -81,11 +81,11 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Add Multiple Player</DrawerTitle>
-        </DrawerHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Multiple Player</DialogTitle>
+        </DialogHeader>
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -129,7 +129,7 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
               </div>
             ))}
 
-            <DrawerFooter className="!mt-8 w-full flex-row items-end !justify-between">
+            <DialogFooter className="!mt-8 w-full flex-row items-end !justify-between">
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -147,11 +147,11 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
                   {isPending ? "Adding..." : "Add"}
                 </LoadingButton>
               </div>
-            </DrawerFooter>
+            </DialogFooter>
           </form>
         </Form>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 }
 
