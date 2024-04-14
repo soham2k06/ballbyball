@@ -23,12 +23,12 @@ const navItems = [
     href: "/matches",
   },
   {
-    name: "Players",
-    href: "/players",
-  },
-  {
     name: "Teams",
     href: "/teams",
+  },
+  {
+    name: "Players",
+    href: "/players",
   },
   {
     name: "Normal Scoring",
