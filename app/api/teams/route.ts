@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
         userId,
         name: newName,
         teamPlayers: {
-          create: playerIds.map((playerId: string) => ({
+          create: playerIds.reverse().map((playerId: string) => ({
             player: { connect: { id: playerId } },
           })),
         },

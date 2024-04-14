@@ -23,15 +23,13 @@ export async function GET(
     });
 
     const matchSimplified = {
-      teams: match?.matchTeams
-        .map((team) => {
-          const { teamPlayers, ...rest } = team.team;
-          return {
-            ...rest,
-            players: teamPlayers.map((teamPlayer) => teamPlayer.player),
-          };
-        })
-        .reverse(),
+      teams: match?.matchTeams.map((team) => {
+        const { teamPlayers, ...rest } = team.team;
+        return {
+          ...rest,
+          players: teamPlayers.map((teamPlayer) => teamPlayer.player),
+        };
+      }),
       ...match,
     };
 

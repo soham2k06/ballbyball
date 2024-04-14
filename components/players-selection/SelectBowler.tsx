@@ -135,7 +135,7 @@ function SelectBowler({
                         defaultValue={field.value}
                         className="max-h-96 overflow-auto"
                       >
-                        {players?.toReversed()?.map((player) => {
+                        {players?.map((player) => {
                           const isSelected = field.value?.includes(player.id);
                           const isBothSelected = field.value?.length === 1;
                           return (
