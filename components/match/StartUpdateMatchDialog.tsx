@@ -118,7 +118,7 @@ function StartUpdateMatchDialog({
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="max-h-full space-y-3 overflow-y-auto p-4 pt-0"
+            className="space-y-3 p-4 pt-0"
           >
             <FormField
               control={control}
@@ -146,42 +146,45 @@ function StartUpdateMatchDialog({
                         First team selected will be batting first
                       </FormDescription>
                     </div>
-                    {teams?.map((item) => (
-                      <FormField
-                        key={item.id}
-                        control={form.control}
-                        name="teamIds"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={item.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(item.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([
-                                          ...field.value!,
-                                          item.id,
-                                        ])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== item.id,
-                                          ),
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {item.name}
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
-                      />
-                    ))}
+                    <ul className="max-h-48 space-y-4 overflow-y-auto">
+                      {teams?.map((item) => (
+                        <FormField
+                          key={item.id}
+                          control={form.control}
+                          name="teamIds"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={item.id}
+                                className="flex flex-row items-center space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    className="size-6"
+                                    checked={field.value?.includes(item.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value!,
+                                            item.id,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== item.id,
+                                            ),
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {item.name}
+                                </FormLabel>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </ul>
                     <FormMessage />
                   </FormItem>
                 )}

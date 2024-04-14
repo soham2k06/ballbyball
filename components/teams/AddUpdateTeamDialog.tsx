@@ -126,13 +126,14 @@ function AddUpdateTeamDialog({
           <Form {...form}>
             <form
               onSubmit={handleSubmitOwn}
-              className="max-h-full space-y-3 overflow-y-auto p-4"
+              className="max-h-full space-y-3 overflow-y-auto p-4 pt-0"
             >
               <FormField
                 control={control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>Team Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Team name" {...field} />
                     </FormControl>
@@ -153,42 +154,45 @@ function AddUpdateTeamDialog({
                       </FormDescription>
                     </div>
                     {players?.length ? (
-                      players?.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="playerIds"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([
-                                            ...field.value,
-                                            item.id,
-                                          ])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.id,
-                                            ),
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {item.name}
-                                </FormLabel>
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))
+                      <ul className="max-h-96 space-y-4 overflow-auto p-1">
+                        {players?.map((item) => (
+                          <FormField
+                            key={item.id}
+                            control={form.control}
+                            name="playerIds"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  key={item.id}
+                                  className="flex flex-row items-center space-x-3 space-y-0"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      className="size-6"
+                                      checked={field.value?.includes(item.id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([
+                                              ...field.value,
+                                              item.id,
+                                            ])
+                                          : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== item.id,
+                                              ),
+                                            );
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">
+                                    {item.name}
+                                  </FormLabel>
+                                </FormItem>
+                              );
+                            }}
+                          />
+                        ))}
+                      </ul>
                     ) : (
                       <p>No players</p>
                     )}
