@@ -118,7 +118,7 @@ function StartUpdateMatchDialog({
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="max-h-full space-y-3 overflow-y-auto p-4"
+            className="max-h-full space-y-3 overflow-y-auto p-4 pt-0"
           >
             <FormField
               control={control}
