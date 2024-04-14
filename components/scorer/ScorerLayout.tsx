@@ -52,7 +52,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // ** React query hooks
   const { createBallEvent, isPending } = useSaveBallEvents();
-  const { updateMatch } = useUpdateMatch();
+  const { updateMatch, isPending: isUpdatingMatch } = useUpdateMatch();
   const { deleteAllBallEvents } = useDeleteAllBallEvents();
 
   // ** States
@@ -408,7 +408,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           events={events as BallEvent[]}
         />
         <Separator className="my-3" />
-        {!matchIsFetching ? (
+        {!isUpdatingMatch && !isPending ? (
           <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
         ) : (
           <ScoreButtonsSkeleton />
@@ -439,6 +439,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           }}
           handleSelectPlayer={handleSelectPlayer}
           allowSinglePlayer={match?.allowSinglePlayer}
+          isLoading={isUpdatingMatch}
         />
         <SelectBowler
           open={showSelectBowler}
