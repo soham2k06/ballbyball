@@ -143,7 +143,7 @@ function StartUpdateMatchDialog({
                     <div className="mb-4">
                       <FormLabel className="text-base">Teams</FormLabel>
                       <FormDescription>
-                        Select the teams from your collection
+                        First team selected will be batting first
                       </FormDescription>
                     </div>
                     {teams?.map((item) => (
