@@ -37,6 +37,7 @@ import FieldersDialog from "./FieldersDialog";
 import MatchSummary from "./MatchSummary";
 import NoMatchFound from "./NoMatchFound";
 import TargetInfo from "./TargetInfo";
+import ScoreButtonsSkeleton from "../score-buttons/ScoreButtonsSkeleton";
 
 function ScorerLayout({ matchId }: { matchId: string }) {
   const { match, matchIsLoading, matchIsFetching, isSuccess } =
@@ -407,7 +408,11 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           events={events as BallEvent[]}
         />
         <Separator className="my-3" />
-        <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
+        {!matchIsFetching ? (
+          <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
+        ) : (
+          <ScoreButtonsSkeleton />
+        )}
         <div className="mt-4 md:mt-6" />
         <Tools
           runRate={runRate}
