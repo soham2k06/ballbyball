@@ -22,13 +22,18 @@ function cn(...inputs: ClassValue[]) {
 // If event is no ball(-3), add run along with no ball and 1 run for no ball, split the last char to calculate runs along with run out
 // Else return an event and ensure to convert wide(-2) to 1 run
 // Sum all the runs
-const calcRuns = (ballEvents: EventType[] | string[], forPlayer?: boolean) =>
+const calcRuns = (
+  ballEvents: EventType[] | string[],
+  forPlayerRuns?: boolean,
+) =>
   ballEvents
     ?.filter((ball) => !(ball.includes("-1") && !ball.split("_")[3]))
     ?.map((event) =>
       event.includes("-3")
-        ? (Number(event.slice(2)) + Number(!forPlayer)).toString()
-        : event.replace("-2", "1").replace("-4", "0").slice(-1),
+        ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
+        : event === "-2"
+          ? String(Number(!forPlayerRuns))
+          : event.replace("-4", "0").slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
@@ -38,8 +43,8 @@ const calcWickets = (ballEvents: EventType[] | string[]) =>
 const getIsInvalidBall = (ball: EventType | string) =>
   !invalidBalls.includes(ball) && !ball.includes("-3");
 
-function getScore(balls: (EventType | string)[]) {
-  const runs = calcRuns(balls);
+function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
+  const runs = calcRuns(balls, forPlayerRuns);
   const totalBalls = balls?.filter(
     (ball) => ball !== "-4" && getIsInvalidBall(ball),
   ).length;
