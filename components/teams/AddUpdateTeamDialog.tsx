@@ -80,7 +80,6 @@ function AddUpdateTeamDialog({
   );
 
   function onSubmit(data: CreateTeamSchema) {
-    console.log(data);
     if (teamToUpdate) {
       updateTeam(
         { id: teamToUpdate.id, ...data },
