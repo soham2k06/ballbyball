@@ -143,7 +143,7 @@ function StartUpdateMatchDialog({
                     <div className="mb-4">
                       <FormLabel className="text-base">Teams</FormLabel>
                       <FormDescription>
-                        Select the temas from your collection
+                        Select the teams from your collection
                       </FormDescription>
                     </div>
                     {teams?.map((item) => (
