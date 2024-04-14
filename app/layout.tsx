@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
+import { Lato } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
 
-import { Inter } from "next/font/google";
-
 // If loading a variable font, you don't need to specify the font weight
-const inter = Inter({
+const inter = Lato({
   subsets: ["latin"],
   weight: "400",
 });
