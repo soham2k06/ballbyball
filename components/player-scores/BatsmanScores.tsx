@@ -1,13 +1,7 @@
 import { BallEvent, Player } from "@prisma/client";
 
 import { usePlayerById } from "@/apiHooks/player";
-import {
-  calcRuns,
-  getBattingStats,
-  getIsInvalidBall,
-  getScore,
-} from "@/lib/utils";
-import { EventType } from "@/types";
+import { getBattingStats, getScore } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 
 interface BatsmanScoresProps {
