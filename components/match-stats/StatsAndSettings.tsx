@@ -67,12 +67,14 @@ function StatsAndSettings({
   const playerIds = curTeam?.players.map((player) => player.id) || [];
 
   const fTeamEvents = events
-    .filter((event) => playerIds.includes(event.bowlerId))
+    .filter((event) => playerIds.includes(event.batsmanId))
     .map((event) => event.type as EventType);
 
   const sTeamEvents = events
-    .filter((event) => playerIds.includes(event.batsmanId))
+    .filter((event) => playerIds.includes(event.bowlerId))
     .map((event) => event.type as EventType);
+
+  console.log(fTeamEvents, sTeamEvents);
 
   const ballEventsArr = [fTeamEvents, sTeamEvents];
 

@@ -103,7 +103,6 @@ function WormChart({
           <XAxis dataKey="over" />
           <YAxis />
           <Tooltip
-            // wrapperClassName="!bg-background !border-muted rounded-md"
             content={({ payload, label }) => {
               const wickets = payload?.map(
                 (payload) => payload.payload.wickets,
