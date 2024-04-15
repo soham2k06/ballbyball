@@ -21,7 +21,7 @@ function TeamTabs({ selectedTeam, setSelectedTeam, teams }: TeamTabsProps) {
       <li>
         {teams?.map((team, i) => (
           <Button
-            variant={selectedTeam.name === team.name ? "default" : "secondary"}
+            variant={selectedTeam.index === i ? "default" : "secondary"}
             size="sm"
             key={team.id}
             onClick={() => setSelectedTeam({ index: i, name: team.name })}
