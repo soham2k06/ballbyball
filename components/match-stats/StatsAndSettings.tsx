@@ -74,8 +74,6 @@ function StatsAndSettings({
     .filter((event) => playerIds.includes(event.bowlerId))
     .map((event) => event.type as EventType);
 
-  console.log(fTeamEvents, sTeamEvents);
-
   const ballEventsArr = [fTeamEvents, sTeamEvents];
 
   const {
@@ -218,7 +216,10 @@ function StatsAndSettings({
                 selectedTeam={selectedTeam}
                 setSelectedTeam={setSelectedTeam}
               />
-              <OverStats ballEvents={ballEventsArr[selectedTeam.index]} />
+              <OverStats
+                ballEvents={ballEventsArr[selectedTeam.index]}
+                totalOvers={match.overs}
+              />
             </DrawerContent>
           </Drawer>
           <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>
