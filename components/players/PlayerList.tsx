@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useAllPlayers, useDeletePlayer } from "@/apiHooks/player";
-import { cn, truncStr } from "@/lib/utils";
-
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
-import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
-import LoadingButton from "../ui/loading-button";
-import { UpdatePlayerSchema } from "@/lib/validation/player";
-import AlertNote from "../AlertNote";
 import { LoaderIcon } from "lucide-react";
-import AddPlayerButton from "./AddPlayer";
+
+import { useAllPlayers, useDeletePlayer } from "@/apiHooks/player";
+import { cn } from "@/lib/utils";
+import { UpdatePlayerSchema } from "@/lib/validation/player";
+
+import AlertNote from "../AlertNote";
 import EmptyState from "../EmptyState";
+
+import Player from "./Player";
+import AddPlayerButton from "./AddPlayer";
+import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
 
 function PlayerList() {
   const { players, isFetching } = useAllPlayers();
@@ -24,8 +24,6 @@ function PlayerList() {
   const [playerToUpdate, setPlayerToUpdate] = useState<
     UpdatePlayerSchema | undefined
   >(undefined);
-
-  const handleDelete = (playerId: string) => setPlayerToDelete(playerId);
 
   if (isFetching)
     return (
@@ -44,26 +42,13 @@ function PlayerList() {
         {players?.length ? (
           <div className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-6">
             {players.map((player) => {
-              const isLoading = isPending && playerToDelete === player.id;
               return (
-                <Card key={player.id}>
-                  <CardHeader>
-                    <CardTitle>{truncStr(player.name as string, 10)}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-x-2">
-                    <Button onClick={() => setPlayerToUpdate(player)}>
-                      Edit
-                    </Button>
-
-                    <LoadingButton
-                      loading={isLoading}
-                      disabled={isLoading}
-                      onClick={() => handleDelete(player.id)}
-                    >
-                      {isLoading ? "Deleting..." : "Delete"}
-                    </LoadingButton>
-                  </CardContent>
-                </Card>
+                <Player
+                  key={player.id}
+                  player={player}
+                  setPlayerToDelete={setPlayerToDelete}
+                  setPlayerToUpdate={setPlayerToUpdate}
+                />
               );
             })}
           </div>
@@ -84,6 +69,7 @@ function PlayerList() {
         setOpen={() =>
           setPlayerToDelete(playerToDelete ? undefined : playerToDelete)
         }
+        isLoading={isPending}
         content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
         onConfirm={() => playerToDelete && deletePlayer(playerToDelete)}
       />
