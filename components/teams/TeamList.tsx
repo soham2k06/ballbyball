@@ -1,34 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import { LoaderIcon } from "lucide-react";
 
 import { useAllTeams } from "@/apiHooks/team";
 
-import CreateTeam from "@/components/teams/AddTeam";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TypographyP } from "@/components/ui/typography";
 import { useDeleteTeam } from "@/apiHooks/team/useDeleteTeam";
-import { useState } from "react";
-import LoadingButton from "../ui/loading-button";
-import { Button } from "../ui/button";
+import CreateTeam from "@/components/teams/AddTeam";
 import AddUpdateTeamDialog from "./AddUpdateTeamDialog";
 import { UpdateTeamSchema } from "@/lib/validation/team";
 import { TeamWithPlayers } from "@/types";
 import EmptyState from "../EmptyState";
 import { cn } from "@/lib/utils";
+import Team from "./Team";
+import AlertNote from "../AlertNote";
+import { Player } from "@prisma/client";
+import TeamPlayers from "./TeamPlayers";
 
 function TeamList() {
   const { allTeams: teams, isFetching } = useAllTeams();
 
-  const playersArr = teams?.map((team) => team.players);
-
   const { deleteTeam, isPending } = useDeleteTeam();
 
-  const [teamToDelete, setTeamToDelete] = useState<string | null>(null);
+  const [teamToDelete, setTeamToDelete] = useState<string | undefined>();
 
   const [teamToUpdate, setTeamToUpdate] = useState<
     (UpdateTeamSchema & { matchId: string | null }) | undefined
+  >();
+
+  const [showingTeam, setShowingTeam] = useState<
+    | {
+        name: string;
+        players: Player[];
+        captainId: string | null;
+      }
+    | undefined
   >(undefined);
+
+  console.log(showingTeam);
 
   if (isFetching)
     return (
@@ -41,7 +50,7 @@ function TeamList() {
     setTeamToDelete(id);
     deleteTeam(id, {
       onSettled() {
-        setTeamToDelete(null);
+        setTeamToDelete(undefined);
       },
     });
   }
@@ -58,6 +67,8 @@ function TeamList() {
     setTeamToUpdate(teamToUpdateVar);
   }
 
+  console.log(showingTeam);
+
   return (
     <div
       className={cn("md:p-8", {
@@ -65,38 +76,15 @@ function TeamList() {
       })}
     >
       {teams?.length ? (
-        <ul className="grid grid-cols-2 gap-4 pb-4">
+        <ul className="grid grid-cols-4 gap-4 pb-4">
           {teams.map((team, i) => {
-            const players = playersArr?.[i];
-            const captainIndex = players?.findIndex(
-              (player) => player.id === team.captain,
-            );
-
-            const isLoading = isPending && teamToDelete === team.id;
-
             return (
-              <Card>
-                <CardHeader>
-                  <CardTitle>{team.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {players?.map(({ name }, playerIndex) => (
-                    <TypographyP>
-                      {name} {captainIndex === playerIndex && "(C)"}
-                    </TypographyP>
-                  ))}
-                  <Button onClick={() => handleUpdateClick(0, team)}>
-                    Edit
-                  </Button>
-                  <LoadingButton
-                    loading={isLoading}
-                    disabled={isLoading}
-                    onClick={() => handleDelete(team.id)}
-                  >
-                    {isLoading ? "Deleting..." : "Delete"}
-                  </LoadingButton>
-                </CardContent>
-              </Card>
+              <Team
+                team={team}
+                setTeamToDelete={setTeamToDelete}
+                setShowingTeam={setShowingTeam}
+                handleUpdateClick={(team) => handleUpdateClick(i, team)}
+              />
             );
           })}
         </ul>
@@ -109,6 +97,19 @@ function TeamList() {
         open={!!teamToUpdate}
         setOpen={() => setTeamToUpdate(teamToUpdate ? undefined : teamToUpdate)}
         teamToUpdate={teamToUpdate}
+      />
+
+      <AlertNote
+        open={!!teamToDelete}
+        setOpen={() => setTeamToDelete(teamToDelete ? undefined : teamToDelete)}
+        content="Removing team may lead to bugs if the team is included in  matches. Do you still want to continue?"
+        onConfirm={() => teamToDelete && handleDelete(teamToDelete)}
+        isLoading={isPending}
+      />
+
+      <TeamPlayers
+        showingTeam={showingTeam}
+        onClose={() => setShowingTeam(undefined)}
       />
     </div>
   );
