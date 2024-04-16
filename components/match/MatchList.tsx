@@ -1,22 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { LoaderIcon } from "lucide-react";
 
-import { EventType } from "@/types";
 import { useAllMatches, useDeleteMatch } from "@/apiHooks/match";
-import { calculateWinner, cn, getOverStr, getScore } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { UpdateMatchSchema } from "@/lib/validation/match";
-
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
-import { TypographyP } from "../ui/typography";
 
 import AlertNote from "../AlertNote";
 import EmptyState from "../EmptyState";
 import StartUpdateMatchDialog from "./StartUpdateMatchDialog";
 import StartMatchButton from "./StartMatch";
+import Match from "./Match";
 
 function MatchList() {
   const { matches, isLoading } = useAllMatches();
@@ -38,91 +33,20 @@ function MatchList() {
 
   return (
     <div
-      className={cn("md:p-8", {
-        "flex flex-col items-center": !matches?.length,
+      className={cn({
+        "flex flex-col items-center md:p-8": !matches?.length,
+        "py-8": matches?.length,
       })}
     >
       {matches?.length ? (
-        <ul>
-          {matches?.map((match) => {
-            const matchToUpdateVar = {
-              ...match,
-              teamIds: match.teams.map((team) => team.id),
-            };
-
-            const ballEventsbyTeam = (i: number) =>
-              match.ballEvents
-                .filter((event) =>
-                  match.teams[i].teamPlayers
-                    .map(({ playerId }) => playerId)
-                    .includes(event.batsmanId),
-                )
-                .map((event) => event.type);
-
-            const { runs: runs1 } = getScore(ballEventsbyTeam(0));
-            const {
-              runs: runs2,
-              wickets: wickets2,
-              totalBalls: totalBalls2,
-            } = getScore(ballEventsbyTeam(1));
-            const totalWickets = match.teams[1].teamPlayers.length;
-
-            const { winInfo } = calculateWinner({
-              allowSinglePlayer: match.allowSinglePlayer,
-              matchBalls: match.overs * 6,
-              runs1,
-              runs2,
-              teams: match.teams.map(({ name }) => name),
-              totalBalls: totalBalls2,
-              totalWickets,
-              wickets2,
-            });
-
-            return (
-              <Card>
-                <CardHeader className="flex-row items-center justify-between">
-                  <CardTitle>{match.name}</CardTitle>
-                  <Button asChild>
-                    <Link href={`/match/${match.id}`}>Play</Link>
-                  </Button>
-                  <Button onClick={() => setMatchToUpdate(matchToUpdateVar)}>
-                    Edit
-                  </Button>
-                  <Button onClick={() => setMatchToDelete(match.id)}>
-                    Delete
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {match.teams.map(({ name, teamPlayers }) => {
-                    const ballEventsByTeam = match.ballEvents
-                      .filter((event) =>
-                        teamPlayers
-                          .map(({ playerId }) => playerId)
-                          .includes(event.batsmanId),
-                      )
-                      .map((event) => event.type as EventType);
-
-                    const { runs, totalBalls, wickets } =
-                      getScore(ballEventsByTeam);
-
-                    return (
-                      <TypographyP>
-                        {name}:{" "}
-                        {ballEventsByTeam.length ? (
-                          <>
-                            runs - {runs}/{wickets} ({getOverStr(totalBalls)})
-                          </>
-                        ) : (
-                          "Yet to bat"
-                        )}
-                      </TypographyP>
-                    );
-                  })}
-                  {match.hasEnded && winInfo}
-                </CardContent>
-              </Card>
-            );
-          })}
+        <ul className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {matches?.map((match) => (
+            <Match
+              match={match}
+              setMatchToDelete={setMatchToDelete}
+              setMatchToUpdate={setMatchToUpdate}
+            />
+          ))}
         </ul>
       ) : (
         <EmptyState document="matches" />
