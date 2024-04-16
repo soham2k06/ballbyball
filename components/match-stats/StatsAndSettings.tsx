@@ -246,7 +246,11 @@ function StatsAndSettings({
                   </span>
                 </DrawerTitle>
               </DrawerHeader>
-              <WormChart ballEvents={ballEventsArr} teams={match.teams} />
+              <WormChart
+                ballEvents={ballEventsArr}
+                teams={match.teams}
+                totalOvers={match.overs}
+              />
             </DrawerContent>
           </Drawer>
         </>

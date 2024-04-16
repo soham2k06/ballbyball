@@ -15,9 +15,11 @@ import { Card, CardContent, CardTitle } from "../ui/card";
 function WormChart({
   ballEvents,
   teams,
+  totalOvers,
 }: {
   ballEvents: EventType[][];
   teams: Team[];
+  totalOvers: number;
 }) {
   const { overSummaries } = generateOverSummary(ballEvents[0]);
   const { overSummaries: overSummaries2 } = generateOverSummary(ballEvents[1]);
@@ -40,8 +42,8 @@ function WormChart({
   const combineData = (
     team1Score: { runs: number; wickets: number }[],
     team2Score: { runs: number; wickets: number }[],
+    totalOvers: number,
   ) => {
-    const maxOvers = Math.max(team1Score.length, team2Score.length);
     const data = [];
 
     let team1TotalRuns = 0;
@@ -50,7 +52,7 @@ function WormChart({
     let team1TotalWickets = 0;
     let team2TotalWickets = 0;
 
-    for (let i = 0; i < maxOvers; i++) {
+    for (let i = 0; i < totalOvers; i++) {
       const aggrTeam1Score = i < team1Score.length ? team1Score[i] : null;
       const aggrTeam2Runs = i < team2Score.length ? team2Score[i] : null;
 
@@ -88,7 +90,7 @@ function WormChart({
         [teams[1].name]: 0,
       },
     },
-    ...combineData(team1Score, team2Score),
+    ...combineData(team1Score, team2Score, totalOvers),
   ];
 
   return (
