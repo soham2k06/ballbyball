@@ -439,7 +439,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           }}
           handleSelectPlayer={handleSelectPlayer}
           allowSinglePlayer={match?.allowSinglePlayer}
-          isLoading={isUpdatingMatch}
+          isLoading={isUpdatingMatch || matchIsFetching}
         />
         <SelectBowler
           open={showSelectBowler}
