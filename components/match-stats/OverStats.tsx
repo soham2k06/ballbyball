@@ -7,13 +7,13 @@ function OverStats({
   totalOvers,
 }: {
   ballEvents: EventType[];
-  totalOvers: number;
+  totalOvers?: number;
 }) {
   const { overSummaries } = generateOverSummary(ballEvents);
 
   const chartSummaryData = [];
 
-  for (let i = 0; i < totalOvers; i++) {
+  for (let i = 0; i < (totalOvers ?? overSummaries.length); i++) {
     const summary = overSummaries[i] || ["0"];
     const overName = overSummaries.length > 9 ? `Over ${i + 1}` : i + 1;
 
