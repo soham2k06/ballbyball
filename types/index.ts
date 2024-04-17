@@ -19,6 +19,23 @@ type PlayerPerformance = {
   isWinner: boolean;
 };
 
+type PlayerStats = {
+  batting: {
+    runs: number;
+    balls: number;
+    wickets: number;
+    fifties: number;
+    centuries: number;
+    highestScore: number;
+  };
+  bowling: {
+    runs: number;
+    balls: number;
+    wickets: number;
+  };
+  matchesPlayed: number;
+};
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };
@@ -31,7 +48,8 @@ type MatchExtended = Match & {
 export type {
   EventType,
   OverlayStateProps,
+  PlayerPerformance,
+  PlayerStats,
   TeamWithPlayers,
   MatchExtended,
-  PlayerPerformance,
 };

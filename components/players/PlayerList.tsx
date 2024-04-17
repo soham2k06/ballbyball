@@ -13,17 +13,21 @@ import EmptyState from "../EmptyState";
 import Player from "./Player";
 import AddPlayerButton from "./AddPlayer";
 import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
+import PlayerStats from "./PlayerStats";
 
 function PlayerList() {
   const { players, isFetching } = useAllPlayers();
   const { deletePlayer, isPending } = useDeletePlayer();
-  const [playerToDelete, setPlayerToDelete] = useState<string | undefined>(
-    undefined,
-  );
+  const [playerToDelete, setPlayerToDelete] = useState<string | undefined>();
 
   const [playerToUpdate, setPlayerToUpdate] = useState<
     UpdatePlayerSchema | undefined
-  >(undefined);
+  >();
+
+  const [openedPlayer, setOpenedPlayer] = useState<{
+    id: string | undefined;
+    name: string | undefined;
+  }>();
 
   if (isFetching)
     return (
@@ -48,6 +52,7 @@ function PlayerList() {
                   player={player}
                   setPlayerToDelete={setPlayerToDelete}
                   setPlayerToUpdate={setPlayerToUpdate}
+                  setOpenedPlayer={setOpenedPlayer}
                 />
               );
             })}
@@ -72,6 +77,11 @@ function PlayerList() {
         isLoading={isPending}
         content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
         onConfirm={() => playerToDelete && deletePlayer(playerToDelete)}
+      />
+
+      <PlayerStats
+        openedPlayer={openedPlayer}
+        setOpenedPlayer={() => setOpenedPlayer(undefined)}
       />
     </>
   );

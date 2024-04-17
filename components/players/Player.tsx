@@ -1,25 +1,39 @@
+import { Player as PlayerSchemaType } from "@prisma/client";
+import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+
+import { truncStr } from "@/lib/utils";
+import { UpdatePlayerSchema } from "@/lib/validation/player";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import { Card, CardHeader, CardTitle } from "../ui/card";
+} from "../ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import { Player as PlayerSchemaType } from "@prisma/client";
-import { truncStr } from "@/lib/utils";
-import { UpdatePlayerSchema } from "@/lib/validation/player";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
 
 interface PlayerProps {
   player: PlayerSchemaType;
   setPlayerToDelete: (playerId: string) => void;
   setPlayerToUpdate: (player: UpdatePlayerSchema) => void;
+  setOpenedPlayer: ({
+    name,
+    id,
+  }: {
+    id: string | undefined;
+    name: string | undefined;
+  }) => void;
 }
 
-function Player({ player, setPlayerToDelete, setPlayerToUpdate }: PlayerProps) {
+function Player({
+  player,
+  setPlayerToDelete,
+  setPlayerToUpdate,
+  setOpenedPlayer,
+}: PlayerProps) {
   const handleDelete = (playerId: string) => setPlayerToDelete(playerId);
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
@@ -46,6 +60,19 @@ function Player({ player, setPlayerToDelete, setPlayerToUpdate }: PlayerProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
+      <CardContent>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            setOpenedPlayer({
+              id: player.id,
+              name: player.name,
+            })
+          }
+        >
+          All time Stats
+        </Button>
+      </CardContent>
     </Card>
   );
 }
