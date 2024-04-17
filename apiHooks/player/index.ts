@@ -4,6 +4,7 @@ import { useCreatePlayer } from "./useCreatePlayer";
 import { useDeletePlayer } from "./useDeletePlayer";
 import { usePlayerById } from "./usePlayerById";
 import { useUpdatePlayer } from "./useUpdatePlayer";
+import { usePlayerStats } from "./usePlayerStats";
 
 export {
   useAllPlayers,
@@ -12,4 +13,5 @@ export {
   usePlayerById,
   useDeletePlayer,
   useUpdatePlayer,
+  usePlayerStats,
 };
