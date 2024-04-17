@@ -4,7 +4,7 @@
 
 ## Overview:
 
-The Cricket Scoring Web App is a comprehensive tool designed to streamline the scoring process for cricket matches. Whether you're a seasoned scorer or just starting out, this app offers intuitive features to accurately record every aspect of the game.
+The Ballbyball is a comprehensive tool designed to streamline the scoring process for cricket matches. Whether you're a seasoned scorer or just starting out, this app offers intuitive features to accurately record every aspect of the game.
 
 ## Key Features:
 
