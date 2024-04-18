@@ -14,20 +14,14 @@ export async function GET() {
       select: {
         id: true,
         name: true,
-        ballEvents: {
-          select: { batsmanId: true, type: true },
-        },
+        ballEvents: { select: { batsmanId: true, type: true } },
         matchTeams: {
           include: {
             team: {
               select: {
                 id: true,
                 name: true,
-                teamPlayers: {
-                  select: {
-                    playerId: true,
-                  },
-                },
+                teamPlayers: { select: { playerId: true } },
               },
             },
           },
