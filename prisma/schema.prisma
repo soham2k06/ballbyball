@@ -30,7 +30,6 @@ model Player {
   userId      String
   name        String
   image       String?
-  desc        String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   teamId      String?      @db.ObjectId
