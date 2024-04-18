@@ -4,6 +4,7 @@ import { EventType } from "@/types";
 import { usePlayerById } from "@/apiHooks/player";
 import {
   abbreviateName,
+  calculateMaidenOvers,
   getBattingStats,
   getOverStr,
   getScore,
@@ -145,35 +146,6 @@ function Score({
                   </TableCell>
                 </TableRow>
               );
-
-            function calculateMaidenOvers(ballsThrown: EventType[]) {
-              let maidenOvers = 0;
-              let ballsInCurrentOver = 0;
-
-              let didRunCome = false;
-
-              for (let i = 0; i < ballsThrown.length; i++) {
-                const ball = ballsThrown[i];
-                ballsInCurrentOver++;
-
-                if (
-                  !(
-                    ball === "0" ||
-                    (ball.includes("-1") && ball.split("_")[3] === "0")
-                  )
-                )
-                  didRunCome = true;
-
-                if (ballsInCurrentOver === 6) {
-                  if (!didRunCome) maidenOvers++;
-
-                  ballsInCurrentOver = 0;
-                  didRunCome = false;
-                }
-              }
-
-              return maidenOvers;
-            }
 
             const maidenOverCount = calculateMaidenOvers(
               ballEvents

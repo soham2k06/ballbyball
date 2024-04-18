@@ -121,6 +121,33 @@ function getBattingStats(events: BallEvent[]) {
   return { fours: score.fours, sixes: score.sixes };
 }
 
+function calculateMaidenOvers(ballsThrown: EventType[]) {
+  console.log(ballsThrown);
+  let maidenOvers = 0;
+  let ballsInCurrentOver = 0;
+
+  let didRunCome = false;
+
+  for (let i = 0; i < ballsThrown.length; i++) {
+    const ball = ballsThrown[i];
+    ballsInCurrentOver++;
+
+    console.log(ball, ball.includes("-1"), ball.split("_")[3] === "0");
+
+    if (!(ball === "0" || ball.includes("-1") || ball.split("_")[3] === "0"))
+      didRunCome = true;
+
+    if (ballsInCurrentOver === 6) {
+      if (!didRunCome) maidenOvers++;
+
+      ballsInCurrentOver = 0;
+      didRunCome = false;
+    }
+  }
+
+  return maidenOvers;
+}
+
 function getOverStr(numBalls: number) {
   return `${Math.floor(numBalls / 6)}${numBalls % 6 ? `.${numBalls % 6}` : ""}`;
 }
@@ -320,6 +347,7 @@ export {
   getIsInvalidBall,
   getOverStr,
   getBattingStats,
+  calculateMaidenOvers,
   processTeamName,
   abbreviateName,
   calculateFallOfWickets,

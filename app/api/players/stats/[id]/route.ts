@@ -1,5 +1,11 @@
 import prisma from "@/lib/db/prisma";
-import { calcMilestones, getScore, validateUser } from "@/lib/utils";
+import {
+  calcMilestones,
+  calculateMaidenOvers,
+  getScore,
+  validateUser,
+} from "@/lib/utils";
+import { EventType } from "@/types";
 import { BallEvent } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -58,10 +64,13 @@ export async function GET(
       wickets: wicketsTaken,
     } = getScore(bowlingEvents);
 
+    const maidenOverCount = calculateMaidenOvers(bowlingEvents as EventType[]);
+
     const bowlingStats = {
       runs: runsConceded,
       balls: ballsBowled,
       wickets: wicketsTaken,
+      maidenOvers: maidenOverCount,
     };
 
     const playerStats = {
