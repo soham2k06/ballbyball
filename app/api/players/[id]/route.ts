@@ -10,7 +10,10 @@ export async function GET(
   try {
     validateUser();
 
-    const player = await prisma.player.findFirst({ where: { id } });
+    const player = await prisma.player.findFirst({
+      where: { id },
+      select: { id: true, name: true },
+    });
 
     if (!player)
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
