@@ -47,7 +47,7 @@ function PlayerStats({
               <Stat
                 data={matchesPlayed ? batAverage : "-"}
                 dataKey="Average"
-                showStar={isNotOutYet}
+                showStar={isNotOutYet && (matchesPlayed ?? 0) > 0}
               />
               <Stat
                 data={data.batting.balls ? batStrikeRate : "-"}
