@@ -11,6 +11,7 @@ export async function GET() {
     const players = await prisma.player.findMany({
       where: { userId },
       orderBy: { id: "asc" },
+      select: { id: true, name: true },
     });
 
     if (!players)
