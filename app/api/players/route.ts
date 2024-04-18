@@ -11,6 +11,7 @@ export async function GET() {
     const players = await prisma.player.findMany({
       where: { userId },
       orderBy: { id: "asc" },
+      select: { id: true, name: true },
     });
 
     if (!players)
@@ -42,14 +43,15 @@ export async function POST(req: NextRequest) {
 
     const userId = validateUser();
 
-    const player = await prisma.player.create({
+    await prisma.player.create({
       data: {
         userId,
         name: newName,
       },
+      select: { id: true, name: true },
     });
 
-    return NextResponse.json({ player }, { status: 201 });
+    return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (error) {
     console.error(error);
 

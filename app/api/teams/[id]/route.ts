@@ -13,7 +13,13 @@ export async function GET(
 
     const team = await prisma.team.findFirst({
       where: { id },
-      include: { teamPlayers: { include: { player: true } } },
+      select: {
+        teamPlayers: {
+          select: {
+            player: { select: { id: true } },
+          },
+        },
+      },
     });
 
     const teamSimplified = {

@@ -12,11 +12,29 @@ export async function GET(
 
     const match = await prisma.match.findFirst({
       where: { id },
-      include: {
-        ballEvents: true,
+      select: {
+        allowSinglePlayer: true,
+        curPlayers: true,
+        curTeam: true,
+        hasEnded: true,
+        id: true,
+        name: true,
+        overs: true,
+        strikeIndex: true,
+        ballEvents: {
+          select: { batsmanId: true, bowlerId: true, type: true },
+        },
         matchTeams: {
-          include: {
-            team: { include: { teamPlayers: { include: { player: true } } } },
+          select: {
+            team: {
+              select: {
+                id: true,
+                name: true,
+                teamPlayers: {
+                  select: { player: { select: { id: true, name: true } } },
+                },
+              },
+            },
           },
         },
       },

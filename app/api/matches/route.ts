@@ -11,14 +11,32 @@ export async function GET() {
 
     const matches = await prisma.match.findMany({
       where: { userId },
-      include: {
-        ballEvents: true,
-        matchTeams: { include: { team: { include: { teamPlayers: true } } } },
+      select: {
+        id: true,
+        name: true,
+        ballEvents: { select: { batsmanId: true, type: true } },
+        matchTeams: {
+          include: {
+            team: {
+              select: {
+                id: true,
+                name: true,
+                teamPlayers: { select: { playerId: true } },
+              },
+            },
+          },
+        },
       },
     });
 
     const matchesSimplified = matches.map((match) => {
-      const teams = match.matchTeams.map((matchTeam) => matchTeam.team);
+      const teams = match.matchTeams.map((matchTeam) => {
+        const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
+        return {
+          playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
+          ...teamWithoutPlayers,
+        };
+      });
 
       const { matchTeams, ...matchWithoutMatchTeams } = match;
 
@@ -69,10 +87,6 @@ export async function POST(req: NextRequest) {
         overs,
         allowSinglePlayer,
       },
-      include: {
-        matchTeams: { include: { team: true } },
-        ballEvents: true,
-      },
     });
 
     await prisma.team.updateMany({
@@ -117,7 +131,7 @@ export async function PUT(req: NextRequest) {
 
     const newName = await createWithUniqueName(name ?? "", prisma.match);
 
-    const updatedMatch = await prisma.match.update({
+    await prisma.match.update({
       where: { id: matchId },
       data: {
         name: newName || name,
@@ -127,9 +141,10 @@ export async function PUT(req: NextRequest) {
         strikeIndex,
         hasEnded,
       },
+      select: { id: true },
     });
 
-    return NextResponse.json({ match: updatedMatch }, { status: 200 });
+    return NextResponse.json({ message: "success" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

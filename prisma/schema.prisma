@@ -17,8 +17,6 @@ model Match {
   strikeIndex       Int         @default(0)
   hasEnded          Boolean     @default(false)
   curPlayers        CurPlayer[]
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
   ballEvents        BallEvent[]
   matchTeams        MatchTeam[]
 
@@ -30,9 +28,6 @@ model Player {
   userId      String
   name        String
   image       String?
-  desc        String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
   teamId      String?      @db.ObjectId
   teamPlayers TeamPlayer[]
 
@@ -44,8 +39,6 @@ model Team {
   userId      String
   name        String
   captain     String?      @db.ObjectId
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
   matchId     String?      @db.ObjectId
   matchTeams  MatchTeam[]
   teamPlayers TeamPlayer[]
@@ -74,15 +67,13 @@ model MatchTeam {
 }
 
 model BallEvent {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
   userId    String
-  batsmanId String   @db.ObjectId
-  bowlerId  String   @db.ObjectId
+  batsmanId String  @db.ObjectId
+  bowlerId  String  @db.ObjectId
   type      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Match     Match?   @relation(fields: [matchId], references: [id])
-  matchId   String?  @db.ObjectId
+  Match     Match?  @relation(fields: [matchId], references: [id])
+  matchId   String? @db.ObjectId
 
   @@map("ballEvents")
 }

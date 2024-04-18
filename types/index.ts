@@ -1,4 +1,4 @@
-import { BallEvent, Match, Player, Team, TeamPlayer } from "@prisma/client";
+import { BallEvent, Match, Player, Team } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
 
 type EventType = "0" | "1" | "2" | "3" | "4" | "6" | "-1" | "-2" | "-3" | "-4";
@@ -42,7 +42,7 @@ type PlayerStats = {
 type TeamWithPlayers = Team & { players: Player[] };
 
 type MatchExtended = Match & {
-  teams: (TeamWithPlayers & { teamPlayers: TeamPlayer[] })[];
+  teams: (TeamWithPlayers & { playerIds: string[] })[];
   ballEvents: BallEvent[];
 };
 
