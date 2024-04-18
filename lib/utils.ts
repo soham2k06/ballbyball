@@ -289,6 +289,26 @@ async function createWithUniqueName(
   return newName;
 }
 
+function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
+  let fifties = 0;
+  let centuries = 0;
+  let highestScore = 0;
+  for (const matchId in groupedMatches) {
+    const matchEvents = groupedMatches[matchId];
+
+    const { runs } = getScore(
+      matchEvents.map((event) => event.type),
+      true,
+    );
+
+    if (runs >= 50 && runs < 100) fifties++;
+    if (runs >= 100) centuries++;
+    if (runs > highestScore) highestScore = runs;
+  }
+
+  return { fifties, centuries, highestScore };
+}
+
 export {
   cn,
   getScore,
@@ -308,4 +328,5 @@ export {
   // Backend
   validateUser,
   createWithUniqueName,
+  calcMilestones,
 };
