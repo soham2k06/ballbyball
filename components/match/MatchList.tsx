@@ -42,6 +42,7 @@ function MatchList() {
         <ul className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {matches?.map((match) => (
             <Match
+              key={match.id}
               match={match}
               setMatchToDelete={setMatchToDelete}
               setMatchToUpdate={setMatchToUpdate}

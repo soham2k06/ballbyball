@@ -11,14 +11,38 @@ export async function GET() {
 
     const matches = await prisma.match.findMany({
       where: { userId },
-      include: {
-        ballEvents: true,
-        matchTeams: { include: { team: { include: { teamPlayers: true } } } },
+      select: {
+        id: true,
+        name: true,
+        ballEvents: {
+          select: { batsmanId: true, type: true },
+        },
+        matchTeams: {
+          include: {
+            team: {
+              select: {
+                id: true,
+                name: true,
+                teamPlayers: {
+                  select: {
+                    playerId: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
     const matchesSimplified = matches.map((match) => {
-      const teams = match.matchTeams.map((matchTeam) => matchTeam.team);
+      const teams = match.matchTeams.map((matchTeam) => {
+        const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
+        return {
+          playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
+          ...teamWithoutPlayers,
+        };
+      });
 
       const { matchTeams, ...matchWithoutMatchTeams } = match;
 

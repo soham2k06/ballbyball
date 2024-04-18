@@ -31,11 +31,7 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
 
   const ballEventsbyTeam = (i: number) =>
     match.ballEvents
-      .filter((event) =>
-        match.teams[i].teamPlayers
-          .map(({ playerId }) => playerId)
-          .includes(event.batsmanId),
-      )
+      .filter((event) => match.teams[i].playerIds.includes(event.batsmanId))
       .map((event) => event.type);
 
   const { runs: runs1 } = getScore(ballEventsbyTeam(0));
@@ -44,7 +40,7 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
     wickets: wickets2,
     totalBalls: totalBalls2,
   } = getScore(ballEventsbyTeam(1));
-  const totalWickets = match.teams[1].teamPlayers.length;
+  const totalWickets = match.teams[1].playerIds.length;
 
   const { winInfo } = calculateWinner({
     allowSinglePlayer: match.allowSinglePlayer,
@@ -56,6 +52,7 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
     totalWickets,
     wickets2,
   });
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
@@ -89,19 +86,15 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {match.teams.map(({ name, teamPlayers }) => {
+        {match.teams.map(({ id, name, playerIds }) => {
           const ballEventsByTeam = match.ballEvents
-            .filter((event) =>
-              teamPlayers
-                .map(({ playerId }) => playerId)
-                .includes(event.batsmanId),
-            )
+            .filter((event) => playerIds.includes(event.batsmanId))
             .map((event) => event.type as EventType);
 
           const { runs, totalBalls, wickets } = getScore(ballEventsByTeam);
 
           return (
-            <TypographyP>
+            <TypographyP key={id}>
               {name}:{" "}
               {ballEventsByTeam.length ? (
                 <>
