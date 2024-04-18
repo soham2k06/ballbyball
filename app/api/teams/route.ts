@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     const newName = await createWithUniqueName(name, prisma.team);
 
-    const team = await prisma.team.create({
+    await prisma.team.create({
       data: {
         userId,
         name: newName,
@@ -65,19 +65,9 @@ export async function POST(req: NextRequest) {
         },
         ...(captain && { captain }),
       },
-      include: {
-        teamPlayers: { include: { player: true } },
-        matchTeams: { include: { team: true } },
-      },
     });
 
-    const { teamPlayers, ...teamToReturn } = team;
-    const teamSimplified = {
-      players: team?.teamPlayers.map((team) => team.player),
-      ...teamToReturn,
-    };
-
-    return NextResponse.json(teamSimplified, { status: 201 });
+    return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

@@ -87,10 +87,6 @@ export async function POST(req: NextRequest) {
         overs,
         allowSinglePlayer,
       },
-      include: {
-        matchTeams: { include: { team: true } },
-        ballEvents: true,
-      },
     });
 
     await prisma.team.updateMany({
