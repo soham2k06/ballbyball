@@ -32,6 +32,7 @@ type PlayerStats = {
     runs: number;
     balls: number;
     wickets: number;
+    maidenOvers: number;
   };
   matchesPlayed: number;
 };

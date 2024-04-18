@@ -1,5 +1,7 @@
 import { usePlayerStats } from "@/apiHooks/player";
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
+import { Skeleton } from "../ui/skeleton";
+import { getOverStr } from "@/lib/utils";
 
 function PlayerStats({
   openedPlayer,
@@ -27,6 +29,10 @@ function PlayerStats({
   const isNotOutYet = data?.batting.wickets === 0;
   const batAverage = (data?.batting.runs ?? 0) / (matchesPlayed ?? 0) ?? 0;
 
+  const economy = ((data?.bowling.runs ?? 0) / (data?.bowling.balls ?? 0)) * 6;
+
+  const wicketsTaken = data?.bowling.wickets;
+
   return (
     <Dialog
       open={!!playerId}
@@ -38,28 +44,73 @@ function PlayerStats({
           <div className="text-sm font-bold">Matches - {matchesPlayed}</div>
         </DialogHeader>
         {data ? (
-          <div className="overflow-hidden rounded-md">
-            <div className="mb-1 bg-primary p-2 text-primary-foreground">
-              <h4 className="text-lg font-semibold md:text-xl">Batting</h4>
+          <div className="space-y-4">
+            <div className="overflow-hidden rounded-md">
+              <div className="mb-1 bg-primary p-2 text-primary-foreground">
+                <h4 className="text-lg font-semibold md:text-xl">Batting</h4>
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                <Stat data={data.batting.runs} dataKey="Runs" />
+                <Stat
+                  data={matchesPlayed ? batAverage : "-"}
+                  dataKey="Average"
+                  showStar={isNotOutYet && (matchesPlayed ?? 0) > 0}
+                />
+                <Stat
+                  data={data.batting.balls ? batStrikeRate : "-"}
+                  dataKey="Strike rate"
+                />
+                <Stat data={data.batting.fifties} dataKey="Fifties" />
+                <Stat data={data.batting.centuries} dataKey="Centuries" />
+                <Stat data={data.batting.highestScore} dataKey="High. Score" />
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-1">
-              <Stat data={data.batting.runs} dataKey="Runs" />
-              <Stat
-                data={matchesPlayed ? batAverage : "-"}
-                dataKey="Average"
-                showStar={isNotOutYet}
-              />
-              <Stat
-                data={data.batting.balls ? batStrikeRate : "-"}
-                dataKey="Strike rate"
-              />
-              <Stat data={data.batting.fifties} dataKey="Fifties" />
-              <Stat data={data.batting.centuries} dataKey="Centuries" />
-              <Stat data={data.batting.highestScore} dataKey="High. Score" />
+            <div className="overflow-hidden rounded-md">
+              <div className="mb-1 bg-primary p-2 text-primary-foreground">
+                <h4 className="text-lg font-semibold md:text-xl">Bowling</h4>
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                <Stat data={getOverStr(data.bowling.balls)} dataKey="Overs" />
+                <Stat data={data.bowling.runs} dataKey="Runs" />
+                <Stat data={data.bowling.wickets} dataKey="Wickets" />
+                <Stat data={data.bowling.maidenOvers} dataKey="Maidens" />
+                <Stat data={economy || "-"} dataKey="Economy" />
+                <Stat
+                  data={wicketsTaken ? data.bowling.balls / wicketsTaken! : "-"}
+                  dataKey="Strike rate"
+                />
+              </div>
             </div>
           </div>
         ) : (
-          <p>No data found</p>
+          <div className="space-y-4">
+            <div className="overflow-hidden rounded-md">
+              <div className="mb-1 bg-primary p-2 text-primary-foreground">
+                <h4 className="text-lg font-semibold md:text-xl">Batting</h4>
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                <Stat skeleton data={0} dataKey="Runs" />
+                <Stat skeleton data={0} dataKey="Average" />
+                <Stat skeleton data="-" dataKey="Strike rate" />
+                <Stat skeleton data={0} dataKey="Fifties" />
+                <Stat skeleton data={0} dataKey="Centuries" />
+                <Stat skeleton data={0} dataKey="High. Score" />
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-md">
+              <div className="mb-1 bg-primary p-2 text-primary-foreground">
+                <h4 className="text-lg font-semibold md:text-xl">Bowling</h4>
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                <Stat skeleton data={0} dataKey="Overs" />
+                <Stat skeleton data={0} dataKey="Runs" />
+                <Stat skeleton data={0} dataKey="Wickets" />
+                <Stat skeleton data={0} dataKey="Maidens" />
+                <Stat skeleton data={0} dataKey="Economy" />
+                <Stat skeleton data={0} dataKey="Strike Rate" />
+              </div>
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>
@@ -70,20 +121,26 @@ function Stat({
   data,
   dataKey,
   showStar,
+  skeleton,
 }: {
   dataKey: string;
-  data: number | "-";
+  data: number | string;
   showStar?: boolean;
+  skeleton?: boolean;
 }) {
   return (
     <div className="bg-muted p-2">
       <h5 className="font-semibold uppercase text-muted-foreground max-md:text-sm">
         {dataKey}
       </h5>
-      <p className="text-2xl font-bold max-md:text-xl">
-        {data}
-        {showStar && "*"}
-      </p>
+      {skeleton ? (
+        <Skeleton className="h-8 w-20 bg-muted-foreground max-md:h-7" />
+      ) : (
+        <p className="text-2xl font-bold max-md:text-xl">
+          {data}
+          {showStar && "*"}
+        </p>
+      )}
     </div>
   );
 }
