@@ -6,7 +6,7 @@ import Link from "next/link";
 async function page() {
   return (
     <>
-      <section className="flex items-center justify-between gap-12 pt-8 md:pt-8 lg:pt-16">
+      <section className="flex items-center justify-between gap-12 pt-8 max-md:flex-col md:pt-8 lg:pt-16">
         <div className="flex max-w-3xl flex-col gap-6">
           <h1 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-6xl lg:leading-[1.1]">
             Cricket Scoring Made Easy
