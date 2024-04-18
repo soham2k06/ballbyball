@@ -37,8 +37,6 @@ function TeamList() {
     | undefined
   >(undefined);
 
-  console.log(showingTeam);
-
   if (isFetching)
     return (
       <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
@@ -66,8 +64,6 @@ function TeamList() {
 
     setTeamToUpdate(teamToUpdateVar);
   }
-
-  console.log(showingTeam);
 
   return (
     <div
