@@ -1,5 +1,6 @@
 import { usePlayerStats } from "@/apiHooks/player";
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
+import { Skeleton } from "../ui/skeleton";
 
 function PlayerStats({
   openedPlayer,
@@ -59,7 +60,24 @@ function PlayerStats({
             </div>
           </div>
         ) : (
-          <p>No data found</p>
+          <div className="overflow-hidden rounded-md">
+            <div className="mb-1 bg-primary p-2 text-primary-foreground">
+              <h4 className="text-lg font-semibold md:text-xl">Batting</h4>
+            </div>
+            <div className="grid grid-cols-3 gap-1">
+              <Stat skeleton data={0} dataKey="Runs" />
+              <Stat
+                skeleton
+                data={matchesPlayed ? batAverage : "-"}
+                dataKey="Average"
+                showStar={isNotOutYet && (matchesPlayed ?? 0) > 0}
+              />
+              <Stat skeleton data="-" dataKey="Strike rate" />
+              <Stat skeleton data={0} dataKey="Fifties" />
+              <Stat skeleton data={0} dataKey="Centuries" />
+              <Stat skeleton data={0} dataKey="High. Score" />
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>
@@ -70,20 +88,26 @@ function Stat({
   data,
   dataKey,
   showStar,
+  skeleton,
 }: {
   dataKey: string;
   data: number | "-";
   showStar?: boolean;
+  skeleton?: boolean;
 }) {
   return (
     <div className="bg-muted p-2">
       <h5 className="font-semibold uppercase text-muted-foreground max-md:text-sm">
         {dataKey}
       </h5>
-      <p className="text-2xl font-bold max-md:text-xl">
-        {data}
-        {showStar && "*"}
-      </p>
+      {skeleton ? (
+        <Skeleton className="h-8 w-20 bg-muted-foreground max-md:h-7" />
+      ) : (
+        <p className="text-2xl font-bold max-md:text-xl">
+          {data}
+          {showStar && "*"}
+        </p>
+      )}
     </div>
   );
 }
