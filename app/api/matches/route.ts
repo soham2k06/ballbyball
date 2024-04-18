@@ -131,7 +131,7 @@ export async function PUT(req: NextRequest) {
 
     const newName = await createWithUniqueName(name ?? "", prisma.match);
 
-    const updatedMatch = await prisma.match.update({
+    await prisma.match.update({
       where: { id: matchId },
       data: {
         name: newName || name,
@@ -141,9 +141,10 @@ export async function PUT(req: NextRequest) {
         strikeIndex,
         hasEnded,
       },
+      select: { id: true },
     });
 
-    return NextResponse.json({ match: updatedMatch }, { status: 200 });
+    return NextResponse.json({ message: "success" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

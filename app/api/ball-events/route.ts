@@ -39,11 +39,10 @@ export async function POST(req: NextRequest) {
 
     const { matchId } = ballEvents[0] || {};
 
-    if (ballEvents.length) {
+    if (ballEvents.length)
       await prisma.ballEvent.deleteMany({ where: { matchId } });
-    }
 
-    const newBallEvents = await prisma.ballEvent.createMany({
+    await prisma.ballEvent.createMany({
       data: ballEvents.map(({ batsmanId, bowlerId, type }) => ({
         userId,
         matchId,
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    return NextResponse.json(newBallEvents, { status: 201 });
+    return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (error) {
     console.error(error);
 

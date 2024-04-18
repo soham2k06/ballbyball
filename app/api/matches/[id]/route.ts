@@ -21,10 +21,20 @@ export async function GET(
         name: true,
         overs: true,
         strikeIndex: true,
-        ballEvents: true,
+        ballEvents: {
+          select: { batsmanId: true, bowlerId: true, type: true },
+        },
         matchTeams: {
           select: {
-            team: { select: { teamPlayers: { select: { player: true } } } },
+            team: {
+              select: {
+                id: true,
+                name: true,
+                teamPlayers: {
+                  select: { player: { select: { id: true, name: true } } },
+                },
+              },
+            },
           },
         },
       },
