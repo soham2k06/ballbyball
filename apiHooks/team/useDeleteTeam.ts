@@ -13,7 +13,8 @@ export function useDeleteTeam() {
       });
       toast.success("Team deleted successfully");
     },
-    onError: () => toast.error("Error deleting a team"),
+    onError: () =>
+      toast.error("Error deleting a team, it might be involved in match."),
   });
 
   return { deleteTeam, isPending };
