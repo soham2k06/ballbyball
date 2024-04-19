@@ -38,7 +38,7 @@ function BatsmanScores({
           const isOnStrike = onStrikeBatsman === i;
 
           const legalEvents = events.filter(
-            (ball) => ball.type !== "-2" && id === ball.batsmanId,
+            (ball) => ball.type.includes("-2") && id === ball.batsmanId,
           );
 
           const { runs: totalRuns, totalBalls } = getScore(

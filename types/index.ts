@@ -1,7 +1,7 @@
 import { BallEvent, Match, Player, Team } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
 
-type EventType = "0" | "1" | "2" | "3" | "4" | "6" | "-1" | "-2" | "-3" | "-4";
+type EventType = "0" | "1" | "2" | "3" | "4" | "6" | "-1" | "-2" | "-3" | "-4" | "-5";
 
 type OverlayStateProps = {
   open: boolean;

@@ -30,10 +30,12 @@ const calcRuns = (
     ?.filter((ball) => !(ball.includes("-1") && !ball.split("_")[3]))
     ?.map((event) =>
       event.includes("-3")
-        ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
-        : event === "-2"
-          ? String(Number(!forPlayerRuns))
-          : event.replace("-4", "0").slice(-1),
+        ? (Number(event.slice(2)) + (Number(!forPlayerRuns))).toString()
+        : event.includes("-5")
+          ? ((Number(!forPlayerRuns) * Number(event.slice(2)))).toString()
+          : event.includes("-2")
+            ? (Number(!forPlayerRuns) + (Number(!forPlayerRuns) * Number(event.slice(2)))).toString()
+            : event.replace("-4", "0").slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
@@ -41,7 +43,7 @@ const calcWickets = (ballEvents: EventType[] | string[]) =>
   ballEvents?.filter((ball) => ball.includes("-1")).length;
 
 const getIsInvalidBall = (ball: EventType | string) =>
-  !invalidBalls.includes(ball) && !ball.includes("-3");
+  !invalidBalls.includes(ball) && !ball.includes("-3") && !ball.includes("-2");
 
 function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
   const runs = calcRuns(balls, forPlayerRuns);
@@ -52,9 +54,16 @@ function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
 
   const extras = balls.filter(
-    (ball) => ball === "-2" || ball.includes("-3"),
-  ).length;
-
+    (ball) => ball.includes("-2") || ball.includes("-3") || ball.includes("-5"),
+  ).map((event) =>
+    event.includes("-5")
+      ? (Number(event.slice(2))).toString() : event.includes("-2")
+        ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
+        : event.includes("-3")
+          ? '1'
+          : '1',
+  )
+    .reduce((acc, cur) => acc + Number(cur), 0);
   return { runs, totalBalls, wickets, runRate, extras };
 }
 
