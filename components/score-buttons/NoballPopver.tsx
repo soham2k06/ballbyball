@@ -3,13 +3,12 @@ import { MouseEventHandler, useState } from "react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn, getIsInvalidBall } from "@/lib/utils";
+import { ballEvents } from "@/lib/constants";
 
 function NoballPopver({
   handleScore,
-  ballEvents,
 }: {
   handleScore: MouseEventHandler<HTMLButtonElement>;
-  ballEvents: Record<string, string>;
 }) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   return (
@@ -23,7 +22,6 @@ function NoballPopver({
           size="lg"
           variant="secondary"
           className="h-20 w-full text-lg text-muted-foreground"
-          value="-3"
         >
           NB
         </Button>

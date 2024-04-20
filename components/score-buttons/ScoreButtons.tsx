@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 
 import NoballPopver from "./NoballPopver";
 import WicketPopover from "./WicketPopover";
-import { ballEvents } from "@/lib/constants";
 import ManualScorePopover from "./ManualScorePopover";
 import WideballPopver from "./WideballPopover";
 import ByesballPopover from "./ByesballPopover";
@@ -19,9 +18,9 @@ function ScoreButtons({
   return (
     <div className="space-y-4">
       <div className="flex w-full justify-center gap-2">
-        <ByesballPopover ballEvents={ballEvents} handleScore={handleScore} />
-        <WideballPopver ballEvents={ballEvents} handleScore={handleScore} />
-        <NoballPopver ballEvents={ballEvents} handleScore={handleScore} />
+        <ByesballPopover handleScore={handleScore} />
+        <WideballPopver handleScore={handleScore} />
+        <NoballPopver handleScore={handleScore} />
         {handleWicket ? (
           <WicketPopover handleWicket={handleWicket} />
         ) : (

@@ -3,13 +3,12 @@ import { MouseEventHandler, useState } from "react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn, getIsInvalidBall } from "@/lib/utils";
+import { ballEvents } from "@/lib/constants";
 
 function ByesballPopover({
   handleScore,
-  ballEvents,
 }: {
   handleScore: MouseEventHandler<HTMLButtonElement>;
-  ballEvents: Record<string, string>;
 }) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   return (
@@ -23,7 +22,6 @@ function ByesballPopover({
           size="lg"
           variant="secondary"
           className="h-20 w-full px-4 text-lg text-muted-foreground"
-          value="-3"
         >
           Byes
         </Button>

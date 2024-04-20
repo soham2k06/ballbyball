@@ -3,13 +3,12 @@ import { MouseEventHandler, useState } from "react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn, getIsInvalidBall } from "@/lib/utils";
+import { ballEvents } from "@/lib/constants";
 
 function WideballPopver({
   handleScore,
-  ballEvents,
 }: {
   handleScore: MouseEventHandler<HTMLButtonElement>;
-  ballEvents: Record<string, string>;
 }) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   return (
@@ -22,8 +21,7 @@ function WideballPopver({
         <Button
           size="lg"
           variant="secondary"
-          className="h-20 w-full text-lg text-muted-foreground px-4"
-          value="-3"
+          className="h-20 w-full px-4 text-lg text-muted-foreground"
         >
           WD
         </Button>
