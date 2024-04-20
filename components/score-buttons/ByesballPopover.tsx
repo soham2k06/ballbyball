@@ -22,10 +22,10 @@ function BiceballPopver({
         <Button
           size="lg"
           variant="secondary"
-          className="h-20 w-full text-lg text-muted-foreground px-4"
+          className="h-20 w-full px-4 text-lg text-muted-foreground"
           value="-3"
         >
-          B
+          Byes
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-60">
