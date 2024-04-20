@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn, getIsInvalidBall } from "@/lib/utils";
 
-function BiceballPopver({
+function ByesballPopover({
   handleScore,
   ballEvents,
 }: {
@@ -59,4 +59,4 @@ function BiceballPopver({
   );
 }
 
-export default BiceballPopver;
+export default ByesballPopover;
