@@ -243,7 +243,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     }
 
     handleStrikeChange(
-      (event.includes("-3") ? event.slice(-1) : event) as EventType,
+      (event.includes("-3") ? event.slice(-1) : event.includes("-5") ? event.slice(-1) : event.includes("-2") ? event.slice(-1) : event) as EventType,
     );
   }
 

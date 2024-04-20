@@ -12,6 +12,8 @@ function BallSummary({
 }) {
   const isNoBall = event?.includes("-3");
   const isWicket = event?.includes("-1");
+  const isByes = event?.includes("-5");
+  const isWide = event?.includes("-2");
   const summaryVariants = cva(
     "text-center rounded-full flex justify-center items-center",
     {
@@ -27,6 +29,7 @@ function BallSummary({
           "6": "bg-amber-400 text-amber-950 dark:bg-amber-600 dark:text-amber-50 font-extrabold",
           "-2": "bg-muted text-muted-foreground",
           "-3": "bg-muted text-muted-foreground",
+          "-5": "bg-muted text-muted-foreground",
           "-1": "bg-destructive text-destructive-foreground font-extrabold",
         },
         size: {
@@ -54,9 +57,6 @@ function BallSummary({
         />
       );
       break;
-    case "-2":
-      summaryToShow = "Wd";
-      break;
 
     default:
       summaryToShow = event;
@@ -70,9 +70,11 @@ function BallSummary({
     else summaryToShow = "W";
   }
   if (isNoBall) summaryToShow = event?.replace("-3", "NB");
+  if (isByes) summaryToShow = event?.replace("-5", "B");
+  if (isWide) summaryToShow = event?.replace("-2", "Wd");
 
   const variant = (
-    isNoBall ? event.slice(2) : isWicket ? "-1" : event
+    isNoBall || isByes || isWide ? event.slice(2) : isWicket ? "-1" : event
   ) as EventType;
 
   return (
