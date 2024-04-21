@@ -1,16 +1,16 @@
 ## Ballbyball quickstart
 
 1. **Fork and Clone Repository:**
-   `git clone https://github.com/soham2k06/cricket-scorer.git`
+   ```git clone https://github.com/soham2k06/cricket-scorer.git```
 
 2. **Install Dependencies:**
-   `npm i`
+   ```npm i```
 
 3. **Run Application:**
-   `npm run dev`
+   ```npm run dev```
 
 4. **Copy .env.example and add .env**
-   `cp .env.example .env`
+   ```cp .env.example .env```
 
 5. **Get your envs and fill it**
 
