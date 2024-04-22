@@ -113,7 +113,7 @@ function MatchSummary({
   const playersPerformance: PlayerPerformance[] = Object.values(
     groupedEvents,
   ).map(({ playerId, batType, bowlType }) => {
-    const { runs: runsScored, totalBalls: ballsFaced } = getScore(batType);
+    const { runs: runsScored, totalBalls: ballsFaced } = getScore(batType,true);
     const {
       runs: runConceded,
       wickets: wicketsTaken,

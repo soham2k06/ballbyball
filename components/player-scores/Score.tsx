@@ -134,6 +134,7 @@ function Score({
                     player.id,
                 )
                 .map((event) => event.type as EventType),
+                true
             );
 
             if (!totalBalls) return null;
