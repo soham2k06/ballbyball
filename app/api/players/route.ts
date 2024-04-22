@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/db/prisma";
 import { createPlayerSchema } from "@/lib/validation/player";
-import { createWithUniqueName, validateUser } from "@/lib/utils";
+import { createOrUpdateWithUniqueName, validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const { name } = parsedRes.data;
+    const { name, uid } = parsedRes.data;
 
-    const newName = await createWithUniqueName(name, prisma.player);
+    const newName = await createOrUpdateWithUniqueName(name, prisma.player);
 
     const userId = validateUser();
 
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         name: newName,
+        uid,
       },
       select: { id: true, name: true },
     });

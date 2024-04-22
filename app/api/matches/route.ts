@@ -3,7 +3,7 @@ import { CurPlayer } from "@prisma/client";
 
 import prisma from "@/lib/db/prisma";
 import { createMatchSchema, updateMatchSchema } from "@/lib/validation/match";
-import { createWithUniqueName, validateUser } from "@/lib/utils";
+import { createOrUpdateWithUniqueName, validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const { name, teamIds, curTeam, overs, curPlayers, allowSinglePlayer } =
       parsedRes.data;
 
-    const newName = await createWithUniqueName(name, prisma.team);
+    const newName = await createOrUpdateWithUniqueName(name, prisma.team);
 
     const match = await prisma.match.create({
       data: {
@@ -129,7 +129,11 @@ export async function PUT(req: NextRequest) {
     if (!matchId)
       return NextResponse.json({ error: "Match not found" }, { status: 400 });
 
-    const newName = await createWithUniqueName(name ?? "", prisma.match);
+    const newName = await createOrUpdateWithUniqueName(
+      name ?? "",
+      prisma.match,
+      matchId,
+    );
 
     await prisma.match.update({
       where: { id: matchId },

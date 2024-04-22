@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { createPlayerSchema } from "@/lib/validation/player";
-import { createWithUniqueName, validateUser } from "@/lib/utils";
+import { createOrUpdateWithUniqueName, validateUser } from "@/lib/utils";
 
 export async function GET(
   _: unknown,
@@ -47,7 +47,7 @@ export async function PUT(
     if (!player)
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
 
-    const newName = await createWithUniqueName(name, prisma.player);
+    const newName = await createOrUpdateWithUniqueName(name, prisma.player, id);
 
     await prisma.player.update({ where: { id }, data: { name: newName } });
 

@@ -30,11 +30,14 @@ const calcRuns = (
     ?.filter((ball) => !(ball.includes("-1") && !ball.split("_")[3]))
     ?.map((event) =>
       event.includes("-3")
-        ? (Number(event.slice(2)) + (Number(!forPlayerRuns))).toString()
+        ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
         : event.includes("-5")
-          ? ((Number(!forPlayerRuns) * Number(event.slice(2)))).toString()
+          ? (Number(!forPlayerRuns) * Number(event.slice(2))).toString()
           : event.includes("-2")
-            ? (Number(!forPlayerRuns) + (Number(!forPlayerRuns) * Number(event.slice(2)))).toString()
+            ? (
+                Number(!forPlayerRuns) +
+                Number(!forPlayerRuns) * Number(event.slice(2))
+              ).toString()
             : event.replace("-4", "0").slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
@@ -53,16 +56,20 @@ function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
 
-  const extras = balls.filter(
-    (ball) => ball.includes("-2") || ball.includes("-3") || ball.includes("-5"),
-  ).map((event) =>
-    event.includes("-5")
-      ? (Number(event.slice(2))).toString() : event.includes("-2")
-        ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
-        : event.includes("-3")
-          ? '1'
-          : '1',
-  )
+  const extras = balls
+    .filter(
+      (ball) =>
+        ball.includes("-2") || ball.includes("-3") || ball.includes("-5"),
+    )
+    .map((event) =>
+      event.includes("-5")
+        ? Number(event.slice(2)).toString()
+        : event.includes("-2")
+          ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
+          : event.includes("-3")
+            ? "1"
+            : "1",
+    )
     .reduce((acc, cur) => acc + Number(cur), 0);
   return { runs, totalBalls, wickets, runRate, extras };
 }
@@ -291,9 +298,10 @@ function validateUser() {
   return userId;
 }
 
-async function createWithUniqueName(
+async function createOrUpdateWithUniqueName(
   name: string,
   schema: PrismaClient["player"] | PrismaClient["team"] | PrismaClient["match"],
+  entityId?: string,
 ) {
   const { userId } = auth();
 
@@ -301,21 +309,38 @@ async function createWithUniqueName(
 
   let newName = name;
   let counter = 0;
-  let playerExists = true;
+  let entityExists = true;
 
-  while (playerExists) {
-    const existingPlayer = await (schema as PrismaClient["player"]).findFirst({
+  if (entityId) {
+    const existingEntity = await (schema as PrismaClient["player"]).findFirst({
       where: {
-        userId: userId,
-        name: newName,
+        AND: [{ id: { not: entityId } }, { userId: userId }, { name: newName }],
       },
     });
 
-    if (existingPlayer) {
+    if (existingEntity) {
       counter++;
       newName = `${name} (${counter})`;
     } else {
-      playerExists = false;
+      entityExists = false;
+    }
+  } else {
+    while (entityExists) {
+      const existingEntity = await (schema as PrismaClient["player"]).findFirst(
+        {
+          where: {
+            userId: userId,
+            name: newName,
+          },
+        },
+      );
+
+      if (existingEntity) {
+        counter++;
+        newName = `${name} (${counter})`;
+      } else {
+        entityExists = false;
+      }
     }
   }
 
@@ -361,6 +386,6 @@ export {
   calculateWinner,
   // Backend
   validateUser,
-  createWithUniqueName,
+  createOrUpdateWithUniqueName,
   calcMilestones,
 };

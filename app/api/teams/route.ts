@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 import prisma from "@/lib/db/prisma";
 import { createTeamSchema } from "@/lib/validation/team";
-import { createWithUniqueName, validateUser } from "@/lib/utils";
+import { createOrUpdateWithUniqueName, validateUser } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     const { name, playerIds, captain } = parsedRes.data;
 
-    const newName = await createWithUniqueName(name, prisma.team);
+    const newName = await createOrUpdateWithUniqueName(name, prisma.team);
 
     await prisma.team.create({
       data: {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/db/prisma";
-import { createWithUniqueName, validateUser } from "@/lib/utils";
+import { createOrUpdateWithUniqueName, validateUser } from "@/lib/utils";
 import { createTeamSchema } from "@/lib/validation/team";
 
 export async function GET(
@@ -67,7 +67,7 @@ export async function PUT(
     if (team.userId !== userId)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const newName = await createWithUniqueName(name, prisma.team);
+    const newName = await createOrUpdateWithUniqueName(name, prisma.team, id);
 
     await prisma.team.update({
       where: { id },
