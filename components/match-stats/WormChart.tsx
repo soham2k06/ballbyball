@@ -93,6 +93,27 @@ function WormChart({
     ...combineData(team1Score, team2Score, totalOvers),
   ];
 
+  const CustomDot1 = (props: JSX.Element["props"]) => {
+    const { cx, cy, index } = props;
+    if (
+      chartData[index].wickets?.[teams[0].name] >
+      chartData[index - 1]?.wickets?.[teams[0].name]
+    )
+      return <circle cx={cx} cy={cy} r={6} fill="#605cbd" />;
+    else return null;
+  };
+
+  const CustomDot2 = (props: JSX.Element["props"]) => {
+    const { cx, cy, index } = props;
+
+    if (
+      chartData[index].wickets?.[teams[1].name] >
+      chartData[index - 1]?.wickets?.[teams[1].name]
+    )
+      return <circle cx={cx} cy={cy} r={6} fill="#467055" />;
+    else return null;
+  };
+
   return (
     <div className="h-96 p-2">
       <ResponsiveContainer width="100%" height="100%">
@@ -100,7 +121,7 @@ function WormChart({
           width={800}
           height={400}
           data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 20, right: 10, left: -20, bottom: 5 }}
         >
           <XAxis dataKey="over" />
           <YAxis />
@@ -141,12 +162,14 @@ function WormChart({
             dataKey={teams[0].name}
             stroke="#8884d8"
             strokeWidth={6}
+            dot={<CustomDot1 />}
           />
           <Line
             type="monotone"
             dataKey={teams[1].name}
             stroke="#82ca9d"
             strokeWidth={6}
+            dot={<CustomDot2 />}
           />
         </LineChart>
       </ResponsiveContainer>
