@@ -29,7 +29,8 @@ function Nav() {
 
   const pathName = usePathname();
 
-  if (pathName.includes("match/")) return;
+  if (pathName.includes("match/") || pathName.includes("/normal-scoring"))
+    return;
 
   return (
     <nav className="border-b py-4 max-xl:p-4">
