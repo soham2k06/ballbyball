@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const { name, uid } = parsedRes.data;
+    const { name } = parsedRes.data;
 
     const newName = await createOrUpdateWithUniqueName(name, prisma.player);
 
@@ -47,7 +47,6 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         name: newName,
-        uid,
       },
       select: { id: true, name: true },
     });
