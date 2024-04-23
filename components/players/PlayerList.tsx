@@ -31,7 +31,7 @@ function PlayerList() {
 
   if (isFetching)
     return (
-      <ul className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-6">
+      <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
         {Array(5)
           .fill(0)
           .map((_, i) => (
@@ -48,7 +48,7 @@ function PlayerList() {
         })}
       >
         {players?.length ? (
-          <ul className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-6">
+          <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
             {players.map((player) => {
               return (
                 <Player
