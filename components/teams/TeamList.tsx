@@ -1,21 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderIcon } from "lucide-react";
+import { Player } from "@prisma/client";
+
+import { TeamWithPlayers } from "@/types";
+
+import { cn } from "@/lib/utils";
+import { UpdateTeamSchema } from "@/lib/validation/team";
 
 import { useAllTeams } from "@/apiHooks/team";
-
 import { useDeleteTeam } from "@/apiHooks/team/useDeleteTeam";
+
 import CreateTeam from "@/components/teams/AddTeam";
-import AddUpdateTeamDialog from "./AddUpdateTeamDialog";
-import { UpdateTeamSchema } from "@/lib/validation/team";
-import { TeamWithPlayers } from "@/types";
-import EmptyState from "../EmptyState";
-import { cn } from "@/lib/utils";
-import Team from "./Team";
-import AlertNote from "../AlertNote";
-import { Player } from "@prisma/client";
+import { Skeleton } from "@/components/ui/skeleton";
+
+import EmptyState from "@/components/EmptyState";
+import AlertNote from "@/components/AlertNote";
+
 import TeamPlayers from "./TeamPlayers";
+import AddUpdateTeamDialog from "./AddUpdateTeamDialog";
+import Team from "./Team";
 
 function TeamList() {
   const { allTeams: teams, isFetching } = useAllTeams();
@@ -39,9 +43,13 @@ function TeamList() {
 
   if (isFetching)
     return (
-      <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
-        <LoaderIcon className="animate-spin" />
-      </div>
+      <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
+        {Array(5)
+          .fill(0)
+          .map((_, i) => (
+            <Skeleton key={i} className="h-14 sm:h-[72px]"></Skeleton>
+          ))}
+      </ul>
     );
 
   function handleDelete(id: string) {
@@ -72,7 +80,7 @@ function TeamList() {
       })}
     >
       {teams?.length ? (
-        <ul className="grid grid-cols-4 gap-4 pb-4">
+        <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
           {teams.map((team, i) => {
             return (
               <Team

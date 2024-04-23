@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Button } from "../ui/button";
 
 interface TeamProps {
@@ -35,7 +35,7 @@ function Team({
   return (
     <>
       <Card>
-        <CardHeader className="flex-row items-center justify-between">
+        <div className="flex items-center justify-between p-2 sm:p-4">
           <CardTitle className="truncate">{team.name}</CardTitle>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -70,7 +70,7 @@ function Team({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </CardHeader>
+        </div>
       </Card>
     </>
   );
