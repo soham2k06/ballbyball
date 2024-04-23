@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderIcon } from "lucide-react";
 
 import { useAllMatches, useDeleteMatch } from "@/apiHooks/match";
 import { cn } from "@/lib/utils";
@@ -12,6 +11,7 @@ import EmptyState from "../EmptyState";
 import StartUpdateMatchDialog from "./StartUpdateMatchDialog";
 import StartMatchButton from "./StartMatch";
 import Match from "./Match";
+import MatchSkeleton from "./MatchSkeleton";
 
 function MatchList() {
   const { matches, isLoading } = useAllMatches();
@@ -26,9 +26,13 @@ function MatchList() {
 
   if (isLoading)
     return (
-      <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
-        <LoaderIcon className="animate-spin" />
-      </div>
+      <ul className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {Array(3)
+          .fill(0)
+          .map((_, i) => (
+            <MatchSkeleton key={i} />
+          ))}
+      </ul>
     );
 
   return (
@@ -39,7 +43,7 @@ function MatchList() {
       })}
     >
       {matches?.length ? (
-        <ul className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mb-8 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {matches?.map((match) => (
             <Match
               key={match.id}
