@@ -52,7 +52,7 @@ async function page() {
           </span>
         </div>
 
-        <div className="flex w-fit gap-6">
+        <div className="flex w-fit gap-6 max-md:hidden">
           <div className="overflow-hidden rounded-lg border">
             <Image
               src="/worm-chart.png"
