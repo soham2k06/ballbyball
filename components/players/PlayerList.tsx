@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderIcon } from "lucide-react";
 
 import { useAllPlayers, useDeletePlayer } from "@/apiHooks/player";
 import { cn } from "@/lib/utils";
@@ -14,6 +13,7 @@ import Player from "./Player";
 import AddPlayerButton from "./AddPlayer";
 import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
 import PlayerStats from "./PlayerStats";
+import { Skeleton } from "../ui/skeleton";
 
 function PlayerList() {
   const { players, isFetching } = useAllPlayers();
@@ -31,9 +31,13 @@ function PlayerList() {
 
   if (isFetching)
     return (
-      <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
-        <LoaderIcon className="animate-spin" />
-      </div>
+      <ul className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-6">
+        {Array(5)
+          .fill(0)
+          .map((_, i) => (
+            <Skeleton key={i} className="h-14 sm:h-[72px]"></Skeleton>
+          ))}
+      </ul>
     );
 
   return (
@@ -44,7 +48,7 @@ function PlayerList() {
         })}
       >
         {players?.length ? (
-          <div className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-6">
+          <ul className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-6">
             {players.map((player) => {
               return (
                 <Player
@@ -56,7 +60,7 @@ function PlayerList() {
                 />
               );
             })}
-          </div>
+          </ul>
         ) : (
           <EmptyState document="players" />
         )}
