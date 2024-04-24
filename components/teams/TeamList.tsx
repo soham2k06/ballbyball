@@ -75,7 +75,7 @@ function TeamList() {
 
   return (
     <div
-      className={cn("md:p-8", {
+      className={cn({
         "flex flex-col items-center": !teams?.length,
       })}
     >
