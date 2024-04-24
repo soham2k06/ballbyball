@@ -113,7 +113,7 @@ function StartUpdateMatchDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="rounded-md p-0">
         <DialogHeader className="p-4">
-          <DialogTitle>{matchToUpdate ? "Update" : "Add"} Team</DialogTitle>
+          <DialogTitle>{matchToUpdate ? "Update" : "Start"} Match</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
