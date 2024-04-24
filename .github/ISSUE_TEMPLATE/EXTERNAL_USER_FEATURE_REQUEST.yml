@@ -1,6 +1,6 @@
 name: Feature Request 🚀
 description: Submit a proposal/request for a new Ballbyball feature.
-title: "[Feat]: "
+title: "[feat] "
 labels: ["feature"]
 body:
   - type: markdown
