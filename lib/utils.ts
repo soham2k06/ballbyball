@@ -2,6 +2,7 @@ import { BallEvent, Player, PrismaClient } from "@prisma/client";
 import { auth } from "@clerk/nextjs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import "server-only";
 
 import { EventType, PlayerPerformance } from "@/types";
 import { invalidBalls } from "./constants";
@@ -296,6 +297,10 @@ function validateUser() {
   if (!userId) throw new Error("User not authenticated");
 
   return userId;
+}
+
+export function add(a: number, b: number) {
+  return a + b;
 }
 
 async function createOrUpdateWithUniqueName(

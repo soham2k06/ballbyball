@@ -9,10 +9,12 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "baseUrl": "./",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "types": ["@testing-library/jest-dom"],
     "plugins": [
       {
         "name": "next"
@@ -28,7 +30,11 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "components/scorer/ScorerLayout.jsx",
-    "app/test/page.jsx"
+    "app/test/page.jsx",
+    "jest.config.js",
+    "jest.config.js",
+    "__tests__/Home.test.tsx",
+    "jest.setup.js"
   ],
   "exclude": ["node_modules"]
 }
