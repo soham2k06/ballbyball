@@ -38,7 +38,7 @@ function MatchList() {
   return (
     <div
       className={cn({
-        "flex flex-col items-center md:p-8": !matches?.length,
+        "flex flex-col items-center": !matches?.length,
         "py-8": matches?.length,
       })}
     >
