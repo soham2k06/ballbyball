@@ -26,7 +26,7 @@ function ByesballPopover({
           Byes
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-60">
+      <PopoverContent className="w-60" align="start">
         <div className="grid w-full grid-cols-3 gap-2">
           {Object.keys(ballEvents)
             .filter(
