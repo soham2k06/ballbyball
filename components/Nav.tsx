@@ -46,9 +46,23 @@ function Nav() {
             </NavItem>
           ))}
         </ul>
+        <div className="max-md:ml-auto max-md:mr-4">
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              baseTheme: theme === "dark" ? dark : undefined,
+              elements: {
+                avatarBox: {
+                  width: "2.5rem",
+                  height: "2.5rem",
+                },
+              },
+            }}
+          />
+        </div>
 
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger className="ml-auto mr-4 md:hidden">
+          <SheetTrigger className="mr-4 md:hidden">
             <Menu />
           </SheetTrigger>
           <SheetContent className="space-y-4">
@@ -70,36 +84,8 @@ function Nav() {
                 </NavItem>
               ))}
             </ul>
-            <UserButton
-              showName
-              afterSignOutUrl="/"
-              appearance={{
-                baseTheme: theme === "dark" ? dark : undefined,
-                elements: {
-                  avatarBox: {
-                    width: "2.5rem",
-                    height: "2.5rem",
-                  },
-                },
-              }}
-            />
           </SheetContent>
         </Sheet>
-
-        <div className="max-md:hidden">
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{
-              baseTheme: theme === "dark" ? dark : undefined,
-              elements: {
-                avatarBox: {
-                  width: "2.5rem",
-                  height: "2.5rem",
-                },
-              },
-            }}
-          />
-        </div>
       </div>
     </nav>
   );
