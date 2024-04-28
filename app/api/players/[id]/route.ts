@@ -40,7 +40,7 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const { name } = parsedRes.data;
+    const { name, image } = parsedRes.data;
 
     const player = await prisma.player.findFirst({ where: { id } });
 
@@ -49,7 +49,10 @@ export async function PUT(
 
     const newName = await createOrUpdateWithUniqueName(name, prisma.player, id);
 
-    await prisma.player.update({ where: { id }, data: { name: newName } });
+    await prisma.player.update({
+      where: { id },
+      data: { name: newName, image },
+    });
 
     return NextResponse.json({ message: "Player updated" }, { status: 200 });
   } catch (error) {

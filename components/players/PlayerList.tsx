@@ -24,10 +24,7 @@ function PlayerList() {
     UpdatePlayerSchema | undefined
   >();
 
-  const [openedPlayer, setOpenedPlayer] = useState<{
-    id: string | undefined;
-    name: string | undefined;
-  }>();
+  const [openedPlayer, setOpenedPlayer] = useState<UpdatePlayerSchema>();
 
   if (isFetching)
     return (
@@ -48,12 +45,12 @@ function PlayerList() {
         })}
       >
         {players?.length ? (
-          <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
+          <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-5">
             {players.map((player) => {
               return (
                 <Player
                   key={player.id}
-                  player={player}
+                  player={player as UpdatePlayerSchema}
                   setPlayerToDelete={setPlayerToDelete}
                   setPlayerToUpdate={setPlayerToUpdate}
                   setOpenedPlayer={setOpenedPlayer}

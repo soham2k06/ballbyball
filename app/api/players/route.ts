@@ -11,7 +11,7 @@ export async function GET() {
     const players = await prisma.player.findMany({
       where: { userId },
       orderBy: { id: "asc" },
-      select: { id: true, name: true },
+      select: { id: true, name: true, image: true },
     });
 
     if (!players)
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const { name } = parsedRes.data;
+    const { name, image } = parsedRes.data;
 
     const newName = await createOrUpdateWithUniqueName(name, prisma.player);
 
@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         name: newName,
+        image,
       },
-      select: { id: true, name: true },
     });
 
     return NextResponse.json({ message: "success" }, { status: 201 });

@@ -22,10 +22,14 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
+import { UploadButton } from "@/lib/uploadthing";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { processTeamName } from "@/lib/utils";
 
 interface AddUpdatePlayerDialogProps extends OverlayStateProps {
   playerToUpdate?: UpdatePlayerSchema;
@@ -44,6 +48,7 @@ function AddUpdatePlayerDialog({
     handleSubmit,
     control,
     reset,
+    setError,
     formState: { isDirty },
   } = form;
 
@@ -95,6 +100,41 @@ function AddUpdatePlayerDialog({
                   <FormControl>
                     <Input placeholder="Player name" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image (optional)</FormLabel>
+                  <div className="flex gap-4">
+                    <Avatar>
+                      <AvatarImage
+                        src={form.watch("image")}
+                        alt="player"
+                        width={60}
+                        height={60}
+                      />
+                      <AvatarFallback>
+                        {processTeamName(form.watch("name") ?? "")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <FormControl>
+                      <UploadButton
+                        appearance={{ allowedContent: { display: "none" } }}
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) =>
+                          field.onChange(res[0].url)
+                        }
+                        onUploadError={(error: Error) =>
+                          setError("image", { message: error.message })
+                        }
+                      />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

@@ -1,7 +1,6 @@
-import { Player as PlayerSchemaType } from "@prisma/client";
 import { AreaChart, Edit, MoreHorizontal, Trash2 } from "lucide-react";
 
-import { truncStr } from "@/lib/utils";
+import { processTeamName, truncStr } from "@/lib/utils";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 
 import {
@@ -13,18 +12,13 @@ import {
 } from "../ui/dropdown-menu";
 import { Card, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface PlayerProps {
-  player: PlayerSchemaType;
+  player: UpdatePlayerSchema;
   setPlayerToDelete: (playerId: string) => void;
   setPlayerToUpdate: (player: UpdatePlayerSchema) => void;
-  setOpenedPlayer: ({
-    name,
-    id,
-  }: {
-    id: string | undefined;
-    name: string | undefined;
-  }) => void;
+  setOpenedPlayer: (player: UpdatePlayerSchema) => void;
 }
 
 function Player({
@@ -37,11 +31,25 @@ function Player({
 
   return (
     <Card>
-      <div className="flex items-center justify-between p-2 sm:p-4">
-        <CardTitle>{truncStr(player.name as string, 10)}</CardTitle>
+      <div className="flex items-center justify-between gap-2 p-2 sm:p-4">
+        <div className="flex items-center gap-2">
+          <Avatar className="size-8">
+            <AvatarImage
+              src={player.image}
+              alt={player.name}
+              width={32}
+              height={32}
+              className="size-8"
+            />
+            <AvatarFallback>{processTeamName(player.name)}</AvatarFallback>
+          </Avatar>
+          <CardTitle className="truncate max-md:text-sm">
+            {truncStr(player.name, 10)}
+          </CardTitle>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost">
+            <Button size="icon" variant="ghost" className="flex-shrink-0">
               <MoreHorizontal size={20} />
             </Button>
           </DropdownMenuTrigger>
