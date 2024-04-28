@@ -147,7 +147,7 @@ function MatchSummary({
   const { player, isLoading } = usePlayerById(playerOfTheMatch.playerId);
 
   return (
-    <Dialog open={true || open}>
+    <Dialog open={open}>
       <DialogContent removeCloseButton>
         <DialogHeader className="w-full flex-row items-center justify-between border-b pb-6">
           <DialogTitle>Match Summary</DialogTitle>
