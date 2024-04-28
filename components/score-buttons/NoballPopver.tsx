@@ -29,7 +29,12 @@ function NoballPopver({
       <PopoverContent className="w-60">
         <div className="grid w-full grid-cols-3 gap-2">
           {Object.keys(ballEvents)
-            .filter((event) => !event.includes("-1") && getIsInvalidBall(event))
+            .filter(
+              (event) =>
+                !event.includes("-1") &&
+                getIsInvalidBall(event) &&
+                event !== "-5",
+            )
             .map((event, i) => (
               <Button
                 key={i}

@@ -1,4 +1,4 @@
-import { FileSearch } from "lucide-react";
+import Image from "next/image";
 
 interface EmptyStateProps {
   document: string;
@@ -6,18 +6,14 @@ interface EmptyStateProps {
 
 function EmptyState({ document }: EmptyStateProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="mx-auto inline-flex h-20 w-20 items-center justify-center rounded-full bg-muted shadow-sm">
-        <FileSearch className="h-10 w-10" />
+    <div className="bg-mted mb-4 flex w-full flex-col justify-center gap-4 rounded-md">
+      <div className="mx-auto inline-flex size-56 items-center justify-center rounded-md p-4">
+        <Image src="/error-404.png" alt="Empty" width={400} height={400} />
       </div>
       <div>
-        <h2 className="pb-1 text-center text-base font-semibold leading-relaxed">
+        <h2 className="pb-1 text-center text-base font-semibold leading-relaxed text-muted-foreground">
           There’s no {document} in your list
         </h2>
-        <p className="pb-4 text-center text-sm font-normal leading-snug">
-          Start creating {document} <br />
-          to see list
-        </p>
       </div>
     </div>
   );

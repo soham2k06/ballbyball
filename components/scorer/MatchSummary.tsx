@@ -38,7 +38,8 @@ function MatchSummary({
   handleUndo,
   match,
 }: MatchSummaryProps) {
-  const { setShowRunrateChart, setShowOverSummaries } = useStatsOpenContext();
+  const { setShowRunrateChart, setShowOverSummaries, setShowWormChart } =
+    useStatsOpenContext();
 
   const { allowSinglePlayer, overs } = match || {
     allowSinglePlayer: false,
@@ -113,7 +114,10 @@ function MatchSummary({
   const playersPerformance: PlayerPerformance[] = Object.values(
     groupedEvents,
   ).map(({ playerId, batType, bowlType }) => {
-    const { runs: runsScored, totalBalls: ballsFaced } = getScore(batType,true);
+    const { runs: runsScored, totalBalls: ballsFaced } = getScore(
+      batType,
+      true,
+    );
     const {
       runs: runConceded,
       wickets: wicketsTaken,
@@ -212,20 +216,17 @@ function MatchSummary({
             </div>
             <p>{winInfo}</p>
             <Separator className="my-2" />
-            <div className="flex gap-2">
-              <Button onClick={() => setShowScorecard(true)} className="w-full">
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={() => setShowScorecard(true)}>
                 Scorecard
               </Button>
-              <Button
-                onClick={() => setShowRunrateChart(true)}
-                className="w-full"
-              >
+              <Button size="sm" onClick={() => setShowRunrateChart(true)}>
                 Run rate chart
               </Button>
-              <Button
-                onClick={() => setShowOverSummaries(true)}
-                className="w-full"
-              >
+              <Button size="sm" onClick={() => setShowWormChart(true)}>
+                Worm Chart
+              </Button>
+              <Button size="sm" onClick={() => setShowOverSummaries(true)}>
                 Over summaries
               </Button>
             </div>

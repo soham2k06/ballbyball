@@ -22,7 +22,7 @@ export default function Home() {
 
           <div className="flex w-full items-center space-x-4 md:pb-10">
             <Button asChild>
-              <Link href="/players">Browse</Link>
+              <Link href="/guide">Browse</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="https://github.com/soham2k06/cricket-scorer">

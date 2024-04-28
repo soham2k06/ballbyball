@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 function page() {
   return (
     <div>
-      <h2 className="text-3xl font-semibold tracking-tight max-sm:text-xl">
+      <h2 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Matches
       </h2>
       <MatchList />
