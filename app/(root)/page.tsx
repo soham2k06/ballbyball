@@ -22,7 +22,9 @@ export default function Home() {
 
           <div className="flex w-full items-center space-x-4 md:pb-10">
             <Button asChild>
-              <Link href="/guide">Browse</Link>
+              <Link href="/guide" data-testid="banner-heading">
+                Browse
+              </Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="https://github.com/soham2k06/cricket-scorer">
@@ -44,9 +46,9 @@ export default function Home() {
       </section>
       <section className="pt-8 md:pt-8 lg:pt-16">
         <div className="mb-4 flex max-w-3xl flex-col gap-2 md:mb-8">
-          {/* <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:leading-[1.1]">
+          <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:leading-[1.1]">
             Feature Glimpse
-          </h2> */}
+          </h2>
           <span className="max-w-[568px] text-lg text-muted-foreground sm:text-xl">
             Explore BallByBall: A Visual Journey Through Cricket Stats
           </span>
@@ -87,9 +89,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="md:hidden">
-          <GlimpseCarousel />
-        </div>
+        <div className="md:hidden">{/* <GlimpseCarousel /> */}</div>
       </section>
     </>
   );
