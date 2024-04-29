@@ -39,7 +39,7 @@ async function page() {
           alt="demo"
           width={320}
           height={100}
-          className="mx-8 rounded-lg max-md:mx-auto max-md:w-11/12"
+          className="mx-8 rounded-lg max-md:mx-auto max-md:hidden max-md:w-11/12"
         />
       </section>
       <section className="pt-8 md:pt-8 lg:pt-16">
