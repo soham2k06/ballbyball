@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
 
@@ -21,6 +21,7 @@ import { TypographyH2 } from "./ui/typography";
 import NavItem from "./NavItem";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { Button } from "./ui/button";
 
 function Nav() {
   const { theme } = useTheme();
@@ -46,20 +47,27 @@ function Nav() {
             </NavItem>
           ))}
         </ul>
-        <div className="max-md:ml-auto max-md:mr-4">
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{
-              baseTheme: theme === "dark" ? dark : undefined,
-              elements: {
-                avatarBox: {
-                  width: "2.5rem",
-                  height: "2.5rem",
+        <SignedIn>
+          <div className="max-md:ml-auto max-md:mr-4">
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                baseTheme: theme === "dark" ? dark : undefined,
+                elements: {
+                  avatarBox: {
+                    width: "2.5rem",
+                    height: "2.5rem",
+                  },
                 },
-              },
-            }}
-          />
-        </div>
+              }}
+            />
+          </div>
+        </SignedIn>
+        <SignedOut>
+          <Button className="btn btn-primary" asChild>
+            <Link href="/sign-in">Sign In</Link>
+          </Button>
+        </SignedOut>
 
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger className="mr-4 md:hidden">
