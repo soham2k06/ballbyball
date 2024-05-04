@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
 
@@ -22,9 +22,12 @@ import NavItem from "./NavItem";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
+import { Skeleton } from "./ui/skeleton";
 
 function Nav() {
   const { theme } = useTheme();
+
+  const { isLoaded } = useUser();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -49,18 +52,22 @@ function Nav() {
         </ul>
         <SignedIn>
           <div className="max-md:ml-auto max-md:mr-4">
-            <UserButton
-              afterSignOutUrl="/"
-              appearance={{
-                baseTheme: theme === "dark" ? dark : undefined,
-                elements: {
-                  avatarBox: {
-                    width: "2.5rem",
-                    height: "2.5rem",
+            {isLoaded ? (
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  baseTheme: theme === "dark" ? dark : undefined,
+                  elements: {
+                    avatarBox: {
+                      width: "2.5rem",
+                      height: "2.5rem",
+                    },
                   },
-                },
-              }}
-            />
+                }}
+              />
+            ) : (
+              <Skeleton className="size-10 animate-pulse rounded-full text-center leading-10" />
+            )}
           </div>
         </SignedIn>
         <SignedOut>
@@ -73,8 +80,8 @@ function Nav() {
           <SheetTrigger className="mr-4 md:hidden">
             <Menu />
           </SheetTrigger>
-          <SheetContent className="space-y-4">
-            <SheetHeader className="text-left">
+          <SheetContent>
+            <SheetHeader className="mb-4 text-left">
               <Link href="/">
                 <TypographyH2 className="text-2xl font-semibold tracking-tighter">
                   ballbyball.

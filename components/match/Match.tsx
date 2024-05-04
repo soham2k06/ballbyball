@@ -73,13 +73,13 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
                 className="gap-2 font-bold"
                 onClick={() => setMatchToUpdate(matchToUpdateVar)}
               >
-                <Edit /> Edit
+                <Edit size={20} /> Edit
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="gap-2 font-bold"
                 onClick={() => setMatchToDelete(match.id)}
               >
-                <Trash2 /> Delete
+                <Trash2 size={20} /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
