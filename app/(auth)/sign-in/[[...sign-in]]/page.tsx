@@ -1,7 +1,5 @@
 import { SignIn } from "@clerk/nextjs";
 
-function SignUpPage() {
-  return <SignIn />;
-}
+const SignUpPage = () => <SignIn />;
 
 export default SignUpPage;

@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
+import { dark } from "@clerk/themes";
 
 // If loading a variable font, you don't need to specify the font weight
 const lato = Lato({
@@ -130,7 +131,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
         <head>
           <link
