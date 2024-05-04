@@ -26,10 +26,10 @@ The Ballbyball is a comprehensive tool designed to streamline the scoring proces
 ## Tech Stack:
 
 - **Core:** React.js, Next.js, Typescript
-- **Backend:** MongoDB (thinking to shift to sql), Prisma, Next.js API routes
+- **Backend:** MongoDB, Prisma, Next.js API routes
 - **UI:** Tailwind CSS, shadcn-ui
 - **Authentication:** Clerk
-- **Deployment:** Vercel (will shift to azure)
+- **Deployment:** Vercel
 - **Other:** tanstack react query, recharts, react-hook-form, zod, sonner, cookies-next, next-themes
 
 ## Support:
