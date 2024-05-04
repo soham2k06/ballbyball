@@ -45,7 +45,7 @@ function PlayerStats({
         </DialogHeader>
         {data ? (
           <div className="space-y-4">
-            <div className="overflow-hidden rounded-md">
+            <div className="overflow-hidden rounded-xl">
               <div className="mb-1 bg-primary p-2 text-primary-foreground">
                 <h4 className="text-lg font-semibold md:text-xl">Batting</h4>
               </div>
@@ -65,7 +65,7 @@ function PlayerStats({
                 <Stat data={data.batting.highestScore} dataKey="High. Score" />
               </div>
             </div>
-            <div className="overflow-hidden rounded-md">
+            <div className="overflow-hidden rounded-xl">
               <div className="mb-1 bg-primary p-2 text-primary-foreground">
                 <h4 className="text-lg font-semibold md:text-xl">Bowling</h4>
               </div>
@@ -84,7 +84,7 @@ function PlayerStats({
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="overflow-hidden rounded-md">
+            <div className="overflow-hidden rounded-xl">
               <div className="mb-1 bg-primary p-2 text-primary-foreground">
                 <h4 className="text-lg font-semibold md:text-xl">Batting</h4>
               </div>
@@ -97,7 +97,7 @@ function PlayerStats({
                 <Stat skeleton data={0} dataKey="High. Score" />
               </div>
             </div>
-            <div className="overflow-hidden rounded-md">
+            <div className="overflow-hidden rounded-xl">
               <div className="mb-1 bg-primary p-2 text-primary-foreground">
                 <h4 className="text-lg font-semibold md:text-xl">Bowling</h4>
               </div>
@@ -134,7 +134,7 @@ function Stat({
         {dataKey}
       </h5>
       {skeleton ? (
-        <Skeleton className="h-8 w-20 bg-muted-foreground max-md:h-7" />
+        <Skeleton className="h-8 w-20 max-md:h-7" />
       ) : (
         <p className="text-2xl font-bold max-md:text-xl">
           {data}

@@ -6,11 +6,15 @@ interface NavItemProps extends LinkProps {
 
 function NavItem({ children, href, ...props }: NavItemProps) {
   return (
-    <Link href={href} {...props}>
-      <li className="rounded-md p-3 font-normal transition-colors hover:bg-secondary">
+    <li>
+      <Link
+        href={href}
+        {...props}
+        className="block rounded-md p-3 font-normal transition-colors hover:bg-secondary"
+      >
         {children}
-      </li>
-    </Link>
+      </Link>
+    </li>
   );
 }
 
