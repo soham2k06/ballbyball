@@ -33,8 +33,7 @@ function WideballPopver({
               (event) =>
                 !event.includes("-1") &&
                 getIsInvalidBall(event) &&
-                event !== "-5" &&
-                event !== "0",
+                event !== "-5",
             )
             .map((event, i) => (
               <Button
