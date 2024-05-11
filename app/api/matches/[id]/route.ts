@@ -8,10 +8,10 @@ export async function GET(
   { params: { id } }: { params: { id: string } },
 ) {
   try {
-    validateUser();
+    const userId = validateUser();
 
     const match = await prisma.match.findFirst({
-      where: { id },
+      where: { userId, id },
       select: {
         allowSinglePlayer: true,
         curPlayers: true,
