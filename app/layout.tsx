@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import { Lato } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
+import type { Metadata } from "next";
+import { Lato } from "next/font/google";
 
 import { cn } from "@/lib/utils";
 
-import "./globals.css";
 import { dark } from "@clerk/themes";
+import "./globals.css";
 
 // If loading a variable font, you don't need to specify the font weight
 const lato = Lato({
@@ -138,6 +138,7 @@ export default function RootLayout({
             rel="icon"
             href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎾</text></svg>"
           />
+          <meta name="google-site-verification" content="VoqGlTAQWR5pCGtJXLewyVpsxWiR1LZr4yRhSg30U-o" />
         </head>
         <body className={cn("antialiased", lato.className)}>
           {children}
