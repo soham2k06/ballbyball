@@ -1,15 +1,18 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 
-import { OverlayStateProps } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import { useCreateMatch, useUpdateMatch } from "@/apiHooks/match";
+import { useAllTeams } from "@/apiHooks/team";
 import {
   CreateMatchSchema,
   UpdateMatchSchema,
   createMatchSchema,
 } from "@/lib/validation/match";
-import { useAllTeams } from "@/apiHooks/team";
-import { useCreateMatch, useUpdateMatch } from "@/apiHooks/match";
+import { OverlayStateProps } from "@/types";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -28,9 +31,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useEffect, useState } from "react";
 import { useValidateMatchData } from "@/lib/hooks";
+import PlayerLabel from "../players-selection/PlayerLabel";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
@@ -146,26 +148,25 @@ function StartUpdateMatchDialog({
                         First team selected will be batting first
                       </FormDescription>
                     </div>
-                    <ul className="max-h-48 space-y-4 overflow-y-auto p-1">
+                    <ul className="grid max-h-96 grid-cols-2 gap-2 overflow-auto">
                       {teams?.map((item) => (
                         <FormField
                           key={item.id}
-                          control={form.control}
+                          control={control}
                           name="teamIds"
                           render={({ field }) => {
+                            const isSelected = field.value?.includes(item.id);
+
                             return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row items-center space-x-3 space-y-0"
-                              >
+                              <FormItem key={item.id} className="space-y-0">
                                 <FormControl>
                                   <Checkbox
-                                    className="size-6"
+                                    className="sr-only"
                                     checked={field.value?.includes(item.id)}
                                     onCheckedChange={(checked) => {
                                       return checked
                                         ? field.onChange([
-                                            ...field.value!,
+                                            ...(field.value ?? []),
                                             item.id,
                                           ])
                                         : field.onChange(
@@ -176,9 +177,11 @@ function StartUpdateMatchDialog({
                                     }}
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal">
-                                  {item.name}
-                                </FormLabel>
+
+                                <PlayerLabel
+                                  title={item.name}
+                                  isSelected={isSelected}
+                                />
                               </FormItem>
                             );
                           }}

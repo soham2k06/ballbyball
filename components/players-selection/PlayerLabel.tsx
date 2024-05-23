@@ -21,9 +21,9 @@ function PlayerLabel({
   return (
     <FormLabel
       className={cn(
-        "flex h-8 w-full cursor-pointer items-center justify-between rounded bg-muted p-2 font-normal",
+        "flex w-full cursor-pointer items-center justify-between rounded bg-muted px-2 py-3 font-normal",
         {
-          "bg-emerald-500 font-bold text-emerald-950": isSelected,
+          "bg-emerald-500 font-black text-emerald-950": isSelected,
           "opacity-75": isOpacityDown,
           "brightness-50": isBrightnessDown,
         },

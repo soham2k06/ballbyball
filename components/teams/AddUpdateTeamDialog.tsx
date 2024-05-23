@@ -1,14 +1,14 @@
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
-import { OverlayStateProps } from "@/types";
+import { useAllPlayers } from "@/apiHooks/player";
+import { useCreateTeam, useUpdateTeam } from "@/apiHooks/team";
 import {
   CreateTeamSchema,
   UpdateTeamSchema,
   createTeamSchema,
 } from "@/lib/validation/team";
-import { useAllPlayers } from "@/apiHooks/player";
-import { useCreateTeam, useUpdateTeam } from "@/apiHooks/team";
+import { OverlayStateProps } from "@/types";
 
 import {
   Dialog,
@@ -28,6 +28,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
+import { FormEvent, useEffect, useState } from "react";
+import AlertNote from "../AlertNote";
+import PlayerLabel from "../players-selection/PlayerLabel";
 import { Checkbox } from "../ui/checkbox";
 import {
   Select,
@@ -36,8 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { FormEvent, useEffect, useState } from "react";
-import AlertNote from "../AlertNote";
 
 interface AddUpdateTeamDialogProps extends OverlayStateProps {
   teamToUpdate?: UpdateTeamSchema & { matchId: string | null };
@@ -153,22 +154,21 @@ function AddUpdateTeamDialog({
                       </FormDescription>
                     </div>
                     {players?.length ? (
-                      <ul className="max-h-96 space-y-4 overflow-auto p-1">
+                      <ul className="grid max-h-96 grid-cols-2 gap-2 overflow-auto">
                         {players?.map((item) => (
                           <FormField
                             key={item.id}
-                            control={form.control}
+                            control={control}
                             name="playerIds"
                             render={({ field }) => {
+                              const isSelected = field.value.includes(item.id);
+
                               return (
-                                <FormItem
-                                  key={item.id}
-                                  className="flex flex-row items-center space-x-3 space-y-0"
-                                >
+                                <FormItem key={item.id} className="space-y-0">
                                   <FormControl>
                                     <Checkbox
-                                      className="size-6"
-                                      checked={field.value?.includes(item.id)}
+                                      className="sr-only"
+                                      checked={field.value.includes(item.id)}
                                       onCheckedChange={(checked) => {
                                         return checked
                                           ? field.onChange([
@@ -176,16 +176,18 @@ function AddUpdateTeamDialog({
                                               item.id,
                                             ])
                                           : field.onChange(
-                                              field.value?.filter(
+                                              field.value.filter(
                                                 (value) => value !== item.id,
                                               ),
                                             );
                                       }}
                                     />
                                   </FormControl>
-                                  <FormLabel className="font-normal">
-                                    {item.name}
-                                  </FormLabel>
+
+                                  <PlayerLabel
+                                    title={item.name}
+                                    isSelected={isSelected}
+                                  />
                                 </FormItem>
                               );
                             }}
