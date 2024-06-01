@@ -44,7 +44,7 @@ function FooterSummary({
       <div className="flex gap-2">
         <Drawer>
           <DrawerTrigger asChild>
-            <Button size="icon">
+            <Button size="icon" name="bar-chart" title="bar chart">
               <BarChart3 />
             </Button>
           </DrawerTrigger>
@@ -59,7 +59,7 @@ function FooterSummary({
         </Drawer>
         <Drawer preventScrollRestoration>
           <DrawerTrigger asChild>
-            <Button size="icon">
+            <Button size="icon" name="over-summary" title="over-summary">
               <ListOrdered />
             </Button>
           </DrawerTrigger>
