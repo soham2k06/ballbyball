@@ -23,7 +23,10 @@ function ManualScorePopover({
 }) {
   const limitError = "Enter Manual runs between 1 and 9";
   const schema = z.object({
-    manualRuns: z.number().min(1, limitError).max(9, limitError),
+    manualRuns: z
+      .number({ message: "Please add a number only" })
+      .min(1, limitError)
+      .max(9, limitError),
   });
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
