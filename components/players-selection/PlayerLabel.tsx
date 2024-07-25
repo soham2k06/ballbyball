@@ -21,7 +21,7 @@ function PlayerLabel({
   return (
     <FormLabel
       className={cn(
-        "flex w-full cursor-pointer items-center justify-between rounded bg-muted px-2 py-3 font-normal",
+        "flex w-full cursor-pointer items-center justify-between rounded bg-muted p-2 text-sm font-normal",
         {
           "bg-emerald-500 font-black text-emerald-950": isSelected,
           "opacity-75": isOpacityDown,
@@ -29,11 +29,8 @@ function PlayerLabel({
         },
       )}
     >
-      {title}
-
-      <span className="whitespace-nowrap text-sm font-semibold">
-        {subTitle}
-      </span>
+      <span>{title}</span>
+      <span className="whitespace-nowrap">{subTitle}</span>
     </FormLabel>
   );
 }
