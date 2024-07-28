@@ -69,7 +69,7 @@ function WicketPopover({
         <Button
           size="lg"
           variant="destructive"
-          className="h-20 w-full text-lg font-bold"
+          className="h-20 rounded-none text-lg font-bold"
         >
           OUT
         </Button>

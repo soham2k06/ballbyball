@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import { useAllMatches, useDeleteMatch } from "@/apiHooks/match";
 import { cn } from "@/lib/utils";
 import { UpdateMatchSchema } from "@/lib/validation/match";
 
@@ -11,29 +10,25 @@ import EmptyState from "../EmptyState";
 import StartUpdateMatchDialog from "./StartUpdateMatchDialog";
 import StartMatchButton from "./StartMatch";
 import Match from "./Match";
-import MatchSkeleton from "./MatchSkeleton";
+import { MatchExtended, TeamWithPlayers } from "@/types";
+import { useActionMutate } from "@/lib/hooks";
+import { deleteMatch } from "@/lib/actions/match";
 
-function MatchList() {
-  const { matches, isLoading } = useAllMatches();
-
-  const { deleteMatch, isPending: isDeleting } = useDeleteMatch();
+function MatchList({
+  matches,
+  teams,
+}: {
+  matches: MatchExtended[] | undefined;
+  teams: TeamWithPlayers[];
+}) {
+  const { mutate: deleteMutate, isPending: isDeleting } =
+    useActionMutate(deleteMatch);
 
   const [matchToUpdate, setMatchToUpdate] = useState<
     (UpdateMatchSchema & { teams: { id: string }[] }) | undefined
   >(undefined);
 
   const [matchToDelete, setMatchToDelete] = useState<string | null>(null);
-
-  if (isLoading)
-    return (
-      <ul className="grid grid-cols-1 gap-2 pt-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array(3)
-          .fill(0)
-          .map((_, i) => (
-            <MatchSkeleton key={i} />
-          ))}
-      </ul>
-    );
 
   return (
     <div
@@ -55,17 +50,18 @@ function MatchList() {
       ) : (
         <EmptyState document="matches" />
       )}
-      <StartMatchButton />
+      <StartMatchButton teams={teams} />
 
       <StartUpdateMatchDialog
         open={!!matchToUpdate}
         setOpen={() => setMatchToUpdate(undefined)}
         matchToUpdate={matchToUpdate}
+        teams={teams}
       />
       <AlertNote
         open={!!matchToDelete}
         setOpen={() => setMatchToDelete(matchToDelete ? null : matchToDelete)}
-        onConfirm={() => matchToDelete && deleteMatch(matchToDelete)}
+        onConfirm={() => matchToDelete && deleteMutate(matchToDelete)}
         content="Removing matches will lead to removing all team and player stats connected with the match. Do you still want to continue?"
         isLoading={isDeleting}
       />

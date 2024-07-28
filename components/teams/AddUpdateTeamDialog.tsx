@@ -1,8 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { useAllPlayers } from "@/apiHooks/player";
-import { useCreateTeam, useUpdateTeam } from "@/apiHooks/team";
 import {
   CreateTeamSchema,
   UpdateTeamSchema,
@@ -39,8 +37,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Player } from "@prisma/client";
+import { useActionMutate } from "@/lib/hooks";
+import { createTeam, updateTeam } from "@/lib/actions/team";
 
 interface AddUpdateTeamDialogProps extends OverlayStateProps {
+  players: Player[];
   teamToUpdate?: UpdateTeamSchema & { matchId: string | null };
 }
 
@@ -48,6 +50,7 @@ function AddUpdateTeamDialog({
   open,
   setOpen,
   teamToUpdate,
+  players,
 }: AddUpdateTeamDialogProps) {
   const form = useForm<CreateTeamSchema>({
     resolver: zodResolver(createTeamSchema),
@@ -68,12 +71,12 @@ function AddUpdateTeamDialog({
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
-  const { createTeam, isPending: isCreating } = useCreateTeam();
-  const { updateTeam, isPending: isUpdating } = useUpdateTeam();
+  const { mutate: createMutate, isPending: isCreating } =
+    useActionMutate(createTeam);
+  const { mutate: updateMutate, isPending: isUpdating } =
+    useActionMutate(updateTeam);
 
   const isPending = isCreating || isUpdating;
-
-  const { players } = useAllPlayers();
 
   const watchedPlayerIds = watch("playerIds");
   const selectedPlayers = players?.filter(({ id }) =>
@@ -82,7 +85,7 @@ function AddUpdateTeamDialog({
 
   function onSubmit(data: CreateTeamSchema) {
     if (teamToUpdate) {
-      updateTeam(
+      updateMutate(
         { id: teamToUpdate.id, ...data },
         {
           onSuccess: () => {
@@ -93,7 +96,7 @@ function AddUpdateTeamDialog({
       );
       return;
     }
-    createTeam(data, {
+    createMutate(data, {
       onSuccess: () => {
         reset();
         setOpen(false);

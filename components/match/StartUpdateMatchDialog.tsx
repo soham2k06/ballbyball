@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { useCreateMatch, useUpdateMatch } from "@/apiHooks/match";
-import { useAllTeams } from "@/apiHooks/team";
 import {
   CreateMatchSchema,
   UpdateMatchSchema,
   createMatchSchema,
 } from "@/lib/validation/match";
-import { OverlayStateProps } from "@/types";
+import { OverlayStateProps, TeamWithPlayers } from "@/types";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -31,17 +29,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
-import { useValidateMatchData } from "@/lib/hooks";
+import { useActionMutate, useValidateMatchData } from "@/lib/hooks";
 import PlayerLabel from "../players-selection/PlayerLabel";
+import { createMatch, updateMatch } from "@/lib/actions/match";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
+  teams: TeamWithPlayers[];
 }
 
 function StartUpdateMatchDialog({
   open,
   setOpen,
   matchToUpdate,
+  teams,
 }: StartUpdateMatchDialogProps) {
   const form = useForm<CreateMatchSchema | UpdateMatchSchema>({
     resolver: zodResolver(createMatchSchema),
@@ -51,8 +52,6 @@ function StartUpdateMatchDialog({
       overs: 0,
     },
   });
-
-  const { allTeams: teams } = useAllTeams();
 
   const {
     handleSubmit,
@@ -64,8 +63,10 @@ function StartUpdateMatchDialog({
 
   const [isOversDirty, setIsOversDirty] = useState(false);
 
-  const { createMatch, isPending: isCreating } = useCreateMatch();
-  const { updateMatch, isPending: isUpdating } = useUpdateMatch();
+  const { mutate: createMutate, isPending: isCreating } =
+    useActionMutate(createMatch);
+  const { mutate: updateMutate, isPending: isUpdating } =
+    useActionMutate(updateMatch);
 
   const { containsSamePlayer, isDifferentPlayerLengthTeams } =
     useValidateMatchData(form.watch("teamIds") || []);
@@ -76,7 +77,7 @@ function StartUpdateMatchDialog({
     // TODO: Create Input for curTeam
 
     if (matchToUpdate) {
-      updateMatch(
+      updateMutate(
         { ...data, id: matchToUpdate.id },
         {
           onSuccess: () => {
@@ -88,7 +89,7 @@ function StartUpdateMatchDialog({
 
       return;
     }
-    createMatch(
+    createMutate(
       {
         curTeam: 0,
         ...(data as CreateMatchSchema),

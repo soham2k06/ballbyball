@@ -14,22 +14,19 @@ import {
 import { Button } from "@/components/ui/button";
 
 import CreateTeamDialog from "./AddUpdateTeamDialog";
-import { useAllPlayers } from "@/apiHooks/player";
 import Link from "next/link";
+import { Player } from "@prisma/client";
 
-function AddPlayerButton() {
+function AddPlayerButton({ players }: { players: Player[] }) {
   const [open, setOpen] = useState(false);
 
   const [showCreateTeam, setShowCreateTeam] = useState(false);
-
-  const { players } = useAllPlayers();
 
   // TODO: Create two teams with auto spreading players on two teams
 
   return (
     <>
       <Button
-        disabled={!players}
         onClick={() => {
           if (!players?.length) setShowCreateTeam(true);
           else setOpen(true);
@@ -38,7 +35,7 @@ function AddPlayerButton() {
         Add
       </Button>
 
-      <CreateTeamDialog open={open} setOpen={setOpen} />
+      <CreateTeamDialog open={open} setOpen={setOpen} players={players} />
 
       <Dialog open={showCreateTeam} onOpenChange={setShowCreateTeam}>
         <DialogContent>

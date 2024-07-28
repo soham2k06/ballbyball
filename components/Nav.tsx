@@ -20,7 +20,6 @@ import { TypographyH2 } from "./ui/typography";
 
 import NavItem from "./NavItem";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 
@@ -30,10 +29,6 @@ function Nav() {
   const { isLoaded } = useUser();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-  const pathName = usePathname();
-
-  if (pathName.includes("match/") || pathName.includes("/scorer")) return;
 
   return (
     <nav className="sticky top-0 border-b bg-card py-4 max-xl:p-4">

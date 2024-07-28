@@ -5,20 +5,13 @@ import { useEffect, useState } from "react";
 import { BallEvent, CurPlayer } from "@prisma/client";
 import { toast } from "sonner";
 
-import { EventType } from "@/types";
+import { EventType, MatchExtended } from "@/types";
 
 import { StatsOpenProvider } from "@/contexts/StatsOpenContext";
 
 import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
 import { strikeChangers } from "@/lib/constants";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
-
-import {
-  useDeleteAllBallEvents,
-  useSaveBallEvents,
-} from "@/apiHooks/ballEvent/";
-import { useMatchById } from "@/apiHooks/match";
-import { useUpdateMatch } from "@/apiHooks/match";
 
 import { Card, CardContent } from "@/components/ui/card";
 import LoadingButton from "@/components/ui/loading-button";
@@ -35,14 +28,19 @@ import BatsmanScores from "../player-scores/BatsmanScores";
 import Tools from "../match-stats/Tools";
 import FieldersDialog from "./FieldersDialog";
 import MatchSummary from "./MatchSummary";
-import NoMatchFound from "./NoMatchFound";
 import TargetInfo from "./TargetInfo";
 import ScoreButtonsSkeleton from "../score-buttons/ScoreButtonsSkeleton";
+import { useActionMutate } from "@/lib/hooks";
+import { updateMatch } from "@/lib/actions/match";
+import { deleteAllBallEvents, saveBallEvents } from "@/lib/actions/ball-event";
 
-function ScorerLayout({ matchId }: { matchId: string }) {
-  const { match, matchIsLoading, matchIsFetching, isSuccess } =
-    useMatchById(matchId);
-
+function ScorerLayout({
+  matchId,
+  match,
+}: {
+  matchId: string;
+  match: MatchExtended;
+}) {
   const ballEventsFromMatch = match?.ballEvents;
 
   const team = match?.teams[match?.curTeam];
@@ -50,10 +48,13 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   const teamPlayerIds = team?.players.map((player) => player.id);
 
-  // ** React query hooks
-  const { createBallEvent, isPending } = useSaveBallEvents();
-  const { updateMatch, isPending: isUpdatingMatch } = useUpdateMatch();
-  const { deleteAllBallEvents } = useDeleteAllBallEvents();
+  // ** Action hooks
+  const { mutate: createBallEvent, isPending } =
+    useActionMutate(saveBallEvents);
+  const { mutate: updateMutate, isPending: isUpdatingMatch } =
+    useActionMutate(updateMatch);
+  const { mutate: deleteAllBallEventsMutate } =
+    useActionMutate(deleteAllBallEvents);
 
   // ** States
   const [curPlayers, setCurPlayers] = useState<CurPlayer[]>(
@@ -112,7 +113,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // Handling initial player selection
   useEffect(() => {
-    if (!isSuccess || match?.hasEnded) return;
+    if (match?.hasEnded) return;
     const getHasPlayer = (type: "batsman" | "bowler") =>
       (curPlayers.length ? curPlayers : match?.curPlayers)?.some(
         (player) => player.type === type,
@@ -125,7 +126,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
     const hasBowler = getHasPlayer("bowler");
     if (!hasBowler) setShowSelectBowler(!hasBowler && !showSelectBatsman);
-  }, [showSelectBatsman, isSuccess, match?.hasEnded]);
+  }, [showSelectBatsman, match?.hasEnded]);
 
   // Handling strike change on last ball of over
   useEffect(() => {
@@ -150,7 +151,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
 
   // Handling after last ball
   useEffect(() => {
-    if (matchIsLoading && !match) return;
+    if (!match) return;
     const matchBalls = (match?.overs || 0) * 6;
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
 
@@ -163,7 +164,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
         else handleInningChange();
       }
     }
-  }, [totalBalls, matchIsLoading]);
+  }, [totalBalls]);
 
   // Handling Succesfull Chase
   useEffect(() => {
@@ -187,11 +188,6 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     }
   }, [wickets, match?.hasEnded]);
 
-  // if (matchIsLoading) return <p>loading...</p>;
-  if (!match && !matchIsLoading) return <NoMatchFound />;
-
-  // if (!match) return null;
-
   // ** Over Summary
   const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
 
@@ -207,7 +203,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
-    updateMatch(
+    updateMutate(
       { id: matchId, curPlayers: payload },
       {
         onSuccess: () => {
@@ -243,7 +239,13 @@ function ScorerLayout({ matchId }: { matchId: string }) {
     }
 
     handleStrikeChange(
-      (event.includes("-3") ? event.slice(-1) : event.includes("-5") ? event.slice(-1) : event.includes("-2") ? event.slice(-1) : event) as EventType,
+      (event.includes("-3")
+        ? event.slice(-1)
+        : event.includes("-5")
+          ? event.slice(-1)
+          : event.includes("-2")
+            ? event.slice(-1)
+            : event) as EventType,
     );
   }
 
@@ -336,7 +338,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
   }
 
   function handleRestart() {
-    deleteAllBallEvents(matchId);
+    deleteAllBallEventsMutate(matchId);
     setEvents([]);
     updateMatch({
       id: matchId,
@@ -360,7 +362,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
               disabled={isPending || !isModified}
               onClick={handleSave}
             >
-              {isPending || matchIsFetching ? "Saving..." : "Save"}
+              {isPending ? "Saving..." : "Save"}
             </LoadingButton>
           </div>
           <DangerActions
@@ -439,7 +441,7 @@ function ScorerLayout({ matchId }: { matchId: string }) {
           }}
           handleSelectPlayer={handleSelectPlayer}
           allowSinglePlayer={match?.allowSinglePlayer}
-          isLoading={isUpdatingMatch || matchIsFetching}
+          isLoading={isUpdatingMatch}
         />
         <SelectBowler
           open={showSelectBowler}

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import { useAllPlayers, useDeletePlayer } from "@/apiHooks/player";
 import { cn } from "@/lib/utils";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 
@@ -13,11 +12,13 @@ import Player from "./Player";
 import AddPlayerButton from "./AddPlayer";
 import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
 import PlayerStats from "./PlayerStats";
-import { Skeleton } from "../ui/skeleton";
+import { Player as PlayerType } from "@prisma/client";
+import { useActionMutate } from "@/lib/hooks";
+import { deletePlayer } from "@/lib/actions/player";
 
-function PlayerList() {
-  const { players, isFetching } = useAllPlayers();
-  const { deletePlayer, isPending } = useDeletePlayer();
+function PlayerList({ players }: { players: PlayerType[] }) {
+  const { mutate: deleteMutate, isPending } = useActionMutate(deletePlayer);
+
   const [playerToDelete, setPlayerToDelete] = useState<string | undefined>();
 
   const [playerToUpdate, setPlayerToUpdate] = useState<
@@ -28,17 +29,6 @@ function PlayerList() {
     id: string | undefined;
     name: string | undefined;
   }>();
-
-  if (isFetching)
-    return (
-      <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
-        {Array(5)
-          .fill(0)
-          .map((_, i) => (
-            <Skeleton key={i} className="h-14 sm:h-[72px]"></Skeleton>
-          ))}
-      </ul>
-    );
 
   return (
     <>
@@ -80,7 +70,7 @@ function PlayerList() {
         }
         isLoading={isPending}
         content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
-        onConfirm={() => playerToDelete && deletePlayer(playerToDelete)}
+        onConfirm={() => playerToDelete && deleteMutate(playerToDelete)}
       />
 
       <PlayerStats

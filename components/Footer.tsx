@@ -2,14 +2,8 @@
 
 import Link from "next/link";
 import DarkModeToggle from "./DarkModeToggle";
-import { usePathname } from "next/navigation";
 
 function Footer() {
-  const pathname = usePathname();
-
-  // Not showing footer on match page
-  if (pathname.includes("match/")) return null;
-
   return (
     <div className="fixed bottom-0 mt-4 w-full border-t bg-card/75 p-2 text-sm text-muted-foreground backdrop-blur-lg">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-2 max-md:flex-col">

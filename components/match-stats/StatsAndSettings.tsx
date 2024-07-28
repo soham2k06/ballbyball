@@ -15,11 +15,12 @@ import { SelectBowler, SelectBatsman } from "../players-selection";
 import OverStats from "./OverStats";
 import FullOverSummary from "./FullOverSummary";
 import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
-import { useSaveBallEvents } from "@/apiHooks/ballEvent";
-import { useUpdateMatch } from "@/apiHooks/match";
 import StatsDrawerHeader from "./StatsDrawerHeader";
 import WormChart from "./WormChart";
 import { getOverStr, getScore } from "@/lib/utils";
+import { updateMatch } from "@/lib/actions/match";
+import { useActionMutate } from "@/lib/hooks";
+import { saveBallEvents } from "@/lib/actions/ball-event";
 
 interface StatsAndSettingsProps {
   runRate: number;
@@ -58,8 +59,8 @@ function StatsAndSettings({
     name: match?.teams?.[0].name ?? "",
   });
 
-  const { createBallEvent } = useSaveBallEvents();
-  const { updateMatch } = useUpdateMatch();
+  const { mutate: createBallEvent } = useActionMutate(saveBallEvents);
+  const { mutate: updateMutate } = useActionMutate(updateMatch);
 
   const curTeam = match?.teams[match.curTeam];
   const opposingTeam = match?.teams[match.curTeam === 0 ? 1 : 0];
@@ -91,7 +92,7 @@ function StatsAndSettings({
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
     if (!match?.id) return;
 
-    updateMatch(
+    updateMutate(
       { id: match.id, curPlayers: payload },
       {
         onSuccess: () => {

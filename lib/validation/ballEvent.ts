@@ -8,11 +8,3 @@ export const createBallEventSchema = z.object({
 });
 
 export type CreateBallEventSchema = z.infer<typeof createBallEventSchema>;
-
-export const updateMatchSchema = createBallEventSchema.extend({
-  id: z.string().min(1),
-});
-
-export const deleteMatchSchema = z.object({
-  id: z.string().min(1),
-});

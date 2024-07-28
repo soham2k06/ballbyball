@@ -8,7 +8,6 @@ import {
   UpdatePlayerSchema,
   createPlayerSchema,
 } from "@/lib/validation/player";
-import { useCreatePlayer, useUpdatePlayer } from "@/apiHooks/player";
 
 import {
   Dialog,
@@ -26,6 +25,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
+import { createPlayer, updatePlayer } from "@/lib/actions/player";
+import { toast } from "sonner";
+import { useActionMutate } from "@/lib/hooks";
+import { toastError } from "@/lib/utils";
 
 interface AddUpdatePlayerDialogProps extends OverlayStateProps {
   playerToUpdate?: UpdatePlayerSchema;
@@ -47,14 +50,16 @@ function AddUpdatePlayerDialog({
     formState: { isDirty },
   } = form;
 
-  const { createPlayer, isPending: isCreating } = useCreatePlayer();
-  const { udpatePlayer, isPending: isUpdating } = useUpdatePlayer();
+  const { mutate: createMutate, isPending: isCreating } =
+    useActionMutate(createPlayer);
+  const { mutate: updateMutate, isPending: isUpdating } =
+    useActionMutate(updatePlayer);
 
   const isPending = isCreating || isUpdating;
 
-  function onSubmit(data: CreatePlayerSchema | UpdatePlayerSchema) {
+  async function onSubmit(data: CreatePlayerSchema | UpdatePlayerSchema) {
     if (!!playerToUpdate) {
-      udpatePlayer(
+      updateMutate(
         { id: playerToUpdate.id, ...data },
         {
           onSuccess: () => {
@@ -65,9 +70,11 @@ function AddUpdatePlayerDialog({
       );
       return;
     }
-    createPlayer(data, {
+
+    createMutate(data, {
+      onError: (error) => toastError(error),
       onSuccess: () => {
-        reset();
+        toast.success("Player successfully created!");
         setOpen(false);
       },
     });

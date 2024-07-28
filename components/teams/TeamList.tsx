@@ -8,11 +8,7 @@ import { TeamWithPlayers } from "@/types";
 import { cn } from "@/lib/utils";
 import { UpdateTeamSchema } from "@/lib/validation/team";
 
-import { useAllTeams } from "@/apiHooks/team";
-import { useDeleteTeam } from "@/apiHooks/team/useDeleteTeam";
-
 import CreateTeam from "@/components/teams/AddTeam";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import EmptyState from "@/components/EmptyState";
 import AlertNote from "@/components/AlertNote";
@@ -20,11 +16,17 @@ import AlertNote from "@/components/AlertNote";
 import TeamPlayers from "./TeamPlayers";
 import AddUpdateTeamDialog from "./AddUpdateTeamDialog";
 import Team from "./Team";
+import { useActionMutate } from "@/lib/hooks";
+import { deleteTeam } from "@/lib/actions/team";
 
-function TeamList() {
-  const { allTeams: teams, isFetching } = useAllTeams();
-
-  const { deleteTeam, isPending } = useDeleteTeam();
+function TeamList({
+  teams,
+  players,
+}: {
+  teams: TeamWithPlayers[];
+  players: Player[];
+}) {
+  const { mutate: deleteMutate, isPending } = useActionMutate(deleteTeam);
 
   const [teamToDelete, setTeamToDelete] = useState<string | undefined>();
 
@@ -41,20 +43,9 @@ function TeamList() {
     | undefined
   >(undefined);
 
-  if (isFetching)
-    return (
-      <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
-        {Array(5)
-          .fill(0)
-          .map((_, i) => (
-            <Skeleton key={i} className="h-14 sm:h-[72px]"></Skeleton>
-          ))}
-      </ul>
-    );
-
   function handleDelete(id: string) {
     setTeamToDelete(id);
-    deleteTeam(id, {
+    deleteMutate(id, {
       onSettled() {
         setTeamToDelete(undefined);
       },
@@ -63,11 +54,8 @@ function TeamList() {
 
   function handleUpdateClick(_: unknown, team: TeamWithPlayers) {
     const teamToUpdateVar: UpdateTeamSchema & { matchId: string | null } = {
-      id: team.id,
-      name: team.name,
       playerIds: team.players?.map((player) => player.id) ?? [],
-      captain: team.captain,
-      matchId: team.matchId,
+      ...team,
     };
 
     setTeamToUpdate(teamToUpdateVar);
@@ -84,6 +72,7 @@ function TeamList() {
           {teams.map((team, i) => {
             return (
               <Team
+                key={team.id}
                 team={team}
                 setTeamToDelete={setTeamToDelete}
                 setShowingTeam={setShowingTeam}
@@ -95,9 +84,10 @@ function TeamList() {
       ) : (
         <EmptyState document="teams" />
       )}
-      <CreateTeam />
+      <CreateTeam players={players} />
 
       <AddUpdateTeamDialog
+        players={players}
         open={!!teamToUpdate}
         setOpen={() => setTeamToUpdate(teamToUpdate ? undefined : teamToUpdate)}
         teamToUpdate={teamToUpdate}

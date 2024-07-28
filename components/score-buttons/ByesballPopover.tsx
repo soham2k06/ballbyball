@@ -21,7 +21,7 @@ function ByesballPopover({
         <Button
           size="lg"
           variant="secondary"
-          className="h-20 w-full px-4 text-lg text-muted-foreground"
+          className="h-20 rounded-none text-lg text-muted-foreground"
         >
           Byes
         </Button>

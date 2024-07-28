@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 
 import { EventType, PlayerPerformance } from "@/types";
 import { invalidBalls } from "./constants";
+import { toast } from "sonner";
 
 interface BatsmanStats {
   batsmanId: string;
@@ -290,6 +291,11 @@ function calculateWinner({
   return { winInfo, winner };
 }
 
+function toastError(err: unknown) {
+  if (err instanceof Error) toast.error(err.message);
+  else toast.error("Something went wrong!");
+}
+
 // ** Backend
 function validateUser() {
   const { userId } = auth();
@@ -367,6 +373,11 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
   return { fifties, centuries, highestScore };
 }
 
+function handleError(err: unknown) {
+  if (err instanceof Error) throw new Error(err.message);
+  else throw new Error("Something went wrong!");
+}
+
 export {
   cn,
   getScore,
@@ -384,8 +395,10 @@ export {
   calculateFallOfWickets,
   calculatePlayerOfTheMatch,
   calculateWinner,
+  toastError,
   // Backend
   validateUser,
   createOrUpdateWithUniqueName,
   calcMilestones,
+  handleError,
 };

@@ -17,7 +17,7 @@ function ScoreButtons({
 }) {
   return (
     <div className="space-y-4">
-      <div className="flex w-full justify-center gap-2">
+      <div className="grid w-full grid-cols-4 justify-center gap-[2px] overflow-hidden rounded-md">
         <ByesballPopover handleScore={handleScore} />
         <WideballPopver handleScore={handleScore} />
         <NoballPopver handleScore={handleScore} />

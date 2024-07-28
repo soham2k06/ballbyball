@@ -12,18 +12,8 @@ export async function GET(
 
     const match = await prisma.match.findFirst({
       where: { userId, id },
-      select: {
-        allowSinglePlayer: true,
-        curPlayers: true,
-        curTeam: true,
-        hasEnded: true,
-        id: true,
-        name: true,
-        overs: true,
-        strikeIndex: true,
-        ballEvents: {
-          select: { batsmanId: true, bowlerId: true, type: true },
-        },
+      include: {
+        ballEvents: { select: { batsmanId: true, bowlerId: true, type: true } },
         matchTeams: {
           select: {
             team: {
@@ -57,27 +47,6 @@ export async function GET(
       return NextResponse.json({ error: "No data found" }, { status: 404 });
 
     return NextResponse.json(matchSimplified, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
-  }
-}
-
-export async function DELETE(
-  _: any,
-  { params: { id } }: { params: { id: string } },
-) {
-  try {
-    validateUser();
-
-    await prisma.matchTeam.deleteMany({ where: { matchId: id } });
-    await prisma.ballEvent.deleteMany({ where: { matchId: id } });
-    await prisma.match.delete({ where: { id } });
-
-    return NextResponse.json({ message: "Match deleted" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

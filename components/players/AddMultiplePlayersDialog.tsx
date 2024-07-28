@@ -4,12 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Minus, Plus } from "lucide-react";
 
 import { OverlayStateProps } from "@/types";
-import { useCreateMultiplePlayers } from "@/apiHooks/player";
 
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -23,6 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 import { Button } from "@/components/ui/button";
+import { useActionMutate } from "@/lib/hooks";
+import { createMultiplePlayers } from "@/lib/actions/player";
 
 const uniqueArray = (arr: string[]) => new Set(arr).size === arr.length;
 
@@ -51,10 +51,10 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
     shouldUnregister: false,
   });
 
-  const { createMultiplePlayers, isPending } = useCreateMultiplePlayers();
+  const { mutate, isPending } = useActionMutate(createMultiplePlayers);
 
   function onSubmit(data: { names: string[] }) {
-    createMultiplePlayers(data.names, {
+    mutate(data.names, {
       onSuccess: () => {
         reset();
         setOpen(false);
@@ -89,65 +89,66 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="max-h-[calc(100dvh-120px)] min-h-96 space-y-3 overflow-y-auto p-1"
+            className="flex max-h-[calc(100dvh-120px)] min-h-96 flex-col justify-between space-y-3 overflow-y-auto p-1"
           >
-            {fields.map((name, index) => (
-              <div key={name.id} className="flex items-center gap-4">
-                <FormField
-                  name={`names.${index}`}
-                  control={control}
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormControl>
-                        <Input
-                          autoFocus
-                          id={`player-input-${index}`}
-                          placeholder="Player name"
-                          className="w-full"
-                          {...field}
-                          onKeyDown={(e) => handleEnterKeyPress(e, index)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      {!!form.formState.errors.names?.root && (
-                        <p className="text-sm font-medium text-destructive">
-                          {form.formState.errors.names?.root.message}
-                        </p>
-                      )}
-                    </FormItem>
+            <ul>
+              {fields.map((name, index) => (
+                <div key={name.id} className="flex items-center gap-4">
+                  <FormField
+                    name={`names.${index}`}
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            autoFocus
+                            id={`player-input-${index}`}
+                            placeholder="Player name"
+                            className="w-full"
+                            {...field}
+                            onKeyDown={(e) => handleEnterKeyPress(e, index)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        {!!form.formState.errors.names?.root && (
+                          <p className="text-sm font-medium text-destructive">
+                            {form.formState.errors.names?.root.message}
+                          </p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+                  {fields.length > 1 && (
+                    <Button
+                      type="button"
+                      className="aspect-square p-0"
+                      onClick={() => remove(index)}
+                    >
+                      <Minus size={20} />
+                    </Button>
                   )}
-                />
-                {fields.length > 1 && (
-                  <Button
-                    type="button"
-                    className="aspect-square p-0"
-                    onClick={() => remove(index)}
-                  >
-                    <Minus size={20} />
-                  </Button>
-                )}
-              </div>
-            ))}
+                </div>
+              ))}
+            </ul>
 
-            <DialogFooter className="!mt-4 w-full flex-row items-end !justify-between">
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  type="button"
-                  onClick={() => handleAdd(fields.length)}
-                >
-                  <Plus /> Add Field
-                </Button>
-                <LoadingButton
-                  size="sm"
-                  type="submit"
-                  disabled={isPending}
-                  loading={isPending}
-                >
-                  {isPending ? "Adding..." : "Add Players"}
-                </LoadingButton>
-              </div>
-            </DialogFooter>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                type="button"
+                variant="secondary"
+                onClick={() => handleAdd(fields.length)}
+              >
+                <Plus /> Add Field
+              </Button>
+              <LoadingButton
+                size="sm"
+                type="submit"
+                disabled={isPending}
+                loading={isPending}
+              >
+                {isPending ? "Adding..." : "Add Players"}
+              </LoadingButton>
+            </div>
           </form>
         </Form>
       </DialogContent>

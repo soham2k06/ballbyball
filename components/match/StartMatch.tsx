@@ -13,15 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 
 import StartMatchDialog from "./StartUpdateMatchDialog";
-import { useAllTeams } from "@/apiHooks/team";
 import Link from "next/link";
+import { TeamWithPlayers } from "@/types";
 
-function StartMatchButton() {
+function StartMatchButton({ teams }: { teams: TeamWithPlayers[] }) {
   const [open, setOpen] = useState(false);
 
   const [showCreateTeam, setShowCreateTeam] = useState(false);
-
-  const { allTeams: teams } = useAllTeams();
 
   return (
     <>
@@ -35,7 +33,7 @@ function StartMatchButton() {
         Start match
       </Button>
 
-      <StartMatchDialog open={open} setOpen={setOpen} />
+      <StartMatchDialog open={open} setOpen={setOpen} teams={teams} />
 
       <Dialog open={showCreateTeam} onOpenChange={setShowCreateTeam}>
         <DialogContent>
