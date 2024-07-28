@@ -58,7 +58,7 @@ export async function getAllMatches() {
 export async function getMatchById(id: string) {
   const userId = validateUser();
 
-  const match = await prisma.match.findFirst({
+  const fetchedMatch = await prisma.match.findFirst({
     where: { userId, id },
     include: {
       ballEvents: { select: { batsmanId: true, bowlerId: true, type: true } },
@@ -78,8 +78,12 @@ export async function getMatchById(id: string) {
     },
   });
 
+  if (!fetchedMatch) return null;
+
+  const { matchTeams, ...match } = fetchedMatch;
+
   const matchSimplified = {
-    teams: match?.matchTeams.map((team) => {
+    teams: matchTeams?.map((team) => {
       const { teamPlayers, ...rest } = team.team;
       return {
         ...rest,
@@ -89,11 +93,9 @@ export async function getMatchById(id: string) {
     ...match,
   };
 
-  delete matchSimplified.matchTeams;
-
   if (!matchSimplified) throw new Error("Match not found");
 
-  return matchSimplified as MatchExtended;
+  return matchSimplified as unknown as MatchExtended | null;
 }
 
 export async function createMatch(data: CreateMatchSchema) {
