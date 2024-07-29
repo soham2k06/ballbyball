@@ -1,10 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import {
-  calcMilestones,
-  calculateMaidenOvers,
-  getScore,
-  validateUser,
-} from "@/lib/utils";
+import { calcMilestones, calculateMaidenOvers, getScore } from "@/lib/utils";
 import { EventType } from "@/types";
 import { BallEvent } from "@prisma/client";
 import { NextResponse } from "next/server";
@@ -14,8 +9,6 @@ export async function GET(
   { params: { id } }: { params: { id: string } },
 ) {
   try {
-    validateUser();
-
     const playerBallEvents = await prisma.ballEvent.findMany({
       where: { OR: [{ batsmanId: id }, { bowlerId: id }] },
     });

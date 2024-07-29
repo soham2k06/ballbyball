@@ -5,7 +5,7 @@ import prisma from "../db/prisma";
 import {
   createOrUpdateWithUniqueName,
   handleError,
-  validateUser,
+  getValidatedUser,
 } from "../utils";
 import {
   createPlayerSchema,
@@ -15,7 +15,7 @@ import {
 } from "../validation/player";
 
 export async function getAllPlayers() {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
   try {
     const players = await prisma.player.findMany({
       where: { userId },
@@ -29,7 +29,7 @@ export async function getAllPlayers() {
 }
 
 export async function createPlayer(data: CreatePlayerSchema) {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
   const parsedRes = createPlayerSchema.safeParse(data);
 
   if (!parsedRes.success) {
@@ -59,7 +59,7 @@ export async function createPlayer(data: CreatePlayerSchema) {
 export async function createMultiplePlayers(
   data: CreatePlayerSchema["name"][],
 ) {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
 
   if (!Array.isArray(data)) throw new Error("Invalid input");
 

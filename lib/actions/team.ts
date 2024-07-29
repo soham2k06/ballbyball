@@ -5,7 +5,7 @@ import prisma from "../db/prisma";
 import {
   createOrUpdateWithUniqueName,
   handleError,
-  validateUser,
+  getValidatedUser,
 } from "../utils";
 import {
   createTeamSchema,
@@ -17,7 +17,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 export async function getAllTeams() {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
 
   try {
     const teams = await prisma.team.findMany({
@@ -47,7 +47,7 @@ export async function getAllTeams() {
 }
 
 export async function createTeam(data: CreateTeamSchema) {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
 
   const parsedRes = createTeamSchema.safeParse(data);
 
@@ -81,7 +81,7 @@ export async function createTeam(data: CreateTeamSchema) {
 }
 
 export async function updateTeam(data: UpdateTeamSchema) {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
 
   const parsedRes = updateTeamSchema.safeParse(data);
 

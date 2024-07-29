@@ -1,12 +1,11 @@
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 
 import { cn } from "@/lib/utils";
 
-import { dark } from "@clerk/themes";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
 
 // If loading a variable font, you don't need to specify the font weight
 const lato = Lato({
@@ -125,27 +124,28 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider appearance={{ baseTheme: dark }}>
-      <html lang="en">
-        <head>
-          <link
-            rel="icon"
-            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎾</text></svg>"
-          />
-          <meta name="google-site-verification" content="VoqGlTAQWR5pCGtJXLewyVpsxWiR1LZr4yRhSg30U-o" />
-          <meta name="google-adsense-account" content="ca-pub-7226440547183724"/>
-        </head>
-        <body className={cn("antialiased", lato.className)}>
-          {children}
-          <Analytics />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <head>
+        <link
+          rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎾</text></svg>"
+        />
+        <meta
+          name="google-site-verification"
+          content="VoqGlTAQWR5pCGtJXLewyVpsxWiR1LZr4yRhSg30U-o"
+        />
+        <meta name="google-adsense-account" content="ca-pub-7226440547183724" />
+      </head>
+      <body className={cn("antialiased", lato.className)}>
+        <SessionProvider>{children}</SessionProvider>
+        <Analytics />
+      </body>
+    </html>
   );
 }

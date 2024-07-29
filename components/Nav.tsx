@@ -1,13 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
-import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
-import { useTheme } from "next-themes";
-
 import { Menu } from "lucide-react";
-
 import { navItems } from "@/lib/constants";
 
 import {
@@ -20,13 +14,22 @@ import { TypographyH2 } from "./ui/typography";
 
 import NavItem from "./NavItem";
 import { useState } from "react";
-import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { signOut, useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { processTeamName } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import GoogleButton from "./google-button";
 
 function Nav() {
-  const { theme } = useTheme();
-
-  const { isLoaded } = useUser();
+  const { data, status } = useSession();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -45,31 +48,29 @@ function Nav() {
             </NavItem>
           ))}
         </ul>
-        <SignedIn>
-          <div className="max-md:ml-auto max-md:mr-4">
-            {isLoaded ? (
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  baseTheme: theme === "dark" ? dark : undefined,
-                  elements: {
-                    avatarBox: {
-                      width: "2.5rem",
-                      height: "2.5rem",
-                    },
-                  },
-                }}
-              />
-            ) : (
-              <Skeleton className="size-10 animate-pulse rounded-full text-center leading-10" />
-            )}
-          </div>
-        </SignedIn>
-        <SignedOut>
-          <Button className="btn btn-primary" asChild>
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-        </SignedOut>
+        {status === "loading" ? (
+          <Skeleton className="size-10 animate-pulse rounded-full text-center leading-10" />
+        ) : data ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="focus:outline-none">
+              <Avatar>
+                <AvatarImage src={data.user?.image ?? ""} />
+                <AvatarFallback>
+                  {processTeamName(data?.user?.name ?? "")}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>{data.user?.name}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => signOut()}>
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <GoogleButton />
+        )}
 
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger className="mr-4 md:hidden">
