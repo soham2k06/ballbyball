@@ -14,13 +14,15 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
+  applicationName: "Ball By Ball",
   title: "Ball By Ball | Your cricket partner",
-  description: "Your cricket partner",
-  creator: "Soham Bhikadiya & Rudra Bhikadiya",
+  description:
+    "Add players, teams, and matches. Keep track of the score ball by ball. Share the scorecard with your friends. Ball By Ball is your cricket partner 🏏. It's totally free, just signin and start scoring! Cheers!",
+  creator: "Soham Bhikadiya",
   keywords: [
     "ball by ball",
     "ball",
-    "by",
+    "ballbyball cricket scoring",
     "ball by ball cricket",
     "ball by ball cricket score",
     "ball by ball cricket scorecard",
@@ -122,6 +124,25 @@ export const metadata: Metadata = {
     "cricket score card pdf free",
     "cricket scorecard live free",
   ],
+  authors: {
+    name: "Soham Bhikadiya",
+    url: "https://sohamb.tech",
+  },
+  openGraph: {
+    title: "Ball By Ball | Your cricket partner",
+    type: "website",
+    locale: "en_US",
+    url: "https://ballbyball.vercel.app",
+    siteName: "Ball By Ball",
+    images: [
+      {
+        url: "/opengraph-banner.png",
+        width: 1200,
+        height: 630,
+        alt: "Ball By Ball",
+      },
+    ],
+  },
 };
 
 export default async function RootLayout({

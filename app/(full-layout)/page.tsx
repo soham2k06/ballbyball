@@ -34,6 +34,7 @@ async function page() {
             </Button>
           </div>
         </div>
+
         <Image
           src="/banner-demo-dark.png"
           alt="demo"
@@ -42,6 +43,17 @@ async function page() {
           className="mx-8 rounded-lg max-md:mx-auto max-md:hidden max-md:w-11/12"
         />
       </section>
+
+      <div className="sr-only">
+        <h2>Ball By Ball</h2>
+        <h2>Cricket scoring</h2>
+        <h2>Your cricket partner</h2>
+        <p>
+          Ball By Ball is a cricket scoring app that makes scoring matches easy
+          and fun. Share your scores and relive the excitement with friends and
+          teammates.
+        </p>
+      </div>
       <section className="pt-8 md:pt-8 lg:pt-16">
         <div className="mb-4 flex max-w-3xl flex-col gap-2 md:mb-8">
           <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:leading-[1.1]">
