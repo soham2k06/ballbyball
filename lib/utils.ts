@@ -6,6 +6,7 @@ import { EventType, PlayerPerformance } from "@/types";
 import { invalidBalls } from "./constants";
 import { toast } from "sonner";
 import getCachedSession from "./auth/session";
+import { redirect } from "next/navigation";
 
 interface BatsmanStats {
   batsmanId: string;
@@ -380,8 +381,9 @@ function handleError(err: unknown) {
 }
 
 async function checkSession() {
-  const session = getCachedSession();
-  if (!session) throw new Error("User not authenticated");
+  const session = await getCachedSession();
+  console.log(session);
+  if (!session) redirect("/");
 }
 
 export {

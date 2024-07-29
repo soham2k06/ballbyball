@@ -128,20 +128,12 @@ export const metadata: Metadata = {
     name: "Soham Bhikadiya",
     url: "https://sohamb.tech",
   },
+
   openGraph: {
-    title: "Ball By Ball | Your cricket partner",
-    type: "website",
-    locale: "en_US",
-    url: "https://ballbyball.vercel.app",
-    siteName: "Ball By Ball",
-    images: [
-      {
-        url: "/opengraph-banner.png",
-        width: 1200,
-        height: 630,
-        alt: "Ball By Ball",
-      },
-    ],
+    title: "BallByBall | Your cricket partner",
+    description:
+      "Add players, teams, and matches. Keep track of the score ball by ball. Share the scorecard with your friends. Ball By Ball is your cricket partner 🏏. It's totally free, just signin and start scoring! Cheers!",
+    images: "/opengraph-banner.png",
   },
 };
 
