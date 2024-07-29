@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import PlayerList from "@/components/players/PlayerList";
 import { getAllPlayers } from "@/lib/actions/player";
 import { Player } from "@prisma/client";
+import { checkSession } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Players - Ball By Ball",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 async function page() {
+  await checkSession();
   const players = await getAllPlayers();
   return (
     <div>

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import ScorerLayout from "@/components/scorer/ScorerLayout";
 import { getMatchById } from "@/lib/actions/match";
 import NoMatchFound from "@/components/scorer/NoMatchFound";
+import { checkSession } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Match - Ball By Ball",
@@ -13,6 +14,8 @@ export default async function Match({
 }: {
   params: { matchId: string };
 }) {
+  await checkSession();
+
   const match = await getMatchById(params.matchId);
 
   return (

@@ -379,6 +379,11 @@ function handleError(err: unknown) {
   else throw new Error("Something went wrong!");
 }
 
+async function checkSession() {
+  const session = getCachedSession();
+  if (!session) throw new Error("User not authenticated");
+}
+
 export {
   cn,
   getScore,
@@ -402,4 +407,5 @@ export {
   createOrUpdateWithUniqueName,
   calcMilestones,
   handleError,
+  checkSession,
 };
