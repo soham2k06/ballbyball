@@ -5,7 +5,7 @@ import prisma from "../db/prisma";
 import {
   createOrUpdateWithUniqueName,
   handleError,
-  validateUser,
+  getValidatedUser,
 } from "../utils";
 import {
   createMatchSchema,
@@ -17,7 +17,7 @@ import { updateMatchSchema } from "../validation/match";
 import { CurPlayer } from "@prisma/client";
 
 export async function getAllMatches() {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
   const matches = await prisma.match.findMany({
     where: { userId },
     select: {
@@ -56,7 +56,7 @@ export async function getAllMatches() {
 }
 
 export async function getMatchById(id: string) {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
 
   const fetchedMatch = await prisma.match.findFirst({
     where: { userId, id },
@@ -99,7 +99,7 @@ export async function getMatchById(id: string) {
 }
 
 export async function createMatch(data: CreateMatchSchema) {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
   const parsedRes = createMatchSchema.safeParse(data);
 
   if (!parsedRes.success) throw new Error("Invalid inputs");

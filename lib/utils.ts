@@ -1,11 +1,11 @@
 import { BallEvent, Player, PrismaClient } from "@prisma/client";
-import { auth } from "@clerk/nextjs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import { EventType, PlayerPerformance } from "@/types";
 import { invalidBalls } from "./constants";
 import { toast } from "sonner";
+import getCachedSession from "./auth/session";
 
 interface BatsmanStats {
   batsmanId: string;
@@ -297,11 +297,12 @@ function toastError(err: unknown) {
 }
 
 // ** Backend
-function validateUser() {
-  const { userId } = auth();
-  if (!userId) throw new Error("User not authenticated");
 
-  return userId;
+async function getValidatedUser() {
+  const session = await getCachedSession();
+  if (!session?.user?.id) throw new Error("User not authenticated");
+
+  return session.user.id;
 }
 
 async function createOrUpdateWithUniqueName(
@@ -309,7 +310,7 @@ async function createOrUpdateWithUniqueName(
   schema: PrismaClient["player"] | PrismaClient["team"] | PrismaClient["match"],
   entityId?: string,
 ) {
-  const { userId } = auth();
+  const userId = await getValidatedUser();
 
   if (!userId) throw new Error("User not authenticated");
 
@@ -397,7 +398,7 @@ export {
   calculateWinner,
   toastError,
   // Backend
-  validateUser,
+  getValidatedUser,
   createOrUpdateWithUniqueName,
   calcMilestones,
   handleError,

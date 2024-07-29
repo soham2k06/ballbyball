@@ -17,7 +17,7 @@ async function Teams() {
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Teams
       </h1>
-      <TeamList teams={teams} players={players as Player[]} />
+      <TeamList teams={teams ?? []} players={players as Player[]} />
     </div>
   );
 }

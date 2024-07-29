@@ -5,11 +5,11 @@ import {
   CreateBallEventSchema,
 } from "../validation/ballEvent";
 import prisma from "../db/prisma";
-import { validateUser } from "../utils";
+import { getValidatedUser } from "../utils";
 import { revalidatePath } from "next/cache";
 
 export async function saveBallEvents(data: CreateBallEventSchema[]) {
-  const userId = validateUser();
+  const userId = await getValidatedUser();
   const parsedRes = createBallEventSchema.array().safeParse(data);
 
   if (!parsedRes.success) {
