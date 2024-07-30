@@ -144,7 +144,10 @@ export default async function RootLayout({
           name="google-site-verification"
           content="VoqGlTAQWR5pCGtJXLewyVpsxWiR1LZr4yRhSg30U-o"
         />
-        <meta name="google-adsense-account" content="ca-pub-7226440547183724" />
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-7226440547183724"
+        ></meta>
       </head>
       <body className={cn("antialiased", lato.className)}>
         <SessionProvider>{children}</SessionProvider>
