@@ -69,13 +69,15 @@ async function page() {
           </div>
         </div>
 
-        <Image
-          src="/banner-demo-dark.png"
-          alt="demo"
-          width={320}
-          height={100}
-          className="mx-8 rounded-lg max-md:mx-auto max-md:hidden max-md:w-11/12"
-        />
+        <div className="ml-8 aspect-[1/2] w-80 bg-muted">
+          <Image
+            src="/banner-demo-dark.png"
+            alt="Cricket Scorer demo"
+            width={320}
+            height={800}
+            className="size-full rounded-lg max-md:mx-auto max-md:hidden"
+          />
+        </div>
       </section>
 
       <div className="sr-only">
@@ -98,39 +100,33 @@ async function page() {
           </span>
         </div>
 
-        <div className="flex w-fit gap-6 max-md:hidden">
-          <div className="overflow-hidden rounded-lg border">
+        <div className="flex gap-6 max-md:hidden">
+          <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
             <Image
               src="/worm-chart.png"
               alt="worm chart demo"
               width={320}
-              height={100}
+              height={800}
+              className="size-full max-md:mx-auto max-md:hidden"
             />
-            <div className="bg-muted p-1 text-center text-muted-foreground">
-              Worm Chart
-            </div>
           </div>
-          <div className="overflow-hidden rounded-lg border">
+          <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
             <Image
               src="/runrate-chart.png"
               alt="runrate chart demo"
               width={320}
-              height={100}
+              height={800}
+              className="size-full max-md:mx-auto max-md:hidden"
             />
-            <div className="bg-muted p-1 text-center text-muted-foreground">
-              Runrate Chart
-            </div>
           </div>
-          <div className="overflow-hidden rounded-lg border">
+          <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
             <Image
               src="/player-stats.png"
               alt="player stats demo"
               width={320}
-              height={100}
+              height={800}
+              className="size-full max-md:mx-auto max-md:hidden"
             />
-            <div className="bg-muted p-1 text-center text-muted-foreground">
-              Player Stats
-            </div>
           </div>
         </div>
         <div className="md:hidden">
