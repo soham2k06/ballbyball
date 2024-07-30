@@ -6,7 +6,7 @@ import { Player } from "@prisma/client";
 import { checkSession } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Players - Ball By Ball",
+  title: "Players - BallByBall",
   description: "List of players",
 };
 

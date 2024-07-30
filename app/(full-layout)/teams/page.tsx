@@ -6,8 +6,8 @@ import { Player } from "@prisma/client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Teams | Ball by ball",
-  description: "List of teams",
+  title: "Teams | BallByBall",
+  description: "Add, edit, and delete teams. List of all teams.",
 };
 
 async function Teams() {

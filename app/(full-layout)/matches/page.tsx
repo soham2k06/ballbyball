@@ -5,7 +5,7 @@ import { getAllTeams } from "@/lib/actions/team";
 import { checkSession } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Matches - Ball By Ball",
+  title: "Matches - BallByBall",
   description: "List of players",
 };
 

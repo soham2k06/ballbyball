@@ -5,8 +5,8 @@ import NoMatchFound from "@/components/scorer/NoMatchFound";
 import { checkSession } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Match - Ball By Ball",
-  description: "List of players",
+  title: "Match - BallByBall",
+  description: "Match details. Start scoring here",
 };
 
 export default async function Match({
