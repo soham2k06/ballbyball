@@ -69,13 +69,13 @@ async function page() {
           </div>
         </div>
 
-        <div className="ml-8 aspect-[1/2] w-80 bg-muted">
+        <div className="ml-8 aspect-[1/2] w-80 bg-muted max-md:hidden">
           <Image
             src="/banner-demo-dark.png"
             alt="Cricket Scorer demo"
             width={320}
             height={800}
-            className="size-full rounded-lg max-md:mx-auto max-md:hidden"
+            className="size-full rounded-lg max-md:mx-auto"
           />
         </div>
       </section>
@@ -83,7 +83,11 @@ async function page() {
       <div className="sr-only">
         <h2>BallByBall</h2>
         <h2>Cricket scoring</h2>
-        <h2>Your cricket partner</h2>
+        <h2>How to count score online</h2>
+        <h2>How to count cricket score online</h2>
+        <h2>Cricket scorer</h2>
+        <h2>Cricket scorer online</h2>
+        <h2>Your cricket scoring partner</h2>
         <p>
           BallByBall is a cricket scoring app that makes scoring matches easy
           and fun. Share your scores and relive the excitement with friends and
@@ -133,7 +137,7 @@ async function page() {
           <GlimpseCarousel />
         </div>
       </section>
-      <section className="pt-8 text-xl tracking-wide text-muted-foreground md:pt-8 lg:pt-16">
+      <section className="pt-8 text-base tracking-wide text-muted-foreground md:pt-8 md:text-xl lg:pt-16">
         <p className="mb-4">
           Cricket scoring has never been easier with BallByBall, your ultimate
           cricket scoring partner. Our platform allows you to effortlessly add
@@ -171,7 +175,7 @@ async function page() {
             Discover the Benefits of Our Cricket Scoring Platform
           </span>
         </div>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {features.map(({ Icon, title, description }, index) => (
             <Card key={index} className="text-center">
               <CardHeader>
