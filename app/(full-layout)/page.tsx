@@ -69,13 +69,13 @@ async function page() {
           </div>
         </div>
 
-        <div className="ml-8 aspect-[1/2] w-80 bg-muted max-md:hidden">
+        <div className="ml-8 aspect-[1/2] w-80 rounded-lg bg-muted max-md:hidden">
           <Image
             src="/banner-demo-dark.png"
             alt="Cricket Scorer demo"
             width={320}
             height={800}
-            className="size-full rounded-lg max-md:mx-auto"
+            className="size-full max-md:mx-auto"
           />
         </div>
       </section>
