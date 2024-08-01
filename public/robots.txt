@@ -1,3 +1,3 @@
 User-agent: *
 Disallow:
-Sitemap: https://ballbyball.vercel.app/sitemap.xml
+Sitemap: https://ballbyball.sohamb.tech/sitemap.xml
