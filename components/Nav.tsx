@@ -34,7 +34,7 @@ function Nav() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 border-b bg-card py-4 max-xl:p-4">
+    <nav className="sticky top-0 z-10 border-b bg-card py-4 max-xl:p-4">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link href="/">
           <div className="text-2xl font-semibold tracking-tighter">
