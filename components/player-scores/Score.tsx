@@ -70,19 +70,15 @@ function Score({
             <TableHead className="text-left">
               {isBowlingScore ? "Bowling" : "Batting"}
             </TableHead>
-            {hasYetToBatTeam !== teamIndex && (
-              <>
-                <TableHead>{isBowlingScore ? "O" : "R"}</TableHead>
-                <TableHead>{isBowlingScore ? "M" : "B"}</TableHead>
-                <TableHead className="capitalize">
-                  {isBowlingScore ? "W" : "4s"}
-                </TableHead>
-                <TableHead className="capitalize">
-                  {isBowlingScore ? "R" : "6s"}
-                </TableHead>
-                <TableHead>{isBowlingScore ? "Econ" : "S/R"}</TableHead>
-              </>
-            )}
+            <TableHead>{isBowlingScore ? "O" : "R"}</TableHead>
+            <TableHead>{isBowlingScore ? "M" : "B"}</TableHead>
+            <TableHead className="capitalize">
+              {isBowlingScore ? "W" : "4s"}
+            </TableHead>
+            <TableHead className="capitalize">
+              {isBowlingScore ? "R" : "6s"}
+            </TableHead>
+            <TableHead>{isBowlingScore ? "Econ" : "S/R"}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -134,7 +130,7 @@ function Score({
                     player.id,
                 )
                 .map((event) => event.type as EventType),
-                true
+              true,
             );
 
             if (!totalBalls) return null;
