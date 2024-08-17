@@ -1,13 +1,22 @@
 import { calcRuns, generateOverSummary } from "@/lib/utils";
 import { EventType } from "@/types";
-import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 function OverStats({
   ballEvents,
   totalOvers,
+  runRate,
 }: {
   ballEvents: EventType[];
   totalOvers?: number;
+  runRate: number;
 }) {
   const { overSummaries } = generateOverSummary(ballEvents);
 
@@ -23,23 +32,6 @@ function OverStats({
     });
   }
 
-  const renderCustomizedLabel = (props: any) => {
-    const { x, y, width, value } = props;
-    const radius = 10;
-
-    return (
-      <text
-        x={x + width / 2}
-        y={y - radius}
-        fill="hsl(var(--foreground))"
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        {value}
-      </text>
-    );
-  };
-
   return (
     <div className="h-96 p-2">
       {chartSummaryData.length > 0 ? (
@@ -49,17 +41,35 @@ function OverStats({
               width={100}
               height={40}
               data={chartSummaryData}
-              margin={{ top: 20 }}
+              margin={{ top: 20, left: -40 }}
             >
-              <XAxis dataKey="name" />
+              <XAxis
+                dataKey="name"
+                tickLine={false}
+                fontSize={12}
+                stroke="hsla(var(--muted-foreground) / 0.75)"
+              />
+              <YAxis
+                tickLine={false}
+                fontSize={12}
+                stroke="hsla(var(--muted-foreground) / 0.75)"
+              />
+              <ReferenceLine
+                y={runRate}
+                stroke="hsla(var(--muted-foreground) / 0.75)"
+                strokeDasharray={3}
+              />
               <Bar
                 dataKey="runs"
                 style={{ fill: "hsl(var(--foreground))", opacity: 0.9 }}
-              >
-                {chartSummaryData.length <= 15 && (
-                  <LabelList dataKey="runs" content={renderCustomizedLabel} />
-                )}
-              </Bar>
+                radius={[5, 5, 0, 0]}
+                label={{
+                  position: "top",
+                  stroke: "hsl(var(--foreground))",
+                  strokeWidth: 0.5,
+                  fontSize: 12,
+                }}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>

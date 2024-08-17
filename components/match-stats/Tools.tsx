@@ -17,7 +17,6 @@ import Scorecard from "../player-scores/ScoreCard";
 import { processTeamName } from "@/lib/utils";
 
 interface ToolsProps {
-  runRate: number;
   match: MatchExtended | undefined;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
@@ -27,7 +26,6 @@ interface ToolsProps {
 }
 
 function Tools({
-  runRate,
   curPlayers,
   events,
   match,
@@ -44,7 +42,6 @@ function Tools({
   return (
     <div className="flex w-full items-center gap-2 text-lg text-muted-foreground">
       <StatsAndSettings
-        runRate={runRate}
         events={events}
         match={match}
         curPlayers={curPlayers}

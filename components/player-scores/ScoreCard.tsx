@@ -90,7 +90,7 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="px-2 text-xs font-semibold md:text-sm"
+                className="w-full px-2 text-xs font-semibold md:text-sm"
                 disabled={
                   !!hasYetToBatTeam &&
                   (hasYetToBatTeam * 2 === i || hasYetToBatTeam * 2 === i - 1)
@@ -102,15 +102,13 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
           ))}
         </TabsList>
       </div>
-      <>
-        <ScrollArea className="h-[calc(100dvh-180px)]">
-          {tabs.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id}>
-              {tab.content}
-            </TabsContent>
-          ))}
-        </ScrollArea>
-      </>
+      <ScrollArea className="h-[calc(100dvh-180px)]">
+        {tabs.map((tab) => (
+          <TabsContent key={tab.id} value={tab.id}>
+            {tab.content}
+          </TabsContent>
+        ))}
+      </ScrollArea>
     </Tabs>
   );
 }

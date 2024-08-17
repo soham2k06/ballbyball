@@ -23,7 +23,6 @@ import { useActionMutate } from "@/lib/hooks";
 import { saveBallEvents } from "@/lib/actions/ball-event";
 
 interface StatsAndSettingsProps {
-  runRate: number;
   match: MatchExtended | undefined;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
@@ -31,7 +30,6 @@ interface StatsAndSettingsProps {
 }
 
 function StatsAndSettings({
-  runRate,
   curPlayers,
   events,
   match,
@@ -52,12 +50,8 @@ function StatsAndSettings({
   const [showSelectBowler, setShowSelectBowler] = useState(false);
 
   const [selectedTeam, setSelectedTeam] = useState<{
-    index: number;
-    name: string;
-  }>({
-    index: 0,
-    name: match?.teams?.[0].name ?? "",
-  });
+    index: 0 | 1;
+  }>({ index: 0 });
 
   const { mutate: createBallEvent } = useActionMutate(saveBallEvents);
   const { mutate: updateMutate } = useActionMutate(updateMatch);
@@ -75,18 +69,23 @@ function StatsAndSettings({
     .filter((event) => playerIds.includes(event.bowlerId))
     .map((event) => event.type as EventType);
 
-  const ballEventsArr = [fTeamEvents, sTeamEvents];
+  const ballEventsArr =
+    match?.curTeam === 0
+      ? [fTeamEvents, sTeamEvents]
+      : [sTeamEvents, fTeamEvents];
 
   const {
     runs: runs1,
     totalBalls: totalBalls1,
     wickets: wickets1,
+    runRate: runRate1,
   } = getScore(fTeamEvents);
 
   const {
     runs: runs2,
     totalBalls: totalBalls2,
     wickets: wickets2,
+    runRate: runRate2,
   } = getScore(sTeamEvents);
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
@@ -213,13 +212,13 @@ function StatsAndSettings({
             <DrawerContent>
               <StatsDrawerHeader
                 match={match}
-                runRate={runRate}
                 selectedTeam={selectedTeam}
                 setSelectedTeam={setSelectedTeam}
               />
               <OverStats
                 ballEvents={ballEventsArr[selectedTeam.index]}
                 totalOvers={match.overs}
+                runRate={selectedTeam.index === 0 ? runRate2 : runRate1}
               />
             </DrawerContent>
           </Drawer>
@@ -227,7 +226,7 @@ function StatsAndSettings({
             <DrawerContent>
               <StatsDrawerHeader
                 match={match}
-                runRate={runRate}
+                runRate={selectedTeam.index === 0 ? runRate2 : runRate1}
                 selectedTeam={selectedTeam}
                 setSelectedTeam={setSelectedTeam}
               />

@@ -54,7 +54,7 @@ function FooterSummary({
                 CRR: {runRate}
               </DrawerTitle>
             </DrawerHeader>
-            <OverStats ballEvents={ballEvents} />
+            <OverStats ballEvents={ballEvents} runRate={runRate} />
           </DrawerContent>
         </Drawer>
         <Drawer preventScrollRestoration>

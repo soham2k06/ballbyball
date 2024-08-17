@@ -417,7 +417,6 @@ function ScorerLayout({
         )}
         <div className="mt-4 md:mt-6" />
         <Tools
-          runRate={runRate}
           curPlayers={curPlayers}
           setCurPlayers={setCurPlayers}
           events={events}

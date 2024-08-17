@@ -121,11 +121,23 @@ function WormChart({
           width={800}
           height={400}
           data={chartData}
-          margin={{ top: 20, right: 10, left: -20, bottom: 5 }}
+          margin={{ top: 20, left: -32, bottom: 5 }}
         >
-          <XAxis dataKey="over" />
-          <YAxis />
+          <XAxis
+            dataKey="over"
+            tickLine={false}
+            fontSize={12}
+            stroke="hsla(var(--muted-foreground) / 0.75)"
+          />
+          <YAxis
+            tickLine={false}
+            fontSize={12}
+            stroke="hsla(var(--muted-foreground) / 0.75)"
+          />
           <Tooltip
+            cursor={{
+              style: { stroke: "hsla(var(--muted-foreground) / 0.5)" },
+            }}
             content={({ payload, label }) => {
               const wickets = payload?.map(
                 (payload) => payload.payload.wickets,
@@ -156,7 +168,7 @@ function WormChart({
               );
             }}
           />
-          <Legend />
+          <Legend wrapperStyle={{ fontSize: 12, left: 0 }} />
           <Line
             type="monotone"
             dataKey={teams[0].name}

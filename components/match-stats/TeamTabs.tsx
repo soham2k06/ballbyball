@@ -1,9 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
-import { Button } from "../ui/button";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 
 interface Team {
-  index: number;
-  name: string;
+  index: 0 | 1;
 }
 
 interface TeamTabsProps {
@@ -14,23 +13,21 @@ interface TeamTabsProps {
 
 function TeamTabs({ selectedTeam, setSelectedTeam, teams }: TeamTabsProps) {
   return (
-    <ul
-      defaultValue={selectedTeam.name}
+    <Tabs
+      value={String(selectedTeam.index)}
+      onValueChange={(val) =>
+        setSelectedTeam({ index: parseInt(val) as 0 | 1 })
+      }
       className="m-2 w-fit rounded-lg bg-secondary p-1"
     >
-      <li>
-        {teams?.map((team, i) => (
-          <Button
-            variant={selectedTeam.index === i ? "default" : "secondary"}
-            size="sm"
-            key={team.id}
-            onClick={() => setSelectedTeam({ index: i, name: team.name })}
-          >
+      <TabsList>
+        {teams.map((team, i) => (
+          <TabsTrigger value={String(i)} key={team.id}>
             {team.name}
-          </Button>
+          </TabsTrigger>
         ))}
-      </li>
-    </ul>
+      </TabsList>
+    </Tabs>
   );
 }
 
