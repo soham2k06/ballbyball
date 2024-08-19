@@ -15,6 +15,7 @@ import PlayerStats from "./PlayerStats";
 import { Player as PlayerType } from "@prisma/client";
 import { useActionMutate } from "@/lib/hooks";
 import { deletePlayer } from "@/lib/actions/player";
+import PlayerMatches from "./PlayerMatches";
 
 function PlayerList({ players }: { players: PlayerType[] }) {
   const { mutate: deleteMutate, isPending } = useActionMutate(deletePlayer);
@@ -23,6 +24,10 @@ function PlayerList({ players }: { players: PlayerType[] }) {
 
   const [playerToUpdate, setPlayerToUpdate] = useState<
     UpdatePlayerSchema | undefined
+  >();
+
+  const [playerMatchesOpen, setPlayerMatchesOpen] = useState<
+    string | undefined
   >();
 
   const [openedPlayer, setOpenedPlayer] = useState<{
@@ -47,6 +52,7 @@ function PlayerList({ players }: { players: PlayerType[] }) {
                   setPlayerToDelete={setPlayerToDelete}
                   setPlayerToUpdate={setPlayerToUpdate}
                   setOpenedPlayer={setOpenedPlayer}
+                  setPlayerMatchesOpen={setPlayerMatchesOpen}
                 />
               );
             })}
@@ -76,6 +82,11 @@ function PlayerList({ players }: { players: PlayerType[] }) {
       <PlayerStats
         openedPlayer={openedPlayer}
         setOpenedPlayer={() => setOpenedPlayer(undefined)}
+      />
+
+      <PlayerMatches
+        playerId={playerMatchesOpen}
+        setPlayerMatchesOpen={() => setPlayerMatchesOpen(undefined)}
       />
     </>
   );

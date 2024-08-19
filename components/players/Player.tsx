@@ -1,5 +1,11 @@
 import { Player as PlayerSchemaType } from "@prisma/client";
-import { AreaChart, Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import {
+  AreaChart,
+  Edit,
+  LandPlot,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
 
 import { truncStr } from "@/lib/utils";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
@@ -18,6 +24,7 @@ interface PlayerProps {
   player: PlayerSchemaType;
   setPlayerToDelete: (playerId: string) => void;
   setPlayerToUpdate: (player: UpdatePlayerSchema) => void;
+  setPlayerMatchesOpen: (playerId: string) => void;
   setOpenedPlayer: ({
     name,
     id,
@@ -32,8 +39,11 @@ function Player({
   setPlayerToDelete,
   setPlayerToUpdate,
   setOpenedPlayer,
+  setPlayerMatchesOpen,
 }: PlayerProps) {
   const handleDelete = (playerId: string) => setPlayerToDelete(playerId);
+  const handleShowMatches = (playerId: string) =>
+    setPlayerMatchesOpen(playerId);
   return (
     <Card className="flex items-center justify-between p-2 sm:p-4">
       <CardTitle>{truncStr(player.name as string, 10)}</CardTitle>
@@ -54,6 +64,12 @@ function Player({
             }
           >
             <AreaChart size={20} /> Stats
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="gap-2 font-medium"
+            onClick={() => handleShowMatches(player.id)}
+          >
+            <LandPlot size={20} /> Matches
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

@@ -1,7 +1,18 @@
 import { BallEvent, Match, Player, Team } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
 
-type EventType = "0" | "1" | "2" | "3" | "4" | "6" | "-1" | "-2" | "-3" | "-4" | "-5";
+type EventType =
+  | "0"
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "6"
+  | "-1"
+  | "-2"
+  | "-3"
+  | "-4"
+  | "-5";
 
 type OverlayStateProps = {
   open: boolean;
@@ -37,6 +48,13 @@ type PlayerStats = {
   matchesPlayed: number;
 };
 
+type PlayerMatches = {
+  id: string;
+  name: string;
+  hasPlayerWon: boolean;
+  winInfo: string;
+};
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };
@@ -53,4 +71,5 @@ export type {
   PlayerStats,
   TeamWithPlayers,
   MatchExtended,
+  PlayerMatches,
 };
