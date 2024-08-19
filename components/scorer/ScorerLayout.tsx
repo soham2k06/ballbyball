@@ -426,36 +426,40 @@ function ScorerLayout({
         />
 
         {/* DIALOGS */}
-        <SelectBatsman
-          open={showSelectBatsman}
-          setOpen={setShowSelectBatsman}
-          curPlayers={curPlayers}
-          setCurPlayers={setCurPlayers}
-          events={events}
-          team={{ name: team?.name, players: team?.players }}
-          handleUndo={() => {
-            handleUndo();
-            setCurPlayers(match?.curPlayers || []);
-            setShowSelectBatsman(false);
-          }}
-          handleSelectPlayer={handleSelectPlayer}
-          allowSinglePlayer={match?.allowSinglePlayer}
-          isLoading={isUpdatingMatch}
-          isUpdatingMatch={isUpdatingMatch}
-        />
-        <SelectBowler
-          open={showSelectBowler}
-          setOpen={setShowSelectBowler}
-          curPlayers={curPlayers}
-          setCurPlayers={setCurPlayers}
-          handleSelectPlayer={handleSelectPlayer}
-          team={{ name: opposingTeam?.name, players: opposingTeam?.players }}
-          handleUndo={() => {
-            handleUndo();
-            setShowSelectBowler(false);
-          }}
-          isUpdatingMatch={isUpdatingMatch}
-        />
+        {!match.hasEnded && (
+          <SelectBatsman
+            open={showSelectBatsman}
+            setOpen={setShowSelectBatsman}
+            curPlayers={curPlayers}
+            setCurPlayers={setCurPlayers}
+            events={events}
+            team={{ name: team?.name, players: team?.players }}
+            handleUndo={() => {
+              handleUndo();
+              setCurPlayers(match?.curPlayers || []);
+              setShowSelectBatsman(false);
+            }}
+            handleSelectPlayer={handleSelectPlayer}
+            allowSinglePlayer={match?.allowSinglePlayer}
+            isLoading={isUpdatingMatch}
+            isUpdatingMatch={isUpdatingMatch}
+          />
+        )}
+        {!match.hasEnded && (
+          <SelectBowler
+            open={showSelectBowler}
+            setOpen={setShowSelectBowler}
+            curPlayers={curPlayers}
+            setCurPlayers={setCurPlayers}
+            handleSelectPlayer={handleSelectPlayer}
+            team={{ name: opposingTeam?.name, players: opposingTeam?.players }}
+            handleUndo={() => {
+              handleUndo();
+              setShowSelectBowler(false);
+            }}
+            isUpdatingMatch={isUpdatingMatch}
+          />
+        )}
 
         <FieldersDialog
           wicketTypeId={wicketTypeId}
