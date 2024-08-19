@@ -115,9 +115,9 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
             </TypographyP>
           );
         })}
-        <CardDescription className="mt-3">
-          {match.hasEnded && winInfo}
-        </CardDescription>
+        {match.hasEnded && (
+          <CardDescription className="mt-3">{winInfo}</CardDescription>
+        )}
       </CardContent>
     </Card>
   );
