@@ -60,7 +60,7 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
   });
 
   return (
-    <Card>
+    <Card className="relative">
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle>{match.name}</CardTitle>
         <div className="flex items-center space-x-4">
@@ -115,14 +115,12 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
             </TypographyP>
           );
         })}
-        <div className="flex items-end justify-between">
-          {match.hasEnded && (
-            <CardDescription className="mt-3">{winInfo}</CardDescription>
-          )}
-          <CardDescription className="mt-3 text-right">
-            Created at <br /> {match.createdAt.toLocaleDateString()}
-          </CardDescription>
-        </div>
+        {match.hasEnded && (
+          <CardDescription className="mt-3">{winInfo}</CardDescription>
+        )}
+        <CardDescription className="absolute bottom-3 right-3 text-right">
+          Started at <br /> {match.createdAt.toLocaleDateString()}
+        </CardDescription>
       </CardContent>
     </Card>
   );
