@@ -19,7 +19,6 @@ import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import LoadingButton from "../ui/loading-button";
 import PlayerLabel from "./PlayerLabel";
 
@@ -29,6 +28,7 @@ interface SelectBowlerProps {
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleUndo?: () => void;
+  isUpdatingMatch: boolean;
   isManualMode?: boolean;
   team: {
     name?: string;
@@ -43,6 +43,7 @@ function SelectBowler({
   handleUndo,
   curPlayers,
   setCurPlayers,
+  isUpdatingMatch,
   isManualMode,
   team,
   handleSelectPlayer,
@@ -63,10 +64,6 @@ function SelectBowler({
       playerId: defaultBowler,
     },
   });
-
-  const queryClient = useQueryClient();
-
-  const isPending = !!queryClient.isMutating({ mutationKey: ["updateMatch"] });
 
   const { handleSubmit, watch, reset } = form;
 
@@ -90,10 +87,7 @@ function SelectBowler({
   }
 
   useEffect(() => {
-    if (open)
-      reset({
-        playerId: defaultBowler,
-      });
+    if (open) reset({ playerId: defaultBowler });
   }, [open]);
 
   useEffect(() => {
@@ -160,8 +154,11 @@ function SelectBowler({
                   </FormItem>
                 )}
               />
-              <LoadingButton loading={isPending} disabled={isPending}>
-                {isPending ? "Submitting" : "Submit"}
+              <LoadingButton
+                loading={isUpdatingMatch}
+                disabled={isUpdatingMatch}
+              >
+                Submit
               </LoadingButton>
             </form>
           </Form>

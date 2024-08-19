@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 
 import { BallEvent, CurPlayer, Player } from "@prisma/client";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -33,6 +32,7 @@ interface SelectBatsmanProps {
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleUndo?: () => void;
+  isUpdatingMatch: boolean;
   isManualMode?: boolean;
   team: {
     name?: string;
@@ -55,6 +55,7 @@ function SelectBatsman({
   handleUndo,
   setCurPlayers,
   isManualMode,
+  isUpdatingMatch,
   team,
   handleSelectPlayer,
   allowSinglePlayer,
@@ -85,10 +86,6 @@ function SelectBatsman({
   const outPlayers = events
     ?.filter((event) => event.type.includes("-1"))
     .map((event) => event.batsmanId);
-
-  const queryClient = useQueryClient();
-
-  const isPending = !!queryClient.isMutating({ mutationKey: ["updateMatch"] });
 
   const { handleSubmit, control, getValues, watch, reset } = form;
 
@@ -246,8 +243,11 @@ function SelectBatsman({
                     </FormItem>
                   )}
                 />
-                <LoadingButton loading={isPending} disabled={isPending}>
-                  {isPending ? "Submitting" : "Submit"}
+                <LoadingButton
+                  loading={isUpdatingMatch}
+                  disabled={isUpdatingMatch}
+                >
+                  Submit
                 </LoadingButton>
               </form>
             </Form>

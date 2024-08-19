@@ -291,7 +291,7 @@ function ScorerLayout({
         },
       );
 
-    updateMatch({
+    updateMutate({
       id: matchId,
       strikeIndex: onStrikeBatsman,
     });
@@ -301,7 +301,7 @@ function ScorerLayout({
     setCurPlayers([]);
     setShowSelectBatsman(true);
     setOnStrikeBatsman(0);
-    updateMatch({
+    updateMutate({
       id: matchId,
       curPlayers: [],
       curTeam: Number(!Boolean(match?.curTeam)),
@@ -313,7 +313,7 @@ function ScorerLayout({
     if (!match?.hasEnded) {
       setShowSelectBatsman(false);
       handleSave(0);
-      updateMatch({
+      updateMutate({
         id: matchId,
         hasEnded: true,
       });
@@ -340,7 +340,7 @@ function ScorerLayout({
   function handleRestart() {
     deleteAllBallEventsMutate(matchId);
     setEvents([]);
-    updateMatch({
+    updateMutate({
       id: matchId,
       curPlayers: [],
       curTeam: 0,
@@ -441,6 +441,7 @@ function ScorerLayout({
           handleSelectPlayer={handleSelectPlayer}
           allowSinglePlayer={match?.allowSinglePlayer}
           isLoading={isUpdatingMatch}
+          isUpdatingMatch={isUpdatingMatch}
         />
         <SelectBowler
           open={showSelectBowler}
@@ -453,6 +454,7 @@ function ScorerLayout({
             handleUndo();
             setShowSelectBowler(false);
           }}
+          isUpdatingMatch={isUpdatingMatch}
         />
 
         <FieldersDialog
@@ -469,7 +471,7 @@ function ScorerLayout({
           handleUndo={() => {
             handleUndo();
             setShowMatchSummary(false);
-            updateMatch({
+            updateMutate({
               id: matchId,
               hasEnded: false,
             });
