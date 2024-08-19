@@ -32,7 +32,7 @@ function BatsmanScores({
           <div className="min-w-8 text-center">SR</div>
         </div>
       </div>
-      {playerIds.length && player1 && (playerIds.length !== 2 || player2) ? (
+      {!player1.isLoading && !player2.isLoading ? (
         playerIds.map((id, i) => {
           const player = i === 0 ? player1.player : player2.player;
           const isOnStrike = onStrikeBatsman === i;
