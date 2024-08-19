@@ -41,8 +41,6 @@ function ScorerLayout({
   matchId: string;
   match: MatchExtended;
 }) {
-  const ballEventsFromMatch = match?.ballEvents;
-
   const team = match?.teams[match?.curTeam];
   const opposingTeam = match?.teams[match?.curTeam === 0 ? 1 : 0];
 
