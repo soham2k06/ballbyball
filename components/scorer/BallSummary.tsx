@@ -22,9 +22,9 @@ function BallSummary({
           default: "bg-muted",
           "0": "bg-muted text-muted-foreground flex justify-center items-center",
           "-4": "bg-muted text-muted-foreground flex justify-center items-center", // Manual Strike change without runs
-          "1": "bg-muted text-primary",
-          "2": "bg-muted text-primary",
-          "3": "bg-muted text-primary",
+          "1": "bg-muted text-foreground",
+          "2": "bg-muted text-foreground",
+          "3": "bg-muted text-foreground",
           "4": "bg-emerald-500 text-emerald-50 dark:bg-emerald-600 font-extrabold",
           "6": "bg-amber-400 text-amber-950 dark:bg-amber-600 dark:text-amber-50 font-extrabold",
           "-2": "bg-muted text-muted-foreground",
