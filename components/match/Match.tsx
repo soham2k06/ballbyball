@@ -115,9 +115,14 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
             </TypographyP>
           );
         })}
-        {match.hasEnded && (
-          <CardDescription className="mt-3">{winInfo}</CardDescription>
-        )}
+        <div className="flex items-end justify-between">
+          {match.hasEnded && (
+            <CardDescription className="mt-3">{winInfo}</CardDescription>
+          )}
+          <CardDescription className="mt-3 text-right">
+            Created at <br /> {match.createdAt.toLocaleDateString()}
+          </CardDescription>
+        </div>
       </CardContent>
     </Card>
   );

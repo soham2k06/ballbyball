@@ -19,6 +19,7 @@ export async function GET(
         overs: true,
         hasEnded: true,
         allowSinglePlayer: true,
+        createdAt: true,
         matchTeams: {
           select: {
             team: {
@@ -75,6 +76,7 @@ export async function GET(
         name: match.name,
         winInfo: match.hasEnded ? winInfo : "Not ended yet",
         hasPlayerWon,
+        createdAt: match.createdAt,
       };
     });
 

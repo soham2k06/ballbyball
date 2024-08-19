@@ -53,6 +53,7 @@ type PlayerMatches = {
   name: string;
   hasPlayerWon: boolean;
   winInfo: string;
+  createdAt: Date;
 };
 
 // ** Schema relations types

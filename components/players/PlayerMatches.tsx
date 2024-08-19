@@ -43,13 +43,19 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
                 <li key={match.id} className="rounded-md border shadow">
                   <Link
                     href={`/match/${match.id}`}
-                    className="inline-block p-2"
+                    className="inline-block w-full p-2"
                   >
-                    <h4 className="text-lg font-medium">
-                      {match.name}{" "}
-                      {match.hasPlayerWon !== undefined &&
-                        (match.hasPlayerWon === true ? "(Won)" : "(Lost)")}
-                    </h4>
+                    <div className="flex justify-between gap-2">
+                      <h4 className="text-lg font-medium">
+                        {match.name}{" "}
+                        {match.hasPlayerWon !== undefined &&
+                          (match.hasPlayerWon === true ? "(Won)" : "(Lost)")}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Created at{" "}
+                        {new Date(match.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       {match.winInfo}
                     </p>
