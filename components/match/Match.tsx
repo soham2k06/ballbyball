@@ -60,7 +60,7 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
   });
 
   return (
-    <Card className="relative">
+    <Card className="relative flex flex-col justify-between">
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle>{match.name}</CardTitle>
         <div className="flex items-center space-x-4">
