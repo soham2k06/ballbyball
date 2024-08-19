@@ -23,7 +23,12 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
   const { data, isFetching } = usePlayerMatches(playerId);
 
   const matchesWon = data?.filter((match) => match.hasPlayerWon).length;
-  const winRate = matchesWon ? round((matchesWon / data!.length) * 100) : 0;
+  const completedMatches = data?.filter(
+    (match) => match.hasPlayerWon !== undefined,
+  );
+  const winRate = matchesWon
+    ? round((matchesWon / (completedMatches?.length ?? 0)) * 100)
+    : 0;
 
   return (
     <Dialog
