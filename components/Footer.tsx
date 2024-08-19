@@ -20,7 +20,7 @@ function Footer() {
         <p className="font-medium">
           Built with ❤️ by{" "}
           <a
-            href="https://github.com/soham2k06"
+            href="https://sohamb.tech"
             className="text-foreground/80 underline"
           >
             Soham Bhikadiya
