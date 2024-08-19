@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
+import { round } from "@/lib/utils";
 
 interface PlayerMatchesProps {
   playerId: string | undefined;
@@ -22,7 +23,7 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
   const { data, isFetching } = usePlayerMatches(playerId);
 
   const matchesWon = data?.filter((match) => match.hasPlayerWon).length;
-  const winRate = matchesWon ? (matchesWon / data!.length) * 100 : 0;
+  const winRate = matchesWon ? round((matchesWon / data!.length) * 100) : 0;
 
   return (
     <Dialog
