@@ -58,15 +58,17 @@ function ScorerLayout({
 
   // ** States
   const [curPlayers, setCurPlayers] = useState<CurPlayer[]>(
-    match?.curPlayers || [],
+    match?.curPlayers ?? [],
   );
   const [events, setEvents] = useState<CreateBallEventSchema[] | BallEvent[]>(
-    [],
+    match.ballEvents ?? [],
   );
   const [isModified, setIsModified] = useState(false);
 
   // TODO: Mantain strike with sync of events if possible
-  const [onStrikeBatsman, setOnStrikeBatsman] = useState(0);
+  const [onStrikeBatsman, setOnStrikeBatsman] = useState(
+    match.strikeIndex ?? 0,
+  );
 
   const [isInSecondInning, setIsInSecondInning] = useState(false);
 
@@ -100,17 +102,6 @@ function ScorerLayout({
 
   // ** Effects
 
-  // Setting default values
-  useEffect(() => {
-    if (ballEventsFromMatch?.length) setEvents(ballEventsFromMatch);
-  }, [ballEventsFromMatch]);
-  useEffect(() => {
-    if (match?.strikeIndex) setOnStrikeBatsman(match.strikeIndex || 0);
-  }, [match?.strikeIndex]);
-  useEffect(() => {
-    if (match?.curPlayers) setCurPlayers(match.curPlayers);
-  }, [match?.curPlayers]);
-
   // Handling initial player selection
   useEffect(() => {
     if (match?.hasEnded) return;
@@ -120,9 +111,7 @@ function ScorerLayout({
       );
 
     const hasBatsman = getHasPlayer("batsman");
-    if (!hasBatsman) {
-      setShowSelectBatsman((prev) => prev || true);
-    }
+    if (!hasBatsman) setShowSelectBatsman((prev) => prev || true);
 
     const hasBowler = getHasPlayer("bowler");
     if (!hasBowler) setShowSelectBowler(!hasBowler && !showSelectBatsman);
