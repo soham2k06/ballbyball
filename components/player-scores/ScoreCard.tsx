@@ -91,10 +91,6 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
                 key={tab.id}
                 value={tab.id}
                 className="w-full px-2 text-xs font-semibold md:text-sm"
-                disabled={
-                  !!hasYetToBatTeam &&
-                  (hasYetToBatTeam * 2 === i || hasYetToBatTeam * 2 === i - 1)
-                }
               >
                 {tab.name}
               </TabsTrigger>
