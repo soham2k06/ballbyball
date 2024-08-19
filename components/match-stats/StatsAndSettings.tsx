@@ -79,15 +79,15 @@ function StatsAndSettings({
     runs: runs1,
     totalBalls: totalBalls1,
     wickets: wickets1,
-    runRate: runRate1,
   } = getScore(fTeamEvents);
 
   const {
     runs: runs2,
     totalBalls: totalBalls2,
     wickets: wickets2,
-    runRate: runRate2,
   } = getScore(sTeamEvents);
+
+  const { runRate } = getScore(ballEventsArr[selectedTeam.index]);
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
     if (!match?.id) return;
@@ -221,7 +221,7 @@ function StatsAndSettings({
               <OverStats
                 ballEvents={ballEventsArr[selectedTeam.index]}
                 totalOvers={match.overs}
-                runRate={selectedTeam.index === 0 ? runRate2 : runRate1}
+                runRate={runRate}
               />
             </DrawerContent>
           </Drawer>
@@ -229,9 +229,9 @@ function StatsAndSettings({
             <DrawerContent>
               <StatsDrawerHeader
                 match={match}
-                runRate={selectedTeam.index === 0 ? runRate2 : runRate1}
                 selectedTeam={selectedTeam}
                 setSelectedTeam={setSelectedTeam}
+                runRate={runRate}
               />
               <FullOverSummary ballEvents={ballEventsArr[selectedTeam.index]} />
             </DrawerContent>
