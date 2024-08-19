@@ -42,6 +42,7 @@ function OverStats({
               height={40}
               data={chartSummaryData}
               margin={{ top: 20, left: -40 }}
+              maxBarSize={80}
             >
               <XAxis
                 dataKey="name"
