@@ -1,7 +1,7 @@
 import { usePlayerStats } from "@/apiHooks/player";
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
 import { Skeleton } from "../ui/skeleton";
-import { getOverStr } from "@/lib/utils";
+import { getOverStr, round } from "@/lib/utils";
 
 function PlayerStats({
   openedPlayer,
@@ -23,8 +23,8 @@ function PlayerStats({
 
   const batStrikeRate =
     Math.round(
-      ((data?.batting.runs ?? 0) / (data?.batting.balls ?? 1)) * 1000,
-    ) / 10;
+      ((data?.batting.runs ?? 0) / (data?.batting.balls ?? 1)) * 10000,
+    ) / 100;
 
   const isNotOutYet = data?.batting.wickets === 0;
   const batAverage = (data?.batting.runs ?? 0) / (matchesPlayed ?? 0) ?? 0;
@@ -32,6 +32,7 @@ function PlayerStats({
   const economy = ((data?.bowling.runs ?? 0) / (data?.bowling.balls ?? 0)) * 6;
 
   const wicketsTaken = data?.bowling.wickets;
+  const ballStrikeRate = (data?.bowling.balls ?? 0) / (wicketsTaken ?? 0);
 
   return (
     <Dialog
@@ -52,7 +53,7 @@ function PlayerStats({
               <div className="grid grid-cols-3 gap-1">
                 <Stat data={data.batting.runs} dataKey="Runs" />
                 <Stat
-                  data={matchesPlayed ? batAverage : "-"}
+                  data={matchesPlayed ? round(batAverage) : "-"}
                   dataKey="Average"
                   showStar={isNotOutYet && (matchesPlayed ?? 0) > 0}
                 />
@@ -74,9 +75,11 @@ function PlayerStats({
                 <Stat data={data.bowling.runs} dataKey="Runs" />
                 <Stat data={data.bowling.wickets} dataKey="Wickets" />
                 <Stat data={data.bowling.maidenOvers} dataKey="Maidens" />
-                <Stat data={economy || "-"} dataKey="Economy" />
+                <Stat data={round(economy) || "-"} dataKey="Economy" />
                 <Stat
-                  data={wicketsTaken ? data.bowling.balls / wicketsTaken! : "-"}
+                  data={
+                    wicketsTaken && ballStrikeRate ? round(ballStrikeRate) : "-"
+                  }
                   dataKey="Strike rate"
                 />
               </div>

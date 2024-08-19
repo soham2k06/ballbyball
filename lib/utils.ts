@@ -297,6 +297,10 @@ function toastError(err: unknown) {
   else toast.error("Something went wrong!");
 }
 
+function round(num: number, places = 2) {
+  return Math.round(num * Math.pow(10, places)) / Math.pow(10, places);
+}
+
 // ** Backend
 
 async function getValidatedUser() {
@@ -404,6 +408,7 @@ export {
   calculatePlayerOfTheMatch,
   calculateWinner,
   toastError,
+  round,
   // Backend
   getValidatedUser,
   createOrUpdateWithUniqueName,
