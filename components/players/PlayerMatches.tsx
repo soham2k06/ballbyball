@@ -28,7 +28,7 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Player Matches</DialogTitle>
+          <DialogTitle>{data?.length} Matches</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-96">
           <ul className="space-y-3">
