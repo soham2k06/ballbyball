@@ -386,7 +386,6 @@ function handleError(err: unknown) {
 
 async function checkSession() {
   const session = await getCachedSession();
-  console.log(session);
   if (!session) redirect("/");
 }
 
