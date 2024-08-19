@@ -133,7 +133,7 @@ function SelectBowler({
                           const isSelected = field.value?.includes(player.id);
                           const isBothSelected = field.value?.length === 1;
                           return (
-                            <FormItem className="space-y-0">
+                            <FormItem key={player.id} className="space-y-0">
                               <FormControl>
                                 <RadioGroupItem
                                   value={player.id}
