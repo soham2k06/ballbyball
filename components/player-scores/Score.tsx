@@ -123,14 +123,14 @@ function Score({
             const { fours, sixes } = getBattingStats(legalEvents);
 
             const { runs, totalBalls, runRate, wickets } = getScore(
-              legalEvents
+              ballEvents
                 ?.filter(
                   (event) =>
                     event[isBowlingScore ? "bowlerId" : "batsmanId"] ===
                     player.id,
                 )
                 .map((event) => event.type as EventType),
-              true,
+              !isBowlingScore,
             );
 
             if (!totalBalls) return null;
