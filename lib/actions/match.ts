@@ -23,6 +23,8 @@ export async function getAllMatches() {
     select: {
       id: true,
       name: true,
+      hasEnded: true,
+      overs: true,
       ballEvents: { select: { batsmanId: true, type: true } },
       matchTeams: {
         include: {

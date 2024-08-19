@@ -10,7 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Button } from "../ui/button";
 import { TypographyP } from "../ui/typography";
 import { UpdateMatchSchema } from "@/lib/validation/match";
@@ -94,11 +100,14 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
           const { runs, totalBalls, wickets } = getScore(ballEventsByTeam);
 
           return (
-            <TypographyP key={id}>
+            <TypographyP
+              key={id}
+              className="leading-5 [&:not(:first-child)]:mt-2"
+            >
               {name}:{" "}
               {ballEventsByTeam.length ? (
                 <>
-                  runs - {runs}/{wickets} ({getOverStr(totalBalls)})
+                  {runs}/{wickets} ({getOverStr(totalBalls)})
                 </>
               ) : (
                 "Yet to bat"
@@ -106,7 +115,9 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
             </TypographyP>
           );
         })}
-        {match.hasEnded && winInfo}
+        <CardDescription className="mt-3">
+          {match.hasEnded && winInfo}
+        </CardDescription>
       </CardContent>
     </Card>
   );

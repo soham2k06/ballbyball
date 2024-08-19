@@ -276,6 +276,7 @@ function calculateWinner({
 }) {
   let winInfo = "";
   let winner;
+
   if (runs1 > runs2) {
     winInfo = `${processTeamName(teams[0])} won by ${runs1 - runs2} runs`;
     winner = 0;
