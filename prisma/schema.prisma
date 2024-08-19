@@ -84,6 +84,9 @@ model Match {
   ballEvents        BallEvent[]
   matchTeams        MatchTeam[]
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("matches")
 }
 
@@ -94,6 +97,9 @@ model Player {
   image       String?
   teamId      String?      @db.ObjectId
   teamPlayers TeamPlayer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("players")
 }
@@ -106,6 +112,9 @@ model Team {
   matchId     String?      @db.ObjectId
   matchTeams  MatchTeam[]
   teamPlayers TeamPlayer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("teams")
 }
