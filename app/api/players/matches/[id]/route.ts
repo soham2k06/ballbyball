@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import { calculateWinner, getScore } from "@/lib/utils";
+import { calculateWinner, getScore, round } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function GET(

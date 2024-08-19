@@ -21,6 +21,9 @@ function MatchSkeleton() {
 function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
   const { data, isFetching } = usePlayerMatches(playerId);
 
+  const matchesWon = data?.filter((match) => match.hasPlayerWon).length;
+  const winRate = matchesWon ? (matchesWon / data!.length) * 100 : 0;
+
   return (
     <Dialog
       open={!!playerId}
@@ -28,7 +31,9 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{data?.length} Matches</DialogTitle>
+          <DialogTitle>
+            {data?.length} Matches - {matchesWon} ({winRate}%) Won
+          </DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-96">
           <ul className="space-y-3">
