@@ -9,7 +9,12 @@ import { EventType, MatchExtended } from "@/types";
 
 import { StatsOpenProvider } from "@/contexts/StatsOpenContext";
 
-import { calcRuns, generateOverSummary, getScore } from "@/lib/utils";
+import {
+  calcRuns,
+  generateOverSummary,
+  getIsInvalidBall,
+  getScore,
+} from "@/lib/utils";
 import { strikeChangers } from "@/lib/constants";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
@@ -136,23 +141,6 @@ function ScorerLayout({
     }
   }, [events]);
 
-  // Handling after last ball
-  useEffect(() => {
-    if (!match) return;
-    const matchBalls = (match?.overs || 0) * 6;
-    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-
-    if (isLastBallOfOver) {
-      if (matchBalls !== totalBalls) setShowSelectBowler(true);
-
-      // Check if inning is finished
-      if (totalBalls === matchBalls && totalBalls) {
-        if (isInSecondInning || match?.hasEnded) handleFinish();
-        else handleInningChange();
-      }
-    }
-  }, [totalBalls]);
-
   // Handling Succesfull Chase
   useEffect(() => {
     const remainingRuns = opponentRuns - runs + 1;
@@ -234,6 +222,24 @@ function ScorerLayout({
             ? event.slice(-1)
             : event) as EventType,
     );
+
+    // if (matchBalls !== totalBalls && isExtra && isLastBallOfOver)
+    //   setShowSelectBowler(true);
+
+    if (!match) return;
+    const matchBalls = (match?.overs || 0) * 6;
+    const isLastBallOfOver =
+      totalBalls % 6 === 5 && totalBalls > 0 && getIsInvalidBall(event);
+
+    if (isLastBallOfOver) {
+      if (matchBalls !== totalBalls) setShowSelectBowler(true);
+
+      // Check if inning is finished
+      if (totalBalls === matchBalls - 1) {
+        if (isInSecondInning || match?.hasEnded) handleFinish();
+        else handleInningChange();
+      }
+    }
   }
 
   function handleWicket(e: React.MouseEvent<HTMLButtonElement>) {
@@ -242,8 +248,14 @@ function ScorerLayout({
     const wicketType = JSON.parse(event);
     let eventToAdd;
 
+    const outPlayers = events.filter((event) => event.type.includes("-1"));
+    const isSLastPlayer = outPlayers.length === team?.players.length - 2;
+
+    // if (isSLastPlayer) setOnStrikeBatsman(0);
     if (!wicketType.isOtherPlayerInvolved) {
-      setShowSelectBatsman(true);
+      // If second last player is out, don't show select batsman dialog
+      if (!isSLastPlayer) setShowSelectBatsman(true);
+      // setShowSelectBatsman(true);
       if (wicketType.id === 1) eventToAdd = `-1`;
       eventToAdd = `-1_${wicketType.id}`;
 
@@ -258,7 +270,9 @@ function ScorerLayout({
     fielderId: string,
     runsAlongWithRunOut?: number,
   ) {
-    setShowSelectBatsman(true);
+    const outPlayers = events.filter((event) => event.type.includes("-1"));
+    const isSLastPlayer = outPlayers.length === team?.players.length - 2;
+    if (!isSLastPlayer) setShowSelectBatsman(true);
     handleScore({
       currentTarget: {
         value: `-1_${wicketTypeId}_${fielderId}_${runsAlongWithRunOut}`,
