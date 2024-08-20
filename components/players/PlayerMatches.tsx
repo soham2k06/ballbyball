@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
-import { round } from "@/lib/utils";
+import { getOverStr, round } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 interface PlayerMatchesProps {
   playerId: string | undefined;
@@ -50,29 +51,59 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
                 <MatchSkeleton />
               </>
             ) : data?.length ? (
-              data.map((match) => (
-                <li key={match.id} className="rounded-md border shadow">
-                  <Link
-                    href={`/match/${match.id}`}
-                    className="inline-block w-full p-2"
-                  >
-                    <div className="flex justify-between gap-2">
-                      <h4 className="text-lg font-medium">
-                        {match.name}{" "}
-                        {match.hasPlayerWon !== undefined &&
-                          (match.hasPlayerWon === true ? "(Won)" : "(Lost)")}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Created at{" "}
-                        {new Date(match.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {match.winInfo}
-                    </p>
-                  </Link>
-                </li>
-              ))
+              data.map((match) => {
+                const didBat = match.batScore.totalBalls > 0;
+                const didBowl =
+                  match.bowlScore.totalBalls > 0 && match.bowlScore.wickets > 0;
+                const isNotout = match.batScore.isNotout;
+
+                return (
+                  <Card key={match.id} className="rounded-md border shadow">
+                    <Link
+                      href={`/match/${match.id}`}
+                      className="inline-block w-full p-2"
+                    >
+                      <CardHeader className="flex flex-row justify-between gap-2 space-y-0">
+                        <CardTitle>
+                          {match.name}{" "}
+                          {match.hasPlayerWon !== undefined &&
+                            (match.hasPlayerWon === true ? "(Won)" : "(Lost)")}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Created at{" "}
+                          {new Date(match.createdAt).toLocaleDateString()}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex justify-between gap-2">
+                          <p>
+                            {didBat ? (
+                              <>
+                                {match.batScore.runs}
+                                {isNotout && "*"} ({match.batScore.totalBalls})
+                              </>
+                            ) : (
+                              "Did Not Bat"
+                            )}{" "}
+                            •{" "}
+                            {didBowl ? (
+                              <>
+                                {match.bowlScore.runs}/{match.bowlScore.wickets}{" "}
+                                ({getOverStr(match.bowlScore.totalBalls)})
+                              </>
+                            ) : (
+                              "Did Not Bowl"
+                            )}
+                          </p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {match.winInfo}
+                        </p>
+                      </CardContent>
+                    </Link>
+                  </Card>
+                );
+              })
             ) : (
               "No matches found"
             )}

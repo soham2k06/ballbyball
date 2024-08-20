@@ -30,7 +30,7 @@ export async function GET(
             },
           },
         },
-        ballEvents: { select: { batsmanId: true, type: true } },
+        ballEvents: { select: { batsmanId: true, bowlerId: true, type: true } },
       },
     });
 
@@ -54,6 +54,17 @@ export async function GET(
         totalBalls,
       } = getScore(ballEventsbyTeam(1));
 
+      const playerBatEvents = ballEvents
+        .filter((event) => event.batsmanId === id)
+        .map((event) => event.type);
+
+      const playerBowlEvents = ballEvents
+        .filter((event) => event.bowlerId === id)
+        .map((event) => event.type);
+
+      const batScore = getScore(playerBatEvents, true);
+      const bowlScore = getScore(playerBowlEvents);
+
       const { winInfo, winner } = calculateWinner({
         allowSinglePlayer: match.allowSinglePlayer,
         matchBalls: match.overs * 6,
@@ -71,10 +82,18 @@ export async function GET(
           ? true
           : false;
 
+      const isOut = playerBatEvents.some((event) => event.includes("-1"));
+
       return {
         id: match.id,
         name: match.name,
         winInfo: match.hasEnded ? winInfo : "Not ended yet",
+        batScore: {
+          ...batScore,
+          isNotout: !isOut,
+        },
+        bowlScore,
+
         hasPlayerWon,
         createdAt: match.createdAt,
       };

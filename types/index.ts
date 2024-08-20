@@ -19,6 +19,14 @@ type OverlayStateProps = {
   setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
+type PlayerScore = {
+  runs: number;
+  totalBalls: number;
+  wickets: number;
+  runRate: number;
+  extras: number;
+};
+
 type PlayerPerformance = {
   playerId: string;
   runsScored: number;
@@ -51,6 +59,8 @@ type PlayerStats = {
 type PlayerMatches = {
   id: string;
   name: string;
+  batScore: PlayerScore & { isNotout: boolean };
+  bowlScore: PlayerScore;
   hasPlayerWon: boolean;
   winInfo: string;
   createdAt: Date;
@@ -73,4 +83,5 @@ export type {
   TeamWithPlayers,
   MatchExtended,
   PlayerMatches,
+  PlayerScore,
 };
