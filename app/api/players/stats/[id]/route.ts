@@ -29,10 +29,6 @@ export async function GET(
 
     const { fifties, centuries, highestScore } = calcMilestones(groupedMatches);
 
-    const matchIds = playerBallEvents.map((event) => event.matchId);
-    const uniqueMatchIds = new Set(matchIds);
-    const matchesPlayed = uniqueMatchIds.size;
-
     const battingEvents = battingEventsExtended.map((event) => event.type);
 
     const bowlingEvents = playerBallEvents
@@ -65,6 +61,14 @@ export async function GET(
       wickets: wicketsTaken,
       maidenOvers: maidenOverCount,
     };
+
+    const matchesPlayed = await prisma.match.count({
+      where: {
+        matchTeams: {
+          some: { team: { teamPlayers: { some: { playerId: id } } } },
+        },
+      },
+    });
 
     const playerStats = {
       matchesPlayed,
