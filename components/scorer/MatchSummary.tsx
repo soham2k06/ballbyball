@@ -23,7 +23,6 @@ import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { usePlayerById } from "@/apiHooks/player";
 import { Skeleton } from "../ui/skeleton";
 import { TypographyH4 } from "../ui/typography";
-import { useTopPerformants } from "@/apiHooks/match/useTopPerformants";
 
 interface MatchSummaryProps {
   open: OverlayStateProps["open"];
@@ -144,15 +143,52 @@ function MatchSummary({
     };
   });
 
-  const { topPerformants, isLoading: isTopPerformantsLoading } =
-    useTopPerformants({
-      id: match?.id,
-      payload: {
-        playersPerformance,
-        team1: teams[0].name ?? "",
-        team2: teams[1].name ?? "",
-      },
-    });
+  const topPerformants = playersPerformance
+    .filter((player) => player.team === teams[0].name && player.ballsFaced)
+    .sort((a, b) => b.runsScored - a.runsScored)
+    .slice(0, 2)
+    .map((player) => ({
+      ...player,
+      type: "batsman",
+      name: match?.teams[0].players.find(({ id }) => id === player.playerId)
+        ?.name,
+    }))
+    .concat(
+      playersPerformance
+        .filter((player) => player.team === teams[1].name && player.ballsFaced)
+        .sort((a, b) => b.runsScored - a.runsScored)
+        .slice(0, 2)
+        .map((player) => ({
+          ...player,
+          type: "batsman",
+          name: match?.teams[1].players.find(({ id }) => id === player.playerId)
+            ?.name,
+        })),
+    )
+    .concat(
+      playersPerformance
+        .filter((player) => player.team === teams[0].name && player.ballsBowled)
+        .sort((a, b) => b.wicketsTaken - a.wicketsTaken)
+        .slice(0, 2)
+        .map((player) => ({
+          ...player,
+          type: "bowler",
+          name: match?.teams[0].players.find(({ id }) => id === player.playerId)
+            ?.name,
+        })),
+    )
+    .concat(
+      playersPerformance
+        .filter((player) => player.team === teams[1].name && player.ballsBowled)
+        .sort((a, b) => b.wicketsTaken - a.wicketsTaken)
+        .slice(0, 2)
+        .map((player) => ({
+          ...player,
+          type: "bowler",
+          name: match?.teams[1].players.find(({ id }) => id === player.playerId)
+            ?.name,
+        })),
+    );
 
   const playerOfTheMatch = calculatePlayerOfTheMatch({ playersPerformance });
 
@@ -239,12 +275,19 @@ function MatchSummary({
                   ballEventsbyTeam(i) || [],
                 );
 
-                const top2Batsmen = (topPerformants ?? []).filter(
-                  (player) =>
-                    player.team === team.name && player.type === "batsman",
-                );
+                const topBatsmen = (topPerformants ?? [])
+                  .filter(
+                    (player) =>
+                      player.team === team.name && player.type === "batsman",
+                  )
+                  .map((player) => ({
+                    ...player,
+                    isNotOut: ballEvents
+                      .filter((evt) => evt.batsmanId === player.playerId)
+                      .every((event) => !event.type.includes("-1")),
+                  }));
 
-                const top2Bowlers = (topPerformants ?? []).filter(
+                const topBowlers = (topPerformants ?? []).filter(
                   (player) =>
                     player.team !== team.name && player.type === "bowler",
                 );
@@ -255,33 +298,30 @@ function MatchSummary({
                       {processTeamName(team.name ?? "")} · {runs}/{wickets} (
                       {getOverStr(totalBalls)})
                     </span>
-                    {isTopPerformantsLoading ? (
-                      <Skeleton className="h-24 w-full" />
-                    ) : (
-                      <div className="flex justify-between">
-                        <ul className="space-y-2">
-                          {top2Batsmen.map((player) => (
-                            <li key={player.playerId}>
-                              <h4>{player.name}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {player.runsScored} ({player.ballsFaced})
-                              </p>
-                            </li>
-                          ))}
-                        </ul>
-                        <ul className="space-y-2 text-right">
-                          {top2Bowlers.map((player) => (
-                            <li key={player.playerId}>
-                              <h4>{player.name}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {player.wicketsTaken}/{player.runConceded} (
-                                {getOverStr(player.ballsBowled)})
-                              </p>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    <div className="flex justify-between">
+                      <ul className="space-y-2">
+                        {topBatsmen.map((player) => (
+                          <li key={player.playerId}>
+                            <h4>{player.name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {player.runsScored}
+                              {player.isNotOut && "*"} ({player.ballsFaced})
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                      <ul className="space-y-2 text-right">
+                        {topBowlers.map((player) => (
+                          <li key={player.playerId}>
+                            <h4>{player.name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {player.wicketsTaken}/{player.runConceded} (
+                              {getOverStr(player.ballsBowled)})
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 );
               })}
