@@ -128,8 +128,12 @@ function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
 function getBattingStats(events: BallEvent[]) {
   const score = events.reduce(
     (acc: { fours: number; sixes: number }, ballEvent: BallEvent) => {
-      if (ballEvent.type === "4") acc.fours++;
-      else if (ballEvent.type === "6") acc.sixes++;
+      let ballType = ballEvent.type;
+      // Handling runs with no ball
+      if (ballType.includes("-3")) ballType = ballType.slice(2);
+
+      if (ballType === "4") acc.fours++;
+      else if (ballType === "6") acc.sixes++;
 
       return acc;
     },
