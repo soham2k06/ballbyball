@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import { calculateWinner, getScore } from "@/lib/utils";
+import { calculateWinner, getIsNotOut, getScore } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -82,7 +82,7 @@ export async function GET(
           ? true
           : false;
 
-      const isOut = playerBatEvents.some((event) => event.includes("-1"));
+      const isNotout = getIsNotOut({ playerId: id });
 
       return {
         id: match.id,
@@ -90,7 +90,7 @@ export async function GET(
         winInfo: match.hasEnded ? winInfo : "Not ended yet",
         batScore: {
           ...batScore,
-          isNotout: !isOut,
+          isNotout,
         },
         bowlScore,
 

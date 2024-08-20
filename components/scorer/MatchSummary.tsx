@@ -14,6 +14,7 @@ import {
   calculatePlayerOfTheMatch,
   calculateWinner,
   cn,
+  getIsNotOut,
   getOverStr,
   getScore,
   processTeamName,
@@ -196,10 +197,10 @@ function MatchSummary({
     .find((team) => team.name === playerOfTheMatchData.team)
     ?.players.find((player) => player.id === playerOfTheMatchData.playerId);
 
-  const playerOfTheMatchNotout = ballEvents
-    .filter((event) => event.batsmanId === playerOfTheMatchData.playerId)
-    .map((event) => event.type)
-    .every((type) => !type.includes("-1"));
+  const playerOfTheMatchNotout = getIsNotOut({
+    ballEvents: ballEvents as BallEvent[],
+    playerId: playerOfTheMatchData.playerId,
+  });
 
   return (
     <Dialog open={open}>
@@ -286,9 +287,10 @@ function MatchSummary({
                   )
                   .map((player) => ({
                     ...player,
-                    isNotOut: ballEvents
-                      .filter((evt) => evt.batsmanId === player.playerId)
-                      .every((event) => !event.type.includes("-1")),
+                    isNotOut: getIsNotOut({
+                      ballEvents: ballEvents as BallEvent[],
+                      playerId: player.playerId,
+                    }),
                   }));
 
                 const topBowlers = (topPerformants ?? []).filter(

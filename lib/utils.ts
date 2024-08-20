@@ -297,6 +297,24 @@ function calculateWinner({
   return { winInfo, winner };
 }
 
+function getIsNotOut({
+  playerId,
+  ballEvents,
+  events,
+}: {
+  playerId?: string;
+  ballEvents?: BallEvent[];
+  events?: EventType[];
+}) {
+  if (events) return events.every((evt) => !evt.includes("-1"));
+
+  if (ballEvents && playerId)
+    return ballEvents
+      .filter((event) => event.batsmanId === playerId)
+      .map((event) => event.type)
+      .every((evt) => !evt.includes("-1"));
+}
+
 function toastError(err: unknown) {
   if (err instanceof Error) toast.error(err.message);
   else toast.error("Something went wrong!");
@@ -411,6 +429,7 @@ export {
   calculateFallOfWickets,
   calculatePlayerOfTheMatch,
   calculateWinner,
+  getIsNotOut,
   toastError,
   round,
   // Backend
