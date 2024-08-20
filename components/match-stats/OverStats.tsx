@@ -62,7 +62,7 @@ function OverStats({
               />
               <Bar
                 dataKey="runs"
-                style={{ fill: "hsl(var(--foreground))", opacity: 0.9 }}
+                style={{ fill: "hsl(var(--primary))" }}
                 radius={[5, 5, 0, 0]}
                 label={{
                   position: "top",
