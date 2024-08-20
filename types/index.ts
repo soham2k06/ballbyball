@@ -66,6 +66,11 @@ type PlayerMatches = {
   createdAt: Date;
 };
 
+type TopPerformant = PlayerPerformance & {
+  type: "batsman" | "bowler";
+  name: string;
+};
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };
@@ -84,4 +89,5 @@ export type {
   MatchExtended,
   PlayerMatches,
   PlayerScore,
+  TopPerformant,
 };

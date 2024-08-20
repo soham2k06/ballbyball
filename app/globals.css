@@ -61,3 +61,22 @@
 .cl-userButtonBox {
   flex-direction: row-reverse;
 }
+
+.custom-divider {
+  display: flex;
+  align-items: center;
+}
+.custom-divider::before,
+.custom-divider::after {
+  flex: 1;
+  content: "";
+  padding: 0.5px;
+  @apply bg-border;
+}
+
+.custom-divider::before {
+  margin-right: 0.5em;
+}
+.custom-divider::after {
+  margin-left: 0.5em;
+}

@@ -13,6 +13,7 @@ import { Separator } from "../ui/separator";
 import {
   calculatePlayerOfTheMatch,
   calculateWinner,
+  cn,
   getOverStr,
   getScore,
   processTeamName,
@@ -22,6 +23,7 @@ import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { usePlayerById } from "@/apiHooks/player";
 import { Skeleton } from "../ui/skeleton";
 import { TypographyH4 } from "../ui/typography";
+import { useTopPerformants } from "@/apiHooks/match/useTopPerformants";
 
 interface MatchSummaryProps {
   open: OverlayStateProps["open"];
@@ -142,13 +144,23 @@ function MatchSummary({
     };
   });
 
+  const { topPerformants, isLoading: isTopPerformantsLoading } =
+    useTopPerformants({
+      id: match?.id,
+      payload: {
+        playersPerformance,
+        team1: teams[0].name ?? "",
+        team2: teams[1].name ?? "",
+      },
+    });
+
   const playerOfTheMatch = calculatePlayerOfTheMatch({ playersPerformance });
 
   const { player, isLoading } = usePlayerById(playerOfTheMatch.playerId);
 
   return (
     <Dialog open={open}>
-      <DialogContent removeCloseButton>
+      <DialogContent removeCloseButton className="max-h-[92%] overflow-auto">
         <DialogHeader className="w-full flex-row items-center justify-between border-b pb-6">
           <DialogTitle>Match Summary</DialogTitle>
 
@@ -165,6 +177,31 @@ function MatchSummary({
           </div>
         ) : (
           <>
+            <div className="flex justify-between gap-2">
+              {teams.map((team, i) => {
+                const { runs, totalBalls, wickets } = getScore(
+                  ballEventsbyTeam(i) || [],
+                );
+
+                return (
+                  <div
+                    key={i}
+                    className={cn("flex flex-col justify-between", {
+                      "items-end": i === 1,
+                    })}
+                  >
+                    <h4 className="text-lg font-semibold">
+                      {team?.name ?? ""}
+                    </h4>
+                    <p>
+                      {runs}/{wickets} ({getOverStr(totalBalls)})
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-center font-medium">{winInfo}</p>
+            <Separator className="my-2" />
             <div className="rounded-md bg-muted p-2">
               <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
                 Player of the Match
@@ -195,26 +232,61 @@ function MatchSummary({
                 <Skeleton className="h-6 w-48 bg-foreground/10" />
               )}
             </div>
-            <Separator className="my-2" />
-            <div className="space-y-2">
+
+            <ul className="space-y-2">
               {teams.map((team, i) => {
                 const { runs, totalBalls, wickets } = getScore(
                   ballEventsbyTeam(i) || [],
                 );
 
+                const top2Batsmen = (topPerformants ?? []).filter(
+                  (player) =>
+                    player.team === team.name && player.type === "batsman",
+                );
+
+                const top2Bowlers = (topPerformants ?? []).filter(
+                  (player) =>
+                    player.team !== team.name && player.type === "bowler",
+                );
+
                 return (
-                  <div key={i} className="flex items-center justify-between">
-                    <h4 className="text-lg font-semibold">
-                      {processTeamName(team?.name ?? "")}
-                    </h4>
-                    <p>
-                      {runs}/{wickets} ({getOverStr(totalBalls)})
-                    </p>
+                  <div>
+                    <span className="custom-divider text-sm">
+                      {processTeamName(team.name ?? "")} · {runs}/{wickets} (
+                      {getOverStr(totalBalls)})
+                    </span>
+                    {isTopPerformantsLoading ? (
+                      <Skeleton className="h-24 w-full" />
+                    ) : (
+                      <div className="flex justify-between">
+                        <ul className="space-y-2">
+                          {top2Batsmen.map((player) => (
+                            <li key={player.playerId}>
+                              <h4>{player.name}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {player.runsScored} ({player.ballsFaced})
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                        <ul className="space-y-2 text-right">
+                          {top2Bowlers.map((player) => (
+                            <li key={player.playerId}>
+                              <h4>{player.name}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {player.wicketsTaken}/{player.runConceded} (
+                                {getOverStr(player.ballsBowled)})
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 );
               })}
-            </div>
-            <p>{winInfo}</p>
+            </ul>
+
             <Separator className="my-2" />
             <div className="flex flex-wrap gap-2">
               <Button size="sm" onClick={() => setShowScorecard(true)}>
@@ -231,7 +303,11 @@ function MatchSummary({
               </Button>
             </div>
             <Separator className="my-2" />
-            <Button className="w-full" asChild variant="secondary">
+            <Button
+              className="sticky bottom-0 w-full"
+              asChild
+              variant="secondary"
+            >
               <Link href="/matches">Back & Finish</Link>
             </Button>
           </>
