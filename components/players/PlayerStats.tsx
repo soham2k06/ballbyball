@@ -26,8 +26,9 @@ function PlayerStats({
       ((data?.batting.runs ?? 0) / (data?.batting.balls ?? 1)) * 10000,
     ) / 100;
 
-  const isNotOutYet = data?.batting.wickets === 0;
-  const batAverage = (data?.batting.runs ?? 0) / (matchesPlayed ?? 0) ?? 0;
+  const outTimes = data?.batting.wickets;
+  const isNotOutYet = outTimes === 0;
+  const batAverage = (data?.batting.runs ?? 0) / (outTimes ?? 0) ?? 0;
 
   const economy = ((data?.bowling.runs ?? 0) / (data?.bowling.balls ?? 0)) * 6;
 
