@@ -20,8 +20,6 @@ import {
 } from "@/lib/utils";
 import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
-import { usePlayerById } from "@/apiHooks/player";
-import { Skeleton } from "../ui/skeleton";
 import { TypographyH4 } from "../ui/typography";
 
 interface MatchSummaryProps {
@@ -190,9 +188,18 @@ function MatchSummary({
         })),
     );
 
-  const playerOfTheMatch = calculatePlayerOfTheMatch({ playersPerformance });
+  const playerOfTheMatchData = calculatePlayerOfTheMatch({
+    playersPerformance,
+  });
 
-  const { player, isLoading } = usePlayerById(playerOfTheMatch.playerId);
+  const playerOfTheMatch = match?.teams
+    .find((team) => team.name === playerOfTheMatchData.team)
+    ?.players.find((player) => player.id === playerOfTheMatchData.playerId);
+
+  const playerOfTheMatchNotout = ballEvents
+    .filter((event) => event.batsmanId === playerOfTheMatchData.playerId)
+    .map((event) => event.type)
+    .every((type) => !type.includes("-1"));
 
   return (
     <Dialog open={open}>
@@ -242,31 +249,28 @@ function MatchSummary({
               <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
                 Player of the Match
               </h4>
-              {!isLoading ? (
-                <p>
-                  <strong>{player?.name ?? "Loading..."}</strong> (
-                  {processTeamName(playerOfTheMatch.team)}) ·{" "}
-                  {!!playerOfTheMatch.ballsBowled && (
-                    <>
-                      {" "}
-                      {playerOfTheMatch.wicketsTaken}/
-                      {playerOfTheMatch.runConceded} (
-                      {getOverStr(playerOfTheMatch.ballsBowled)})
-                    </>
-                  )}
-                  {!!playerOfTheMatch.ballsBowled &&
-                    !!playerOfTheMatch.ballsFaced &&
-                    " & "}
-                  {playerOfTheMatch.ballsFaced && (
-                    <>
-                      {playerOfTheMatch.runsScored} (
-                      {playerOfTheMatch.ballsFaced})
-                    </>
-                  )}
-                </p>
-              ) : (
-                <Skeleton className="h-6 w-48 bg-foreground/10" />
-              )}
+              <p>
+                <strong>{playerOfTheMatch?.name}</strong> (
+                {processTeamName(playerOfTheMatchData.team)}) ·{" "}
+                {!!playerOfTheMatchData.ballsBowled && (
+                  <>
+                    {" "}
+                    {playerOfTheMatchData.wicketsTaken}/
+                    {playerOfTheMatchData.runConceded} (
+                    {getOverStr(playerOfTheMatchData.ballsBowled)})
+                  </>
+                )}
+                {!!playerOfTheMatchData.ballsBowled &&
+                  !!playerOfTheMatchData.ballsFaced &&
+                  " & "}
+                {playerOfTheMatchData.ballsFaced && (
+                  <>
+                    {playerOfTheMatchData.runsScored}
+                    {playerOfTheMatchNotout && "*"} (
+                    {playerOfTheMatchData.ballsFaced})
+                  </>
+                )}
+              </p>
             </div>
 
             <ul className="space-y-2">
