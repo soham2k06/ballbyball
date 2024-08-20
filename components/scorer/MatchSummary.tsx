@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MatchExtended, OverlayStateProps, PlayerPerformance } from "@/types";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
@@ -21,6 +21,7 @@ import {
 import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { TypographyH4 } from "../ui/typography";
+import PlayerCardsDialog from "../match-stats/player-cards-dialog";
 
 interface MatchSummaryProps {
   open: OverlayStateProps["open"];
@@ -39,6 +40,8 @@ function MatchSummary({
 }: MatchSummaryProps) {
   const { setShowRunrateChart, setShowOverSummaries, setShowWormChart } =
     useStatsOpenContext();
+
+  const [showPlayerCards, setShowPlayerCards] = useState(false);
 
   const { allowSinglePlayer, overs } = match || {
     allowSinglePlayer: false,
@@ -345,6 +348,9 @@ function MatchSummary({
               <Button size="sm" onClick={() => setShowOverSummaries(true)}>
                 Over summaries
               </Button>
+              <Button size="sm" onClick={() => setShowPlayerCards(true)}>
+                Player Cards
+              </Button>
             </div>
             <Separator className="my-2" />
             <Button
@@ -357,6 +363,12 @@ function MatchSummary({
           </>
         )}
       </DialogContent>
+      <PlayerCardsDialog
+        open={showPlayerCards}
+        setOpen={setShowPlayerCards}
+        match={match}
+        playersPerformance={playersPerformance}
+      />
     </Dialog>
   );
 }
