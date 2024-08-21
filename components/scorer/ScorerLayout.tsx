@@ -163,6 +163,15 @@ function ScorerLayout({
     }
   }, [wickets, match?.hasEnded]);
 
+  // Handle last ball of inning
+  useEffect(() => {
+    const matchBalls = (match?.overs || 0) * 6;
+    if (totalBalls === matchBalls) {
+      if (isInSecondInning || match?.hasEnded) handleFinish();
+      else handleInningChange();
+    }
+  }, []);
+
   // ** Over Summary
   const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
 
