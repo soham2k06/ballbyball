@@ -26,6 +26,7 @@ export async function getAllMatches() {
       hasEnded: true,
       overs: true,
       createdAt: true,
+      allowSinglePlayer: true,
       ballEvents: { select: { batsmanId: true, type: true } },
       matchTeams: {
         include: {
