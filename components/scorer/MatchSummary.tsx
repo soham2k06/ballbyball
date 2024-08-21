@@ -232,7 +232,7 @@ function MatchSummary({
 
                 return (
                   <div
-                    key={i}
+                    key={team.name}
                     className={cn("flex flex-col justify-between", {
                       "items-end": i === 1,
                     })}
@@ -302,7 +302,7 @@ function MatchSummary({
                 );
 
                 return (
-                  <div>
+                  <div key={team.name}>
                     <span className="custom-divider text-sm">
                       {processTeamName(team.name ?? "")} · {runs}/{wickets} (
                       {getOverStr(totalBalls)})
