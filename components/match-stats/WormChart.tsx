@@ -170,6 +170,7 @@ function WormChart({
           />
           <Legend wrapperStyle={{ fontSize: 12, left: 0 }} />
           <Line
+            strokeLinecap="round"
             type="monotone"
             dataKey={teams[0].name}
             stroke="#8884d8"
@@ -177,6 +178,7 @@ function WormChart({
             dot={<CustomDot1 />}
           />
           <Line
+            strokeLinecap="round"
             type="monotone"
             dataKey={teams[1].name}
             stroke="#82ca9d"
