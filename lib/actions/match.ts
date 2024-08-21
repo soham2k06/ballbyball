@@ -26,8 +26,10 @@ export async function getAllMatches() {
       hasEnded: true,
       overs: true,
       createdAt: true,
-      allowSinglePlayer: true,
-      ballEvents: { select: { batsmanId: true, type: true } },
+      ballEvents: {
+        select: { batsmanId: true, type: true },
+        orderBy: { id: "asc" },
+      },
       matchTeams: {
         include: {
           team: {
@@ -65,7 +67,10 @@ export async function getMatchById(id: string) {
   const fetchedMatch = await prisma.match.findFirst({
     where: { userId, id },
     include: {
-      ballEvents: { select: { batsmanId: true, bowlerId: true, type: true } },
+      ballEvents: {
+        select: { batsmanId: true, bowlerId: true, type: true },
+        orderBy: { id: "asc" },
+      },
       matchTeams: {
         select: {
           team: {
