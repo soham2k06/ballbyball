@@ -47,13 +47,13 @@ const calcRuns = (
 const calcWickets = (ballEvents: EventType[] | string[]) =>
   ballEvents?.filter((ball) => ball.includes("-1")).length;
 
-const getIsInvalidBall = (ball: EventType | string) =>
+const getIsvalidBall = (ball: EventType | string) =>
   !invalidBalls.includes(ball) && !ball.includes("-3") && !ball.includes("-2");
 
 function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
   const runs = calcRuns(balls, forPlayerRuns);
   const totalBalls = balls?.filter(
-    (ball) => ball !== "-4" && getIsInvalidBall(ball),
+    (ball) => ball !== "-4" && getIsvalidBall(ball),
   ).length;
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
@@ -82,7 +82,7 @@ function generateOverSummary(ballEvents: EventType[]) {
   let validBallCount = 0;
   let currentOver: EventType[] = [];
   for (const ballEvent of ballEvents) {
-    const isInvalidBall = getIsInvalidBall(ballEvent);
+    const isInvalidBall = getIsvalidBall(ballEvent);
     currentOver.push(ballEvent);
     if (isInvalidBall) {
       validBallCount++;
@@ -420,7 +420,7 @@ export {
   truncStr,
   calcRuns,
   calcWickets,
-  getIsInvalidBall,
+  getIsvalidBall,
   getOverStr,
   getBattingStats,
   calculateMaidenOvers,

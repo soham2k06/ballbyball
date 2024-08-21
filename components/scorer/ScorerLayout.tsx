@@ -12,7 +12,7 @@ import { StatsOpenProvider } from "@/contexts/StatsOpenContext";
 import {
   calcRuns,
   generateOverSummary,
-  getIsInvalidBall,
+  getIsvalidBall,
   getScore,
 } from "@/lib/utils";
 import { strikeChangers } from "@/lib/constants";
@@ -236,7 +236,7 @@ function ScorerLayout({
     if (!match) return;
     const matchBalls = (match?.overs || 0) * 6;
     const isLastBallOfOver =
-      totalBalls % 6 === 5 && totalBalls > 0 && getIsInvalidBall(event);
+      totalBalls % 6 === 5 && totalBalls > 0 && getIsvalidBall(event);
 
     if (isLastBallOfOver) {
       if (matchBalls !== totalBalls) setShowSelectBowler(true);

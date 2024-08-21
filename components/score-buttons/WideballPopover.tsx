@@ -2,7 +2,7 @@ import { MouseEventHandler, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn, getIsInvalidBall } from "@/lib/utils";
+import { cn, getIsvalidBall } from "@/lib/utils";
 import { ballEvents } from "@/lib/constants";
 
 function WideballPopver({
@@ -32,7 +32,7 @@ function WideballPopver({
             .filter(
               (event) =>
                 !event.includes("-1") &&
-                getIsInvalidBall(event) &&
+                getIsvalidBall(event) &&
                 event !== "-5",
             )
             .map((event, i) => (
