@@ -204,7 +204,10 @@ function MatchSummary({
 
   return (
     <Dialog open={open}>
-      <DialogContent removeCloseButton className="max-h-[92%] overflow-auto">
+      <DialogContent
+        removeCloseButton
+        className="max-h-[92%] overflow-y-auto overscroll-none"
+      >
         <DialogHeader className="w-full flex-row items-center justify-between border-b pb-6">
           <DialogTitle>Match Summary</DialogTitle>
 
