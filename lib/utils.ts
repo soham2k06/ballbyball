@@ -47,14 +47,18 @@ const calcRuns = (
 const calcWickets = (ballEvents: EventType[] | string[]) =>
   ballEvents?.filter((ball) => ball.includes("-1")).length;
 
-const getIsvalidBall = (ball: EventType | string) =>
-  !invalidBalls.includes(ball) && !ball.includes("-3") && !ball.includes("-2");
+const getIsvalidBall = (ball: EventType | string, countNB?: boolean) =>
+  !invalidBalls.includes(ball) &&
+  !ball.includes("-2") &&
+  !(!countNB && ball.includes("-3"));
 
 function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
   const runs = calcRuns(balls, forPlayerRuns);
+
   const totalBalls = balls?.filter(
-    (ball) => ball !== "-4" && getIsvalidBall(ball),
+    (ball) => ball !== "-4" && getIsvalidBall(ball, forPlayerRuns),
   ).length;
+
   const wickets = calcWickets(balls);
   const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
 
