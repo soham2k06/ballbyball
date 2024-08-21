@@ -64,12 +64,15 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
                       className="inline-block w-full p-2"
                     >
                       <CardHeader className="flex flex-row justify-between gap-2 space-y-0">
-                        <CardTitle>
+                        <CardTitle className="text-xl">
                           {match.name}{" "}
-                          {match.hasPlayerWon !== undefined &&
-                            (match.hasPlayerWon === true ? "(Won)" : "(Lost)")}
+                          {match.hasPlayerWon !== undefined && (
+                            <span className="font-sans text-xs">
+                              {match.hasPlayerWon === true ? "(Won)" : "(Lost)"}
+                            </span>
+                          )}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-right text-sm text-muted-foreground">
                           Created at{" "}
                           {new Date(match.createdAt).toLocaleDateString()}
                         </p>
