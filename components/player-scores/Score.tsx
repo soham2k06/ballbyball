@@ -102,9 +102,11 @@ function Score({
                   (item) => item.id === typeId,
                 );
 
-                const bowler = teams[teamIndex].players.find(
-                  (player) => player.id === bowlerId,
-                );
+                const bowler = teams
+                  .flatMap((team) => team.players)
+                  .find((player) => player.id === bowlerId);
+
+                console.log(bowler);
 
                 return {
                   bowlerId,
@@ -117,9 +119,9 @@ function Score({
                 };
               })[0];
 
-            const fielder = teams[teamIndex].players.find(
-              (player) => player.id === outBy?.fielderId,
-            );
+            const fielder = teams
+              .flatMap((team) => team.players)
+              .find((player) => player.id === outBy?.fielderId);
 
             const legalEvents = ballEvents.filter(
               (ball) =>
