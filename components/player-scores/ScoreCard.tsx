@@ -55,6 +55,7 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
             teams.map((team) => team.players).flat(),
           ),
       teamIndex: i,
+      teams,
     };
   }
 

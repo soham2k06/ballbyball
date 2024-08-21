@@ -80,6 +80,11 @@ function ScorerLayout({
 
   const playerIds = team?.players.map((player) => player.id) || [];
 
+  const curBowlerId = curPlayers.find((player) => player.type === "bowler")?.id;
+  const curBatsmenIds = curPlayers
+    .filter((player) => player.type === "batsman")
+    .map((player) => player.id);
+
   const balls =
     events
       ?.filter((event) => playerIds.includes(event.batsmanId))
@@ -123,11 +128,7 @@ function ScorerLayout({
   // Handling strike change on last ball of over
   useEffect(() => {
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
-    if (
-      isLastBallOfOver &&
-      curPlayers.filter((player) => player.type === "batsman").length === 2
-    )
-      changeStrike();
+    if (isLastBallOfOver && curBatsmenIds.length === 2) changeStrike();
   }, [totalBalls]);
 
   // Check if second inning
@@ -179,10 +180,7 @@ function ScorerLayout({
 
   // ** Handlers
   function handleStrikeChange(ballEventType: EventType) {
-    if (
-      strikeChangers.includes(ballEventType) &&
-      curPlayers.filter((player) => player.type === "batsman").length === 2
-    )
+    if (strikeChangers.includes(ballEventType) && curBatsmenIds.length === 2)
       changeStrike();
   }
 
@@ -210,7 +208,7 @@ function ScorerLayout({
       {
         type: event,
         batsmanId: curPlayers?.[onStrikeBatsman].id!,
-        bowlerId: curPlayers.find((player) => player.type === "bowler")?.id,
+        bowlerId: curBowlerId,
         matchId,
       },
     ] as CreateBallEventSchema[]);
@@ -406,17 +404,16 @@ function ScorerLayout({
         <div className="my-4" />
 
         <BatsmanScores
+          players={team.players}
           onStrikeBatsman={onStrikeBatsman}
-          playerIds={
-            curPlayers
-              .filter(({ type }) => type === "batsman")
-              ?.map(({ id }) => id)!
-          }
+          playerIds={curBatsmenIds}
           events={events as BallEvent[]}
         />
         <div className="my-2 md:my-4" />
         <BowlerScores
-          playerId={curPlayers.find((player) => player.type === "bowler")?.id!}
+          player={opposingTeam.players.find(
+            (player) => curBowlerId === player.id,
+          )}
           events={events as BallEvent[]}
         />
         <Separator className="my-3" />

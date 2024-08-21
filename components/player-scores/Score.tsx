@@ -1,7 +1,6 @@
-import { BallEvent, Player } from "@prisma/client";
+import { BallEvent, Player, Team } from "@prisma/client";
 
 import { EventType } from "@/types";
-import { usePlayerById } from "@/apiHooks/player";
 import {
   abbreviateName,
   calculateMaidenOvers,
@@ -28,6 +27,7 @@ function Score({
   fallOfWickets,
   hasYetToBatTeam,
   teamIndex,
+  teams,
 }: {
   players: Player[];
   ballEvents: BallEvent[];
@@ -39,6 +39,7 @@ function Score({
     batsman: string | undefined;
   }[];
   teamIndex: number;
+  teams: (Team & { players: Player[] })[];
 }) {
   const hasYetToBat = players.filter((player) => {
     const isBatsman = ballEvents
@@ -101,6 +102,10 @@ function Score({
                   (item) => item.id === typeId,
                 );
 
+                const bowler = teams[teamIndex].players.find(
+                  (player) => player.id === bowlerId,
+                );
+
                 return {
                   bowlerId,
                   fielderId: type.split("_")[2],
@@ -108,11 +113,13 @@ function Score({
                   isNotBowlersWicket: wicketType?.isNotBowlersWicket,
                   typeStr:
                     !wicketType?.isNotBowlersWicket &&
-                    `${[1, 2, 4].includes(Number(wicketType?.id)) ? "" : "b."} ${usePlayerById(bowlerId).player?.name}`,
+                    `${[1, 2, 4].includes(Number(wicketType?.id)) ? "" : "b."} ${bowler?.name}`,
                 };
               })[0];
 
-            const { player: fielder } = usePlayerById(outBy?.fielderId);
+            const fielder = teams[teamIndex].players.find(
+              (player) => player.id === outBy?.fielderId,
+            );
 
             const legalEvents = ballEvents.filter(
               (ball) =>
@@ -159,7 +166,7 @@ function Score({
               <TableRow>
                 <TableCell className="text-left font-semibold">
                   <p>
-                    {player.name} {!outBy && !isBowlingScore && "**"}
+                    {player.name} {!outBy && !isBowlingScore && "*"}
                   </p>
                   {outBy && (
                     <span className="mt-0.5 text-[13px] text-muted-foreground">
