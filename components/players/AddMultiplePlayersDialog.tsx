@@ -89,9 +89,9 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex max-h-[calc(100dvh-120px)] min-h-96 flex-col justify-between space-y-3 overflow-y-auto p-1"
+            className="flex max-h-[calc(100dvh-120px)] min-h-96 flex-col justify-between overflow-y-auto p-1"
           >
-            <ul>
+            <ul className="space-y-4">
               {fields.map((name, index) => (
                 <div key={name.id} className="flex items-center gap-4">
                   <FormField
