@@ -106,8 +106,6 @@ function Score({
                   .flatMap((team) => team.players)
                   .find((player) => player.id === bowlerId);
 
-                console.log(bowler);
-
                 return {
                   bowlerId,
                   fielderId: type.split("_")[2],

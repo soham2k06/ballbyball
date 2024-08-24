@@ -22,8 +22,6 @@ function PlayerList({ players }: { players: PlayerType[] }) {
   const [playerData, setPlayerData] = useState<PlayerType[]>(players);
   const { mutate: deleteMutate } = useActionMutate(deletePlayer);
 
-  console.log(playerData);
-
   const [playerToDelete, setPlayerToDelete] = useState<string | undefined>();
 
   const [playerToUpdate, setPlayerToUpdate] = useState<
