@@ -6,11 +6,11 @@ import {
   BadgeIndianRupee,
   Component,
   SmilePlus,
+  Zap,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import GlimpseCarousel from "@/components/GlimpseCarousel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const features = [
@@ -18,7 +18,12 @@ const features = [
     Icon: SmilePlus,
     title: "User-Friendly Interface",
     description:
-      "BallByBall offers an interface that simplifies the cricket scoring process.",
+      "BallByBall offers an interface that simplifies the cricket scoring process",
+  },
+  {
+    Icon: Zap,
+    title: "Instant Setup",
+    description: "Get started with BallByBall in minutes. No complex setups.",
   },
   {
     Icon: Component,
@@ -98,40 +103,80 @@ async function page() {
           </span>
         </div>
 
-        <div className="flex gap-6 max-lg:hidden">
-          <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
+        <div className="mb-6 grid gap-6 md:grid-cols-[8fr_4fr]">
+          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Run rate chart</h2>
+              <p className="text-muted-foreground">
+                Bar chart comparing the run rates achieved by each team in every
+                over of the match
+              </p>
+            </div>
             <Image
-              src="/worm-chart.png"
-              alt="worm chart demo"
-              width={320}
-              height={800}
-              className="size-full"
-            />
-          </div>
-          <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
-            <Image
+              alt="Run rate chart"
+              draggable="false"
+              width="864"
+              height="433"
+              className="rounded-lg"
               src="/runrate-chart.png"
-              alt="runrate chart demo"
-              width={320}
-              height={800}
-              className="size-full"
             />
           </div>
-          <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
+          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Worm Chart</h2>
+              <p className="text-muted-foreground">
+                Graphical representation of the cumulative runs scored by each
+                team over time during the match, showing the edge and flow of
+                the game
+              </p>
+            </div>
             <Image
-              src="/player-stats.png"
-              alt="player stats demo"
-              width={320}
-              height={800}
-              className="size-full"
+              alt="Worm Chart"
+              width="700"
+              height="403"
+              className="rounded-lg"
+              src="/worm-chart.png"
             />
           </div>
         </div>
-        <div className="lg:hidden">
-          <GlimpseCarousel />
+        <div className="mb-6 grid gap-6 md:grid-cols-[6fr_6fr]">
+          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Player Stats</h2>
+              <p className="text-muted-foreground">
+                Detailed statistics showcasing individual player performances,
+                including runs, wickets, and other key metrics
+              </p>
+            </div>
+            <Image
+              alt="Player Stats"
+              width="700"
+              height="403"
+              className="rounded-lg"
+              src="/player-stats.png"
+            />
+          </div>
+          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold">Match summary</h2>
+              <p className="text-muted-foreground">
+                Comprehensive summary of the match, highlighting key statistics,
+                scores, and outcomes for both teams, including man of the match
+                declaration
+              </p>
+            </div>
+            <Image
+              alt="Match summary"
+              draggable="false"
+              width="864"
+              height="433"
+              className="rounded-lg"
+              src="/match-summary.png"
+            />
+          </div>
         </div>
       </section>
-      <section className="pt-8 text-base tracking-wide text-muted-foreground md:pt-8 md:text-xl lg:pt-16">
+      <section className="sr-only pt-8 text-base tracking-wide text-muted-foreground md:pt-8 md:text-xl lg:pt-16">
         <p className="mb-4">
           Cricket scoring has never been easier with BallByBall, your ultimate
           cricket scoring partner. Our platform allows you to effortlessly add
