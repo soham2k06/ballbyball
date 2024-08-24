@@ -24,7 +24,7 @@ const navItems = [
   { name: "Players", href: "/players" },
   { name: "Instant Scoring", href: "/scorer" },
   { name: "Guide", href: "/guide" },
-];
+] as const
 
 const guideSteps = [
   {
