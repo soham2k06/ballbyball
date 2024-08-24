@@ -352,6 +352,7 @@ function ScorerLayout({
       id: matchId,
       curPlayers: [],
       curTeam: 0,
+      strikeIndex: 0,
       ...(match?.hasEnded && { hasEnded: false }),
     });
     setOnStrikeBatsman(0);
