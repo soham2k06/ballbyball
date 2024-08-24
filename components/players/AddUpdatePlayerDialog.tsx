@@ -24,20 +24,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import LoadingButton from "@/components/ui/loading-button";
 import { createPlayer, updatePlayer } from "@/lib/actions/player";
-import { toast } from "sonner";
 import { useActionMutate } from "@/lib/hooks";
 import { toastError } from "@/lib/utils";
+import { Player } from "@prisma/client";
+import { Button } from "../ui/button";
 
 interface AddUpdatePlayerDialogProps extends OverlayStateProps {
   playerToUpdate?: UpdatePlayerSchema;
+  setPlayerData: React.Dispatch<React.SetStateAction<(Player | undefined)[]>>;
 }
 
 function AddUpdatePlayerDialog({
   open,
   setOpen,
   playerToUpdate,
+  setPlayerData,
 }: AddUpdatePlayerDialogProps) {
   const form = useForm<CreatePlayerSchema>({
     resolver: zodResolver(createPlayerSchema),
@@ -50,32 +52,53 @@ function AddUpdatePlayerDialog({
     formState: { isDirty },
   } = form;
 
-  const { mutate: createMutate, isPending: isCreating } =
-    useActionMutate(createPlayer);
-  const { mutate: updateMutate, isPending: isUpdating } =
-    useActionMutate(updatePlayer);
-
-  const isPending = isCreating || isUpdating;
+  const { mutate: createMutate } = useActionMutate(createPlayer);
+  const { mutate: updateMutate } = useActionMutate(updatePlayer);
 
   async function onSubmit(data: CreatePlayerSchema | UpdatePlayerSchema) {
     if (!!playerToUpdate) {
+      setPlayerData(
+        (prevData) =>
+          prevData.map((player) =>
+            player?.id === playerToUpdate.id
+              ? { id: player.id, ...data }
+              : player,
+          ) as Player[],
+      );
+      setOpen(false);
       updateMutate(
         { id: playerToUpdate.id, ...data },
         {
-          onSuccess: () => {
-            reset();
-            setOpen(false);
+          onSuccess: () => reset(),
+          onError: (error) => {
+            setPlayerData(
+              (prevData) =>
+                prevData.map((player) =>
+                  player?.id === playerToUpdate.id
+                    ? { ...playerToUpdate, id: player.id }
+                    : player,
+                ) as Player[],
+            );
+            toastError(error);
           },
         },
       );
       return;
     }
 
+    const newId = "optimistic" + Math.random().toString(36);
+    setPlayerData((prevData) => [
+      ...prevData,
+      { id: newId, ...data } as Player,
+    ]);
+    setOpen(false);
+
     createMutate(data, {
-      onError: (error) => toastError(error),
-      onSuccess: () => {
-        toast.success("Player successfully created!");
-        setOpen(false);
+      onError: (error) => {
+        toastError(error);
+        setPlayerData((prevData) =>
+          prevData.filter((player) => player?.id !== newId),
+        );
       },
     });
   }
@@ -108,19 +131,9 @@ function AddUpdatePlayerDialog({
             />
 
             <DialogFooter>
-              <LoadingButton
-                type="submit"
-                disabled={isPending || !isDirty}
-                loading={isPending}
-              >
-                {isPending
-                  ? !!playerToUpdate
-                    ? "Updating..."
-                    : "Adding..."
-                  : !!playerToUpdate
-                    ? "Update"
-                    : "Add"}
-              </LoadingButton>
+              <Button type="submit" disabled={!isDirty}>
+                {!!playerToUpdate ? "Update" : "Add"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

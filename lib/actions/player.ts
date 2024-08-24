@@ -47,7 +47,6 @@ export async function createPlayer(data: CreatePlayerSchema) {
         userId,
         name: newName,
       },
-      select: { id: true, name: true },
     });
 
     revalidatePath("/players");
@@ -100,11 +99,10 @@ export async function updatePlayer(data: UpdatePlayerSchema) {
 }
 
 export async function deletePlayer(id: string) {
-  const playerToDelete = await prisma.player.findUnique({ where: { id } });
-
-  if (!playerToDelete) throw new Error("Player not found!");
-
   try {
+    const playerToDelete = await prisma.player.findUnique({ where: { id } });
+  
+    if (!playerToDelete) throw new Error("Player not found!");
     await prisma.teamPlayer.deleteMany({ where: { playerId: id } });
     await prisma.player.delete({ where: { id } });
     revalidatePath("/players");

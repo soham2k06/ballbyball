@@ -16,9 +16,13 @@ import { Player as PlayerType } from "@prisma/client";
 import { useActionMutate } from "@/lib/hooks";
 import { deletePlayer } from "@/lib/actions/player";
 import PlayerMatches from "./PlayerMatches";
+import { toast } from "sonner";
 
 function PlayerList({ players }: { players: PlayerType[] }) {
-  const { mutate: deleteMutate, isPending } = useActionMutate(deletePlayer);
+  const [playerData, setPlayerData] = useState<PlayerType[]>(players);
+  const { mutate: deleteMutate } = useActionMutate(deletePlayer);
+
+  console.log(playerData);
 
   const [playerToDelete, setPlayerToDelete] = useState<string | undefined>();
 
@@ -39,12 +43,12 @@ function PlayerList({ players }: { players: PlayerType[] }) {
     <>
       <div
         className={cn({
-          "flex flex-col items-center md:p-8": !players?.length,
+          "flex flex-col items-center md:p-8": !playerData?.length,
         })}
       >
-        {players?.length ? (
+        {playerData?.length ? (
           <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
-            {players.map((player) => {
+            {playerData.map((player) => {
               return (
                 <Player
                   key={player.id}
@@ -60,12 +64,23 @@ function PlayerList({ players }: { players: PlayerType[] }) {
         ) : (
           <EmptyState document="players" />
         )}
-        <AddPlayerButton />
+        <AddPlayerButton
+          setPlayerData={
+            setPlayerData as React.Dispatch<
+              React.SetStateAction<(PlayerType | undefined)[]>
+            >
+          }
+        />
       </div>
       <AddEditPlayerFormDialog
         open={!!playerToUpdate}
         setOpen={() =>
           setPlayerToUpdate(playerToUpdate ? undefined : playerToUpdate)
+        }
+        setPlayerData={
+          setPlayerData as React.Dispatch<
+            React.SetStateAction<(PlayerType | undefined)[]>
+          >
         }
         playerToUpdate={playerToUpdate}
       />
@@ -74,9 +89,34 @@ function PlayerList({ players }: { players: PlayerType[] }) {
         setOpen={() =>
           setPlayerToDelete(playerToDelete ? undefined : playerToDelete)
         }
-        isLoading={isPending}
+        noLoading
         content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
-        onConfirm={() => playerToDelete && deleteMutate(playerToDelete)}
+        onConfirm={() => {
+          if (playerToDelete) {
+            if (playerToDelete.includes("optimistic"))
+              return toast.error(
+                "Error deleting player, please reload and try again",
+              );
+            setPlayerData((prevData) =>
+              prevData.filter((player) => player?.id !== playerToDelete),
+            );
+
+            deleteMutate(playerToDelete, {
+              onError: () => {
+                setPlayerData(
+                  (prevData) =>
+                    [
+                      ...prevData,
+                      playerData.find(
+                        (player) => player?.id === playerToDelete,
+                      ),
+                    ] as PlayerType[],
+                );
+                toast.error("Failed to delete player");
+              },
+            });
+          }
+        }}
       />
 
       <PlayerStats

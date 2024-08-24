@@ -5,8 +5,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import AddPlayerFormDialog from "./AddUpdatePlayerDialog";
 import AddMultiplePlayersDialog from "./AddMultiplePlayersDialog";
+import { Player } from "@prisma/client";
 
-function AddPlayerButton() {
+function AddPlayerButton({
+  setPlayerData,
+}: {
+  setPlayerData: React.Dispatch<React.SetStateAction<(Player | undefined)[]>>;
+}) {
   const [open, setOpen] = useState(false);
 
   const [openMultiple, setOpenMultiple] = useState(false);
@@ -18,8 +23,16 @@ function AddPlayerButton() {
         Add Multiple Players
       </Button>
 
-      <AddPlayerFormDialog open={open} setOpen={setOpen} />
-      <AddMultiplePlayersDialog open={openMultiple} setOpen={setOpenMultiple} />
+      <AddPlayerFormDialog
+        open={open}
+        setOpen={setOpen}
+        setPlayerData={setPlayerData}
+      />
+      <AddMultiplePlayersDialog
+        open={openMultiple}
+        setOpen={setOpenMultiple}
+        setPlayerData={setPlayerData}
+      />
     </div>
   );
 }

@@ -23,6 +23,8 @@ import LoadingButton from "@/components/ui/loading-button";
 import { Button } from "@/components/ui/button";
 import { useActionMutate } from "@/lib/hooks";
 import { createMultiplePlayers } from "@/lib/actions/player";
+import { Player } from "@prisma/client";
+import { toastError } from "@/lib/utils";
 
 const uniqueArray = (arr: string[]) => new Set(arr).size === arr.length;
 
@@ -35,7 +37,15 @@ const schema = z.object({
     }),
 });
 
-function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
+interface AddMultiplePlayersDialogProps extends OverlayStateProps {
+  setPlayerData: React.Dispatch<React.SetStateAction<(Player | undefined)[]>>;
+}
+
+function AddMultiplePlayersDialog({
+  open,
+  setOpen,
+  setPlayerData,
+}: AddMultiplePlayersDialogProps) {
   const form = useForm<{ names: string[] }>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -54,11 +64,23 @@ function AddMultiplePlayersDialog({ open, setOpen }: OverlayStateProps) {
   const { mutate, isPending } = useActionMutate(createMultiplePlayers);
 
   function onSubmit(data: { names: string[] }) {
+    setPlayerData((prevData) => [
+      ...prevData,
+      ...(data.names.map((name) => {
+        const newId = "optimistic" + Math.random().toString(36);
+        return { name, id: newId };
+      }) as Player[]),
+    ]);
+    setOpen(false);
+
     mutate(data.names, {
-      onSuccess: () => {
-        reset();
-        setOpen(false);
+      onError: (error) => {
+        toastError(error);
+        setPlayerData((prevData) =>
+          prevData.filter((player) => !data.names.includes(player?.name ?? "")),
+        );
       },
+      onSuccess: () => reset(),
     });
   }
 

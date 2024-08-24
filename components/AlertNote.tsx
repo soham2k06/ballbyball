@@ -16,6 +16,7 @@ interface AlertNodeProps extends OverlayStateProps {
   onConfirm: () => void;
   content: string;
   isLoading?: boolean;
+  noLoading?: boolean;
 }
 
 function AlertNote({
@@ -24,6 +25,7 @@ function AlertNote({
   onConfirm,
   content,
   isLoading,
+  noLoading,
 }: AlertNodeProps) {
   useEffect(() => {
     if (!isLoading) setOpen(false);
@@ -38,7 +40,14 @@ function AlertNote({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button onClick={onConfirm} disabled={isLoading} className="min-w-32">
+          <Button
+            onClick={() => {
+              onConfirm();
+              if (noLoading) setOpen(false);
+            }}
+            disabled={isLoading}
+            className="min-w-32"
+          >
             {isLoading ? (
               <Loader2 className="size-5 animate-spin" strokeWidth={3} />
             ) : (
