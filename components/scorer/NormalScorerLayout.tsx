@@ -47,7 +47,7 @@ function ScorerLayout() {
 
   return (
     <div className="flex justify-center md:p-6">
-      <Card className="relative p-2 max-sm:w-full max-sm:border-0 sm:w-96">
+      <Card className="relative p-2 max-sm:w-full max-sm:border-0 max-sm:shadow-none sm:w-96">
         <div className="absolute right-2 top-2">
           <DangerActions
             handleRestart={() => {

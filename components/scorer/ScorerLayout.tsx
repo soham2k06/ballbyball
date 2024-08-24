@@ -362,7 +362,7 @@ function ScorerLayout({
 
   return (
     <StatsOpenProvider>
-      <Card className="relative max-sm:w-full max-sm:border-0 sm:w-96 sm:p-2">
+      <Card className="relative max-sm:w-full max-sm:border-0 max-sm:shadow-none sm:w-96 sm:p-2">
         <div className="absolute left-0 top-0 flex w-full items-center justify-between sm:p-2">
           <div>
             <LoadingButton

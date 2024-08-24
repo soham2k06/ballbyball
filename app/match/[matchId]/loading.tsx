@@ -8,7 +8,7 @@ import { MoreVertical } from "lucide-react";
 function Loading() {
   return (
     <div className="flex h-full flex-col items-center md:justify-center">
-      <Card className="relative max-sm:w-full max-sm:border-0 sm:w-96 sm:p-2">
+      <Card className="relative max-sm:w-full max-sm:border-0 max-sm:shadow-none sm:w-96 sm:p-2">
         <div className="absolute left-0 top-0 flex w-full items-center justify-between sm:p-2">
           <Button disabled>Save</Button>
           <Button
