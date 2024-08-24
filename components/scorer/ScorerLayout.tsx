@@ -255,7 +255,9 @@ function ScorerLayout({
       totalBalls > 0 &&
       getIsvalidBall(e.currentTarget.value);
 
-    if (!isLastBallOfOver) setOnStrikeBatsman(0);
+    if (isLastBallOfOver) setOnStrikeBatsman(1);
+    else setOnStrikeBatsman(0);
+
     const event = e.currentTarget.value;
 
     const wicketType = JSON.parse(event);
