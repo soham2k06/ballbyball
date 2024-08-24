@@ -10,7 +10,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       defaultTheme="system"
       disableTransitionOnChange
     >
-      <div className="flex h-dvh flex-col overflow-hidden">
+      <div className="flex h-dvh flex-col">
         <Nav />
         <div className="mb-auto flex p-4">
           <main className="mx-auto w-full max-w-7xl overflow-hidden">
