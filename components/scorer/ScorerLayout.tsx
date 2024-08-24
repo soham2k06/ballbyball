@@ -250,6 +250,12 @@ function ScorerLayout({
   }
 
   function handleWicket(e: React.MouseEvent<HTMLButtonElement>) {
+    const isLastBallOfOver =
+      totalBalls % 6 === 5 &&
+      totalBalls > 0 &&
+      getIsvalidBall(e.currentTarget.value);
+
+    if (!isLastBallOfOver) setOnStrikeBatsman(0);
     const event = e.currentTarget.value;
 
     const wicketType = JSON.parse(event);
