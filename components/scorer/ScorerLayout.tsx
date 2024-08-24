@@ -263,7 +263,13 @@ function ScorerLayout({
     const wicketType = JSON.parse(event);
     let eventToAdd;
 
-    const outPlayers = events.filter((event) => event.type.includes("-1"));
+    const curTeamEvents = events.filter((event) =>
+      teamPlayerIds?.includes(event.batsmanId),
+    );
+    const outPlayers = curTeamEvents.filter((event) =>
+      event.type.includes("-1"),
+    );
+
     const isSLastPlayer = outPlayers.length === team?.players.length - 2;
 
     // if (isSLastPlayer) setOnStrikeBatsman(0);
