@@ -16,7 +16,7 @@ async function Teams() {
   const teams = await getAllTeams();
   const players = await getAllPlayers();
   return (
-    <div>
+    <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Teams
       </h1>

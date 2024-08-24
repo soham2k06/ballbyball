@@ -10,11 +10,15 @@ function Layout({ children }: { children: React.ReactNode }) {
       defaultTheme="system"
       disableTransitionOnChange
     >
-      <Nav />
-      <div className="p-4">
-        <div className="mx-auto mb-16 w-full max-w-7xl flex-1">{children}</div>
+      <div className="flex h-dvh flex-col overflow-hidden">
+        <Nav />
+        <div className="mb-auto flex p-4">
+          <main className="mx-auto w-full max-w-7xl overflow-hidden">
+            {children}
+          </main>
+        </div>
+        <Footer />
       </div>
-      <Footer />
     </Provider>
   );
 }

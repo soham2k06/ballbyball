@@ -5,7 +5,6 @@ import {
   AreaChart,
   BadgeIndianRupee,
   Component,
-  Github,
   SmilePlus,
 } from "lucide-react";
 
@@ -56,15 +55,10 @@ async function page() {
 
           <div className="flex w-full items-center space-x-4 md:pb-10">
             <Button asChild>
-              <Link href="/guide">Browse</Link>
+              <Link href="/players">Start with players</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="https://github.com/soham2k06/cricket-scorer">
-                <span className="mr-2 inline-flex size-5 items-center justify-center rounded-full bg-foreground pt-1 text-background">
-                  <Github className="size-4 fill-background" />
-                </span>{" "}
-                Github
-              </Link>
+              <Link href="/guide">Instant scoring</Link>
             </Button>
           </div>
         </div>
@@ -104,14 +98,14 @@ async function page() {
           </span>
         </div>
 
-        <div className="flex gap-6 max-md:hidden">
+        <div className="flex gap-6 max-lg:hidden">
           <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
             <Image
               src="/worm-chart.png"
               alt="worm chart demo"
               width={320}
               height={800}
-              className="size-full max-md:mx-auto max-md:hidden"
+              className="size-full"
             />
           </div>
           <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
@@ -120,7 +114,7 @@ async function page() {
               alt="runrate chart demo"
               width={320}
               height={800}
-              className="size-full max-md:mx-auto max-md:hidden"
+              className="size-full"
             />
           </div>
           <div className="aspect-[1/2] w-80 overflow-hidden rounded-md bg-muted">
@@ -129,11 +123,11 @@ async function page() {
               alt="player stats demo"
               width={320}
               height={800}
-              className="size-full max-md:mx-auto max-md:hidden"
+              className="size-full"
             />
           </div>
         </div>
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <GlimpseCarousel />
         </div>
       </section>

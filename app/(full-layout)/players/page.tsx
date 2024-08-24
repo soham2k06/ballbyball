@@ -14,7 +14,7 @@ async function page() {
   await checkSession();
   const players = await getAllPlayers();
   return (
-    <div>
+    <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Players
       </h1>

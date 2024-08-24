@@ -9,7 +9,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       defaultTheme="system"
       disableTransitionOnChange
     >
-      <div className="mb-16 p-4">{children}</div>
+      <div className="p-4">{children}</div>
       <Footer />
     </Provider>
   );

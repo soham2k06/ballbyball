@@ -16,7 +16,7 @@ async function page() {
   const teams = await getAllTeams();
 
   return (
-    <div>
+    <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Matches
       </h1>
