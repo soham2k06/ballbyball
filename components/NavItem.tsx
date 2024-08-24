@@ -1,4 +1,4 @@
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link, { LinkProps } from "next/link";
 
 interface NavItemProps extends LinkProps {
@@ -6,14 +6,21 @@ interface NavItemProps extends LinkProps {
 }
 
 function NavItem({ children, href, ...props }: NavItemProps) {
+  const { status } = useSession();
+
+  const isPrivateAndUnauthenticated =
+    status === "unauthenticated" && href !== "/guide" && href !== "/scorer";
+
   return (
     <li
       onClick={() => {
-        if (href === "/") signIn("google");
+        if (isPrivateAndUnauthenticated) {
+          signIn("google", { callbackUrl: href.toString() });
+        }
       }}
     >
       <Link
-        href={href}
+        href={isPrivateAndUnauthenticated ? "/" : href}
         {...props}
         className="block rounded-md p-3 font-normal transition-colors hover:bg-secondary"
       >

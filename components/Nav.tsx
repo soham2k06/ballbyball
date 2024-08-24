@@ -43,14 +43,7 @@ function Nav() {
         </Link>
         <ul className="hidden md:flex">
           {navItems.map((item) => (
-            <NavItem
-              key={item.name}
-              href={
-                data || item.href === "/scorer" || item.href === "/guide"
-                  ? item.href
-                  : "/"
-              }
-            >
+            <NavItem key={item.name} href={item.href}>
               {item.name}
             </NavItem>
           ))}
