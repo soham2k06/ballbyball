@@ -91,10 +91,6 @@ function PlayerList({ players }: { players: PlayerType[] }) {
         content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
         onConfirm={() => {
           if (playerToDelete) {
-            if (playerToDelete.includes("optimistic"))
-              return toast.error(
-                "Error deleting player, please reload and try again",
-              );
             setPlayerData((prevData) =>
               prevData.filter((player) => player?.id !== playerToDelete),
             );

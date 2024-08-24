@@ -19,6 +19,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Card, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 interface PlayerProps {
   player: PlayerSchemaType;
@@ -74,13 +75,25 @@ function Player({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="gap-2 font-medium"
-            onClick={() => setPlayerToUpdate(player)}
+            onClick={() => {
+              if (player.id.includes("optimistic"))
+                return toast.error(
+                  "Error updating player, please reload and try again",
+                );
+              setPlayerToUpdate(player);
+            }}
           >
             <Edit size={20} /> Edit
           </DropdownMenuItem>
           <DropdownMenuItem
             className="gap-2 font-medium"
-            onClick={() => handleDelete(player.id)}
+            onClick={() => {
+              if (player.id.includes("optimistic"))
+                return toast.error(
+                  "Error deleting player, please reload and try again",
+                );
+              handleDelete(player.id);
+            }}
           >
             <Trash2 size={20} /> Delete
           </DropdownMenuItem>
