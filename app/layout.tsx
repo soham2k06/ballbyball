@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 
@@ -152,6 +153,7 @@ export default async function RootLayout({
       <body className={cn("antialiased", lato.className)}>
         <SessionProvider>{children}</SessionProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
