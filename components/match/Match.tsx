@@ -119,7 +119,11 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
           <CardDescription className="mt-3">{winInfo}</CardDescription>
         )}
         <CardDescription className="absolute bottom-3 right-3 text-right">
-          Started at <br /> {match.createdAt.toLocaleDateString()}
+          Started at <br />{" "}
+          {Intl.DateTimeFormat("en-IN", {
+            dateStyle: "short",
+            timeStyle: "short",
+          }).format(new Date(match.createdAt))}
         </CardDescription>
       </CardContent>
     </Card>
