@@ -5,6 +5,7 @@ import {
   AreaChart,
   BadgeIndianRupee,
   Component,
+  ExternalLink,
   SmilePlus,
   Zap,
 } from "lucide-react";
@@ -12,6 +13,27 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const steps = [
+  {
+    title: "Add Players",
+    description:
+      "Add your team members to BallByBall and keep track of their performance in every match",
+    link: "/players",
+  },
+  {
+    title: "Add Teams",
+    description:
+      "Create your cricket team on BallByBall and manage all your matches and scores in one place",
+    link: "/teams",
+  },
+  {
+    title: "Start match",
+    description:
+      "Start scoring your cricket match on BallByBall and keep track of the score ball by ball",
+    link: "/matches",
+  },
+];
 
 const features = [
   {
@@ -204,6 +226,35 @@ async function page() {
           journey. Join us today and see why we're the preferred cricket scoring
           partner for enthusiasts worldwide.
         </p>
+      </section>
+      <section className="pt-8 md:pt-8 lg:pt-16">
+        <div className="mb-4 flex max-w-3xl flex-col gap-2 md:mb-8">
+          <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:leading-[1.1]">
+            Get started like a pro!
+          </h2>
+          <span className="text-lg text-muted-foreground sm:text-xl">
+            Starting with BallByBall is as easy as 1-2-3. Follow these simple
+          </span>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
+          {steps.map(({ title, description, link }, index) => (
+            <Card key={index} className="text-center">
+              <CardHeader>
+                <Link
+                  href={link ?? ""}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <CardTitle>{title}</CardTitle>
+                  <ExternalLink />
+                </Link>
+              </CardHeader>
+              <hr className="mx-4" />
+              <CardContent>
+                <p className="text-muted-foreground">{description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </section>
       <section className="pt-8 md:pt-8 lg:pt-16">
         <div className="mb-4 flex max-w-3xl flex-col gap-2 md:mb-8">
