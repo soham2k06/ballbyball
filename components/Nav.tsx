@@ -48,34 +48,36 @@ function Nav() {
             </NavItem>
           ))}
         </ul>
-        {status === "loading" ? (
-          <Skeleton className="size-10 animate-pulse rounded-full text-center leading-10" />
-        ) : data ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="focus:outline-none">
-              <Avatar>
-                <AvatarImage src={data.user?.image ?? ""} />
-                <AvatarFallback>
-                  {processTeamName(data?.user?.name ?? "")}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{data.user?.name}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()}>
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <GoogleButton />
-        )}
 
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger className="mr-4 md:hidden">
-            <Menu />
-          </SheetTrigger>
+          <div className="flex gap-3">
+            {status === "loading" ? (
+              <Skeleton className="size-10 animate-pulse rounded-full text-center leading-10" />
+            ) : data ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="focus:outline-none">
+                  <Avatar>
+                    <AvatarImage src={data.user?.image ?? ""} />
+                    <AvatarFallback>
+                      {processTeamName(data?.user?.name ?? "")}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>{data.user?.name}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <GoogleButton />
+            )}
+            <SheetTrigger className="md:hidden">
+              <Menu />
+            </SheetTrigger>
+          </div>
           <SheetContent>
             <SheetHeader className="mb-4 text-left">
               <Link href="/">
