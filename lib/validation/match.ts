@@ -33,6 +33,7 @@ export const updateMatchSchema = z.object({
   teamIds: z.array(z.string()).optional(),
   strikeIndex: z.number().optional(),
   hasEnded: z.boolean().optional(),
+  allowSinglePlayer: z.boolean().optional(),
 });
 
 export type UpdateMatchSchema = z.infer<typeof updateMatchSchema>;

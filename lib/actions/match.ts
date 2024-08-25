@@ -166,6 +166,7 @@ export async function updateMatch(data: UpdateMatchSchema) {
     overs,
     strikeIndex,
     hasEnded,
+    allowSinglePlayer,
   } = parsedRes.data;
 
   try {
@@ -184,6 +185,7 @@ export async function updateMatch(data: UpdateMatchSchema) {
         curTeam,
         strikeIndex,
         hasEnded,
+        allowSinglePlayer,
       },
       select: { id: true },
     });
