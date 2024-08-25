@@ -21,7 +21,6 @@ import {
 import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
-import LoadingButton from "../ui/loading-button";
 
 import PlayerLabel from "./PlayerLabel";
 
@@ -30,9 +29,7 @@ interface SelectBatsmanProps {
   setOpen?: Dispatch<SetStateAction<boolean>>;
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
-  setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleUndo?: () => void;
-  isUpdatingMatch: boolean;
   isManualMode?: boolean;
   team: {
     name?: string;
@@ -53,9 +50,7 @@ function SelectBatsman({
   open,
   setOpen,
   handleUndo,
-  setCurPlayers,
   isManualMode,
-  isUpdatingMatch,
   team,
   handleSelectPlayer,
   allowSinglePlayer,
@@ -111,10 +106,9 @@ function SelectBatsman({
           ...newCurPlayers,
           ...curPlayers.filter((player) => data.playerIds.includes(player.id)),
         ];
-    setCurPlayers(payload);
 
+    setOpen?.(false);
     handleSelectPlayer(payload, () => {
-      setOpen?.(false);
       setTimeout(reset, 500);
     });
   }
@@ -130,133 +124,115 @@ function SelectBatsman({
     watch("playerIds");
   }, [watch("playerIds")]);
 
-  // TODO: Fix strike after out
-
   return (
     <Dialog open={open} onOpenChange={isManualMode ? setOpen : undefined}>
       <DialogContent removeCloseButton className="flex flex-col gap-4">
-        {!isLoading ? (
-          <>
-            <div className="flex items-center justify-between">
-              <TypographyH3>
-                Select Batsman - {processTeamName(team?.name ?? "")}
-              </TypographyH3>
-              {!!curPlayers.length && (
-                <Button
-                  variant={isManualMode ? "ghost" : "destructive"}
-                  size={isManualMode ? "icon" : "default"}
-                  onClick={isManualMode ? () => setOpen?.(false) : handleUndo}
-                >
-                  {isManualMode ? <X /> : "Undo"}
-                </Button>
-              )}
-            </div>
-            <Form {...form}>
-              {/* TODO: Search field HERE to filter players */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  disabled={!getValues("playerIds")?.length}
-                  control={form.control}
-                  name="playerIds"
-                  render={() => (
-                    <FormItem>
-                      <div className="h-96 overflow-auto">
-                        {players?.map((item) => (
-                          <FormField
-                            key={item.id}
-                            control={control}
-                            name="playerIds"
-                            render={({ field }) => {
-                              const isSelected = field.value.includes(item.id);
-                              const isBothSelected = field.value.length === 2;
-                              const isOut = outPlayers?.includes(item.id);
+        <div className="flex items-center justify-between">
+          <TypographyH3>
+            Select Batsman - {processTeamName(team?.name ?? "")}
+          </TypographyH3>
+          {!!curPlayers.length && (
+            <Button
+              variant={isManualMode ? "ghost" : "destructive"}
+              size={isManualMode ? "icon" : "default"}
+              onClick={isManualMode ? () => setOpen?.(false) : handleUndo}
+            >
+              {isManualMode ? <X /> : "Undo"}
+            </Button>
+          )}
+        </div>
+        <Form {...form}>
+          {/* TODO: Search field HERE to filter players */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              disabled={!getValues("playerIds")?.length}
+              control={form.control}
+              name="playerIds"
+              render={() => (
+                <FormItem>
+                  <div className="max-h-96 overflow-auto">
+                    {players?.map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={control}
+                        name="playerIds"
+                        render={({ field }) => {
+                          const isSelected = field.value.includes(item.id);
+                          const isBothSelected = field.value.length === 2;
+                          const isOut = outPlayers?.includes(item.id);
 
-                              const sortedCurPlayers = curPlayers?.sort(
-                                (a, b) => a.type.localeCompare(b.type),
-                              );
-                              const isAlreadyPlaying =
-                                sortedCurPlayers[0]?.id === item.id;
+                          const sortedCurPlayers = curPlayers?.sort((a, b) =>
+                            a.type.localeCompare(b.type),
+                          );
+                          const isAlreadyPlaying =
+                            sortedCurPlayers[0]?.id === item.id;
 
-                              return (
-                                <FormItem key={item.id}>
-                                  <FormControl>
-                                    <Checkbox
-                                      className="sr-only"
-                                      checked={field.value.includes(item.id)}
-                                      onCheckedChange={(checked) => {
-                                        if (isAlreadyPlaying && !isManualMode) {
-                                          toast.info(
-                                            "Player is already playing",
-                                            {
-                                              description:
-                                                "Go to manual mode to hard change",
-                                            },
-                                          );
-                                          return;
-                                        }
-                                        if (
-                                          (isBothSelected && !isSelected) ||
-                                          isOut
-                                        )
-                                          return;
-
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              item.id,
-                                            ])
-                                          : field.onChange(
-                                              field.value.filter(
-                                                (value) => value !== item.id,
-                                              ),
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
-
-                                  <PlayerLabel
-                                    title={item.name}
-                                    isSelected={isSelected}
-                                    isOpacityDown={
+                          return (
+                            <FormItem key={item.id}>
+                              <FormControl>
+                                <Checkbox
+                                  className="sr-only"
+                                  checked={field.value.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    if (isAlreadyPlaying && !isManualMode) {
+                                      toast.info("Player is already playing", {
+                                        description:
+                                          "Go to manual mode to hard change",
+                                      });
+                                      return;
+                                    }
+                                    if (
                                       (isBothSelected && !isSelected) ||
-                                      (isAlreadyPlaying && !isManualMode)
-                                    }
-                                    isBrightnessDown={isOut}
-                                    subTitle={
                                       isOut
-                                        ? "Out"
-                                        : Array.from(
-                                            { length: 2 },
-                                            (_: unknown, i) =>
-                                              field.value?.[i] === item.id &&
-                                              playerPositions[i],
-                                          )
-                                    }
-                                  />
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <LoadingButton
-                  loading={isUpdatingMatch}
-                  disabled={isUpdatingMatch}
-                >
-                  Submit
-                </LoadingButton>
-              </form>
-            </Form>
-          </>
-        ) : (
-          <div className="text-center">
-            <TypographyH3>Updating Innings...</TypographyH3>
-          </div>
-        )}
+                                    )
+                                      return;
+
+                                    return checked
+                                      ? field.onChange([
+                                          ...field.value,
+                                          item.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value.filter(
+                                            (value) => value !== item.id,
+                                          ),
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+
+                              <PlayerLabel
+                                title={item.name}
+                                isSelected={isSelected}
+                                isOpacityDown={
+                                  (isBothSelected && !isSelected) ||
+                                  (isAlreadyPlaying && !isManualMode)
+                                }
+                                isBrightnessDown={isOut}
+                                subTitle={
+                                  isOut
+                                    ? "Out"
+                                    : Array.from(
+                                        { length: 2 },
+                                        (_: unknown, i) =>
+                                          field.value?.[i] === item.id &&
+                                          playerPositions[i],
+                                      )
+                                }
+                              />
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button>Submit</Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

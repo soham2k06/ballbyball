@@ -19,16 +19,13 @@ import { Button } from "../ui/button";
 import { TypographyH3 } from "../ui/typography";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { X } from "lucide-react";
-import LoadingButton from "../ui/loading-button";
 import PlayerLabel from "./PlayerLabel";
 
 interface SelectBowlerProps {
   open: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   curPlayers: CurPlayer[];
-  setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
   handleUndo?: () => void;
-  isUpdatingMatch: boolean;
   isManualMode?: boolean;
   team: {
     name?: string;
@@ -42,8 +39,6 @@ function SelectBowler({
   setOpen,
   handleUndo,
   curPlayers,
-  setCurPlayers,
-  isUpdatingMatch,
   isManualMode,
   team,
   handleSelectPlayer,
@@ -78,10 +73,8 @@ function SelectBowler({
       newBowler,
     ];
 
-    setCurPlayers(newCurPlayers);
-
+    setOpen?.(false);
     handleSelectPlayer(newCurPlayers, () => {
-      setOpen && setOpen(false);
       setTimeout(reset, 500);
     });
   }
@@ -154,12 +147,7 @@ function SelectBowler({
                   </FormItem>
                 )}
               />
-              <LoadingButton
-                loading={isUpdatingMatch}
-                disabled={isUpdatingMatch}
-              >
-                Submit
-              </LoadingButton>
+              <Button>Submit</Button>
             </form>
           </Form>
         </div>

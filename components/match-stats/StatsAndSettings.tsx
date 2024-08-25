@@ -54,8 +54,7 @@ function StatsAndSettings({
   }>({ index: 0 });
 
   const { mutate: createBallEvent } = useActionMutate(saveBallEvents);
-  const { mutate: updateMutate, isPending: isUpdatingMatch } =
-    useActionMutate(updateMatch);
+  const { mutate: updateMutate } = useActionMutate(updateMatch);
 
   const curTeam = match?.teams[match.curTeam];
   const opposingTeam = match?.teams[match.curTeam === 0 ? 1 : 0];
@@ -92,6 +91,7 @@ function StatsAndSettings({
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
     if (!match?.id) return;
 
+    setCurPlayers(payload);
     updateMutate(
       { id: match.id, curPlayers: payload },
       {
@@ -139,10 +139,8 @@ function StatsAndSettings({
               open={showSelectBatsman}
               setOpen={setShowSelectBatsman}
               curPlayers={curPlayers}
-              setCurPlayers={setCurPlayers}
               events={events}
               isManualMode
-              isUpdatingMatch={isUpdatingMatch}
               handleSelectPlayer={(payload) => {
                 handleSelectPlayer(payload, () => {
                   setShowSelectBatsman(false);
@@ -169,9 +167,7 @@ function StatsAndSettings({
               open={showSelectBowler}
               setOpen={setShowSelectBowler}
               curPlayers={curPlayers}
-              setCurPlayers={setCurPlayers}
               isManualMode
-              isUpdatingMatch={isUpdatingMatch}
               handleSelectPlayer={(payload) => {
                 handleSelectPlayer(payload, () => {
                   setShowSelectBatsman(false);
