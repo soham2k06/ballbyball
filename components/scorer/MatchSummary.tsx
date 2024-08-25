@@ -142,52 +142,39 @@ function MatchSummary({
     };
   });
 
-  const topPerformants = playersPerformance
-    .filter((player) => player.team === teams[0].name && player.ballsFaced)
-    .sort((a, b) => b.runsScored - a.runsScored)
-    .slice(0, 2)
-    .map((player) => ({
-      ...player,
-      type: "batsman",
-      name: match?.teams[0].players.find(({ id }) => id === player.playerId)
-        ?.name,
-    }))
-    .concat(
-      playersPerformance
-        .filter((player) => player.team === teams[1].name && player.ballsFaced)
-        .sort((a, b) => b.runsScored - a.runsScored)
-        .slice(0, 2)
-        .map((player) => ({
-          ...player,
-          type: "batsman",
-          name: match?.teams[1].players.find(({ id }) => id === player.playerId)
-            ?.name,
-        })),
-    )
-    .concat(
-      playersPerformance
-        .filter((player) => player.team === teams[0].name && player.ballsBowled)
-        .sort((a, b) => b.wicketsTaken - a.wicketsTaken)
-        .slice(0, 2)
-        .map((player) => ({
-          ...player,
-          type: "bowler",
-          name: match?.teams[0].players.find(({ id }) => id === player.playerId)
-            ?.name,
-        })),
-    )
-    .concat(
-      playersPerformance
-        .filter((player) => player.team === teams[1].name && player.ballsBowled)
-        .sort((a, b) => b.wicketsTaken - a.wicketsTaken)
-        .slice(0, 2)
-        .map((player) => ({
-          ...player,
-          type: "bowler",
-          name: match?.teams[1].players.find(({ id }) => id === player.playerId)
-            ?.name,
-        })),
-    );
+  const topPerformants = [
+    ...getTopPerformants(teams[0].name ?? "", "batsman", 3),
+    ...getTopPerformants(teams[1].name ?? "", "batsman", 3),
+    ...getTopPerformants(teams[0].name ?? "", "bowler", 3),
+    ...getTopPerformants(teams[1].name ?? "", "bowler", 3),
+  ];
+
+  function getTopPerformants(
+    teamName: string,
+    type: "batsman" | "bowler",
+    count: number,
+  ) {
+    return playersPerformance
+      .filter(
+        (player) =>
+          player.team === teamName &&
+          player[type === "batsman" ? "ballsFaced" : "ballsBowled"],
+      )
+      .sort((a, b) =>
+        type === "batsman"
+          ? b.runsScored - a.runsScored
+          : a.runConceded - b.runConceded,
+      )
+      .sort((a, b) => b.wicketsTaken - a.wicketsTaken)
+      .slice(0, count)
+      .map((player) => ({
+        ...player,
+        type,
+        name: match?.teams
+          .find((team) => team.name === teamName)
+          ?.players.find(({ id }) => id === player.playerId)?.name,
+      }));
+  }
 
   const playerOfTheMatchData = calculatePlayerOfTheMatch({
     playersPerformance,

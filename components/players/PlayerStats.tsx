@@ -27,7 +27,6 @@ function PlayerStats({
     ) / 100;
 
   const outTimes = data?.batting.wickets;
-  const isNotOutYet = outTimes === 0;
   const batAverage = (data?.batting.runs ?? 0) / (outTimes ?? 0) ?? 0;
 
   const economy = ((data?.bowling.runs ?? 0) / (data?.bowling.balls ?? 0)) * 6;
@@ -54,9 +53,8 @@ function PlayerStats({
               <div className="grid grid-cols-3 gap-1">
                 <Stat data={data.batting.runs} dataKey="Runs" />
                 <Stat
-                  data={matchesPlayed ? round(batAverage) : "-"}
+                  data={matchesPlayed && batAverage ? round(batAverage) : "-"}
                   dataKey="Average"
-                  showStar={isNotOutYet && (matchesPlayed ?? 0) > 0}
                 />
                 <Stat
                   data={data.batting.balls ? batStrikeRate : "-"}
@@ -64,7 +62,10 @@ function PlayerStats({
                 />
                 <Stat data={data.batting.fifties} dataKey="Fifties" />
                 <Stat data={data.batting.centuries} dataKey="Centuries" />
-                <Stat data={data.batting.highestScore} dataKey="High. Score" />
+                <Stat
+                  data={`${data.batting.highestScore}${data.batting.isNotoutOnHighestScore ? "*" : ""}`}
+                  dataKey="High. Score"
+                />
               </div>
             </div>
             <div className="overflow-hidden rounded-xl">

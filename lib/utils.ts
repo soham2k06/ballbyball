@@ -202,16 +202,19 @@ function processTeamName(input: string) {
 
 function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
   const fallOfWickets = [];
+  const validBalls = ballsThrown.filter((ball) => getIsvalidBall(ball.type));
 
-  for (let i = 0; i < ballsThrown.length; i++) {
-    const ball = ballsThrown[i];
+  for (let i = 0; i < validBalls.length; i++) {
+    const ball = validBalls[i];
+
     if (ball.type.includes("-1")) {
       const scoreAtWicket = calcRuns(
-        ballsThrown.map(({ type }) => type).slice(0, i + 1),
+        validBalls.map(({ type }) => type).slice(0, i + 1),
       );
       const outBatsman = players.find(
         (player) => player.id === ball.batsmanId,
       )?.name;
+
       fallOfWickets.push({
         score: scoreAtWicket,
         ball: i + 1,
@@ -240,11 +243,19 @@ function calculatePlayerOfTheMatch({
   };
 
   const WICKET_POINT = 20;
-  const STRIKE_RATE_POINT = 1;
+  const STRIKE_RATE_POINT = 1.1;
   const WINNER_POINT = 1.25;
 
   playersPerformance.forEach((player) => {
     const strikeRate = (player.runsScored / player.ballsFaced) * 100;
+
+    function calculateEconomyScore(economyRate: number, balls: number) {
+      if (balls < 12) return 1;
+      const score = 1 * ((36 - economyRate) / (36 - 1));
+      return Math.max(0, Math.min(2, score));
+    }
+    const economy = (player.runConceded / player.ballsBowled) * 6;
+    const economyScore = calculateEconomyScore(economy, player.ballsBowled);
 
     const performanceScore =
       player.runsScored + player.wicketsTaken * WICKET_POINT;
@@ -252,7 +263,8 @@ function calculatePlayerOfTheMatch({
     const adjustedPerformanceScore =
       performanceScore *
       (((strikeRate || 100) / 100) * STRIKE_RATE_POINT) *
-      (player.isWinner ? WINNER_POINT : 1);
+      (player.isWinner ? WINNER_POINT : 1) *
+      economyScore;
 
     if (adjustedPerformanceScore > bestPerformance) {
       bestPerformance = adjustedPerformanceScore;
@@ -390,20 +402,24 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
   let fifties = 0;
   let centuries = 0;
   let highestScore = 0;
+  let isNotout = false;
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
 
-    const { runs } = getScore(
+    const { runs, wickets } = getScore(
       matchEvents.map((event) => event.type),
       true,
     );
 
     if (runs >= 50 && runs < 100) fifties++;
     if (runs >= 100) centuries++;
-    if (runs > highestScore) highestScore = runs;
+    if (runs > highestScore) {
+      highestScore = runs;
+      isNotout = wickets === 0;
+    }
   }
 
-  return { fifties, centuries, highestScore };
+  return { fifties, centuries, highestScore, isNotout };
 }
 
 function handleError(err: unknown) {

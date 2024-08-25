@@ -46,6 +46,7 @@ type PlayerStats = {
     fifties: number;
     centuries: number;
     highestScore: number;
+    isNotoutOnHighestScore: boolean;
   };
   bowling: {
     runs: number;

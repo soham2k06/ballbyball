@@ -27,7 +27,8 @@ export async function GET(
       groupedMatches[matchId].push(event);
     }
 
-    const { fifties, centuries, highestScore } = calcMilestones(groupedMatches);
+    const { fifties, centuries, highestScore, isNotout } =
+      calcMilestones(groupedMatches);
 
     const battingEvents = battingEventsExtended.map((event) => event.type);
 
@@ -72,7 +73,13 @@ export async function GET(
 
     const playerStats = {
       matchesPlayed,
-      batting: { ...battingStats, fifties, centuries, highestScore },
+      batting: {
+        ...battingStats,
+        fifties,
+        centuries,
+        highestScore,
+        isNotoutOnHighestScore: isNotout,
+      },
       bowling: bowlingStats,
     };
 
