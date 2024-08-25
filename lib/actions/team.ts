@@ -86,7 +86,7 @@ export async function createMultipleTeams(data: CreateTeamSchema[]) {
 
   try {
     await Promise.all(
-      data.map(async ({ name, playerIds, captain }) => {
+      data.reverse().map(async ({ name, playerIds, captain }) => {
         const newName = await createOrUpdateWithUniqueName(name, prisma.team);
 
         return prisma.team.create({

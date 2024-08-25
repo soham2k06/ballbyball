@@ -6,20 +6,26 @@ const curPlayer = z.object({
 });
 
 export const createMatchSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  desc: z.string().optional(),
+  name: z
+    .string({ required_error: "Name is required" })
+    .min(1, { message: "Name is required" }),
   teamIds: z
     .array(z.string())
-    .min(2, { message: "Select exact two teams" })
-    .max(2, { message: "Select exact two teams" }),
-  overs: z.number().min(1).max(50),
+    .min(2, { message: "Select only 2 teams" })
+    .max(2, { message: "Select only 2 teams" }),
+  overs: z
+    .number({
+      required_error: "Overs is required",
+      invalid_type_error: "Overs is required",
+    })
+    .min(1, "Overs must be greater than 0")
+    .max(50),
   curPlayers: z.array(curPlayer).optional(),
   allowSinglePlayer: z.boolean().optional(),
-
-  // TODO: not optional in future when we add input for it
-  curTeam: z.number().min(0).max(1).optional(),
-  date: z.date().optional(),
-  time: z.date().optional(),
+  curTeam: z
+    .number({ required_error: "Please select batting first team" })
+    .min(0)
+    .max(1),
 });
 
 export type CreateMatchSchema = z.infer<typeof createMatchSchema>;

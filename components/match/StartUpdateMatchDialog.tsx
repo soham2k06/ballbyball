@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -33,6 +33,13 @@ import LoadingButton from "@/components/ui/loading-button";
 import { useActionMutate, useValidateMatchData } from "@/lib/hooks";
 import PlayerLabel from "../players-selection/PlayerLabel";
 import { createMatch, updateMatch } from "@/lib/actions/match";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
@@ -58,25 +65,25 @@ function StartUpdateMatchDialog({
     handleSubmit,
     control,
     reset,
-    setValue,
     formState: { isDirty },
   } = form;
-
-  const [isOversDirty, setIsOversDirty] = useState(false);
 
   const { mutate: createMutate, isPending: isCreating } =
     useActionMutate(createMatch);
   const { mutate: updateMutate, isPending: isUpdating } =
     useActionMutate(updateMatch);
 
+  const watchedTeamIds = form.watch("teamIds") || [];
+  const selectedTeams = watchedTeamIds.map((id) =>
+    teams.find((team) => team.id === id),
+  );
+
   const { containsSamePlayer, isDifferentPlayerLengthTeams } =
-    useValidateMatchData(form.watch("teamIds") || []);
+    useValidateMatchData((watchedTeamIds ?? []) || []);
 
   const isPending = isCreating || isUpdating;
 
   async function onSubmit(data: CreateMatchSchema | UpdateMatchSchema) {
-    // TODO: Create Input for curTeam
-
     if (matchToUpdate) {
       updateMutate(
         { ...data, id: matchToUpdate.id },
@@ -90,40 +97,28 @@ function StartUpdateMatchDialog({
 
       return;
     }
-    createMutate(
-      {
-        curTeam: 0,
-        ...(data as CreateMatchSchema),
+    createMutate(data as CreateMatchSchema, {
+      onSuccess: () => {
+        reset();
+        setOpen(false);
       },
-      {
-        onSuccess: () => {
-          reset();
-          setOpen(false);
-        },
-      },
-    );
+    });
   }
 
   useEffect(() => {
-    if (open && matchToUpdate) reset(matchToUpdate);
+    if (open && matchToUpdate) {
+      reset(matchToUpdate);
+    }
   }, [open, matchToUpdate]);
-
-  useEffect(() => {
-    if (matchToUpdate)
-      setIsOversDirty(form.watch("overs") !== matchToUpdate?.overs);
-  }, [form.watch("overs")]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="rounded-md p-0">
-        <DialogHeader className="p-4">
+        <DialogHeader>
           <DialogTitle>{matchToUpdate ? "Update" : "Start"} Match</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-3 p-4 pt-0"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={control}
               name="name"
@@ -138,63 +133,91 @@ function StartUpdateMatchDialog({
               )}
             />
 
-            {!matchToUpdate && (
-              <FormField
-                control={form.control}
-                name="teamIds"
-                render={() => (
-                  <FormItem>
-                    <div className="mb-4">
-                      <FormLabel className="text-base">Teams</FormLabel>
-                      <FormDescription>
-                        First team selected will be batting first
-                      </FormDescription>
-                    </div>
-                    <ul className="grid max-h-96 grid-cols-2 gap-2 overflow-auto">
-                      {teams?.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={control}
-                          name="teamIds"
-                          render={({ field }) => {
-                            const isSelected = field.value?.includes(item.id);
+            <FormField
+              control={form.control}
+              name="teamIds"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Teams</FormLabel>
+                  <ul className="grid max-h-96 grid-cols-2 gap-2 overflow-auto">
+                    {teams?.map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={control}
+                        name="teamIds"
+                        render={({ field }) => {
+                          const isSelected = field.value?.includes(item.id);
 
-                            return (
-                              <FormItem key={item.id} className="space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    className="sr-only"
-                                    checked={field.value?.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([
-                                            ...(field.value ?? []),
-                                            item.id,
-                                          ])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.id,
-                                            ),
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-
-                                <PlayerLabel
-                                  title={item.name}
-                                  isSelected={isSelected}
+                          return (
+                            <FormItem key={item.id} className="space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  className="sr-only"
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([
+                                          ...(field.value ?? []),
+                                          item.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== item.id,
+                                          ),
+                                        );
+                                  }}
                                 />
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))}
-                    </ul>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+                              </FormControl>
+
+                              <PlayerLabel
+                                title={item.name}
+                                isSelected={isSelected}
+                              />
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </ul>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={control}
+              name="curTeam"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Batting First Team</FormLabel>
+                  <FormControl>
+                    <Select
+                      defaultValue={
+                        matchToUpdate ? String(matchToUpdate?.curTeam) : ""
+                      }
+                      onValueChange={(val) => {
+                        field.onChange(val ? parseInt(val) : 0);
+                      }}
+                      disabled={!(watchedTeamIds ?? []).length}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select the team that'll bat first" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {selectedTeams.map((team, i) => (
+                          <SelectItem value={String(i)}>
+                            {team?.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -204,7 +227,6 @@ function StartUpdateMatchDialog({
                 max: { value: 50, message: "Enter Maximum 50 overs" },
               }}
               render={({ field }) => {
-                const { onChange, ...rest } = field;
                 return (
                   <FormItem>
                     <FormLabel>Overs</FormLabel>
@@ -212,10 +234,10 @@ function StartUpdateMatchDialog({
                       <Input
                         placeholder="Match Overs"
                         type="number"
+                        {...field}
                         onChange={(e) =>
-                          setValue("overs", parseInt(e.target.value))
+                          field.onChange(parseInt(e.target.value) || 0)
                         }
-                        {...rest}
                       />
                     </FormControl>
                     <FormMessage />
@@ -237,7 +259,7 @@ function StartUpdateMatchDialog({
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      Allow single player
+                      <p>Allow single player</p>
                       <FormDescription>
                         It will not be declared all out if only one player is
                         left
@@ -270,7 +292,7 @@ function StartUpdateMatchDialog({
             <DialogFooter>
               <LoadingButton
                 type="submit"
-                disabled={isPending || (!isDirty && !isOversDirty)}
+                disabled={isPending || !isDirty}
                 loading={isPending}
               >
                 {isPending

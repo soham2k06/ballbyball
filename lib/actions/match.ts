@@ -26,6 +26,7 @@ export async function getAllMatches() {
       hasEnded: true,
       overs: true,
       createdAt: true,
+      curTeam: true,
       ballEvents: {
         select: { batsmanId: true, type: true },
         orderBy: { id: "asc" },
@@ -116,6 +117,8 @@ export async function createMatch(data: CreateMatchSchema) {
   const { name, teamIds, curTeam, overs, curPlayers, allowSinglePlayer } =
     parsedRes.data;
 
+  const newTeams = curTeam === 0 ? teamIds : teamIds.reverse();
+
   try {
     const newName = await createOrUpdateWithUniqueName(name, prisma.team);
 
@@ -123,13 +126,13 @@ export async function createMatch(data: CreateMatchSchema) {
       data: {
         userId,
         name: newName,
-        matchTeams: {
-          create: teamIds.reverse().map((teamId) => ({
-            team: { connect: { id: teamId } },
-          })),
-        },
         curPlayers,
-        curTeam: curTeam ?? 0,
+        curTeam: 0,
+        matchTeams: {
+          createMany: {
+            data: newTeams.map((teamId) => ({ teamId })),
+          },
+        },
         overs,
         allowSinglePlayer,
       },
