@@ -18,6 +18,7 @@ import AddUpdateTeamDialog from "./AddUpdateTeamDialog";
 import Team from "./Team";
 import { useActionMutate } from "@/lib/hooks";
 import { deleteTeam } from "@/lib/actions/team";
+import TeamBuilder from "./team-builder";
 
 function TeamList({
   teams,
@@ -84,8 +85,8 @@ function TeamList({
       ) : (
         <EmptyState document="teams" />
       )}
+      <TeamBuilder players={players} />
       <CreateTeam players={players} />
-
       <AddUpdateTeamDialog
         players={players}
         open={!!teamToUpdate}

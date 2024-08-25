@@ -22,8 +22,6 @@ function AddPlayerButton({ players }: { players: Player[] }) {
 
   const [showCreateTeam, setShowCreateTeam] = useState(false);
 
-  // TODO: Create two teams with auto spreading players on two teams
-
   return (
     <>
       <Button
@@ -32,7 +30,7 @@ function AddPlayerButton({ players }: { players: Player[] }) {
           else setOpen(true);
         }}
       >
-        Add
+        Add single
       </Button>
 
       <CreateTeamDialog open={open} setOpen={setOpen} players={players} />

@@ -13,7 +13,6 @@ import {
   updateTeamSchema,
   UpdateTeamSchema,
 } from "../validation/team";
-import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 export async function getAllTeams() {
@@ -53,7 +52,7 @@ export async function createTeam(data: CreateTeamSchema) {
 
   if (!parsedRes.success) {
     console.error(parsedRes.error);
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    throw new Error("Invalid input");
   }
 
   const { name, playerIds, captain } = parsedRes.data;
@@ -73,6 +72,37 @@ export async function createTeam(data: CreateTeamSchema) {
         ...(captain && { captain }),
       },
     });
+
+    revalidatePath("/teams");
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+export async function createMultipleTeams(data: CreateTeamSchema[]) {
+  const userId = await getValidatedUser();
+
+  if (!data.length) throw new Error("Invalid input");
+
+  try {
+    await Promise.all(
+      data.map(async ({ name, playerIds, captain }) => {
+        const newName = await createOrUpdateWithUniqueName(name, prisma.team);
+
+        return prisma.team.create({
+          data: {
+            userId,
+            name: newName,
+            teamPlayers: {
+              create: playerIds.reverse().map((playerId: string) => ({
+                player: { connect: { id: playerId } },
+              })),
+            },
+            ...(captain && { captain }),
+          },
+        });
+      }),
+    );
 
     revalidatePath("/teams");
   } catch (error) {
