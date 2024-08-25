@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -247,6 +248,25 @@ function StartUpdateMatchDialog({
               )}
             />
 
+            <DialogDescription>
+              {(form.watch("teamIds")?.length ?? 0) >= 2 && (
+                <>
+                  {containsSamePlayer && (
+                    <p className="text-sm text-destructive">
+                      Both teams should not have same player, it may lead to
+                      bugs.
+                    </p>
+                  )}
+                  {isDifferentPlayerLengthTeams && (
+                    <p className="text-sm text-destructive">
+                      Both teams should have same number of players, please look
+                      into it.
+                    </p>
+                  )}
+                </>
+              )}
+            </DialogDescription>
+
             <DialogFooter>
               <LoadingButton
                 type="submit"
@@ -264,15 +284,6 @@ function StartUpdateMatchDialog({
             </DialogFooter>
           </form>
         </Form>
-
-        {(form.watch("teamIds")?.length ?? 0) >= 2 && (
-          <>
-            {containsSamePlayer &&
-              "Both teams can't have same player, please look into it."}
-            {isDifferentPlayerLengthTeams &&
-              "Both teams should have same number of players, please look into it."}
-          </>
-        )}
       </DialogContent>
     </Dialog>
   );
