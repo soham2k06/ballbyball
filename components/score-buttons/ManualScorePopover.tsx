@@ -35,7 +35,7 @@ function ManualScorePopover({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const ballEvents = [
-    { type: "-4", label: "Swap Strike" },
+    { type: "-4", label: "Manual Strike" },
     { type: "3", label: "3" },
     { type: "5", label: "5" },
   ];

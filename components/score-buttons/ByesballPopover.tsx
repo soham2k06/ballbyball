@@ -54,7 +54,7 @@ function ByesballPopover({
                   setIsPopoverOpen(false);
                 }}
               >
-                {event !== "-4" ? event : "Swap Strike"}
+                {event !== "-4" ? event : "Manual Strike"}
               </Button>
             ))}
         </div>
