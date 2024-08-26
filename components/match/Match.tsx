@@ -65,7 +65,9 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
         <CardTitle>{match.name}</CardTitle>
         <div className="flex items-center space-x-4">
           <Button asChild>
-            <Link href={`/match/${match.id}`}>Play</Link>
+            <Link href={`/match/${match.id}`}>
+              {!match.hasEnded ? "Play" : "Summary"}
+            </Link>
           </Button>
 
           <DropdownMenu>
@@ -118,11 +120,10 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
         {match.hasEnded && (
           <CardDescription className="mt-3">{winInfo}</CardDescription>
         )}
-        <CardDescription className="absolute bottom-3 right-3 text-right">
+        <CardDescription className="absolute bottom-2 right-2 text-right sm:bottom-3 sm:right-3">
           Started at <br />{" "}
           {Intl.DateTimeFormat("en-IN", {
             dateStyle: "short",
-            timeStyle: "short",
           }).format(new Date(match.createdAt))}
         </CardDescription>
       </CardContent>

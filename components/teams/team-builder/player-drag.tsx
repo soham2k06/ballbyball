@@ -22,7 +22,7 @@ export const PlayerDrag = memo(function Player({
   return (
     <li
       ref={drag}
-      className="select-none rounded-md border bg-card p-1 text-sm"
+      className="select-none rounded-md border bg-card px-2 py-3 text-sm"
       style={{ opacity }}
     >
       {player.name}

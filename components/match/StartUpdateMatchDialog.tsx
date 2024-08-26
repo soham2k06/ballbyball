@@ -31,7 +31,6 @@ import {
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/ui/loading-button";
 import { useActionMutate, useValidateMatchData } from "@/lib/hooks";
-import PlayerLabel from "../players-selection/PlayerLabel";
 import { createMatch, updateMatch } from "@/lib/actions/match";
 import {
   Select,
@@ -40,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { cn } from "@/lib/utils";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
@@ -113,7 +113,7 @@ function StartUpdateMatchDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="rounded-md p-0">
+      <DialogContent className="max-h-[90%] overflow-y-auto rounded-md">
         <DialogHeader>
           <DialogTitle>{matchToUpdate ? "Update" : "Start"} Match</DialogTitle>
         </DialogHeader>
@@ -139,8 +139,8 @@ function StartUpdateMatchDialog({
               render={() => (
                 <FormItem>
                   <FormLabel>Teams</FormLabel>
-                  <ul className="grid max-h-96 grid-cols-2 gap-2 overflow-auto">
-                    {teams?.map((item) => (
+                  <ul className="grid max-h-32 grid-cols-3 gap-2 overflow-auto">
+                    {(teams ?? []).map((item) => (
                       <FormField
                         key={item.id}
                         control={control}
@@ -148,10 +148,14 @@ function StartUpdateMatchDialog({
                         render={({ field }) => {
                           const isSelected = field.value?.includes(item.id);
 
+                          const disabled =
+                            (field.value ?? "").length >= 2 && !isSelected;
+
                           return (
                             <FormItem key={item.id} className="space-y-0">
                               <FormControl>
                                 <Checkbox
+                                  disabled={disabled}
                                   className="sr-only"
                                   checked={field.value?.includes(item.id)}
                                   onCheckedChange={(checked) => {
@@ -169,10 +173,19 @@ function StartUpdateMatchDialog({
                                 />
                               </FormControl>
 
-                              <PlayerLabel
-                                title={item.name}
-                                isSelected={isSelected}
-                              />
+                              <FormLabel
+                                className={cn(
+                                  "inline-block w-full cursor-pointer truncate rounded bg-muted p-1 text-sm font-normal",
+                                  {
+                                    "bg-emerald-500 font-black text-emerald-950":
+                                      isSelected,
+                                    "opacity-25": disabled,
+                                  },
+                                )}
+                                aria-disabled={disabled}
+                              >
+                                {item.name}
+                              </FormLabel>
                             </FormItem>
                           );
                         }}
@@ -289,7 +302,7 @@ function StartUpdateMatchDialog({
               )}
             </DialogDescription>
 
-            <DialogFooter>
+            <DialogFooter className="sticky bottom-0">
               <LoadingButton
                 type="submit"
                 disabled={isPending || !isDirty}
