@@ -85,7 +85,7 @@ async function page() {
               <Link href="/players">Start with players</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/guide">Instant scoring</Link>
+              <Link href="/scorer">Instant scoring</Link>
             </Button>
           </div>
         </div>
