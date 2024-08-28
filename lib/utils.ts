@@ -60,7 +60,7 @@ function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
   ).length;
 
   const wickets = calcWickets(balls);
-  const runRate = Number(totalBalls ? ((runs / totalBalls) * 6).toFixed(2) : 0);
+  const runRate = totalBalls ? round((runs / totalBalls) * 6) : 0;
 
   const extras = balls
     .filter(
@@ -422,6 +422,41 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
   return { fifties, centuries, highestScore, isNotout };
 }
 
+function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {
+  let threes = 0;
+  let fives = 0;
+  for (const matchId in groupedMatches) {
+    const matchEvents = groupedMatches[matchId];
+
+    const { wickets } = getScore(
+      matchEvents.map((event) => event.type),
+      true,
+    );
+
+    if (wickets === 3 || wickets === 4) threes++;
+    if (wickets >= 5) fives++;
+  }
+
+  return { threes, fives };
+}
+
+function calcBestSpells(data: EventType[][], topN: number = 1) {
+  const playerStats = data.map((balls) => getScore(balls));
+
+  playerStats.sort((a, b) => {
+    if (b.wickets === a.wickets) return a.runRate - b.runRate;
+    return b.wickets - a.wickets;
+  });
+
+  return playerStats
+    .map((spell) => ({
+      runs: spell.runs,
+      balls: spell.totalBalls,
+      wickets: spell.wickets,
+    }))
+    .slice(0, topN);
+}
+
 function handleError(err: unknown) {
   if (err instanceof Error) throw new Error(err.message);
   else throw new Error("Something went wrong!");
@@ -452,10 +487,12 @@ export {
   getIsNotOut,
   toastError,
   round,
+  calcBestSpells,
   // Backend
   getValidatedUser,
   createOrUpdateWithUniqueName,
   calcMilestones,
+  calcWicketHauls,
   handleError,
   checkSession,
 };

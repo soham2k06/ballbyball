@@ -47,12 +47,29 @@ type PlayerStats = {
     centuries: number;
     highestScore: number;
     isNotoutOnHighestScore: boolean;
+    boundaryRate: number;
+    dotsPlayed: number;
+    singles: number;
+    twos: number;
+    fours: number;
+    sixes: number;
   };
   bowling: {
     runs: number;
     balls: number;
     wickets: number;
     maidenOvers: number;
+    dotBalls: number;
+    dotBallsRate: number;
+    bestSpell: {
+      wickets: number;
+      runs: number;
+      balls: number;
+    };
+    extras: number;
+    economy: number;
+    fiveHauls: number;
+    threeHauls: number;
   };
   matchesPlayed: number;
 };

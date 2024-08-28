@@ -98,8 +98,10 @@ model Player {
   teamId      String?      @db.ObjectId
   teamPlayers TeamPlayer[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  playerBatEvents  BallEvent[] @relation("playerBatsman")
+  playerBallEvents BallEvent[] @relation("playerBowler")
 
   @@map("players")
 }
@@ -142,7 +144,9 @@ model MatchTeam {
 model BallEvent {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   userId    String
+  batsman   Player  @relation("playerBatsman", fields: [batsmanId], references: [id])
   batsmanId String  @db.ObjectId
+  bowler    Player  @relation("playerBowler", fields: [bowlerId], references: [id])
   bowlerId  String  @db.ObjectId
   type      String
   Match     Match?  @relation(fields: [matchId], references: [id])

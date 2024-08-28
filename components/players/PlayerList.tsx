@@ -11,7 +11,7 @@ import EmptyState from "../EmptyState";
 import Player from "./Player";
 import AddPlayerButton from "./AddPlayer";
 import AddEditPlayerFormDialog from "./AddUpdatePlayerDialog";
-import PlayerStats from "./PlayerStats";
+import PlayerStats from "./stats";
 import { Player as PlayerType } from "@prisma/client";
 import { useActionMutate } from "@/lib/hooks";
 import { deletePlayer } from "@/lib/actions/player";
