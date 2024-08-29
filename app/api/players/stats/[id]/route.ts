@@ -67,7 +67,7 @@ export async function GET(
     } = getScore(battingEvents, true);
 
     const noWicketEvents = battingEvents.filter(
-      (event) => !["-1"].includes(event),
+      (event) => !event.includes('-1') && !event.includes('-4'),
     );
 
     const boundaries = runsScored
