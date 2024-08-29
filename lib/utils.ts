@@ -157,7 +157,14 @@ function calculateMaidenOvers(ballsThrown: EventType[]) {
     const ball = ballsThrown[i];
     ballsInCurrentOver++;
 
-    if (!(ball === "0" || ball.includes("-1") || ball.split("_")[3] === "0"))
+    if (
+      !(
+        ball === "0" ||
+        ball.includes("-1") ||
+        ball.split("_")[3] === "0" ||
+        ball.includes("-4")
+      )
+    )
       didRunCome = true;
 
     if (ballsInCurrentOver === 6) {
