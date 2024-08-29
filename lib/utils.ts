@@ -178,6 +178,19 @@ function calculateMaidenOvers(ballsThrown: EventType[]) {
   return maidenOvers;
 }
 
+function mapGroupedMatches(events: BallEvent[]) {
+  const groupedMatches: { [matchId: string]: BallEvent[] } = {};
+  for (const event of events) {
+    const matchId = event.matchId ?? "no-data";
+    if (!groupedMatches[matchId]) {
+      groupedMatches[matchId] = [];
+    }
+    groupedMatches[matchId].push(event);
+  }
+
+  return groupedMatches;
+}
+
 function getOverStr(numBalls: number) {
   return `${Math.floor(numBalls / 6)}${numBalls % 6 ? `.${numBalls % 6}` : ""}`;
 }
@@ -494,6 +507,7 @@ export {
   getIsNotOut,
   toastError,
   round,
+  mapGroupedMatches,
   calcBestSpells,
   // Backend
   getValidatedUser,

@@ -89,6 +89,40 @@ type TopPerformant = PlayerPerformance & {
   name: string;
 };
 
+// type BattingRecordsType = {
+//   player: Player;
+//   runs: number;
+//   innings: number;
+//   matches: number;
+//   average: number;
+//   strikeRate: number;
+//   milestones: {
+//     fifties: number;
+//     centuries: number;
+//     highestScore: number;
+//     isNotout: boolean;
+//   };
+//   fours: number;
+//   sixes: number;
+// };
+
+// type BowlingRecordsType = {
+//   player: Player;
+//   wickets: number;
+//   totalBalls: number;
+//   matches: number;
+//   economy: number;
+//   strikeRate: number;
+//   bestSpell: {
+//     wickets: number;
+//     runs: number;
+//     balls: number;
+//   };
+//   maidens: number;
+//   runsConceded: number;
+//   dots: number;
+// };
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };

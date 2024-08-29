@@ -22,9 +22,10 @@ const navItems = [
   { name: "Matches", href: "/matches" },
   { name: "Teams", href: "/teams" },
   { name: "Players", href: "/players" },
+  { name: "Records", href: "/records" },
   { name: "Instant Scoring", href: "/scorer" },
   { name: "Guide", href: "/guide" },
-] as const
+] as const;
 
 const guideSteps = [
   {

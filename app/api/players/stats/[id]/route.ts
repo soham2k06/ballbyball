@@ -6,23 +6,10 @@ import {
   calculateMaidenOvers,
   calcWicketHauls,
   getScore,
+  mapGroupedMatches,
 } from "@/lib/utils";
 import { EventType } from "@/types";
-import { BallEvent } from "@prisma/client";
 import { NextResponse } from "next/server";
-
-function mapGroupedMatches(events: BallEvent[]) {
-  const groupedMatches: { [matchId: string]: BallEvent[] } = {};
-  for (const event of events) {
-    const matchId = event.matchId ?? "no-data";
-    if (!groupedMatches[matchId]) {
-      groupedMatches[matchId] = [];
-    }
-    groupedMatches[matchId].push(event);
-  }
-
-  return groupedMatches;
-}
 
 export async function GET(
   _: unknown,
@@ -67,7 +54,7 @@ export async function GET(
     } = getScore(battingEvents, true);
 
     const noWicketEvents = battingEvents.filter(
-      (event) => !event.includes('-1') && !event.includes('-4'),
+      (event) => !event.includes("-1") && !event.includes("-4"),
     );
 
     const boundaries = runsScored
