@@ -152,7 +152,7 @@ function StartUpdateMatchDialog({
                             (field.value ?? "").length >= 2 && !isSelected;
 
                           return (
-                            <FormItem key={item.id} className="space-y-0">
+                            <FormItem key={item.id} className="flex space-y-0">
                               <FormControl>
                                 <Checkbox
                                   disabled={disabled}
