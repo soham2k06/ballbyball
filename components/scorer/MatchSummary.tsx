@@ -165,7 +165,7 @@ function MatchSummary({
           ? b.runsScored - a.runsScored
           : a.runConceded - b.runConceded,
       )
-      .sort((a, b) => b.wicketsTaken - a.wicketsTaken)
+      .sort((a, b) => type === 'bowler' ? b.wicketsTaken - a.wicketsTaken : 0)
       .slice(0, count)
       .map((player) => ({
         ...player,
