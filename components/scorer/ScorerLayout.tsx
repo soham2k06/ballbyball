@@ -96,6 +96,8 @@ function ScorerLayout({
 
   const { runs, totalBalls, wickets, runRate } = getScore(balls || []);
 
+  const isSLastPlayer = wickets === team?.players.length - 2;
+
   const opponentEvents = events?.filter((event) =>
     playerIds.includes(event.bowlerId),
   );
@@ -214,9 +216,6 @@ function ScorerLayout({
             : event) as EventType,
     );
 
-    // if (matchBalls !== totalBalls && isExtra && isLastBallOfOver)
-    //   setShowSelectBowler(true);
-
     const matchBalls = (match?.overs || 0) * 6;
     const isLastBallOfOver =
       totalBalls % 6 === 5 && totalBalls > 0 && getIsvalidBall(event);
@@ -232,27 +231,26 @@ function ScorerLayout({
     }
   }
 
+  function handleLastBallInWicket(event: string) {
+    const isLastBallOfOver =
+      totalBalls % 6 === 5 && totalBalls > 0 && getIsvalidBall(event);
+    if (isLastBallOfOver) {
+      if (isSLastPlayer) {
+        setOnStrikeBatsman(0);
+      } else setOnStrikeBatsman(1);
+    } else setOnStrikeBatsman(0);
+  }
+
   function handleWicket(e: React.MouseEvent<HTMLButtonElement>) {
     const event = e.currentTarget.value;
 
     const wicketType = JSON.parse(event);
     let eventToAdd;
 
-    const isSLastPlayer = wickets === team?.players.length - 2;
-
-    const isLastBallOfOver =
-      totalBalls % 6 === 5 && totalBalls > 0 && getIsvalidBall(event);
-
-    if (isLastBallOfOver) {
-      if (isSLastPlayer) {
-        setOnStrikeBatsman(0);
-      } else setOnStrikeBatsman(1);
-    } else setOnStrikeBatsman(0);
-
     if (!wicketType.isOtherPlayerInvolved) {
+      handleLastBallInWicket(event);
       // If second last player is out, don't show select batsman dialog
       if (!isSLastPlayer) setShowSelectBatsman(true);
-      // setShowSelectBatsman(true);
       if (wicketType.id === 1) eventToAdd = `-1`;
       eventToAdd = `-1_${wicketType.id}`;
 
@@ -267,9 +265,8 @@ function ScorerLayout({
     fielderId: string,
     runsAlongWithRunOut?: number,
   ) {
-    const outPlayers = events.filter((event) => event.type.includes("-1"));
-    const isSLastPlayer = outPlayers.length === team?.players.length - 2;
     if (!isSLastPlayer) setShowSelectBatsman(true);
+    handleLastBallInWicket("-1");
     handleScore({
       currentTarget: {
         value: `-1_${wicketTypeId}_${fielderId}_${runsAlongWithRunOut}`,
