@@ -18,8 +18,8 @@ function StatsDrawerHeader({
   setSelectedTeam,
 }: StatsDrawerHeaderProps) {
   return (
-    <DrawerHeader className="relative mb-2 flex items-center justify-end pb-4 pt-6">
-      <DrawerTitle className="absolute left-1/2 -translate-x-1/2 text-center text-2xl">
+    <DrawerHeader className="relative mb-2 flex items-center justify-between gap-2 pb-4 pt-6">
+      <DrawerTitle className="text-xl">
         <span className={cn({ "sr-only": !runRate })}>CRR: {runRate}</span>
       </DrawerTitle>
       <TeamTabs

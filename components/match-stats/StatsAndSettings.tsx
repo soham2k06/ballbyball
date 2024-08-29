@@ -213,6 +213,7 @@ function StatsAndSettings({
                 match={match}
                 selectedTeam={selectedTeam}
                 setSelectedTeam={setSelectedTeam}
+                runRate={runRate}
               />
               <OverStats
                 ballEvents={ballEventsArr[selectedTeam.index]}

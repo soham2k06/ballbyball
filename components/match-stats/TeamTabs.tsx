@@ -18,7 +18,7 @@ function TeamTabs({ selectedTeam, setSelectedTeam, teams }: TeamTabsProps) {
       onValueChange={(val) =>
         setSelectedTeam({ index: parseInt(val) as 0 | 1 })
       }
-      className="m-2 w-fit rounded-lg bg-secondary p-1"
+      className="w-fit rounded-lg bg-secondary p-1"
     >
       <TabsList>
         {teams.map((team, i) => (
