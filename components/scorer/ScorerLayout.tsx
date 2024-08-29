@@ -365,6 +365,7 @@ function ScorerLayout({
             </LoadingButton>
           </div>
           <DangerActions
+            backLink="/matches"
             handleRestart={handleRestart}
             handleUndo={handleUndo}
           />

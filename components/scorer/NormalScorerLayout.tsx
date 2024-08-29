@@ -54,6 +54,7 @@ function ScorerLayout() {
               setBalls([]);
               deleteCookie("balls");
             }}
+            backLink="/"
             handleUndo={handleUndo}
           />
         </div>
