@@ -235,10 +235,6 @@ function StartUpdateMatchDialog({
             <FormField
               control={form.control}
               name="overs"
-              rules={{
-                min: { value: 1, message: "Enter Mininum 1 over" },
-                max: { value: 50, message: "Enter Maximum 50 overs" },
-              }}
               render={({ field }) => {
                 return (
                   <FormItem>
@@ -248,9 +244,10 @@ function StartUpdateMatchDialog({
                         placeholder="Match Overs"
                         type="number"
                         {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(parseInt(value.replace(/^0+/, "")));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

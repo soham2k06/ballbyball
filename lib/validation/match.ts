@@ -16,7 +16,7 @@ export const createMatchSchema = z.object({
   overs: z
     .number({
       required_error: "Overs is required",
-      invalid_type_error: "Overs is required",
+      invalid_type_error: "Invalid Number",
     })
     .min(1, "Overs must be greater than 0")
     .max(50),
