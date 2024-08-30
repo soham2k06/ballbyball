@@ -124,57 +124,65 @@ function BowlingRecords({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {records.map(
-                (
-                  {
-                    player,
-                    matches,
-                    wickets,
-                    bestSpell,
-                    economy,
-                    strikeRate,
-                    runsConceded,
-                    totalBalls,
-                    maidens,
-                    dots,
+              {records.length ? (
+                records.map(
+                  (
+                    {
+                      player,
+                      matches,
+                      wickets,
+                      bestSpell,
+                      economy,
+                      strikeRate,
+                      runsConceded,
+                      totalBalls,
+                      maidens,
+                      dots,
+                    },
+                    i,
+                  ) => {
+                    return (
+                      <TableRow key={player.id}>
+                        <TableCell>{i + 1}</TableCell>
+                        <TableCell>{player.name}</TableCell>
+                        <TableCell className="bg-primary/5 text-center">
+                          {wickets}
+                        </TableCell>
+                        <TableCell className="text-center">{matches}</TableCell>
+                        <TableCell className="text-center">
+                          {economy ? round(economy) : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {bestSpell ? (
+                            <>
+                              {bestSpell.wickets}/{bestSpell.runs} (
+                              {getOverStr(bestSpell.balls)})
+                            </>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {strikeRate ? round(strikeRate) : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">{maidens}</TableCell>
+                        <TableCell className="text-center">{dots}</TableCell>
+                        <TableCell className="text-center">
+                          {getOverStr(totalBalls)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {runsConceded}
+                        </TableCell>
+                      </TableRow>
+                    );
                   },
-                  i,
-                ) => {
-                  return (
-                    <TableRow key={player.id}>
-                      <TableCell>{i + 1}</TableCell>
-                      <TableCell>{player.name}</TableCell>
-                      <TableCell className="bg-primary/5 text-center">
-                        {wickets}
-                      </TableCell>
-                      <TableCell className="text-center">{matches}</TableCell>
-                      <TableCell className="text-center">
-                        {economy ? round(economy) : "-"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {bestSpell ? (
-                          <>
-                            {bestSpell.wickets}/{bestSpell.runs} (
-                            {getOverStr(bestSpell.balls)})
-                          </>
-                        ) : (
-                          "-"
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {strikeRate ? round(strikeRate) : "-"}
-                      </TableCell>
-                      <TableCell className="text-center">{maidens}</TableCell>
-                      <TableCell className="text-center">{dots}</TableCell>
-                      <TableCell className="text-center">
-                        {getOverStr(totalBalls)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {runsConceded}
-                      </TableCell>
-                    </TableRow>
-                  );
-                },
+                )
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={11} className="text-center">
+                    No records found
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>

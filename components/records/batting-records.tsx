@@ -121,55 +121,63 @@ function BattingRecords({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {records.map(
-                (
-                  {
-                    player,
-                    runs,
-                    matches,
-                    innings,
-                    milestones,
-                    average,
-                    strikeRate,
-                    fours,
-                    sixes,
+              {records.length ? (
+                records.map(
+                  (
+                    {
+                      player,
+                      runs,
+                      matches,
+                      innings,
+                      milestones,
+                      average,
+                      strikeRate,
+                      fours,
+                      sixes,
+                    },
+                    i,
+                  ) => {
+                    return (
+                      <TableRow key={player.id}>
+                        <TableCell>{i + 1}</TableCell>
+                        <TableCell>{player.name}</TableCell>
+                        <TableCell className="bg-primary/5 text-center">
+                          {runs}
+                        </TableCell>
+                        <TableCell className="text-center">{matches}</TableCell>
+                        <TableCell className="text-center">{innings}</TableCell>
+                        <TableCell className="text-center">
+                          {milestones.highestScore}
+                          {milestones.isNotout ? "*" : ""}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {innings
+                            ? average === Infinity
+                              ? "N/A"
+                              : round(average)
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {round(strikeRate)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {milestones.fifties}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {milestones.centuries}
+                        </TableCell>
+                        <TableCell className="text-center">{fours}</TableCell>
+                        <TableCell className="text-center">{sixes}</TableCell>
+                      </TableRow>
+                    );
                   },
-                  i,
-                ) => {
-                  return (
-                    <TableRow key={player.id}>
-                      <TableCell>{i + 1}</TableCell>
-                      <TableCell>{player.name}</TableCell>
-                      <TableCell className="bg-primary/5 text-center">
-                        {runs}
-                      </TableCell>
-                      <TableCell className="text-center">{matches}</TableCell>
-                      <TableCell className="text-center">{innings}</TableCell>
-                      <TableCell className="text-center">
-                        {milestones.highestScore}
-                        {milestones.isNotout ? "*" : ""}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {innings
-                          ? average === Infinity
-                            ? "N/A"
-                            : round(average)
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {round(strikeRate)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {milestones.fifties}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {milestones.centuries}
-                      </TableCell>
-                      <TableCell className="text-center">{fours}</TableCell>
-                      <TableCell className="text-center">{sixes}</TableCell>
-                    </TableRow>
-                  );
-                },
+                )
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={12} className="text-center">
+                    No records found
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
