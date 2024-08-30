@@ -1,21 +1,18 @@
-# Ballbyball | Your cricket partner
+# Ballbyball | Your cricket scoring partner
 
 ---
 
 ## Overview:
 
-The Ballbyball is a comprehensive tool designed to streamline the scoring process for cricket matches. Whether you're a seasoned scorer or just starting out, this app offers intuitive features to accurately record every aspect of the game.
+The Ballbyball is a fully featured tool built for the scoring process for cricket matches. Whether you're a seasoned scorer or just starting out, it offers intuitive features to accurately record every aspect of the game.
 
 ## Key Features:
 
 1. **Live Scoring:** Score matches in real-time, keeping track of runs, wickets, overs, and more.
-2. **Player Management:** Easily add, edit, and remove player profiles.
-3. **Match History:** Access a detailed history of past matches, including scores, player performances, and match outcomes.
+2. **Entity Management:** Easily add, edit, and remove player, teams and matches
+3. **Match Overview:** Access a detailed history of past matches, including scores, player performances, and match outcomes.
 4. **Statistical Analysis:** View detailed statistics and analytics for matches
-
-## Extra Features:
-
-- **Mobile Compatibility:** Enjoy the convenience of scoring matches on the go with full mobile responsiveness.
+5. **Mobile Compatibility:** Enjoy the convenience of scoring matches on the go with full mobile responsiveness.
 
 ## Demo:
 
@@ -26,7 +23,7 @@ The Ballbyball is a comprehensive tool designed to streamline the scoring proces
 ## Tech Stack:
 
 - **Core:** React.js, Next.js, Typescript
-- **Backend:** MongoDB, Prisma, Next.js API routes
+- **Backend:** MongoDB, Prisma, Next.js API routes, server actions
 - **UI:** Tailwind CSS, shadcn-ui
 - **Authentication:** next-auth
 - **Deployment:** Vercel
@@ -36,10 +33,6 @@ The Ballbyball is a comprehensive tool designed to streamline the scoring proces
 
 For any inquiries or assistance, please contact me at sohmm.dev@gmail.com
 
-## License:
-
-This project is licensed under the MIT License.
-
 ---
 
-Thank you for choosing the ballbyball Web App! We hope it enhances your cricket scoring experience.
+Thank you for choosing the ballbyball cricket scoring Web App! We hope it enhances your cricket scoring experience.
