@@ -85,8 +85,10 @@ function TeamList({
       ) : (
         <EmptyState document="teams" />
       )}
-      <TeamBuilder players={players} />
-      <CreateTeam players={players} />
+      <div>
+        <TeamBuilder players={players} />
+        <CreateTeam players={players} />
+      </div>
       <AddUpdateTeamDialog
         players={players}
         open={!!teamToUpdate}
