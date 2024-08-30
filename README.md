@@ -16,13 +16,17 @@ The Ballbyball is a fully featured tool built for the scoring process for cricke
 
 ## Demo:
 
-<img width="368" alt="dark" src="https://github.com/soham2k06/cricket-scorer/assets/118199354/09b1100a-bc15-4a39-95f8-e35d07bd7bee">
-<img width="368" alt="light" src="https://github.com/soham2k06/cricket-scorer/assets/118199354/020ac427-163d-4043-a0c5-64521ae8c914">
-<img width="368" alt="chart" src="https://github.com/soham2k06/cricket-scorer/assets/118199354/da33f8e3-05b3-4e28-a2c8-6c64deeb6e0f">
+https://github.com/user-attachments/assets/7f0ce100-c672-43ef-996c-f0c5c69d4c9a
+
+<img width="1648" alt="Screenshot 2024-08-30 at 2 01 25 PM" src="https://github.com/user-attachments/assets/a12c1d90-81f3-44d4-aca2-7dfb5ebaea71">
+<img width="500" alt="Screenshot 2024-08-30 at 2 02 01 PM" src="https://github.com/user-attachments/assets/3bfea7b5-bf32-4e53-a017-7cfaaf92c243">
+<img width="500" alt="Screenshot 2024-08-30 at 2 03 20 PM" src="https://github.com/user-attachments/assets/ebd159ce-6017-4798-b488-5d7220e23796">
 
 ## Tech Stack:
 
 - **Core:** React.js, Next.js, Typescript
+
+
 - **Backend:** MongoDB, Prisma, Next.js API routes, server actions
 - **UI:** Tailwind CSS, shadcn-ui
 - **Authentication:** next-auth
