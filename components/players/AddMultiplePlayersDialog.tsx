@@ -110,7 +110,7 @@ function AddMultiplePlayersDialog({
             onSubmit={handleSubmit(onSubmit)}
             className="flex h-96 flex-col justify-between"
           >
-            <ul className="h-full space-y-4 overflow-y-auto">
+            <ul className="h-full space-y-4 overflow-y-auto p-1">
               {(fields.length
                 ? fields
                 : [{ id: Math.random().toString(36), name: "" }]
