@@ -195,10 +195,6 @@ function getOverStr(numBalls: number) {
   return `${Math.floor(numBalls / 6)}${numBalls % 6 ? `.${numBalls % 6}` : ""}`;
 }
 
-const truncStr = (str: string, n: number) => {
-  return str.length > n ? str.substring(0, n - 1) + "..." : str;
-};
-
 function abbreviateName(fullName: string) {
   fullName = fullName.trim();
   const parts = fullName.split(" ");
@@ -492,7 +488,6 @@ export {
   getScore,
   generateOverSummary,
   getBatsmanStats,
-  truncStr,
   calcRuns,
   calcWickets,
   getIsvalidBall,

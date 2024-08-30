@@ -7,7 +7,6 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { truncStr } from "@/lib/utils";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 
 import {
@@ -47,9 +46,10 @@ function Player({
     setPlayerMatchesOpen(playerId);
   return (
     <Card className="flex items-center justify-between p-2 sm:p-4">
-      <CardTitle>{truncStr(player.name as string, 10)}</CardTitle>
+      {/* <CardTitle>{truncStr(player.name as string, 10)}</CardTitle> */}
+      <CardTitle className="truncate">{player.name}</CardTitle>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild className="shrink-0">
           <Button size="icon" variant="ghost">
             <MoreHorizontal size={20} />
           </Button>
