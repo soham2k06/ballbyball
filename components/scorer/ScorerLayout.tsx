@@ -274,7 +274,7 @@ function ScorerLayout({
     } as React.MouseEvent<HTMLButtonElement>);
   }
 
-  function handleSave(_: unknown) {
+  function handleSave() {
     if (balls.length)
       createBallEvent(
         events.map((event) => ({ ...event, matchId })),
@@ -302,14 +302,12 @@ function ScorerLayout({
       curPlayers: [],
       curTeam: Number(!Boolean(match?.curTeam)),
     });
-    handleSave(0);
   }
 
   function handleFinish() {
     setHasEnded(true);
     if (!match?.hasEnded) {
       setShowSelectBatsman(false);
-      handleSave(0);
       updateMutate({
         id: matchId,
         hasEnded: true,
