@@ -63,13 +63,14 @@ function ScorerLayout({
   );
   const [isModified, setIsModified] = useState(false);
 
+  const [canSaveEvents, setCanSaveEvents] = useState(false);
+
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(
     match.strikeIndex ?? 0,
   );
 
   const [showScorecard, setShowScorecard] = useState(false);
-  const [showMatchSummary, setShowMatchSummary] = useState(false);
 
   const team = match?.teams[curTeam];
   const opposingTeam = match?.teams[curTeam === 0 ? 1 : 0];
@@ -158,6 +159,21 @@ function ScorerLayout({
       else handleInningChange();
     }
   }, []);
+
+  // Handle Save Events
+  useEffect(() => {
+    if (canSaveEvents) {
+      createBallEvent(
+        events.map((event) => ({ ...event, matchId })),
+        {
+          onSuccess: () => {
+            setIsModified(false);
+            toast.success("Score saved successfully");
+          },
+        },
+      );
+    }
+  }, [canSaveEvents]);
 
   // ** Over Summary
   const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
@@ -275,16 +291,8 @@ function ScorerLayout({
   }
 
   function handleSave() {
-    if (balls.length)
-      createBallEvent(
-        events.map((event) => ({ ...event, matchId })),
-        {
-          onSuccess: () => {
-            setIsModified(false);
-            toast.success("Score saved successfully");
-          },
-        },
-      );
+    // User this hack to get fresh events
+    if (balls.length) setCanSaveEvents(true);
 
     updateMutate({
       id: matchId,
@@ -302,6 +310,7 @@ function ScorerLayout({
       curPlayers: [],
       curTeam: Number(!Boolean(match?.curTeam)),
     });
+    handleSave();
   }
 
   function handleFinish() {
@@ -314,7 +323,7 @@ function ScorerLayout({
       });
       toast.info("Match finished!");
     }
-    setShowMatchSummary(true);
+    handleSave();
   }
 
   function handleUndo() {
@@ -461,13 +470,12 @@ function ScorerLayout({
         />
         <MatchSummary
           ballEvents={events}
-          open={showMatchSummary}
+          open={hasEnded}
           setShowScorecard={setShowScorecard}
           match={match}
           handleUndo={() => {
             setHasEnded(false);
             handleUndo();
-            setShowMatchSummary(false);
             updateMutate({
               id: matchId,
               hasEnded: false,
