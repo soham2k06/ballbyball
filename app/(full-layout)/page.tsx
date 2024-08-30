@@ -125,8 +125,8 @@ async function page() {
           </span>
         </div>
 
-        <div className="mb-6 grid gap-6 md:grid-cols-[8fr_4fr]">
-          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+        <div className="grid rounded-xl rounded-b-none border bg-primary/5 md:grid-cols-[8fr_4fr]">
+          <div className="group flex flex-col justify-between p-4 md:p-8">
             <div className="mb-6">
               <h2 className="text-2xl font-bold">Run rate chart</h2>
               <p className="text-muted-foreground">
@@ -139,11 +139,11 @@ async function page() {
               draggable="false"
               width="864"
               height="433"
-              className="rounded-lg"
+              className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
               src="/runrate-chart.png"
             />
           </div>
-          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+          <div className="group flex flex-col justify-between border-l p-4 md:p-8">
             <div className="mb-6">
               <h2 className="text-2xl font-bold">Worm Chart</h2>
               <p className="text-muted-foreground">
@@ -156,13 +156,13 @@ async function page() {
               alt="Worm Chart"
               width="700"
               height="403"
-              className="rounded-lg"
+              className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
               src="/worm-chart.png"
             />
           </div>
         </div>
-        <div className="mb-6 grid gap-6 md:grid-cols-[6fr_6fr]">
-          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+        <div className="grid rounded-xl rounded-t-none border border-t-0 bg-primary/5 md:grid-cols-[6fr_6fr]">
+          <div className="group flex flex-col justify-between border-r p-4 md:p-8">
             <div className="mb-6">
               <h2 className="text-2xl font-bold">Player Stats</h2>
               <p className="text-muted-foreground">
@@ -174,11 +174,11 @@ async function page() {
               alt="Player Stats"
               width="700"
               height="403"
-              className="rounded-lg"
+              className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
               src="/player-stats.png"
             />
           </div>
-          <div className="flex flex-col justify-between rounded-2xl bg-primary/5 p-4 shadow-lg shadow-primary/5 md:p-8">
+          <div className="group flex flex-col justify-between p-4 md:p-8">
             <div className="mb-6">
               <h2 className="text-2xl font-bold">Match summary</h2>
               <p className="text-muted-foreground">
@@ -192,12 +192,13 @@ async function page() {
               draggable="false"
               width="864"
               height="433"
-              className="rounded-lg"
+              className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
               src="/match-summary.png"
             />
           </div>
         </div>
       </section>
+
       <section className="sr-only pt-8 text-base tracking-wide text-muted-foreground md:pt-8 md:text-xl lg:pt-16">
         <p className="mb-4">
           Cricket scoring has never been easier with BallByBall, your ultimate
