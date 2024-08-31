@@ -143,11 +143,12 @@ export async function createMatch(data: CreateMatchSchema) {
       where: { id: { in: teamIds } },
       data: { matchId: match.id },
     });
+
+    revalidatePath("/match");
+    return match.id;
   } catch (error) {
     handleError(error);
   }
-
-  revalidatePath("/match");
 }
 
 export async function updateMatch(data: UpdateMatchSchema) {

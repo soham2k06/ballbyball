@@ -40,6 +40,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
   matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
@@ -52,6 +53,7 @@ function StartUpdateMatchDialog({
   matchToUpdate,
   teams,
 }: StartUpdateMatchDialogProps) {
+  const router = useRouter();
   const form = useForm<CreateMatchSchema | UpdateMatchSchema>({
     resolver: zodResolver(createMatchSchema),
     defaultValues: {
@@ -98,9 +100,10 @@ function StartUpdateMatchDialog({
       return;
     }
     createMutate(data as CreateMatchSchema, {
-      onSuccess: () => {
+      onSuccess: (newMatchId) => {
         reset();
         setOpen(false);
+        router.push(`/match/${newMatchId}`);
       },
     });
   }
