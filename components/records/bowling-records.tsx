@@ -44,7 +44,6 @@ function BowlingRecords({
             .map((event) => event.type as EventType),
         ) || [];
 
-      if (player.name === "Mohan") console.log(groupedMatches);
       const bestSpell = calcBestSpells(bowlEventsByMatches, 1)[0];
 
       const {
