@@ -21,6 +21,7 @@ import { getOverStr, getScore } from "@/lib/utils";
 import { updateMatch } from "@/lib/actions/match";
 import { useActionMutate } from "@/lib/hooks";
 import { saveBallEvents } from "@/lib/actions/ball-event";
+import Partnerships from "./Partnerships";
 
 interface StatsAndSettingsProps {
   match: MatchExtended | undefined;
@@ -44,6 +45,8 @@ function StatsAndSettings({
     showOverSummaries,
     showWormChart,
     setShowWormChart,
+    showPartnerships,
+    setShowPartnerships,
   } = useStatsOpenContext();
 
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
@@ -61,30 +64,32 @@ function StatsAndSettings({
 
   const playerIds = curTeam?.players.map((player) => player.id) || [];
 
-  const fTeamEvents = events
-    .filter((event) => playerIds.includes(event.batsmanId))
-    .map((event) => event.type as EventType);
+  const fTeamEvents = events.filter((event) =>
+    playerIds.includes(event.batsmanId),
+  );
 
-  const sTeamEvents = events
-    .filter((event) => playerIds.includes(event.bowlerId))
-    .map((event) => event.type as EventType);
+  const sTeamEvents = events.filter((event) =>
+    playerIds.includes(event.bowlerId),
+  );
+
+  const fTeamBalls = fTeamEvents.map((event) => event.type as EventType);
+
+  const sTeamBalls = sTeamEvents.map((event) => event.type as EventType);
 
   const ballEventsArr =
-    match?.curTeam === 0
-      ? [fTeamEvents, sTeamEvents]
-      : [sTeamEvents, fTeamEvents];
+    match?.curTeam === 0 ? [fTeamBalls, sTeamBalls] : [sTeamBalls, fTeamBalls];
 
   const {
     runs: runs1,
     totalBalls: totalBalls1,
     wickets: wickets1,
-  } = getScore({ balls: fTeamEvents });
+  } = getScore({ balls: fTeamBalls });
 
   const {
     runs: runs2,
     totalBalls: totalBalls2,
     wickets: wickets2,
-  } = getScore({ balls: sTeamEvents });
+  } = getScore({ balls: sTeamBalls });
 
   const { runRate } = getScore({ balls: ballEventsArr[selectedTeam.index] });
 
@@ -256,6 +261,12 @@ function StatsAndSettings({
           </Drawer>
         </>
       )}
+      <Partnerships
+        open={showPartnerships}
+        teams={match?.teams || []}
+        setOpen={setShowPartnerships}
+        events={[fTeamEvents as BallEvent[], sTeamEvents as BallEvent[]]}
+      />
     </>
   );
 }

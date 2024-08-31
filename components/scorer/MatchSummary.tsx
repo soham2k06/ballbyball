@@ -38,8 +38,12 @@ function MatchSummary({
   handleUndo,
   match,
 }: MatchSummaryProps) {
-  const { setShowRunrateChart, setShowOverSummaries, setShowWormChart } =
-    useStatsOpenContext();
+  const {
+    setShowRunrateChart,
+    setShowOverSummaries,
+    setShowWormChart,
+    setShowPartnerships,
+  } = useStatsOpenContext();
 
   const { allowSinglePlayer, overs } = match || {
     allowSinglePlayer: false,
@@ -341,6 +345,9 @@ function MatchSummary({
               </Button>
               <Button size="sm" onClick={() => setShowOverSummaries(true)}>
                 Over summaries
+              </Button>
+              <Button size="sm" onClick={() => setShowPartnerships(true)}>
+                Partnerships
               </Button>
             </div>
             <Separator className="my-2" />
