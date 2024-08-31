@@ -43,7 +43,7 @@ export async function GET(
         events.map((event) => event.type as EventType),
       ) || [];
 
-    const bestSpell = calcBestSpells(playerBallEventsByMatches)[0];
+    const bestSpell = calcBestSpells(playerBallEventsByMatches, 1)[0];
 
     const battingEvents = battingEventsExtended.map((event) => event.type);
 
