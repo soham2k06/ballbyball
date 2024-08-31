@@ -38,9 +38,11 @@ function BowlingRecords({
       );
 
       const bowlEventsByMatches =
-        Object.values(groupedMatches).map(() => bowlEvents) || [];
+        Object.values(groupedMatches).map((events) =>
+          events.map((event) => event.type as EventType),
+        ) || [];
 
-      const bestSpell = calcBestSpells(bowlEventsByMatches)[0];
+      const bestSpell = calcBestSpells(bowlEventsByMatches, 1)[0];
 
       const {
         runs: runsConceded,
