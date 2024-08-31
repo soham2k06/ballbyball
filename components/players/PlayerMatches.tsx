@@ -91,7 +91,7 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
                             •{" "}
                             {didBowl ? (
                               <>
-                                {match.bowlScore.runs}/{match.bowlScore.wickets}{" "}
+                                {match.bowlScore.wickets}/{match.bowlScore.runs}{" "}
                                 ({getOverStr(match.bowlScore.totalBalls)})
                               </>
                             ) : (
