@@ -38,10 +38,12 @@ function BatsmanScores({
 
         const legalEvents = events.filter((ball) => id === ball.batsmanId);
 
-        const { runs: totalRuns, totalBalls } = getScore(
-          events.filter((evt) => evt.batsmanId === id).map(({ type }) => type),
-          true,
-        );
+        const { runs: totalRuns, totalBalls } = getScore({
+          balls: events
+            .filter((evt) => evt.batsmanId === id)
+            .map(({ type }) => type),
+          forBatsman: true,
+        });
 
         const strikeRate =
           Math.round((totalBalls ? (totalRuns / totalBalls) * 100 : 0) * 10) /

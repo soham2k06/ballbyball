@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { wicketTypes } from "../score-buttons/WicketPopover";
+import { wicketTypes } from "@/lib/constants";
 
 function Score({
   players,
@@ -51,12 +51,14 @@ function Score({
     return !(isBatsman || isBowler);
   });
 
+  const teamEvents = ballEvents.map((event) => event.type as EventType);
+
   const {
     runs: teamRuns,
     wickets: teamWickets,
     totalBalls: teamBalls,
     extras: teamExtras,
-  } = getScore(ballEvents.map((event) => event.type as EventType));
+  } = getScore({ balls: teamEvents });
 
   return (
     <>
@@ -129,16 +131,18 @@ function Score({
 
             const { fours, sixes } = getBattingStats(legalEvents);
 
-            const { runs, totalBalls, runRate, wickets } = getScore(
-              ballEvents
-                ?.filter(
-                  (event) =>
-                    event[isBowlingScore ? "bowlerId" : "batsmanId"] ===
-                    player.id,
-                )
-                .map((event) => event.type as EventType),
-              !isBowlingScore,
-            );
+            const playerEvents = ballEvents
+              .filter(
+                (ball) =>
+                  player.id === ball[isBowlingScore ? "bowlerId" : "batsmanId"],
+              )
+              .map((ball) => ball.type as EventType);
+
+            const { runs, totalBalls, runRate, wickets } = getScore({
+              balls: playerEvents,
+              forBatsman: !isBowlingScore,
+              forBowler: isBowlingScore,
+            });
 
             if (!totalBalls) return null;
 

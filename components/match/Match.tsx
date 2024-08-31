@@ -40,12 +40,12 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
       .filter((event) => match.teams[i].playerIds.includes(event.batsmanId))
       .map((event) => event.type);
 
-  const { runs: runs1 } = getScore(ballEventsbyTeam(0));
+  const { runs: runs1 } = getScore({ balls: ballEventsbyTeam(0) });
   const {
     runs: runs2,
     wickets: wickets2,
     totalBalls: totalBalls2,
-  } = getScore(ballEventsbyTeam(1));
+  } = getScore({ balls: ballEventsbyTeam(1) });
   const totalWickets = match.teams[1].playerIds.length;
 
   const { winInfo } = calculateWinner({
@@ -99,7 +99,9 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
             .filter((event) => playerIds.includes(event.batsmanId))
             .map((event) => event.type as EventType);
 
-          const { runs, totalBalls, wickets } = getScore(ballEventsByTeam);
+          const { runs, totalBalls, wickets } = getScore({
+            balls: ballEventsByTeam,
+          });
 
           return (
             <TypographyP

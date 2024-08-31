@@ -51,7 +51,7 @@ export async function GET(
       runs: runsScored,
       totalBalls: ballsFaced,
       wickets: outs,
-    } = getScore(battingEvents, true);
+    } = getScore({ balls: battingEvents, forBatsman: true });
 
     const noWicketEvents = battingEvents.filter(
       (event) => !event.includes("-1") && !event.includes("-4"),
@@ -98,7 +98,7 @@ export async function GET(
       wickets: wicketsTaken,
       extras,
       runRate,
-    } = getScore(bowlingEvents);
+    } = getScore({ balls: bowlingEvents, forBowler: true });
 
     const maidenOverCount = calculateMaidenOvers(bowlingEvents as EventType[]);
 

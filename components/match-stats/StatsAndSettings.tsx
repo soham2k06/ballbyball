@@ -78,15 +78,15 @@ function StatsAndSettings({
     runs: runs1,
     totalBalls: totalBalls1,
     wickets: wickets1,
-  } = getScore(fTeamEvents);
+  } = getScore({ balls: fTeamEvents });
 
   const {
     runs: runs2,
     totalBalls: totalBalls2,
     wickets: wickets2,
-  } = getScore(sTeamEvents);
+  } = getScore({ balls: sTeamEvents });
 
-  const { runRate } = getScore(ballEventsArr[selectedTeam.index]);
+  const { runRate } = getScore({ balls: ballEventsArr[selectedTeam.index] });
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
     if (!match?.id) return;

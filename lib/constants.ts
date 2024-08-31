@@ -18,6 +18,55 @@ export const ballEvents: Record<EventType, string> = {
   "6": "6",
 };
 
+export const wicketTypes = [
+  {
+    id: 1,
+    type: "Bowled",
+    shortName: "b.",
+  },
+  {
+    id: 2,
+    type: "LBW",
+    shortName: "lbw.",
+  },
+  {
+    id: 3,
+    type: "Caught",
+    shortName: "c.",
+    isOtherPlayerInvolved: true,
+  },
+  {
+    id: 4,
+    type: "Caught & Bowled",
+    shortName: "c & b.",
+  },
+  {
+    id: 5,
+    type: "Run Out",
+    shortName: "run out.",
+    isOtherPlayerInvolved: true,
+    isNotBowlersWicket: true,
+  },
+  {
+    id: 6,
+    type: "Stumped",
+    shortName: "st.",
+    isOtherPlayerInvolved: true,
+  },
+  {
+    id: 7,
+    type: "Hit Wicket",
+    shortName: "hit wkt.",
+    isNotBowlersWicket: true,
+  },
+  {
+    id: 8,
+    type: "Retired Hurt",
+    shortName: "ret. hurt",
+    isNotBowlersWicket: true,
+  },
+];
+
 const navItems = [
   { name: "Matches", href: "/matches" },
   { name: "Teams", href: "/teams" },

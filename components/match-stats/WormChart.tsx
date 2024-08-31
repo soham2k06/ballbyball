@@ -25,14 +25,14 @@ function WormChart({
   const { overSummaries: overSummaries2 } = generateOverSummary(ballEvents[1]);
 
   const team1Score = overSummaries.map((summary) => {
-    const { runs, wickets } = getScore(summary);
+    const { runs, wickets } = getScore({ balls: summary });
     return {
       runs,
       wickets,
     };
   });
   const team2Score = overSummaries2.map((summary) => {
-    const { runs, wickets } = getScore(summary);
+    const { runs, wickets } = getScore({ balls: summary });
     return {
       runs,
       wickets,

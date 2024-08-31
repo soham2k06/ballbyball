@@ -92,12 +92,14 @@ function MatchSummary({
       .filter((event) => teams[i]?.playerIds?.includes(event.batsmanId))
       .map((event) => event.type);
 
-  const { runs: runs1 } = getScore(ballEventsbyTeam(0));
+  const { runs: runs1 } = getScore({ balls: ballEventsbyTeam(0) });
   const {
     runs: runs2,
     wickets: wickets2,
     totalBalls,
-  } = getScore(ballEventsbyTeam(1));
+  } = getScore({
+    balls: ballEventsbyTeam(1),
+  });
   const totalWickets = teams[1]?.playerIds?.length ?? 0;
 
   const { winInfo, winner } = calculateWinner({
@@ -114,15 +116,18 @@ function MatchSummary({
   const playersPerformance: PlayerPerformance[] = Object.values(
     groupedEvents,
   ).map(({ playerId, batType, bowlType }) => {
-    const { runs: runsScored, totalBalls: ballsFaced } = getScore(
-      batType,
-      true,
-    );
+    const { runs: runsScored, totalBalls: ballsFaced } = getScore({
+      balls: batType,
+      forBatsman: true,
+    });
     const {
       runs: runConceded,
       wickets: wicketsTaken,
       totalBalls: ballsBowled,
-    } = getScore(bowlType);
+    } = getScore({
+      balls: bowlType,
+      forBowler: true,
+    });
 
     return {
       playerId,
@@ -165,7 +170,7 @@ function MatchSummary({
           ? b.runsScored - a.runsScored
           : a.runConceded - b.runConceded,
       )
-      .sort((a, b) => type === 'bowler' ? b.wicketsTaken - a.wicketsTaken : 0)
+      .sort((a, b) => (type === "bowler" ? b.wicketsTaken - a.wicketsTaken : 0))
       .slice(0, count)
       .map((player) => ({
         ...player,
@@ -213,9 +218,9 @@ function MatchSummary({
           <>
             <div className="flex justify-between gap-2">
               {teams.map((team, i) => {
-                const { runs, totalBalls, wickets } = getScore(
-                  ballEventsbyTeam(i) || [],
-                );
+                const { runs, totalBalls, wickets } = getScore({
+                  balls: ballEventsbyTeam(i) || [],
+                });
 
                 return (
                   <div
@@ -266,9 +271,9 @@ function MatchSummary({
 
             <ul className="space-y-2">
               {teams.map((team, i) => {
-                const { runs, totalBalls, wickets } = getScore(
-                  ballEventsbyTeam(i) || [],
-                );
+                const { runs, totalBalls, wickets } = getScore({
+                  balls: ballEventsbyTeam(i) || [],
+                });
 
                 const topBatsmen = (topPerformants ?? [])
                   .filter(

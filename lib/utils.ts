@@ -3,7 +3,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import { EventType, PlayerPerformance } from "@/types";
-import { invalidBalls } from "./constants";
+import { invalidBalls, wicketTypes } from "./constants";
 import { toast } from "sonner";
 import getCachedSession from "./auth/session";
 import { redirect } from "next/navigation";
@@ -44,22 +44,38 @@ const calcRuns = (
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
-const calcWickets = (ballEvents: EventType[] | string[]) =>
-  ballEvents?.filter((ball) => ball.includes("-1")).length;
+const calcWickets = (ballEvents: EventType[] | string[], forPlayer?: boolean) =>
+  ballEvents?.filter((ball) => {
+    if (ball.includes("-1")) {
+      if (!forPlayer) return true;
+      const typeId = Number(ball.split("_")[1]);
+      const wicketType = wicketTypes.find((item) => item.id === typeId);
+      if (wicketType?.isNotBowlersWicket) return false;
+      return ball.includes("-1");
+    }
+  }).length;
 
 const getIsvalidBall = (ball: EventType | string, countNB?: boolean) =>
   !invalidBalls.includes(ball) &&
   !ball.includes("-2") &&
   !(!countNB && ball.includes("-3"));
 
-function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
-  const runs = calcRuns(balls, forPlayerRuns);
+function getScore({
+  balls,
+  forBatsman,
+  forBowler,
+}: {
+  balls: (EventType | string)[];
+  forBatsman?: boolean;
+  forBowler?: boolean;
+}) {
+  const runs = calcRuns(balls, forBatsman);
 
   const totalBalls = balls?.filter(
-    (ball) => ball !== "-4" && getIsvalidBall(ball, forPlayerRuns),
+    (ball) => ball !== "-4" && getIsvalidBall(ball, forBatsman),
   ).length;
 
-  const wickets = calcWickets(balls);
+  const wickets = calcWickets(balls, forBowler);
   const runRate = totalBalls ? round((runs / totalBalls) * 6) : 0;
 
   const extras = balls
@@ -71,7 +87,7 @@ function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
       event.includes("-5")
         ? Number(event.slice(2)).toString()
         : event.includes("-2")
-          ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
+          ? (Number(event.slice(2)) + Number(!forBatsman)).toString()
           : event.includes("-3")
             ? "1"
             : "1",
@@ -422,10 +438,10 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
 
-    const { runs, wickets } = getScore(
-      matchEvents.map((event) => event.type),
-      true,
-    );
+    const { runs, wickets } = getScore({
+      balls: matchEvents.map((event) => event.type),
+      forBatsman: true,
+    });
 
     if (runs >= 50 && runs < 100) fifties++;
     if (runs >= 100) centuries++;
@@ -444,10 +460,10 @@ function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
 
-    const { wickets } = getScore(
-      matchEvents.map((event) => event.type),
-      true,
-    );
+    const { wickets } = getScore({
+      balls: matchEvents.map((event) => event.type),
+      forBowler: true,
+    });
 
     if (wickets === 3 || wickets === 4) threes++;
     if (wickets >= 5) fives++;
@@ -457,7 +473,7 @@ function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {
 }
 
 function calcBestSpells(data: EventType[][], topN: number = 1) {
-  const playerStats = data.map((balls) => getScore(balls));
+  const playerStats = data.map((balls) => getScore({ balls, forBowler: true }));
 
   playerStats.sort((a, b) => {
     if (b.wickets === a.wickets) return a.runRate - b.runRate;

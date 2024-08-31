@@ -47,7 +47,7 @@ function BowlingRecords({
         totalBalls,
         wickets,
         runRate,
-      } = getScore(bowlEvents);
+      } = getScore({ balls: bowlEvents, forBowler: true });
 
       const maidens = calculateMaidenOvers(bowlEvents);
 

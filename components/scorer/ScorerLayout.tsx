@@ -53,7 +53,7 @@ function ScorerLayout({
     useActionMutate(deleteAllBallEvents);
 
   // ** States
-  const [hasEnded, setHasEnded] = useState(match?.hasEnded ?? false);
+  const [hasEnded, setHasEnded] = useState(false);
   const [curTeam, setCurTeam] = useState(match?.curTeam ?? 0);
   const [curPlayers, setCurPlayers] = useState<CurPlayer[]>(
     match?.curPlayers ?? [],
@@ -95,7 +95,9 @@ function ScorerLayout({
 
   const [wicketTypeId, setWicketTypeId] = useState<string | null>(null);
 
-  const { runs, totalBalls, wickets, runRate } = getScore(balls || []);
+  const { runs, totalBalls, wickets, runRate } = getScore({
+    balls,
+  });
 
   const isSLastPlayer = wickets === team?.players.length - 2;
 
@@ -291,8 +293,8 @@ function ScorerLayout({
   }
 
   function handleSave() {
-    // User this hack to get fresh events
-    if (balls.length) setCanSaveEvents(true);
+    // Use this hack to get fresh events
+    if (balls.length && !match.hasEnded) setCanSaveEvents(true);
 
     updateMutate({
       id: matchId,

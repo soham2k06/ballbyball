@@ -39,7 +39,10 @@ function BattingRecords({
 
       const milestones = calcMilestones(groupedInnings);
 
-      const { runs, totalBalls, wickets } = getScore(batEvents, true);
+      const { runs, totalBalls, wickets } = getScore({
+        balls: batEvents,
+        forBatsman: true,
+      });
 
       const average = runs / wickets || 0;
       const strikeRate = (runs / totalBalls) * 100 || 0;

@@ -18,14 +18,14 @@ import ScoreWrapper from "./ScoreDisplay";
 function ScorerLayout() {
   const [balls, setBalls] = useState<EventType[]>([]);
 
-  const { runs, totalBalls, wickets, extras, runRate } = getScore(balls);
+  const { runs, totalBalls, wickets, extras, runRate } = getScore({ balls });
 
   const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
 
   const curOverIndex = Math.floor(totalBalls / 6);
-  const { runs: curOverRuns, wickets: curOverWickets } = getScore(
-    overSummaries[curOverIndex] || [],
-  );
+  const { runs: curOverRuns, wickets: curOverWickets } = getScore({
+    balls: overSummaries[curOverIndex] || [],
+  });
 
   useEffect(() => {
     const balls = getCookie("balls");
