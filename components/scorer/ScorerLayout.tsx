@@ -145,7 +145,7 @@ function ScorerLayout({
       (team?.players.length || 0) - (match?.allowSinglePlayer ? 0 : 1);
 
     if (isAllOut) {
-      if (isInSecondInning || hasEnded) handleFinish();
+      if (isInSecondInning || match.hasEnded) handleFinish();
       else {
         toast.info("All out!");
         handleInningChange();
