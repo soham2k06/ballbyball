@@ -43,7 +43,9 @@ import { cn, processTeamName } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
-  matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
+  matchToUpdate?: UpdateMatchSchema & {
+    teams: { id: string; batFirst?: boolean }[];
+  };
   teams: TeamWithPlayers[];
 }
 
@@ -79,6 +81,11 @@ function StartUpdateMatchDialog({
   const selectedTeams = watchedTeamIds.map((id) =>
     teams.find((team) => team.id === id),
   );
+  const defBatFirstTeam = matchToUpdate
+    ? teams.find((team) =>
+        matchToUpdate?.teams.some((t) => t.batFirst && t.id === team.id),
+      )
+    : null;
 
   const { containsSamePlayer, isDifferentPlayerLengthTeams } =
     useValidateMatchData((watchedTeamIds ?? []) || []);
@@ -110,9 +117,12 @@ function StartUpdateMatchDialog({
 
   useEffect(() => {
     if (open && matchToUpdate) {
+      matchToUpdate.batFirst = defBatFirstTeam?.id;
       reset(matchToUpdate);
     }
   }, [open, matchToUpdate]);
+
+  console.log(form.watch());
 
   useEffect(() => {
     const numTeams = (form.watch("teamIds") || []).length;
@@ -227,11 +237,11 @@ function StartUpdateMatchDialog({
                   <FormLabel>Batting First Team</FormLabel>
                   <FormControl>
                     <Select
-                      defaultValue={
-                        matchToUpdate ? matchToUpdate?.batFirst : ""
-                      }
                       onValueChange={field.onChange}
-                      disabled={!(watchedTeamIds ?? []).length}
+                      value={field.value}
+                      disabled={
+                        !(watchedTeamIds ?? []).length || field.disabled
+                      }
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -239,7 +249,7 @@ function StartUpdateMatchDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {selectedTeams.map((team, i) => (
+                        {selectedTeams.map((team) => (
                           <SelectItem value={team?.id ?? ""} key={team?.id}>
                             {team?.name}
                           </SelectItem>

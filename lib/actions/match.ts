@@ -53,6 +53,7 @@ export async function getAllMatches(user?: string | null) {
       const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
       return {
         playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
+        batFirst: matchTeam.batFirst,
         ...teamWithoutPlayers,
       };
     });
@@ -173,9 +174,11 @@ export async function updateMatch(data: UpdateMatchSchema) {
     curPlayers,
     name,
     overs,
+    batFirst,
     strikeIndex,
     hasEnded,
     allowSinglePlayer,
+    curTeam,
   } = parsedRes.data;
 
   try {
@@ -184,6 +187,18 @@ export async function updateMatch(data: UpdateMatchSchema) {
       prisma.match,
       matchId,
     );
+
+    if (batFirst) {
+      await prisma.matchTeam.updateMany({
+        where: { matchId, batFirst: true },
+        data: { batFirst: false },
+      });
+
+      await prisma.matchTeam.updateMany({
+        where: { matchId, teamId: batFirst },
+        data: { batFirst: true },
+      });
+    }
 
     await prisma.match.update({
       where: { id: matchId },
@@ -194,6 +209,7 @@ export async function updateMatch(data: UpdateMatchSchema) {
         strikeIndex,
         hasEnded,
         allowSinglePlayer,
+        curTeam,
       },
       select: { id: true },
     });

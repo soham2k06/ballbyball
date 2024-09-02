@@ -128,7 +128,7 @@ type TopPerformant = PlayerPerformance & {
 type TeamWithPlayers = Team & { players: Player[] };
 
 type MatchExtended = Match & {
-  teams: (TeamWithPlayers & { playerIds: string[] })[];
+  teams: (TeamWithPlayers & { batFirst?: boolean; playerIds: string[] })[];
   ballEvents: BallEvent[];
 };
 
