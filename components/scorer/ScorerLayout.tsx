@@ -190,7 +190,7 @@ function ScorerLayout({
   }, [userRef]);
 
   // ** Over Summary
-  const { overSummaries, ballLimitInOver } = userRef
+  const { overSummaries, ballLimitInOver } = !userRef
     ? generateOverSummary(balls)
     : { overSummaries: [], ballLimitInOver: 6 };
 
