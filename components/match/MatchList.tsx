@@ -40,8 +40,9 @@ function MatchList({
         "flex flex-col items-center": !matches?.length,
       })}
     >
+      {!userRef && <StartMatchButton teams={teams} />}
       {matches?.length ? (
-        <ul className="mb-8 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {matches?.map((match) => (
             <Match
               key={match.id}
@@ -56,8 +57,6 @@ function MatchList({
       )}
       {!userRef && (
         <>
-          <StartMatchButton teams={teams} />
-
           <StartUpdateMatchDialog
             open={!!matchToUpdate}
             setOpen={() => setMatchToUpdate(undefined)}

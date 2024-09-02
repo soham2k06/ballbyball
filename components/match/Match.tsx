@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, Eye, MoreHorizontal, Play, Trash2 } from "lucide-react";
 
 import { EventType, MatchExtended } from "@/types";
 import { calculateWinner, getOverStr, getScore } from "@/lib/utils";
@@ -68,11 +68,15 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle>{match.name}</CardTitle>
         <div className="flex items-center space-x-4">
-          <Button asChild>
+          <Button asChild size="icon">
             <Link
               href={`/match/${match.id}${userRef ? `?user=${userRef}` : ""}`}
             >
-              {!match.hasEnded ? (!userRef ? "Play" : "Watch") : "Summary"}
+              {!match.hasEnded && !userRef ? (
+                <Play className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </Link>
           </Button>
 

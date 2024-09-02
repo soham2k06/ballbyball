@@ -29,6 +29,7 @@ function StartMatchButton({ teams }: { teams: TeamWithPlayers[] }) {
           if ((teams?.length ?? 0) < 2) setShowCreateTeam(true);
           else setOpen(true);
         }}
+        className="max-sm:w-full"
       >
         Start match
       </Button>
