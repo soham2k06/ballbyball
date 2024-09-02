@@ -5,7 +5,6 @@ import getSession from "@/lib/auth/session";
 import { Suspense } from "react";
 
 async function AsyncNav() {
-  await new Promise((resolve) => setTimeout(resolve, 5000));
   const session = await getSession();
 
   return <Nav session={session} />;
