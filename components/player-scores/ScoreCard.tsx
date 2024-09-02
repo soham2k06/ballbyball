@@ -86,8 +86,8 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
     <Tabs defaultValue="1-bat">
       <div className="px-2">
         <TabsList className="justify-normal divide-x divide-foreground/40 px-0 max-md:w-full">
-          {tabs.map((tab, i) => (
-            <div className="w-full px-1">
+          {tabs.map((tab) => (
+            <div className="w-full px-1" key={tab.id}>
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}

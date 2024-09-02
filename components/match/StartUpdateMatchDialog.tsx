@@ -39,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { cn } from "@/lib/utils";
+import { cn, processTeamName } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
@@ -113,6 +113,25 @@ function StartUpdateMatchDialog({
       reset(matchToUpdate);
     }
   }, [open, matchToUpdate]);
+
+  useEffect(() => {
+    const numTeams = (form.watch("teamIds") || []).length;
+    if (!form.watch("name") && numTeams === 2) {
+      const formattedTime = Intl.DateTimeFormat("en-US", {
+        hour: "2-digit",
+        minute: "numeric",
+        hour12: true,
+      })
+        .format(new Date())
+        .replace(/\s[AP]M/, "");
+
+      const matchName = `${selectedTeams
+        .map((team) => (team?.name ? processTeamName(team.name) : ""))
+        .join(" vs ")} (${formattedTime})`;
+
+      form.resetField("name", { defaultValue: matchName });
+    }
+  }, [form.watch("teamIds")]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -223,7 +242,7 @@ function StartUpdateMatchDialog({
                       </FormControl>
                       <SelectContent>
                         {selectedTeams.map((team, i) => (
-                          <SelectItem value={String(i)}>
+                          <SelectItem value={String(i)} key={team?.id}>
                             {team?.name}
                           </SelectItem>
                         ))}
@@ -283,24 +302,21 @@ function StartUpdateMatchDialog({
               )}
             />
 
-            <DialogDescription>
-              {(form.watch("teamIds")?.length ?? 0) >= 2 && (
-                <>
-                  {containsSamePlayer && (
-                    <p className="text-sm text-destructive">
-                      Both teams should not have same player, it may lead to
-                      bugs.
-                    </p>
-                  )}
-                  {isDifferentPlayerLengthTeams && (
-                    <p className="text-sm text-destructive">
-                      Both teams should have same number of players, please look
-                      into it.
-                    </p>
-                  )}
-                </>
-              )}
-            </DialogDescription>
+            {(form.watch("teamIds")?.length ?? 0) >= 2 && (
+              <>
+                {containsSamePlayer && (
+                  <DialogDescription className=" text-destructive">
+                    Both teams should not have same player, it may lead to bugs.
+                  </DialogDescription>
+                )}
+                {isDifferentPlayerLengthTeams && (
+                  <DialogDescription className="text-destructive">
+                    Both teams should have same number of players, please look
+                    into it.
+                  </DialogDescription>
+                )}
+              </>
+            )}
 
             <DialogFooter className="sticky bottom-0">
               <LoadingButton

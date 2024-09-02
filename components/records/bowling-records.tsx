@@ -157,14 +157,9 @@ function BowlingRecords({
                           {economy ? round(economy) : "-"}
                         </TableCell>
                         <TableCell className="text-center">
-                          {bestSpell ? (
-                            <>
-                              {bestSpell.wickets}/{bestSpell.runs} (
-                              {getOverStr(bestSpell.balls)})
-                            </>
-                          ) : (
-                            "-"
-                          )}
+                          {bestSpell
+                            ? bestSpell.wickets + "/" + bestSpell.runs
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-center">
                           {strikeRate ? round(strikeRate) : "-"}

@@ -63,7 +63,7 @@ function Score({
   return (
     <>
       <Table>
-        {!isBowlingScore && (
+        {!isBowlingScore && !!hasYetToBat.length && (
           <TableCaption className="mt-8 border-t py-2 font-bold uppercase">
             Yet to bat
           </TableCaption>
@@ -148,7 +148,7 @@ function Score({
 
             if (!totalBalls && hasYetToBatTeam === teamIndex)
               return (
-                <TableRow>
+                <TableRow key={player.id}>
                   <TableCell colSpan={6} className="text-left font-semibold">
                     {player.name}
                   </TableCell>
@@ -167,7 +167,7 @@ function Score({
             );
 
             return (
-              <TableRow>
+              <TableRow key={player.id}>
                 <TableCell className="text-left font-semibold">
                   <p>
                     {player.name} {!outBy && !isBowlingScore && "*"}
@@ -203,7 +203,7 @@ function Score({
             </li>
           ))}
         </ul>
-      ) : (
+      ) : fallOfWickets.length ? (
         <div>
           <h6 className="mt-8 border-t px-2 py-2 text-center text-sm font-bold uppercase text-muted-foreground">
             Fall of wickets
@@ -219,7 +219,7 @@ function Score({
             ))}
           </ul>
         </div>
-      )}
+      ) : null}
 
       <div className="sticky bottom-0.5 m-2 flex justify-between rounded-md bg-muted p-2">
         <span>

@@ -122,14 +122,14 @@ function AddUpdateTeamDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="rounded-md p-0">
+        <DialogContent className="rounded-md h-[95%] p-0">
           <DialogHeader className="p-4">
             <DialogTitle>{teamToUpdate ? "Update" : "Add"} Team</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
               onSubmit={handleSubmitOwn}
-              className="max-h-full space-y-3 overflow-y-auto p-4 pt-0"
+              className="space-y-3 overflow-y-auto p-4 pt-0"
             >
               <FormField
                 control={control}
@@ -157,7 +157,7 @@ function AddUpdateTeamDialog({
                       </FormDescription>
                     </div>
                     {players?.length ? (
-                      <ul className="grid max-h-96 grid-cols-2 gap-2 overflow-auto">
+                      <ul className="grid max-h-40 grid-cols-2 gap-2 overflow-auto">
                         {players?.map((item) => (
                           <FormField
                             key={item.id}
