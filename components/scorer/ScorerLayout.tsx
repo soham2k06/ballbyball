@@ -56,6 +56,7 @@ function ScorerLayout({
 
   // ** States
   const [hasEnded, setHasEnded] = useState(false);
+  const [showMatchSummary, setShowMatchSummary] = useState(false);
   const [curTeam, setCurTeam] = useState(match?.curTeam ?? 0);
   const [curPlayers, setCurPlayers] = useState<CurPlayer[]>(
     match?.curPlayers ?? [],
@@ -64,8 +65,6 @@ function ScorerLayout({
     match.ballEvents ?? [],
   );
   const [isModified, setIsModified] = useState(false);
-
-  const [canSaveEvents, setCanSaveEvents] = useState(false);
 
   // TODO: Mantain strike with sync of events if possible
   const [onStrikeBatsman, setOnStrikeBatsman] = useState(
@@ -159,34 +158,25 @@ function ScorerLayout({
     }
   }, [wickets, hasEnded]);
 
-  // Handle last ball of inning
+  // Handle last ball of over & inning change
   useEffect(() => {
     if (userRef) return;
     const matchBalls = (match?.overs || 0) * 6;
-    if (totalBalls === matchBalls) {
-      if (isInSecondInning || hasEnded) handleFinish();
-      else handleInningChange();
-    }
-  }, []);
+    const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
 
-  // Handle Save Events
-  useEffect(() => {
-    if (userRef) return;
-    if (canSaveEvents) {
-      createBallEvent(
-        events.map((event) => ({ ...event, matchId })),
-        {
-          onSuccess: () => {
-            setIsModified(false);
-            toast.success("Score saved successfully");
-          },
-        },
-      );
+    if (isLastBallOfOver) {
+      if (matchBalls !== totalBalls) setShowSelectBowler(true);
+
+      // Check if inning is finished
+      if (totalBalls === matchBalls) {
+        if (isInSecondInning || hasEnded) handleFinish();
+        else handleInningChange();
+      }
     }
-  }, [canSaveEvents]);
+  }, [totalBalls]);
 
   useEffect(() => {
-    if (userRef) setHasEnded(true);
+    if (userRef) setShowMatchSummary(true);
   }, [userRef]);
 
   // ** Over Summary
@@ -247,20 +237,6 @@ function ScorerLayout({
             ? event.slice(-1)
             : event) as EventType,
     );
-
-    const matchBalls = (match?.overs || 0) * 6;
-    const isLastBallOfOver =
-      totalBalls % 6 === 5 && totalBalls > 0 && getIsvalidBall(event);
-
-    if (isLastBallOfOver) {
-      if (matchBalls !== totalBalls) setShowSelectBowler(true);
-
-      // Check if inning is finished
-      if (totalBalls === matchBalls - 1 && getIsvalidBall(event)) {
-        if (isInSecondInning || hasEnded) handleFinish();
-        else handleInningChange();
-      }
-    }
   }
 
   function handleLastBallInWicket(event: string) {
@@ -307,9 +283,16 @@ function ScorerLayout({
   }
 
   function handleSave() {
-    if (userRef) return;
-    // Use this hack to get fresh events
-    if (balls.length && !match.hasEnded) setCanSaveEvents(true);
+    if (events.length && !match.hasEnded)
+      createBallEvent(
+        events.map((event) => ({ ...event, matchId })),
+        {
+          onSuccess: () => {
+            setIsModified(false);
+            toast.success("Score saved successfully");
+          },
+        },
+      );
 
     updateMutate({
       id: matchId,
@@ -331,6 +314,7 @@ function ScorerLayout({
   }
 
   function handleFinish() {
+    setShowMatchSummary(true);
     setHasEnded(true);
     if (!match?.hasEnded) {
       setShowSelectBatsman(false);
@@ -488,11 +472,12 @@ function ScorerLayout({
           />
           <MatchSummary
             ballEvents={events}
-            open={hasEnded}
+            open={showMatchSummary}
             setShowScorecard={setShowScorecard}
             match={match}
             playerIds={playerIds}
             handleUndo={() => {
+              setShowMatchSummary(false);
               setHasEnded(false);
               handleUndo();
               updateMutate({
@@ -506,18 +491,11 @@ function ScorerLayout({
         <>
           <MatchSummary
             ballEvents={events}
-            open={hasEnded}
+            open={showMatchSummary}
             setShowScorecard={setShowScorecard}
             match={match}
             playerIds={playerIds}
-            handleUndo={() => {
-              setHasEnded(false);
-              handleUndo();
-              updateMutate({
-                id: matchId,
-                hasEnded: false,
-              });
-            }}
+            handleUndo={() => {}}
           />
           <div className="hidden">
             <Tools
