@@ -34,6 +34,7 @@ export async function getAllMatches(user?: string | null) {
         orderBy: { id: "asc" },
       },
       matchTeams: {
+        orderBy: { batFirst: "desc" },
         include: {
           team: {
             select: {
@@ -48,15 +49,13 @@ export async function getAllMatches(user?: string | null) {
   });
 
   const matchesSimplified = matches.map((match) => {
-    const teams = match.matchTeams
-      .map((matchTeam) => {
-        const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
-        return {
-          playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
-          ...teamWithoutPlayers,
-        };
-      })
-      .sort((a, b) => b.id.localeCompare(a.id));
+    const teams = match.matchTeams.map((matchTeam) => {
+      const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
+      return {
+        playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
+        ...teamWithoutPlayers,
+      };
+    });
 
     const { matchTeams, ...matchWithoutMatchTeams } = match;
 
@@ -118,10 +117,10 @@ export async function createMatch(data: CreateMatchSchema) {
 
   if (!parsedRes.success) throw new Error("Invalid inputs");
 
-  const { name, teamIds, curTeam, overs, curPlayers, allowSinglePlayer } =
+  const { name, teamIds, batFirst, overs, curPlayers, allowSinglePlayer } =
     parsedRes.data;
 
-  const newTeams = curTeam === 0 ? teamIds : teamIds.reverse();
+  const curTeam = teamIds.findIndex((teamId) => teamId === batFirst);
 
   try {
     const newName = await createOrUpdateWithUniqueName(name, prisma.team);
@@ -131,10 +130,13 @@ export async function createMatch(data: CreateMatchSchema) {
         userId,
         name: newName,
         curPlayers,
-        curTeam: 0,
+        curTeam,
         matchTeams: {
           createMany: {
-            data: newTeams.map((teamId) => ({ teamId })),
+            data: teamIds.map((teamId) => ({
+              teamId,
+              batFirst: teamId === batFirst,
+            })),
           },
         },
         overs,
@@ -169,7 +171,6 @@ export async function updateMatch(data: UpdateMatchSchema) {
   const {
     id: matchId,
     curPlayers,
-    curTeam,
     name,
     overs,
     strikeIndex,
@@ -190,7 +191,6 @@ export async function updateMatch(data: UpdateMatchSchema) {
         name: newName || name,
         overs,
         curPlayers: curPlayers as CurPlayer[],
-        curTeam,
         strikeIndex,
         hasEnded,
         allowSinglePlayer,

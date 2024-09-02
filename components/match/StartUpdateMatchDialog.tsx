@@ -221,18 +221,16 @@ function StartUpdateMatchDialog({
 
             <FormField
               control={control}
-              name="curTeam"
+              name="batFirst"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Batting First Team</FormLabel>
                   <FormControl>
                     <Select
                       defaultValue={
-                        matchToUpdate ? String(matchToUpdate?.curTeam) : ""
+                        matchToUpdate ? matchToUpdate?.batFirst : ""
                       }
-                      onValueChange={(val) => {
-                        field.onChange(val ? parseInt(val) : 0);
-                      }}
+                      onValueChange={field.onChange}
                       disabled={!(watchedTeamIds ?? []).length}
                     >
                       <FormControl>
@@ -242,7 +240,7 @@ function StartUpdateMatchDialog({
                       </FormControl>
                       <SelectContent>
                         {selectedTeams.map((team, i) => (
-                          <SelectItem value={String(i)} key={team?.id}>
+                          <SelectItem value={team?.id ?? ""} key={team?.id}>
                             {team?.name}
                           </SelectItem>
                         ))}
