@@ -13,6 +13,7 @@ import Match from "./Match";
 import { MatchExtended, TeamWithPlayers } from "@/types";
 import { useActionMutate } from "@/lib/hooks";
 import { deleteMatch } from "@/lib/actions/match";
+import { useSearchParams } from "next/navigation";
 
 function MatchList({
   matches,
@@ -21,6 +22,9 @@ function MatchList({
   matches: MatchExtended[] | undefined;
   teams: TeamWithPlayers[];
 }) {
+  const searchParams = useSearchParams();
+  const userRef = searchParams.get("user");
+
   const { mutate: deleteMutate, isPending: isDeleting } =
     useActionMutate(deleteMatch);
 
@@ -50,21 +54,27 @@ function MatchList({
       ) : (
         <EmptyState document="matches" />
       )}
-      <StartMatchButton teams={teams} />
+      {!userRef && (
+        <>
+          <StartMatchButton teams={teams} />
 
-      <StartUpdateMatchDialog
-        open={!!matchToUpdate}
-        setOpen={() => setMatchToUpdate(undefined)}
-        matchToUpdate={matchToUpdate}
-        teams={teams}
-      />
-      <AlertNote
-        open={!!matchToDelete}
-        setOpen={() => setMatchToDelete(matchToDelete ? null : matchToDelete)}
-        onConfirm={() => matchToDelete && deleteMutate(matchToDelete)}
-        content="Removing matches will lead to removing all team and player stats connected with the match. Do you still want to continue?"
-        isLoading={isDeleting}
-      />
+          <StartUpdateMatchDialog
+            open={!!matchToUpdate}
+            setOpen={() => setMatchToUpdate(undefined)}
+            matchToUpdate={matchToUpdate}
+            teams={teams}
+          />
+          <AlertNote
+            open={!!matchToDelete}
+            setOpen={() =>
+              setMatchToDelete(matchToDelete ? null : matchToDelete)
+            }
+            onConfirm={() => matchToDelete && deleteMutate(matchToDelete)}
+            content="Removing matches will lead to removing all team and player stats connected with the match. Do you still want to continue?"
+            isLoading={isDeleting}
+          />
+        </>
+      )}
     </div>
   );
 }

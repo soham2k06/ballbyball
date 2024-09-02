@@ -10,17 +10,28 @@ export const metadata: Metadata = {
   description: "Add, edit, and delete teams. List of all teams.",
 };
 
-async function Teams() {
-  await checkSession();
+interface Props {
+  searchParams: {
+    user: string;
+  };
+}
 
-  const teams = await getAllTeams();
-  const players = await getAllPlayers();
+async function Teams({ searchParams }: Props) {
+  const userRef = searchParams.user;
+  if (!userRef) await checkSession();
+
+  const teams = await getAllTeams(userRef);
+  const players = await getAllPlayers(userRef);
   return (
     <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Teams
       </h1>
-      <TeamList teams={teams ?? []} players={players as Player[]} />
+      <TeamList
+        teams={teams ?? []}
+        players={players as Player[]}
+        userRef={userRef}
+      />
     </div>
   );
 }

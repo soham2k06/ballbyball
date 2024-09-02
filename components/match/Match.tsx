@@ -20,6 +20,7 @@ import {
 import { Button } from "../ui/button";
 import { TypographyP } from "../ui/typography";
 import { UpdateMatchSchema } from "@/lib/validation/match";
+import { useSearchParams } from "next/navigation";
 
 type Team = { teams: { id: string }[] };
 
@@ -30,6 +31,9 @@ interface MatchProps {
 }
 
 function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
+  const searchParams = useSearchParams();
+  const userRef = searchParams.get("user");
+
   const matchToUpdateVar = {
     ...match,
     teamIds: match.teams.map((team) => team.id),
@@ -65,32 +69,36 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
         <CardTitle>{match.name}</CardTitle>
         <div className="flex items-center space-x-4">
           <Button asChild>
-            <Link href={`/match/${match.id}`}>
-              {!match.hasEnded ? "Play" : "Summary"}
+            <Link
+              href={`/match/${match.id}${userRef ? `?user=${userRef}` : ""}`}
+            >
+              {!match.hasEnded ? (!userRef ? "Play" : "Watch") : "Summary"}
             </Link>
           </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="ghost">
-                <MoreHorizontal size={20} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="gap-2 font-bold"
-                onClick={() => setMatchToUpdate(matchToUpdateVar)}
-              >
-                <Edit size={20} /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="gap-2 font-bold"
-                onClick={() => setMatchToDelete(match.id)}
-              >
-                <Trash2 size={20} /> Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {!userRef && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost">
+                  <MoreHorizontal size={20} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="gap-2 font-bold"
+                  onClick={() => setMatchToUpdate(matchToUpdateVar)}
+                >
+                  <Edit size={20} /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-2 font-bold"
+                  onClick={() => setMatchToDelete(match.id)}
+                >
+                  <Trash2 size={20} /> Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </CardHeader>
       <CardContent>

@@ -16,8 +16,9 @@ import { revalidatePath } from "next/cache";
 import { updateMatchSchema } from "../validation/match";
 import { CurPlayer } from "@prisma/client";
 
-export async function getAllMatches() {
-  const userId = await getValidatedUser();
+export async function getAllMatches(user?: string | null) {
+  const userId = user ?? (await getValidatedUser());
+
   const matches = await prisma.match.findMany({
     where: { userId },
     select: {
@@ -47,13 +48,15 @@ export async function getAllMatches() {
   });
 
   const matchesSimplified = matches.map((match) => {
-    const teams = match.matchTeams.map((matchTeam) => {
-      const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
-      return {
-        playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
-        ...teamWithoutPlayers,
-      };
-    });
+    const teams = match.matchTeams
+      .map((matchTeam) => {
+        const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
+        return {
+          playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
+          ...teamWithoutPlayers,
+        };
+      })
+      .sort((a, b) => b.id.localeCompare(a.id));
 
     const { matchTeams, ...matchWithoutMatchTeams } = match;
 
@@ -63,8 +66,8 @@ export async function getAllMatches() {
   return matchesSimplified;
 }
 
-export async function getMatchById(id: string) {
-  const userId = await getValidatedUser();
+export async function getMatchById(id: string, user?: string | null) {
+  const userId = user ?? (await getValidatedUser());
 
   const fetchedMatch = await prisma.match.findFirst({
     where: { userId, id },

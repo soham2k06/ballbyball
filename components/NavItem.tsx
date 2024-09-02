@@ -1,5 +1,6 @@
 import { signIn, useSession } from "next-auth/react";
 import Link, { LinkProps } from "next/link";
+import { useSearchParams } from "next/navigation";
 
 interface NavItemProps extends LinkProps {
   children: React.ReactNode;
@@ -7,9 +8,14 @@ interface NavItemProps extends LinkProps {
 
 function NavItem({ children, href, ...props }: NavItemProps) {
   const { status } = useSession();
+  const searchParams = useSearchParams();
+  const userRef = searchParams.get("user");
 
   const isPrivateAndUnauthenticated =
-    status === "unauthenticated" && href !== "/guide" && href !== "/scorer";
+    !userRef &&
+    status === "unauthenticated" &&
+    href !== "/guide" &&
+    href !== "/scorer";
 
   return (
     <li
@@ -20,7 +26,11 @@ function NavItem({ children, href, ...props }: NavItemProps) {
       }}
     >
       <Link
-        href={isPrivateAndUnauthenticated ? "/" : href}
+        href={
+          isPrivateAndUnauthenticated
+            ? "/"
+            : href + (userRef ? `?user=${userRef}` : "")
+        }
         {...props}
         className="block rounded-md p-3 font-normal transition-colors hover:bg-secondary"
       >

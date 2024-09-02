@@ -14,8 +14,8 @@ import {
   UpdatePlayerSchema,
 } from "../validation/player";
 
-export async function getAllPlayers() {
-  const userId = await getValidatedUser();
+export async function getAllPlayers(user?: string | null) {
+  const userId = user ?? (await getValidatedUser());
   try {
     const players = await prisma.player.findMany({
       where: { userId },
@@ -101,7 +101,7 @@ export async function updatePlayer(data: UpdatePlayerSchema) {
 export async function deletePlayer(id: string) {
   try {
     const playerToDelete = await prisma.player.findUnique({ where: { id } });
-  
+
     if (!playerToDelete) throw new Error("Player not found!");
     await prisma.teamPlayer.deleteMany({ where: { playerId: id } });
     await prisma.player.delete({ where: { id } });

@@ -18,7 +18,13 @@ import { deletePlayer } from "@/lib/actions/player";
 import PlayerMatches from "./PlayerMatches";
 import { toast } from "sonner";
 
-function PlayerList({ players }: { players: PlayerType[] }) {
+function PlayerList({
+  players,
+  userRef,
+}: {
+  players: PlayerType[];
+  userRef?: string | null;
+}) {
   const [playerData, setPlayerData] = useState<PlayerType[]>(players);
   const { mutate: deleteMutate } = useActionMutate(deletePlayer);
 
@@ -51,6 +57,7 @@ function PlayerList({ players }: { players: PlayerType[] }) {
                 <Player
                   key={player.id}
                   player={player}
+                  userRef={userRef}
                   setPlayerToDelete={setPlayerToDelete}
                   setPlayerToUpdate={setPlayerToUpdate}
                   setOpenedPlayer={setOpenedPlayer}
@@ -62,56 +69,62 @@ function PlayerList({ players }: { players: PlayerType[] }) {
         ) : (
           <EmptyState document="players" />
         )}
-        <AddPlayerButton
-          setPlayerData={
-            setPlayerData as React.Dispatch<
-              React.SetStateAction<(PlayerType | undefined)[]>
-            >
-          }
-        />
+        {!userRef && (
+          <AddPlayerButton
+            setPlayerData={
+              setPlayerData as React.Dispatch<
+                React.SetStateAction<(PlayerType | undefined)[]>
+              >
+            }
+          />
+        )}
       </div>
-      <AddEditPlayerFormDialog
-        open={!!playerToUpdate}
-        setOpen={() =>
-          setPlayerToUpdate(playerToUpdate ? undefined : playerToUpdate)
-        }
-        setPlayerData={
-          setPlayerData as React.Dispatch<
-            React.SetStateAction<(PlayerType | undefined)[]>
-          >
-        }
-        playerToUpdate={playerToUpdate}
-      />
-      <AlertNote
-        open={!!playerToDelete}
-        setOpen={() =>
-          setPlayerToDelete(playerToDelete ? undefined : playerToDelete)
-        }
-        noLoading
-        content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
-        onConfirm={() => {
-          if (playerToDelete) {
-            setPlayerData((prevData) =>
-              prevData.filter((player) => player?.id !== playerToDelete),
-            );
-
-            deleteMutate(playerToDelete, {
-              onError: () => {
-                setPlayerData(
-                  (prevData) =>
-                    [
-                      ...prevData,
-                      playerData.find(
-                        (player) => player?.id === playerToDelete,
-                      ),
-                    ] as PlayerType[],
+      {!userRef && (
+        <>
+          <AddEditPlayerFormDialog
+            open={!!playerToUpdate}
+            setOpen={() =>
+              setPlayerToUpdate(playerToUpdate ? undefined : playerToUpdate)
+            }
+            setPlayerData={
+              setPlayerData as React.Dispatch<
+                React.SetStateAction<(PlayerType | undefined)[]>
+              >
+            }
+            playerToUpdate={playerToUpdate}
+          />
+          <AlertNote
+            open={!!playerToDelete}
+            setOpen={() =>
+              setPlayerToDelete(playerToDelete ? undefined : playerToDelete)
+            }
+            noLoading
+            content="Removing players may lead to bugs if the player is included in any matches. Do you still want to continue?"
+            onConfirm={() => {
+              if (playerToDelete) {
+                setPlayerData((prevData) =>
+                  prevData.filter((player) => player?.id !== playerToDelete),
                 );
-                toast.error("Failed to delete player");
-              },
-            });
-          }
-        }}
-      />
+
+                deleteMutate(playerToDelete, {
+                  onError: () => {
+                    setPlayerData(
+                      (prevData) =>
+                        [
+                          ...prevData,
+                          playerData.find(
+                            (player) => player?.id === playerToDelete,
+                          ),
+                        ] as PlayerType[],
+                    );
+                    toast.error("Failed to delete player");
+                  },
+                });
+              }
+            }}
+          />
+        </>
+      )}
 
       <PlayerStats
         openedPlayer={openedPlayer}

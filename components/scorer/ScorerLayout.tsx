@@ -41,9 +41,11 @@ import { deleteAllBallEvents, saveBallEvents } from "@/lib/actions/ball-event";
 function ScorerLayout({
   matchId,
   match,
+  userRef,
 }: {
   matchId: string;
   match: MatchExtended;
+  userRef: string | null;
 }) {
   // ** Action hooks
   const { mutate: createBallEvent, isPending } =
@@ -114,6 +116,7 @@ function ScorerLayout({
 
   // Handling initial player selection
   useEffect(() => {
+    if (userRef) return;
     if (hasEnded) return;
     const getHasPlayer = (type: "batsman" | "bowler") =>
       curPlayers?.some((player) => player.type === type);
@@ -127,12 +130,14 @@ function ScorerLayout({
 
   // Handling strike change on last ball of over
   useEffect(() => {
+    if (userRef) return;
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
     if (isLastBallOfOver && curBatsmenIds.length === 2) changeStrike();
   }, [totalBalls]);
 
   // Handling Succesfull Chase
   useEffect(() => {
+    if (userRef) return;
     const remainingRuns = opponentRuns - runs + 1;
     if (!opponentEvents.length) return;
     if (remainingRuns <= 0) handleFinish();
@@ -140,6 +145,7 @@ function ScorerLayout({
 
   // Handling All out win
   useEffect(() => {
+    if (userRef) return;
     const isAllOut =
       wickets ===
       (team?.players.length || 0) - (match?.allowSinglePlayer ? 0 : 1);
@@ -155,6 +161,7 @@ function ScorerLayout({
 
   // Handle last ball of inning
   useEffect(() => {
+    if (userRef) return;
     const matchBalls = (match?.overs || 0) * 6;
     if (totalBalls === matchBalls) {
       if (isInSecondInning || hasEnded) handleFinish();
@@ -164,6 +171,7 @@ function ScorerLayout({
 
   // Handle Save Events
   useEffect(() => {
+    if (userRef) return;
     if (canSaveEvents) {
       createBallEvent(
         events.map((event) => ({ ...event, matchId })),
@@ -177,8 +185,14 @@ function ScorerLayout({
     }
   }, [canSaveEvents]);
 
+  useEffect(() => {
+    if (userRef) setHasEnded(true);
+  }, [userRef]);
+
   // ** Over Summary
-  const { overSummaries, ballLimitInOver } = generateOverSummary(balls);
+  const { overSummaries, ballLimitInOver } = userRef
+    ? generateOverSummary(balls)
+    : { overSummaries: [], ballLimitInOver: 6 };
 
   const curOverIndex = Math.floor(totalBalls / 6);
 
@@ -293,6 +307,7 @@ function ScorerLayout({
   }
 
   function handleSave() {
+    if (userRef) return;
     // Use this hack to get fresh events
     if (balls.length && !match.hasEnded) setCanSaveEvents(true);
 
@@ -362,129 +377,160 @@ function ScorerLayout({
 
   return (
     <StatsOpenProvider>
-      <Card className="relative max-sm:w-full max-sm:border-0 max-sm:shadow-none sm:w-96 sm:p-2">
-        <div className="absolute left-0 top-0 flex w-full items-center justify-between sm:p-2">
-          <div>
-            <LoadingButton
-              loading={isPending}
-              disabled={isPending || !isModified}
-              onClick={handleSave}
-            >
-              {isPending ? "Saving..." : "Save"}
-            </LoadingButton>
+      {!userRef ? (
+        <Card className="relative max-sm:w-full max-sm:border-0 max-sm:shadow-none sm:w-96 sm:p-2">
+          <div className="absolute left-0 top-0 flex w-full items-center justify-between sm:p-2">
+            <div>
+              <LoadingButton
+                loading={isPending}
+                disabled={isPending || !isModified}
+                onClick={handleSave}
+              >
+                {isPending ? "Saving..." : "Save"}
+              </LoadingButton>
+            </div>
+            <DangerActions
+              backLink="/matches"
+              handleRestart={handleRestart}
+              handleUndo={handleUndo}
+            />
           </div>
-          <DangerActions
-            backLink="/matches"
-            handleRestart={handleRestart}
-            handleUndo={handleUndo}
-          />
-        </div>
-        <CardContent className="max-sm:p-0">
-          <ScoreDisplay
-            curTeam={team?.name}
-            runs={runs}
-            wickets={wickets}
-            totalBalls={totalBalls}
-            runRate={runRate}
-          />
-          {!!opponentEvents.length && (
-            <TargetInfo
-              runs={runs}
-              target={opponentRuns + 1}
-              ballsRemaining={(match?.overs ?? 0) * 6 - totalBalls || 0}
+          <CardContent className="max-sm:p-0">
+            <ScoreDisplay
               curTeam={team?.name}
+              runs={runs}
+              wickets={wickets}
+              totalBalls={totalBalls}
+              runRate={runRate}
+            />
+            {!!opponentEvents.length && (
+              <TargetInfo
+                runs={runs}
+                target={opponentRuns + 1}
+                ballsRemaining={(match?.overs ?? 0) * 6 - totalBalls || 0}
+                curTeam={team?.name}
+              />
+            )}
+
+            <ul className="mt-6 flex justify-start gap-2 overflow-x-auto">
+              {Array.from({ length: ballLimitInOver }, (_, i) => (
+                <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
+              ))}
+            </ul>
+          </CardContent>
+          <div className="my-4" />
+
+          <BatsmanScores
+            players={team.players}
+            onStrikeBatsman={onStrikeBatsman}
+            playerIds={curBatsmenIds}
+            events={events as BallEvent[]}
+          />
+          <div className="my-2 md:my-4" />
+          <BowlerScores
+            player={opposingTeam.players.find(
+              (player) => curBowlerId === player.id,
+            )}
+            events={events as BallEvent[]}
+          />
+          <Separator className="my-3" />
+          <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
+
+          <div className="mt-4 md:mt-6" />
+          <Tools
+            curPlayers={curPlayers}
+            setCurPlayers={setCurPlayers}
+            events={events}
+            match={match}
+            showScorecard={showScorecard}
+            setShowScorecard={setShowScorecard}
+          />
+
+          {/* DIALOGS */}
+          {!hasEnded && (
+            <SelectBatsman
+              open={showSelectBatsman}
+              setOpen={setShowSelectBatsman}
+              curPlayers={curPlayers}
+              events={events}
+              team={{ name: team?.name, players: team?.players }}
+              handleUndo={() => {
+                handleUndo();
+                setCurPlayers(match?.curPlayers || []);
+                setShowSelectBatsman(false);
+              }}
+              handleSelectPlayer={handleSelectPlayer}
+              allowSinglePlayer={match?.allowSinglePlayer}
+            />
+          )}
+          {!hasEnded && (
+            <SelectBowler
+              open={showSelectBowler}
+              setOpen={setShowSelectBowler}
+              curPlayers={curPlayers}
+              handleSelectPlayer={handleSelectPlayer}
+              team={{
+                name: opposingTeam?.name,
+                players: opposingTeam?.players,
+              }}
+              handleUndo={() => {
+                handleUndo();
+                setShowSelectBowler(false);
+              }}
             />
           )}
 
-          <ul className="mt-6 flex justify-start gap-2 overflow-x-auto">
-            {Array.from({ length: ballLimitInOver }, (_, i) => (
-              <BallSummary key={i} event={overSummaries[curOverIndex]?.[i]} />
-            ))}
-          </ul>
-        </CardContent>
-        <div className="my-4" />
-
-        <BatsmanScores
-          players={team.players}
-          onStrikeBatsman={onStrikeBatsman}
-          playerIds={curBatsmenIds}
-          events={events as BallEvent[]}
-        />
-        <div className="my-2 md:my-4" />
-        <BowlerScores
-          player={opposingTeam.players.find(
-            (player) => curBowlerId === player.id,
-          )}
-          events={events as BallEvent[]}
-        />
-        <Separator className="my-3" />
-        <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
-        {/* {!isUpdatingMatch && !isPending ? (
-        ) : (
-          <ScoreButtonsSkeleton />
-        )} */}
-        <div className="mt-4 md:mt-6" />
-        <Tools
-          curPlayers={curPlayers}
-          setCurPlayers={setCurPlayers}
-          events={events}
-          match={match}
-          showScorecard={showScorecard}
-          setShowScorecard={setShowScorecard}
-        />
-
-        {/* DIALOGS */}
-        {!hasEnded && (
-          <SelectBatsman
-            open={showSelectBatsman}
-            setOpen={setShowSelectBatsman}
-            curPlayers={curPlayers}
-            events={events}
-            team={{ name: team?.name, players: team?.players }}
-            handleUndo={() => {
-              handleUndo();
-              setCurPlayers(match?.curPlayers || []);
-              setShowSelectBatsman(false);
-            }}
-            handleSelectPlayer={handleSelectPlayer}
-            allowSinglePlayer={match?.allowSinglePlayer}
+          <FieldersDialog
+            wicketTypeId={wicketTypeId}
+            setWicketTypeId={setWicketTypeId}
+            fielders={opposingTeam?.players}
+            handleScore={handleWicketWithFielder}
           />
-        )}
-        {!hasEnded && (
-          <SelectBowler
-            open={showSelectBowler}
-            setOpen={setShowSelectBowler}
-            curPlayers={curPlayers}
-            handleSelectPlayer={handleSelectPlayer}
-            team={{ name: opposingTeam?.name, players: opposingTeam?.players }}
+          <MatchSummary
+            ballEvents={events}
+            open={hasEnded}
+            setShowScorecard={setShowScorecard}
+            match={match}
+            playerIds={playerIds}
             handleUndo={() => {
+              setHasEnded(false);
               handleUndo();
-              setShowSelectBowler(false);
+              updateMutate({
+                id: matchId,
+                hasEnded: false,
+              });
             }}
           />
-        )}
-
-        <FieldersDialog
-          wicketTypeId={wicketTypeId}
-          setWicketTypeId={setWicketTypeId}
-          fielders={opposingTeam?.players}
-          handleScore={handleWicketWithFielder}
-        />
-        <MatchSummary
-          ballEvents={events}
-          open={hasEnded}
-          setShowScorecard={setShowScorecard}
-          match={match}
-          handleUndo={() => {
-            setHasEnded(false);
-            handleUndo();
-            updateMutate({
-              id: matchId,
-              hasEnded: false,
-            });
-          }}
-        />
-      </Card>
+        </Card>
+      ) : (
+        <>
+          <MatchSummary
+            ballEvents={events}
+            open={hasEnded}
+            setShowScorecard={setShowScorecard}
+            match={match}
+            playerIds={playerIds}
+            handleUndo={() => {
+              setHasEnded(false);
+              handleUndo();
+              updateMutate({
+                id: matchId,
+                hasEnded: false,
+              });
+            }}
+          />
+          <div className="hidden">
+            <Tools
+              curPlayers={curPlayers}
+              setCurPlayers={setCurPlayers}
+              events={events}
+              match={match}
+              showScorecard={showScorecard}
+              setShowScorecard={setShowScorecard}
+            />
+          </div>
+        </>
+      )}
     </StatsOpenProvider>
   );
 }

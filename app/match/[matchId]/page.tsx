@@ -11,17 +11,24 @@ export const metadata: Metadata = {
 
 export default async function Match({
   params,
+  searchParams,
 }: {
   params: { matchId: string };
+  searchParams: { user: string };
 }) {
-  await checkSession();
+  const userRef = searchParams.user;
+  if (!userRef) await checkSession();
 
-  const match = await getMatchById(params.matchId);
+  const match = await getMatchById(params.matchId, userRef);
 
   return (
     <div className="flex h-full flex-col items-center md:justify-center">
       {match ? (
-        <ScorerLayout matchId={params.matchId} match={match} />
+        <ScorerLayout
+          matchId={params.matchId}
+          match={match}
+          userRef={userRef}
+        />
       ) : (
         <NoMatchFound />
       )}

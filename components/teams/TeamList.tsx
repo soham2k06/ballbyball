@@ -23,9 +23,11 @@ import TeamBuilder from "./team-builder";
 function TeamList({
   teams,
   players,
+  userRef,
 }: {
   teams: TeamWithPlayers[];
   players: Player[];
+  userRef: string | null;
 }) {
   const { mutate: deleteMutate, isPending } = useActionMutate(deleteTeam);
 
@@ -77,6 +79,7 @@ function TeamList({
                 team={team}
                 setTeamToDelete={setTeamToDelete}
                 setShowingTeam={setShowingTeam}
+                userRef={userRef}
                 handleUpdateClick={(team) => handleUpdateClick(i, team)}
               />
             );
@@ -85,24 +88,32 @@ function TeamList({
       ) : (
         <EmptyState document="teams" />
       )}
-      <div>
-        <TeamBuilder players={players} />
-        <CreateTeam players={players} />
-      </div>
-      <AddUpdateTeamDialog
-        players={players}
-        open={!!teamToUpdate}
-        setOpen={() => setTeamToUpdate(teamToUpdate ? undefined : teamToUpdate)}
-        teamToUpdate={teamToUpdate}
-      />
+      {!userRef && (
+        <>
+          <div>
+            <TeamBuilder players={players} />
+            <CreateTeam players={players} />
+          </div>
+          <AddUpdateTeamDialog
+            players={players}
+            open={!!teamToUpdate}
+            setOpen={() =>
+              setTeamToUpdate(teamToUpdate ? undefined : teamToUpdate)
+            }
+            teamToUpdate={teamToUpdate}
+          />
 
-      <AlertNote
-        open={!!teamToDelete}
-        setOpen={() => setTeamToDelete(teamToDelete ? undefined : teamToDelete)}
-        content="Removing team may lead to bugs if the team is included in  matches. Do you still want to continue?"
-        onConfirm={() => teamToDelete && handleDelete(teamToDelete)}
-        isLoading={isPending}
-      />
+          <AlertNote
+            open={!!teamToDelete}
+            setOpen={() =>
+              setTeamToDelete(teamToDelete ? undefined : teamToDelete)
+            }
+            content="Removing team may lead to bugs if the team is included in  matches. Do you still want to continue?"
+            onConfirm={() => teamToDelete && handleDelete(teamToDelete)}
+            isLoading={isPending}
+          />
+        </>
+      )}
 
       <TeamPlayers
         showingTeam={showingTeam}

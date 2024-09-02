@@ -25,6 +25,7 @@ interface TeamProps {
     captainId: string | null;
     name: string;
   }) => void;
+  userRef: string | null;
 }
 
 function Team({
@@ -32,6 +33,7 @@ function Team({
   handleUpdateClick,
   setTeamToDelete,
   setShowingTeam,
+  userRef,
 }: TeamProps) {
   return (
     <>
@@ -56,19 +58,23 @@ function Team({
             >
               <Users size={20} /> Players
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-2 font-bold"
-              onClick={() => handleUpdateClick(team)}
-            >
-              <Edit size={20} /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="gap-2 font-bold"
-              onClick={() => setTeamToDelete(team.id)}
-            >
-              <Trash2 size={20} /> Delete
-            </DropdownMenuItem>
+            {!userRef && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="gap-2 font-bold"
+                  onClick={() => handleUpdateClick(team)}
+                >
+                  <Edit size={20} /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-2 font-bold"
+                  onClick={() => setTeamToDelete(team.id)}
+                >
+                  <Trash2 size={20} /> Delete
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </Card>

@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import { getValidatedUser } from "@/lib/utils";
+import { checkSession, getValidatedUser } from "@/lib/utils";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BowlingRecords from "@/components/records/bowling-records";
@@ -7,8 +7,17 @@ import BattingRecords from "@/components/records/batting-records";
 import { Suspense } from "react";
 import RecordsSkeleton from "@/components/records/records-skeleton";
 
-async function Records() {
-  const userId = await getValidatedUser();
+interface Props {
+  searchParams: {
+    user: string;
+  };
+}
+
+async function Records({ searchParams }: Props) {
+  const userRef = searchParams.user;
+  if (!userRef) await checkSession();
+
+  const userId = userRef ?? (await getValidatedUser());
 
   const players = await prisma.player.findMany({
     where: { userId },
@@ -26,7 +35,7 @@ async function Records() {
   );
 }
 
-function RecordsPage() {
+function RecordsPage({ searchParams }: Props) {
   return (
     <div>
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
@@ -38,7 +47,7 @@ function RecordsPage() {
           <TabsTrigger value="wickets">Most Wickets</TabsTrigger>
         </TabsList>
         <Suspense fallback={<RecordsSkeleton />}>
-          <Records />
+          <Records searchParams={searchParams} />
         </Suspense>
       </Tabs>
     </div>

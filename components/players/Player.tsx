@@ -32,10 +32,12 @@ interface PlayerProps {
     id: string | undefined;
     name: string | undefined;
   }) => void;
+  userRef?: string | null;
 }
 
 function Player({
   player,
+  userRef,
   setPlayerToDelete,
   setPlayerToUpdate,
   setOpenedPlayer,
@@ -46,7 +48,6 @@ function Player({
     setPlayerMatchesOpen(playerId);
   return (
     <Card className="flex items-center justify-between p-2 sm:p-4">
-      {/* <CardTitle>{truncStr(player.name as string, 10)}</CardTitle> */}
       <CardTitle className="truncate">{player.name}</CardTitle>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="shrink-0">
@@ -72,31 +73,35 @@ function Player({
           >
             <LandPlot size={20} /> Matches
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="gap-2 font-medium"
-            onClick={() => {
-              if (player.id.includes("optimistic"))
-                return toast.error(
-                  "Error updating player, please reload and try again",
-                );
-              setPlayerToUpdate(player);
-            }}
-          >
-            <Edit size={20} /> Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="gap-2 font-medium"
-            onClick={() => {
-              if (player.id.includes("optimistic"))
-                return toast.error(
-                  "Error deleting player, please reload and try again",
-                );
-              handleDelete(player.id);
-            }}
-          >
-            <Trash2 size={20} /> Delete
-          </DropdownMenuItem>
+          {!userRef && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-2 font-medium"
+                onClick={() => {
+                  if (player.id.includes("optimistic"))
+                    return toast.error(
+                      "Error updating player, please reload and try again",
+                    );
+                  setPlayerToUpdate(player);
+                }}
+              >
+                <Edit size={20} /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="gap-2 font-medium"
+                onClick={() => {
+                  if (player.id.includes("optimistic"))
+                    return toast.error(
+                      "Error deleting player, please reload and try again",
+                    );
+                  handleDelete(player.id);
+                }}
+              >
+                <Trash2 size={20} /> Delete
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </Card>

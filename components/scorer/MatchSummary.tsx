@@ -22,6 +22,8 @@ import {
 import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 import { TypographyH4 } from "../ui/typography";
+import { useSearchParams } from "next/navigation";
+import TargetInfo from "./TargetInfo";
 
 interface MatchSummaryProps {
   open: OverlayStateProps["open"];
@@ -29,6 +31,7 @@ interface MatchSummaryProps {
   ballEvents: BallEvent[] | CreateBallEventSchema[];
   handleUndo: () => void;
   match: MatchExtended | undefined;
+  playerIds: string[];
 }
 
 function MatchSummary({
@@ -37,7 +40,15 @@ function MatchSummary({
   ballEvents,
   handleUndo,
   match,
+  playerIds,
 }: MatchSummaryProps) {
+  const searchParams = useSearchParams();
+  const userRef = searchParams.get("user");
+
+  const opponentEvents = ballEvents?.filter((event) =>
+    playerIds.includes(event.bowlerId),
+  );
+
   const { setShowRunrateChart, setShowOverSummaries, setShowWormChart } =
     useStatsOpenContext();
 
@@ -102,16 +113,18 @@ function MatchSummary({
   });
   const totalWickets = teams[1]?.playerIds?.length ?? 0;
 
-  const { winInfo, winner } = calculateWinner({
-    allowSinglePlayer,
-    matchBalls,
-    runs1,
-    runs2,
-    teams: teams.map(({ name }) => name ?? ""),
-    totalBalls,
-    totalWickets,
-    wickets2,
-  });
+  const { winInfo, winner } = match?.hasEnded
+    ? calculateWinner({
+        allowSinglePlayer,
+        matchBalls,
+        runs1,
+        runs2,
+        teams: teams.map(({ name }) => name ?? ""),
+        totalBalls,
+        totalWickets,
+        wickets2,
+      })
+    : { winInfo: "Match in progress", winner: 0 };
 
   const playersPerformance: PlayerPerformance[] = Object.values(
     groupedEvents,
@@ -181,18 +194,24 @@ function MatchSummary({
       }));
   }
 
-  const playerOfTheMatchData = calculatePlayerOfTheMatch({
-    playersPerformance,
-  });
+  const playerOfTheMatchData = match?.hasEnded
+    ? calculatePlayerOfTheMatch({
+        playersPerformance,
+      })
+    : null;
 
-  const playerOfTheMatch = match?.teams
-    .find((team) => team.name === playerOfTheMatchData.team)
-    ?.players.find((player) => player.id === playerOfTheMatchData.playerId);
+  const playerOfTheMatch = playerOfTheMatchData
+    ? match?.teams
+        .find((team) => team.name === playerOfTheMatchData.team)
+        ?.players.find((player) => player.id === playerOfTheMatchData.playerId)
+    : null;
 
-  const playerOfTheMatchNotout = getIsNotOut({
-    ballEvents: ballEvents as BallEvent[],
-    playerId: playerOfTheMatchData.playerId,
-  });
+  const playerOfTheMatchNotout = playerOfTheMatchData
+    ? getIsNotOut({
+        ballEvents: ballEvents as BallEvent[],
+        playerId: playerOfTheMatchData.playerId,
+      })
+    : false;
 
   return (
     <Dialog open={open}>
@@ -203,7 +222,7 @@ function MatchSummary({
         <DialogHeader className="w-full flex-row items-center justify-between border-b pb-6">
           <DialogTitle>Match Summary</DialogTitle>
 
-          {match && (
+          {match && !userRef && (
             <Button variant="destructive" onClick={handleUndo}>
               Undo
             </Button>
@@ -239,41 +258,71 @@ function MatchSummary({
                 );
               })}
             </div>
-            <p className="text-center font-medium">{winInfo}</p>
-            <Separator className="my-2" />
-            <div className="rounded-md bg-muted p-2">
-              <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
-                Player of the Match
-              </h4>
-              <p>
-                <strong>{playerOfTheMatch?.name}</strong> (
-                {processTeamName(playerOfTheMatchData.team)}) ·{" "}
-                {!!playerOfTheMatchData.ballsBowled && (
-                  <>
-                    {" "}
-                    {playerOfTheMatchData.wicketsTaken}/
-                    {playerOfTheMatchData.runConceded} (
-                    {getOverStr(playerOfTheMatchData.ballsBowled)})
-                  </>
-                )}
-                {!!playerOfTheMatchData.ballsBowled &&
-                  !!playerOfTheMatchData.ballsFaced &&
-                  " & "}
-                {playerOfTheMatchData.ballsFaced && (
-                  <>
-                    {playerOfTheMatchData.runsScored}
-                    {playerOfTheMatchNotout && "*"} (
-                    {playerOfTheMatchData.ballsFaced})
-                  </>
-                )}
+            {match.hasEnded ? (
+              <p className="text-center font-medium">{winInfo}</p>
+            ) : opponentEvents.length ? (
+              <TargetInfo
+                target={runs2 + 1}
+                ballsRemaining={matchBalls - totalBalls}
+                runs={runs1}
+                curTeam={teams[0].name}
+              />
+            ) : (
+              <p className="text-center font-medium">
+                Waiting for opponent to start
               </p>
-            </div>
+            )}
+            {playerOfTheMatchData && (
+              <>
+                <Separator className="my-2" />
+                <div className="rounded-md bg-muted p-2">
+                  <h4 className="mb-1 text-xs font-bold uppercase text-muted-foreground">
+                    Player of the Match
+                  </h4>
+                  <p>
+                    <strong>{playerOfTheMatch?.name}</strong> (
+                    {processTeamName(playerOfTheMatchData.team)}) ·{" "}
+                    {!!playerOfTheMatchData.ballsBowled && (
+                      <>
+                        {" "}
+                        {playerOfTheMatchData.wicketsTaken}/
+                        {playerOfTheMatchData.runConceded} (
+                        {getOverStr(playerOfTheMatchData.ballsBowled)})
+                      </>
+                    )}
+                    {!!playerOfTheMatchData.ballsBowled &&
+                      !!playerOfTheMatchData.ballsFaced &&
+                      " & "}
+                    {playerOfTheMatchData.ballsFaced && (
+                      <>
+                        {playerOfTheMatchData.runsScored}
+                        {playerOfTheMatchNotout && "*"} (
+                        {playerOfTheMatchData.ballsFaced})
+                      </>
+                    )}
+                  </p>
+                </div>
+              </>
+            )}
 
             <ul className="space-y-2">
               {teams.map((team, i) => {
                 const { runs, totalBalls, wickets } = getScore({
                   balls: ballEventsbyTeam(i) || [],
                 });
+
+                if (!totalBalls && !runs && !wickets)
+                  return (
+                    <div key={team.name}>
+                      <span className="custom-divider text-sm">
+                        {processTeamName(team.name ?? "")} · {runs}/{wickets} (
+                        {getOverStr(totalBalls)})
+                      </span>
+                      <p className="mt-2 text-center text-sm text-muted-foreground">
+                        Yet to play
+                      </p>
+                    </div>
+                  );
 
                 const topBatsmen = (topPerformants ?? [])
                   .filter(
@@ -349,7 +398,9 @@ function MatchSummary({
               asChild
               variant="secondary"
             >
-              <Link href="/matches">Back & Finish</Link>
+              <Link href={`/matches${userRef ? `?user=${userRef} ` : ""}`}>
+                Back & Finish
+              </Link>
             </Button>
           </>
         )}

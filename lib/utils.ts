@@ -376,6 +376,7 @@ function round(num: number, places = 2) {
 
 async function getValidatedUser() {
   const session = await getCachedSession();
+
   if (!session?.user?.id) throw new Error("User not authenticated");
 
   return session.user.id;

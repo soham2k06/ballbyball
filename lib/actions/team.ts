@@ -15,8 +15,8 @@ import {
 } from "../validation/team";
 import { revalidatePath } from "next/cache";
 
-export async function getAllTeams() {
-  const userId = await getValidatedUser();
+export async function getAllTeams(user?: string | null) {
+  const userId = user ?? (await getValidatedUser());
 
   try {
     const teams = await prisma.team.findMany({
