@@ -122,8 +122,6 @@ export async function createMatch(data: CreateMatchSchema) {
   const { name, teamIds, batFirst, overs, curPlayers, allowSinglePlayer } =
     parsedRes.data;
 
-  const curTeam = teamIds.findIndex((teamId) => teamId === batFirst);
-
   try {
     const newName = await createOrUpdateWithUniqueName(name, prisma.team);
 
@@ -132,7 +130,7 @@ export async function createMatch(data: CreateMatchSchema) {
         userId,
         name: newName,
         curPlayers,
-        curTeam,
+        curTeam: 0,
         matchTeams: {
           createMany: {
             data: teamIds.map((teamId) => ({
