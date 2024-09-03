@@ -59,20 +59,19 @@ function StatsAndSettings({
   const curTeam = match?.teams[match.curTeam];
   const opposingTeam = match?.teams[match.curTeam === 0 ? 1 : 0];
 
-  const playerIds = curTeam?.players.map((player) => player.id) || [];
+  const firstTeam = match?.teams[0];
+
+  const fTeamPlayerIds = firstTeam?.players.map((player) => player.id) || [];
 
   const fTeamEvents = events
-    .filter((event) => playerIds.includes(event.batsmanId))
+    .filter((event) => fTeamPlayerIds.includes(event.batsmanId))
     .map((event) => event.type as EventType);
 
   const sTeamEvents = events
-    .filter((event) => playerIds.includes(event.bowlerId))
+    .filter((event) => fTeamPlayerIds.includes(event.bowlerId))
     .map((event) => event.type as EventType);
 
-  const ballEventsArr =
-    match?.curTeam === 0
-      ? [fTeamEvents, sTeamEvents]
-      : [sTeamEvents, fTeamEvents];
+  const ballEventsArr = [fTeamEvents, sTeamEvents];
 
   const {
     runs: runs1,

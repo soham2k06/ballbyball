@@ -1,7 +1,7 @@
 import { BallEvent, Player } from "@prisma/client";
 
 import { MatchExtended } from "@/types";
-import { calculateFallOfWickets, processTeamName } from "@/lib/utils";
+import { calcRuns, calculateFallOfWickets, processTeamName } from "@/lib/utils";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ScrollArea } from "../ui/scroll-area";
@@ -19,18 +19,14 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
   const teams = match.teams;
 
   const curTeam = match.curTeam;
-  const notCurTeam = match.curTeam === 0 ? 1 : 0;
 
   const isInSecondInning = !new Set(
     match.teams[curTeam].players.map((player) => player.id),
   ).has(ballEvents[0]?.batsmanId);
 
-  const firstBattingTeamIndex = isInSecondInning ? notCurTeam : curTeam;
-  const secondBattingTeamIndex = isInSecondInning ? curTeam : notCurTeam;
-
-  const firstBattingTeam = teams[firstBattingTeamIndex];
-  const secondBattingTeam = teams[secondBattingTeamIndex];
-  const hasYetToBatTeam = isInSecondInning ? null : secondBattingTeamIndex;
+  const firstBattingTeam = teams[0];
+  const secondBattingTeam = teams[1];
+  const hasYetToBatTeam = isInSecondInning ? null : 1;
 
   function getScoreProps(
     players: Player[],
@@ -43,17 +39,23 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
         .includes(event[isBowlingScore ? "bowlerId" : "batsmanId"]),
     );
 
+    const selectedTeam = teams[i];
+
+    if (i === 1)
+      console.log(
+        calcRuns(ballEventsToPass.slice(0, 19).map((event) => event.type)),
+      );
+
+    const fallOfWickets = !isBowlingScore
+      ? []
+      : calculateFallOfWickets(ballEventsToPass, selectedTeam.players);
+
     return {
       ballEvents: ballEventsToPass,
       isBowlingScore,
       players,
       hasYetToBatTeam,
-      fallOfWickets: !isBowlingScore
-        ? []
-        : calculateFallOfWickets(
-            ballEventsToPass,
-            teams.map((team) => team.players).flat(),
-          ),
+      fallOfWickets,
       teamIndex: i,
       teams,
     };

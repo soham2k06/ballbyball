@@ -77,6 +77,7 @@ export async function getMatchById(id: string, user?: string | null) {
         orderBy: { id: "asc" },
       },
       matchTeams: {
+        orderBy: { batFirst: "desc" },
         select: {
           team: {
             select: {

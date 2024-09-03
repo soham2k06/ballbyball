@@ -289,7 +289,6 @@ function ScorerLayout({
         {
           onSuccess: () => {
             setIsModified(false);
-            toast.success("Score saved successfully");
           },
         },
       );

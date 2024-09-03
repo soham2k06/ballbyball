@@ -234,14 +234,16 @@ function processTeamName(input: string) {
 
 function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
   const fallOfWickets = [];
-  const validBalls = ballsThrown.filter((ball) => getIsvalidBall(ball.type));
 
-  for (let i = 0; i < validBalls.length; i++) {
-    const ball = validBalls[i];
+  let totalBalls = 0;
+
+  for (let i = 0; i < ballsThrown.length; i++) {
+    if (getIsvalidBall(ballsThrown[i].type)) totalBalls++;
+    const ball = ballsThrown[i];
 
     if (ball.type.includes("-1")) {
       const scoreAtWicket = calcRuns(
-        validBalls.map(({ type }) => type).slice(0, i + 1),
+        ballsThrown.map(({ type }) => type).slice(0, i + 1),
       );
       const outBatsman = players.find(
         (player) => player.id === ball.batsmanId,
@@ -249,7 +251,7 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
 
       fallOfWickets.push({
         score: scoreAtWicket,
-        ball: i + 1,
+        ball: totalBalls,
         batsman: outBatsman,
       });
     }
