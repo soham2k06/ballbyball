@@ -475,6 +475,7 @@ function ScorerLayout({
             setShowScorecard={setShowScorecard}
             match={match}
             playerIds={playerIds}
+            hasEnded={hasEnded}
             handleUndo={() => {
               setShowMatchSummary(false);
               setHasEnded(false);
@@ -495,6 +496,7 @@ function ScorerLayout({
             match={match}
             playerIds={playerIds}
             handleUndo={() => {}}
+            hasEnded={hasEnded}
           />
           <div className="hidden">
             <Tools

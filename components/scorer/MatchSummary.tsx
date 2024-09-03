@@ -32,6 +32,7 @@ interface MatchSummaryProps {
   handleUndo: () => void;
   match: MatchExtended | undefined;
   playerIds: string[];
+  hasEnded: boolean;
 }
 
 function MatchSummary({
@@ -41,6 +42,7 @@ function MatchSummary({
   handleUndo,
   match,
   playerIds,
+  hasEnded,
 }: MatchSummaryProps) {
   const searchParams = useSearchParams();
   const userRef = searchParams.get("user");
@@ -113,7 +115,7 @@ function MatchSummary({
   });
   const totalWickets = teams[1]?.playerIds?.length ?? 0;
 
-  const { winInfo, winner } = match?.hasEnded
+  const { winInfo, winner } = hasEnded
     ? calculateWinner({
         allowSinglePlayer,
         matchBalls,
@@ -195,7 +197,7 @@ function MatchSummary({
       }));
   }
 
-  const playerOfTheMatchData = match?.hasEnded
+  const playerOfTheMatchData = hasEnded
     ? calculatePlayerOfTheMatch({
         playersPerformance,
       })
@@ -259,7 +261,7 @@ function MatchSummary({
                 );
               })}
             </div>
-            {match.hasEnded ? (
+            {hasEnded ? (
               <p className="text-center font-medium">{winInfo}</p>
             ) : opponentEvents.length ? (
               <TargetInfo
