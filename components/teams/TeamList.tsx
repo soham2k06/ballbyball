@@ -19,16 +19,20 @@ import Team from "./Team";
 import { useActionMutate } from "@/lib/hooks";
 import { deleteTeam } from "@/lib/actions/team";
 import TeamBuilder from "./team-builder";
+import { useQuery } from "@tanstack/react-query";
+import { getAllPlayers } from "@/lib/actions/player";
 
 function TeamList({
   teams,
-  players,
   userRef,
 }: {
   teams: TeamWithPlayers[];
-  players: Player[];
   userRef: string | null;
 }) {
+  const { data: players = [], isFetched } = useQuery({
+    queryKey: ["players"],
+    queryFn: () => getAllPlayers(),
+  });
   const { mutate: deleteMutate, isPending } = useActionMutate(deleteTeam);
 
   const [teamToDelete, setTeamToDelete] = useState<string | undefined>();
@@ -88,7 +92,7 @@ function TeamList({
       ) : (
         <EmptyState document="teams" />
       )}
-      {!userRef && (
+      {!userRef && isFetched && (
         <>
           <div>
             <TeamBuilder players={players} />

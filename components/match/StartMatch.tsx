@@ -16,7 +16,13 @@ import StartMatchDialog from "./StartUpdateMatchDialog";
 import Link from "next/link";
 import { TeamWithPlayers } from "@/types";
 
-function StartMatchButton({ teams }: { teams: TeamWithPlayers[] }) {
+function StartMatchButton({
+  teams,
+  isLoading,
+}: {
+  teams: TeamWithPlayers[];
+  isLoading: boolean;
+}) {
   const [open, setOpen] = useState(false);
 
   const [showCreateTeam, setShowCreateTeam] = useState(false);
@@ -24,9 +30,9 @@ function StartMatchButton({ teams }: { teams: TeamWithPlayers[] }) {
   return (
     <>
       <Button
-        disabled={!teams}
+        disabled={isLoading}
         onClick={() => {
-          if ((teams?.length ?? 0) < 2) setShowCreateTeam(true);
+          if (teams.length < 2) setShowCreateTeam(true);
           else setOpen(true);
         }}
         className="max-sm:w-full"

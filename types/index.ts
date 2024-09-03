@@ -127,6 +127,8 @@ type TopPerformant = PlayerPerformance & {
 
 type TeamWithPlayers = Team & { players: Player[] };
 
+type PlayerSimplified = Pick<Player, "id" | "name">;
+
 type MatchExtended = Match & {
   teams: (TeamWithPlayers & { batFirst?: boolean; playerIds: string[] })[];
   ballEvents: BallEvent[];
@@ -141,5 +143,6 @@ export type {
   MatchExtended,
   PlayerMatches,
   PlayerScore,
+  PlayerSimplified,
   TopPerformant,
 };

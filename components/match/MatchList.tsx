@@ -10,20 +10,21 @@ import EmptyState from "../EmptyState";
 import StartUpdateMatchDialog from "./StartUpdateMatchDialog";
 import StartMatchButton from "./StartMatch";
 import Match from "./Match";
-import { MatchExtended, TeamWithPlayers } from "@/types";
+import { MatchExtended } from "@/types";
 import { useActionMutate } from "@/lib/hooks";
 import { deleteMatch } from "@/lib/actions/match";
 import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { getAllTeams } from "@/lib/actions/team";
 
-function MatchList({
-  matches,
-  teams,
-}: {
-  matches: MatchExtended[] | undefined;
-  teams: TeamWithPlayers[];
-}) {
+function MatchList({ matches }: { matches: MatchExtended[] | undefined }) {
   const searchParams = useSearchParams();
   const userRef = searchParams.get("user");
+
+  const { data: teams = [], isLoading } = useQuery({
+    queryKey: ["allTeams"],
+    queryFn: () => getAllTeams(),
+  });
 
   const { mutate: deleteMutate, isPending: isDeleting } =
     useActionMutate(deleteMatch);
@@ -40,7 +41,7 @@ function MatchList({
         "flex flex-col items-center": !matches?.length,
       })}
     >
-      {!userRef && <StartMatchButton teams={teams} />}
+      {!userRef && <StartMatchButton teams={teams} isLoading={isLoading} />}
       {matches?.length ? (
         <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {matches?.map((match) => (

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { PlayerSimplified } from "@/types";
 import { Player } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { memo, useState } from "react";
@@ -10,7 +11,7 @@ export interface TeamProps {
   onDrop: (item: any) => void;
   team: {
     name: string;
-    players: Player[];
+    players: PlayerSimplified[];
   };
   unselect: (playerId: Player["id"]) => void;
   handleNameChange: (name: string) => void;

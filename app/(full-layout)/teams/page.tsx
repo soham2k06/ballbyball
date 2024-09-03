@@ -1,8 +1,6 @@
 import TeamList from "@/components/teams/TeamList";
-import { getAllPlayers } from "@/lib/actions/player";
 import { getAllTeams } from "@/lib/actions/team";
 import { checkSession } from "@/lib/utils";
-import { Player } from "@prisma/client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,17 +19,12 @@ async function Teams({ searchParams }: Props) {
   if (!userRef) await checkSession();
 
   const teams = await getAllTeams(userRef);
-  const players = await getAllPlayers(userRef);
   return (
     <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Teams
       </h1>
-      <TeamList
-        teams={teams ?? []}
-        players={players as Player[]}
-        userRef={userRef}
-      />
+      <TeamList teams={teams ?? []} userRef={userRef} />
     </div>
   );
 }

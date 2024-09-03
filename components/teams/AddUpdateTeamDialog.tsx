@@ -6,7 +6,7 @@ import {
   UpdateTeamSchema,
   createTeamSchema,
 } from "@/lib/validation/team";
-import { OverlayStateProps } from "@/types";
+import { OverlayStateProps, PlayerSimplified } from "@/types";
 
 import {
   Dialog,
@@ -37,12 +37,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Player } from "@prisma/client";
 import { useActionMutate } from "@/lib/hooks";
 import { createTeam, updateTeam } from "@/lib/actions/team";
 
 interface AddUpdateTeamDialogProps extends OverlayStateProps {
-  players: Player[];
+  players: PlayerSimplified[];
   teamToUpdate?: UpdateTeamSchema & { matchId: string | null };
 }
 
@@ -122,7 +121,7 @@ function AddUpdateTeamDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="rounded-md h-[95%] p-0">
+        <DialogContent className="h-[95%] rounded-md p-0">
           <DialogHeader className="p-4">
             <DialogTitle>{teamToUpdate ? "Update" : "Add"} Team</DialogTitle>
           </DialogHeader>

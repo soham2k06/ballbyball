@@ -15,9 +15,9 @@ import { Button } from "@/components/ui/button";
 
 import CreateTeamDialog from "./AddUpdateTeamDialog";
 import Link from "next/link";
-import { Player } from "@prisma/client";
+import { PlayerSimplified } from "@/types";
 
-function AddPlayerButton({ players }: { players: Player[] }) {
+function AddPlayerButton({ players }: { players: PlayerSimplified[] }) {
   const [open, setOpen] = useState(false);
 
   const [showCreateTeam, setShowCreateTeam] = useState(false);

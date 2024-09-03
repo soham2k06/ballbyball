@@ -19,6 +19,7 @@ import { useActionMutate } from "@/lib/hooks";
 import LoadingButton from "@/components/ui/loading-button";
 import { toastError } from "@/lib/utils";
 import { toast } from "sonner";
+import { PlayerSimplified } from "@/types";
 
 export const ItemTypes = {
   FOOD: "food",
@@ -28,7 +29,7 @@ export const ItemTypes = {
 
 interface TeamState {
   name: string;
-  players: Player[];
+  players: PlayerSimplified[];
 }
 
 export interface BoxSpec {
@@ -40,7 +41,7 @@ export interface ContainerState {
   boxes: BoxSpec[];
 }
 
-function TeamBuilder({ players }: { players: Player[] }) {
+function TeamBuilder({ players }: { players: PlayerSimplified[] }) {
   const [open, setOpen] = useState(false);
 
   const [teams, setTeams] = useState<TeamState[]>([

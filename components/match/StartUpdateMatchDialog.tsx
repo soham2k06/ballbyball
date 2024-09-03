@@ -88,7 +88,7 @@ function StartUpdateMatchDialog({
     : null;
 
   const { containsSamePlayer, isDifferentPlayerLengthTeams } =
-    useValidateMatchData((watchedTeamIds ?? []) || []);
+    useValidateMatchData(selectedTeams ?? []);
 
   const isPending = isCreating || isUpdating;
 
