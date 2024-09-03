@@ -398,24 +398,28 @@ async function createOrUpdateWithUniqueName(
   let entityExists = true;
 
   if (entityId) {
-    const existingEntity = await (schema as PrismaClient["player"]).findFirst({
-      where: {
-        AND: [{ id: { not: entityId } }, { userId: userId }, { name: newName }],
-      },
-    });
+    while (entityExists) {
+      const existingEntity = await (schema as PrismaClient["player"]).findFirst(
+        {
+          where: {
+            AND: [{ id: { not: entityId } }, { userId }, { name: newName }],
+          },
+        },
+      );
 
-    if (existingEntity) {
-      counter++;
-      newName = `${name} (${counter})`;
-    } else {
-      entityExists = false;
+      if (existingEntity) {
+        counter++;
+        newName = `${name} (${counter})`;
+      } else {
+        entityExists = false;
+      }
     }
   } else {
     while (entityExists) {
       const existingEntity = await (schema as PrismaClient["player"]).findFirst(
         {
           where: {
-            userId: userId,
+            userId,
             name: newName,
           },
         },
