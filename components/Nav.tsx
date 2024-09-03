@@ -17,7 +17,7 @@ import { useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { processTeamName } from "@/lib/utils";
+import { abbreviateEntity } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,7 +83,7 @@ function Nav({
                   <Avatar>
                     <AvatarImage src={session.user?.image ?? ""} />
                     <AvatarFallback>
-                      {processTeamName(session?.user?.name ?? "")}
+                      {abbreviateEntity(session?.user?.name ?? "")}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>

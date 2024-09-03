@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { processTeamName } from "@/lib/utils";
+import { abbreviateEntity } from "@/lib/utils";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
 
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -129,7 +129,7 @@ function SelectBatsman({
       <DialogContent removeCloseButton className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <TypographyH3>
-            Select Batsman - {processTeamName(team?.name ?? "")}
+            Select Batsman - {abbreviateEntity(team?.name ?? "")}
           </TypographyH3>
           {!!curPlayers.length && (
             <Button

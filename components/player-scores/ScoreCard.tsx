@@ -1,7 +1,7 @@
 import { BallEvent, Player } from "@prisma/client";
 
 import { MatchExtended } from "@/types";
-import { calculateFallOfWickets, processTeamName } from "@/lib/utils";
+import { calculateFallOfWickets, abbreviateEntity } from "@/lib/utils";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ScrollArea } from "../ui/scroll-area";
@@ -59,22 +59,22 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
   const tabs = [
     {
       id: "1-bat",
-      name: `${processTeamName(firstBattingTeam.name)} - Bat`,
+      name: `${abbreviateEntity(firstBattingTeam.name)} - Bat`,
       content: <Score {...getScoreProps(firstBattingTeam.players, 0)} />,
     },
     {
       id: "2-bowl",
-      name: `${processTeamName(secondBattingTeam.name)} - Bowl`,
+      name: `${abbreviateEntity(secondBattingTeam.name)} - Bowl`,
       content: <Score {...getScoreProps(secondBattingTeam.players, 0, true)} />,
     },
     {
       id: "2-bat",
-      name: `${processTeamName(secondBattingTeam.name)} - Bat`,
+      name: `${abbreviateEntity(secondBattingTeam.name)} - Bat`,
       content: <Score {...getScoreProps(secondBattingTeam.players, 1)} />,
     },
     {
       id: "1-bowl",
-      name: `${processTeamName(firstBattingTeam.name)} - Bowl`,
+      name: `${abbreviateEntity(firstBattingTeam.name)} - Bowl`,
       content: <Score {...getScoreProps(firstBattingTeam.players, 1, true)} />,
     },
   ];

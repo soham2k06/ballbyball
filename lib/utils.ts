@@ -221,8 +221,11 @@ function abbreviateName(fullName: string) {
   return abbreviatedName;
 }
 
-function processTeamName(input: string) {
-  const words = input.trim().split(/\s+/);
+function abbreviateEntity(input: string) {
+  const words = input
+    .trim()
+    .replace(/[^a-zA-Z0-9\s]/g, "")
+    .split(/\s+/);
 
   if (words.length === 1) return input.substring(0, 3);
   else {
@@ -332,11 +335,11 @@ function calculateWinner({
   let winner;
 
   if (runs1 > runs2) {
-    winInfo = `${processTeamName(teams[0])} won by ${runs1 - runs2} runs`;
+    winInfo = `${abbreviateEntity(teams[0])} won by ${runs1 - runs2} runs`;
     winner = 0;
   } else if (runs2 > runs1) {
     const wicketMargin = totalWickets - wickets2 - Number(!allowSinglePlayer);
-    winInfo = `${processTeamName(teams[1])} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
+    winInfo = `${abbreviateEntity(teams[1])} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
     winner = 1;
   } else {
     winInfo =
@@ -517,7 +520,7 @@ export {
   getOverStr,
   getBattingStats,
   calculateMaidenOvers,
-  processTeamName,
+  abbreviateEntity,
   abbreviateName,
   calculateFallOfWickets,
   calculatePlayerOfTheMatch,

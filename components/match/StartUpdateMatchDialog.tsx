@@ -39,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { cn, processTeamName } from "@/lib/utils";
+import { cn, abbreviateEntity } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
@@ -134,7 +134,7 @@ function StartUpdateMatchDialog({
         .replace(/\s[AP]M/, "");
 
       const matchName = `${selectedTeams
-        .map((team) => (team?.name ? processTeamName(team.name) : ""))
+        .map((team) => (team?.name ? abbreviateEntity(team.name) : ""))
         .join(" vs ")} (${formattedTime})`;
 
       form.resetField("name", { defaultValue: matchName });

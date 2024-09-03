@@ -14,7 +14,7 @@ import {
 import { Button } from "../ui/button";
 import StatsAndSettings from "./StatsAndSettings";
 import Scorecard from "../player-scores/ScoreCard";
-import { processTeamName } from "@/lib/utils";
+import { abbreviateEntity } from "@/lib/utils";
 
 interface ToolsProps {
   match: MatchExtended | undefined;
@@ -34,7 +34,7 @@ function Tools({
   setShowScorecard,
 }: ToolsProps) {
   const processConditionally = (name: string) =>
-    name.length > 10 ? processTeamName(name) : name;
+    name.length > 10 ? abbreviateEntity(name) : name;
 
   const team1Name = processConditionally(match?.teams[0]?.name ?? "");
   const team2Name = processConditionally(match?.teams[1]?.name ?? "");

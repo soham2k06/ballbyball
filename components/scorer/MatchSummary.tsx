@@ -17,7 +17,7 @@ import {
   getIsNotOut,
   getOverStr,
   getScore,
-  processTeamName,
+  abbreviateEntity,
 } from "@/lib/utils";
 import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
@@ -284,7 +284,7 @@ function MatchSummary({
                   </h4>
                   <p>
                     <strong>{playerOfTheMatch?.name}</strong> (
-                    {processTeamName(playerOfTheMatchData.team)}) ·{" "}
+                    {abbreviateEntity(playerOfTheMatchData.team)}) ·{" "}
                     {!!playerOfTheMatchData.ballsBowled && (
                       <>
                         {" "}
@@ -318,7 +318,7 @@ function MatchSummary({
                   return (
                     <div key={team.name}>
                       <span className="custom-divider text-sm">
-                        {processTeamName(team.name ?? "")} · {runs}/{wickets} (
+                        {abbreviateEntity(team.name ?? "")} · {runs}/{wickets} (
                         {getOverStr(totalBalls)})
                       </span>
                       <p className="mt-2 text-center text-sm text-muted-foreground">
@@ -348,7 +348,7 @@ function MatchSummary({
                 return (
                   <div key={team.name}>
                     <span className="custom-divider text-sm">
-                      {processTeamName(team.name ?? "")} · {runs}/{wickets} (
+                      {abbreviateEntity(team.name ?? "")} · {runs}/{wickets} (
                       {getOverStr(totalBalls)})
                     </span>
                     <div className="flex justify-between">

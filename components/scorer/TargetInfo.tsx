@@ -1,4 +1,4 @@
-import { cn, processTeamName } from "@/lib/utils";
+import { cn, abbreviateEntity } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 interface TargetInfoProps {
@@ -42,7 +42,7 @@ function TargetInfo({
           },
         )}
       >
-        {processTeamName(curTeam ?? "")} need {remainingRuns} in{" "}
+        {abbreviateEntity(curTeam ?? "")} need {remainingRuns} in{" "}
         {ballsRemaining} balls to win
       </div>
       <div
