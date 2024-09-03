@@ -178,12 +178,13 @@ function MatchSummary({
           player.team === teamName &&
           player[type === "batsman" ? "ballsFaced" : "ballsBowled"],
       )
-      .sort((a, b) =>
-        type === "batsman"
+      .sort((a, b) => {
+        const aEconomy = type === "bowler" ? a.runConceded / a.ballsBowled : 0;
+        const bEconomy = type === "bowler" ? b.runConceded / b.ballsBowled : 0;
+        return type === "batsman"
           ? b.runsScored - a.runsScored
-          : a.runConceded - b.runConceded,
-      )
-      .sort((a, b) => (type === "bowler" ? b.wicketsTaken - a.wicketsTaken : 0))
+          : b.wicketsTaken - a.wicketsTaken || aEconomy - bEconomy;
+      })
       .slice(0, count)
       .map((player) => ({
         ...player,
