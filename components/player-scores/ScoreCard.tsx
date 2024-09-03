@@ -1,7 +1,7 @@
 import { BallEvent, Player } from "@prisma/client";
 
 import { MatchExtended } from "@/types";
-import { calcRuns, calculateFallOfWickets, processTeamName } from "@/lib/utils";
+import { calculateFallOfWickets, processTeamName } from "@/lib/utils";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ScrollArea } from "../ui/scroll-area";
@@ -40,11 +40,6 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
     );
 
     const selectedTeam = teams[i];
-
-    if (i === 1)
-      console.log(
-        calcRuns(ballEventsToPass.slice(0, 19).map((event) => event.type)),
-      );
 
     const fallOfWickets = !isBowlingScore
       ? []

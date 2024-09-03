@@ -122,8 +122,6 @@ function StartUpdateMatchDialog({
     }
   }, [open, matchToUpdate]);
 
-  console.log(form.watch());
-
   useEffect(() => {
     const numTeams = (form.watch("teamIds") || []).length;
     if (!form.watch("name") && numTeams === 2) {
