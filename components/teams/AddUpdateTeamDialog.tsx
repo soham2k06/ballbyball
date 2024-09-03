@@ -122,7 +122,7 @@ function AddUpdateTeamDialog({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[95%] rounded-md">
-          <DialogHeader >
+          <DialogHeader>
             <DialogTitle>{teamToUpdate ? "Update" : "Add"} Team</DialogTitle>
           </DialogHeader>
           <Form {...form}>
@@ -224,7 +224,9 @@ function AddUpdateTeamDialog({
                       <SelectContent>
                         {selectedPlayers?.length ? (
                           selectedPlayers?.map(({ id, name }) => (
-                            <SelectItem value={id}>{name}</SelectItem>
+                            <SelectItem value={id} key={id}>
+                              {name}
+                            </SelectItem>
                           ))
                         ) : (
                           <SelectItem value="disabled" disabled>

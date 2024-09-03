@@ -38,10 +38,10 @@ function Team({
   return (
     <>
       <Card className="flex items-center justify-between p-2 sm:p-4">
-        <CardTitle className="truncate">{team.name}</CardTitle>
+        <CardTitle className="truncate py-1">{team.name}</CardTitle>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost">
+            <Button size="icon" variant="ghost" className="shrink-0">
               <MoreHorizontal size={20} />
             </Button>
           </DropdownMenuTrigger>
