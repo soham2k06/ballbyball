@@ -83,7 +83,8 @@ function BowlingRecords({
               a.economy - b.economy ||
               a.matches - b.matches;
     })
-    .slice(0, 5);
+    .slice(0, 10);
+
   return (
     <TabsContent value="wickets">
       <Card className="overflow-x-auto">

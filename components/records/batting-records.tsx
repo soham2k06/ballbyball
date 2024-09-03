@@ -76,7 +76,7 @@ function BattingRecords({
         b.innings - a.innings ||
         b.matches - a.matches,
     )
-    .slice(0, 5);
+    .slice(0, 10);
   return (
     <TabsContent value="runs">
       <Card className="overflow-x-auto">
