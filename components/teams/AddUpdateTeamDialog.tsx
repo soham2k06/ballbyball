@@ -121,14 +121,14 @@ function AddUpdateTeamDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="h-[95%] rounded-md p-0">
-          <DialogHeader className="p-4">
+        <DialogContent className="max-h-[95%] rounded-md">
+          <DialogHeader >
             <DialogTitle>{teamToUpdate ? "Update" : "Add"} Team</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
               onSubmit={handleSubmitOwn}
-              className="space-y-3 overflow-y-auto p-4 pt-0"
+              className="space-y-3 overflow-y-auto p-1"
             >
               <FormField
                 control={control}
