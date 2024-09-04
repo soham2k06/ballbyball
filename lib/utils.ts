@@ -164,7 +164,6 @@ function getBattingStats(events: BallEvent[]) {
 }
 
 function calculateMaidenOvers(ballsThrown: EventType[]) {
-  console.log(ballsThrown);
   let maidenOvers = 0;
   let ballsInCurrentOver = 0;
 

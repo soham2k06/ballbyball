@@ -158,7 +158,10 @@ function Score({
             const maidenOverCount = isBowlingScore
               ? calculateMaidenOvers(
                   ballEvents
-                    .filter((ball) => player.id === ball.bowlerId)
+                    .filter(
+                      (ball) =>
+                        player.id === ball.bowlerId && ball.type !== "-4",
+                    )
                     .map((ball) => ball.type as EventType),
                 )
               : 0;
