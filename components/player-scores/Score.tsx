@@ -213,7 +213,7 @@ function Score({
               <li key={index} className="my-1 px-2 text-sm">
                 {score}/{index + 1}{" "}
                 <span className="text-muted-foreground">
-                  ({abbreviateName(batsman ?? "")}, {getOverStr(ball)} ov)
+                  ({abbreviateName(batsman ?? "")}, {getOverStr(ball, true)} ov)
                 </span>
               </li>
             ))}
