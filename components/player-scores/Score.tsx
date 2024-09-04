@@ -155,16 +155,13 @@ function Score({
                 </TableRow>
               );
 
-            const maidenOverCount = calculateMaidenOvers(
-              ballEvents
-                .filter(
-                  (ball) =>
-                    ball.type !== "-2" &&
-                    player.id ===
-                      ball[isBowlingScore ? "bowlerId" : "batsmanId"],
+            const maidenOverCount = isBowlingScore
+              ? calculateMaidenOvers(
+                  ballEvents
+                    .filter((ball) => player.id === ball.bowlerId)
+                    .map((ball) => ball.type as EventType),
                 )
-                .map((ball) => ball.type as EventType),
-            );
+              : 0;
 
             return (
               <TableRow key={player.id}>

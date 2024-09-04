@@ -164,6 +164,7 @@ function getBattingStats(events: BallEvent[]) {
 }
 
 function calculateMaidenOvers(ballsThrown: EventType[]) {
+  console.log(ballsThrown);
   let maidenOvers = 0;
   let ballsInCurrentOver = 0;
 
@@ -171,16 +172,15 @@ function calculateMaidenOvers(ballsThrown: EventType[]) {
 
   for (let i = 0; i < ballsThrown.length; i++) {
     const ball = ballsThrown[i];
-    ballsInCurrentOver++;
 
-    if (
-      !(
-        ball === "0" ||
-        ball.includes("-1") ||
-        ball.split("_")[3] === "0" ||
-        ball.includes("-4")
-      )
-    )
+    const isDot = ball === "0";
+    const isWicket = ball.includes("-1");
+    const isRunWithRunoutZero = ball.split("_")[3] === "0";
+    const isExtra = ball.includes("-2") || ball.includes("-3");
+
+    if (!isExtra) ballsInCurrentOver++;
+
+    if (!(isDot || isWicket || isRunWithRunoutZero) || isExtra)
       didRunCome = true;
 
     if (ballsInCurrentOver === 6) {
