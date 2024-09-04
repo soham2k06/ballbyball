@@ -29,7 +29,7 @@ function RecordsSkeleton() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array(5)
+            {Array(10)
               .fill(0)
               .map((_, index) => (
                 <TableRow key={index}>

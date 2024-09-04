@@ -1,4 +1,4 @@
-import { getOverStr, getScore } from "@/lib/utils";
+import { calcRuns, getIsvalidBall, getOverStr, getScore } from "@/lib/utils";
 import { EventType } from "@/types";
 import { Team } from "@prisma/client";
 import {
@@ -21,6 +21,40 @@ function WormChart({
   teams: Team[];
   totalOvers: number;
 }) {
+  const adjustedExtras = (events: string[]): string[] => {
+    const adjustedEvents: string[] = [];
+
+    let consicutiveExtras = 0;
+
+    events.forEach((event) => {
+      if (event === "-4") return;
+      let curBallRun = 0;
+
+      const isExtra = !getIsvalidBall(event);
+
+      if (isExtra) {
+        const extraRuns = calcRuns([event]);
+        consicutiveExtras += extraRuns;
+        return;
+      }
+
+      const isWicket = event.includes("-1");
+      const run = calcRuns([event]);
+
+      curBallRun += run + consicutiveExtras;
+
+      adjustedEvents.push(
+        isWicket ? "-1_x_x_" + consicutiveExtras : curBallRun.toString(),
+      );
+      consicutiveExtras = 0;
+    });
+
+    return adjustedEvents;
+  };
+
+  const adjustBallEvents1 = adjustedExtras(ballEvents[0]);
+  const adjustBallEvents2 = adjustedExtras(ballEvents[1]);
+
   const combineData = () => {
     const data = [];
 
@@ -31,14 +65,14 @@ function WormChart({
     let team2TotalWickets = 0;
 
     const maxBalls = Math.max(
-      ballEvents[0].length,
-      ballEvents[1].length,
+      adjustBallEvents1.length,
+      adjustBallEvents2.length,
       totalOvers * 6,
     );
 
     for (let i = 0; i < maxBalls; i++) {
-      const curEvent1 = ballEvents[0]?.[i];
-      const curEvent2 = ballEvents[1]?.[i];
+      const curEvent1 = adjustBallEvents1?.[i];
+      const curEvent2 = adjustBallEvents2?.[i];
 
       const score1 = curEvent1 ? getScore({ balls: [curEvent1] }) : null;
       const score2 = curEvent2 ? getScore({ balls: [curEvent2] }) : null;
@@ -55,7 +89,7 @@ function WormChart({
 
       data.push({
         over: (i + 1) % 6 === 0 ? (i + 1) / 6 : "",
-        overStr: getOverStr(i + 1),
+        overStr: getOverStr(i + 1, true),
         [teams[0].name]: score1 !== null ? team1TotalRuns : null,
         [teams[1].name]: score2 !== null ? team2TotalRuns : null,
         wickets: {
@@ -71,6 +105,7 @@ function WormChart({
   const chartData = [
     {
       over: "",
+      overStr: "0.0",
       [teams[0].name]: 0,
       [teams[1].name]: 0,
       wickets: {
@@ -129,6 +164,7 @@ function WormChart({
           margin={{ top: 20, left: -32, bottom: 5 }}
         >
           <XAxis
+            tickCount={totalOvers}
             dataKey="over"
             tickLine={false}
             fontSize={12}
@@ -180,7 +216,7 @@ function WormChart({
           <Legend wrapperStyle={{ fontSize: 12, left: 0 }} />
           <Line
             strokeLinecap="round"
-            type="basis"
+            type="bump"
             dataKey={teams[0].name}
             stroke="#3b82f6"
             strokeWidth="2.5"
@@ -188,7 +224,7 @@ function WormChart({
           />
           <Line
             strokeLinecap="round"
-            type="basis"
+            type="bump"
             dataKey={teams[1].name}
             stroke="#f59e0b"
             strokeWidth="2.5"

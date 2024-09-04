@@ -207,7 +207,11 @@ function mapGroupedMatches(events: BallEvent[]) {
   return groupedMatches;
 }
 
-function getOverStr(numBalls: number) {
+function getOverStr(numBalls: number, show6?: boolean) {
+  if (show6) {
+    const isLastBall = numBalls % 6 === 0;
+    return `${Math.floor(numBalls / 6) - (isLastBall ? 1 : 0)}.${isLastBall ? 6 : numBalls % 6}`;
+  }
   return `${Math.floor(numBalls / 6)}${numBalls % 6 ? `.${numBalls % 6}` : ""}`;
 }
 
