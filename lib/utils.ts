@@ -380,6 +380,13 @@ function round(num: number, places = 2) {
   return Math.round(num * Math.pow(10, places)) / Math.pow(10, places);
 }
 
+function toPercentage(value1: number, value2: number) {
+  const total = value1 + value2;
+  const percentage1 = Math.round((value1 / total) * 100);
+  const percentage2 = 100 - percentage1;
+  return [percentage1, percentage2];
+}
+
 // ** Backend
 
 async function getValidatedUser() {
@@ -533,6 +540,7 @@ export {
   round,
   mapGroupedMatches,
   calcBestSpells,
+  toPercentage,
   // Backend
   getValidatedUser,
   createOrUpdateWithUniqueName,
