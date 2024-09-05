@@ -278,6 +278,9 @@ function calculatePlayerOfTheMatch({
     wicketsTaken: 0,
     runConceded: 0,
     ballsBowled: 0,
+    catches: 0,
+    runOuts: 0,
+    stumpings: 0,
     team: "",
     isWinner: false,
   };

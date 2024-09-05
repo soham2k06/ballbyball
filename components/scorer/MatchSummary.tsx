@@ -62,7 +62,12 @@ function MatchSummary({
 
   const groupedEvents: Record<
     string,
-    { playerId: string; batType: string[]; bowlType: string[] }
+    {
+      playerId: string;
+      batType: string[];
+      bowlType: string[];
+      fieldType: string[];
+    }
   > = {};
 
   ballEvents.forEach((event) => {
@@ -73,19 +78,37 @@ function MatchSummary({
         playerId: batsmanId,
         batType: [type],
         bowlType: [],
+        fieldType: [],
       };
-    } else {
-      groupedEvents[batsmanId].batType.push(type);
-    }
+    } else groupedEvents[batsmanId].batType.push(type);
 
     if (!groupedEvents[bowlerId]) {
       groupedEvents[bowlerId] = {
         playerId: bowlerId,
         batType: [],
         bowlType: [type],
+        fieldType: [],
       };
-    } else {
-      groupedEvents[bowlerId].bowlType.push(type);
+    } else groupedEvents[bowlerId].bowlType.push(type);
+
+    if (
+      type === "-1_4" ||
+      type.includes("_3_") ||
+      type.includes("_5_" || type.includes("_6_"))
+    ) {
+      let fielderId;
+
+      if (type === "-1_4") fielderId = bowlerId;
+      else fielderId = type.split("_")[2];
+
+      if (!groupedEvents[fielderId]) {
+        groupedEvents[fielderId] = {
+          playerId: fielderId,
+          batType: [],
+          bowlType: [],
+          fieldType: [type],
+        };
+      } else groupedEvents[fielderId].fieldType.push(type);
     }
   });
 
@@ -130,7 +153,7 @@ function MatchSummary({
 
   const playersPerformance: PlayerPerformance[] = Object.values(
     groupedEvents,
-  ).map(({ playerId, batType, bowlType }) => {
+  ).map(({ playerId, batType, bowlType, fieldType }) => {
     const { runs: runsScored, totalBalls: ballsFaced } = getScore({
       balls: batType,
       forBatsman: true,
@@ -144,6 +167,12 @@ function MatchSummary({
       forBowler: true,
     });
 
+    const catches = fieldType.filter(
+      (type) => type.includes("_3_") || type === "-1_4",
+    );
+    const runOuts = fieldType.filter((type) => type.includes("_5_"));
+    const stumpings = fieldType.filter((type) => type.includes("_6_"));
+
     return {
       playerId,
       runsScored,
@@ -151,6 +180,9 @@ function MatchSummary({
       wicketsTaken,
       ballsFaced,
       ballsBowled,
+      catches: catches.length,
+      runOuts: runOuts.length,
+      stumpings: stumpings.length,
       team:
         match?.teams.find(
           ({ players }) =>

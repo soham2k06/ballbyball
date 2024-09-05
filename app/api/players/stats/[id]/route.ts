@@ -6,6 +6,7 @@ import {
   calculateMaidenOvers,
   calcWicketHauls,
   getScore,
+  getValidatedUser,
   mapGroupedMatches,
 } from "@/lib/utils";
 import { EventType } from "@/types";
@@ -15,6 +16,7 @@ export async function GET(
   _: unknown,
   { params: { id } }: { params: { id: string } },
 ) {
+  const userId = await getValidatedUser();
   try {
     const player = await prisma.player.findUnique({
       where: { id },
@@ -31,6 +33,45 @@ export async function GET(
 
     const groupedMatchesBat = mapGroupedMatches(battingEventsExtended);
     const groupedMatchesBowl = mapGroupedMatches(bowlingEventsExtended);
+
+    const playerFieldEvents = player
+      ? await prisma.ballEvent.findMany({
+          where: {
+            userId,
+            OR: [
+              { AND: [{ type: "-1_4" }, { bowlerId: player.id }] },
+              {
+                AND: [
+                  { type: { contains: player.id } },
+                  {
+                    OR: [
+                      { type: { contains: "_3_" } },
+                      { type: { contains: "_5_" } },
+                      { type: { contains: "_6_" } },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        })
+      : [];
+
+    const catches = playerFieldEvents.filter(
+      (event) => event.type.includes("_3_") || event.type === "-1_4",
+    );
+    const runOuts = playerFieldEvents.filter((event) =>
+      event.type.includes("_5_"),
+    );
+    const stumpings = playerFieldEvents.filter((event) =>
+      event.type.includes("_6_"),
+    );
+
+    const fieldingStats = {
+      catches: catches.length,
+      runOuts: runOuts.length,
+      stumpings: stumpings.length,
+    };
 
     const { fifties, centuries, highestScore, isNotout } =
       calcMilestones(groupedMatchesBat);
@@ -131,6 +172,7 @@ export async function GET(
       matchesPlayed,
       batting: battingStats,
       bowling: bowlingStats,
+      fielding: fieldingStats,
     };
 
     if (!playerStats)

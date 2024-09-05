@@ -34,6 +34,9 @@ type PlayerPerformance = {
   runConceded: number;
   ballsBowled: number;
   wicketsTaken: number;
+  catches: number;
+  runOuts: number;
+  stumpings: number;
   team: string;
   isWinner: boolean;
 };
@@ -71,6 +74,7 @@ type PlayerStats = {
     fiveHauls: number;
     threeHauls: number;
   };
+  fielding: { catches: number; runOuts: number; stumpings: number };
   matchesPlayed: number;
 };
 
