@@ -37,8 +37,20 @@ type PlayerPerformance = {
   catches: number;
   runOuts: number;
   stumpings: number;
+  fours: number;
+  sixes: number;
+  economy: number;
+  strikeRate: number;
+  is30: boolean;
+  is50: boolean;
+  is100: boolean;
+  is2: boolean;
+  is3: boolean;
+  isDuck: boolean;
+  maidens: number;
   team: string;
   isWinner: boolean;
+  points?: number;
 };
 
 type PlayerStats = {

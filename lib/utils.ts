@@ -265,57 +265,67 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
   return fallOfWickets;
 }
 
-function calculatePlayerOfTheMatch({
+function calcBestPerformance({
   playersPerformance,
 }: {
   playersPerformance: PlayerPerformance[];
 }) {
-  let bestPerformance = -1;
-  let playerOfTheMatch: PlayerPerformance = {
-    playerId: "",
-    runsScored: 0,
-    ballsFaced: 0,
-    wicketsTaken: 0,
-    runConceded: 0,
-    ballsBowled: 0,
-    catches: 0,
-    runOuts: 0,
-    stumpings: 0,
-    team: "",
-    isWinner: false,
-  };
-
-  const WICKET_POINT = 20;
-  const STRIKE_RATE_POINT = 1.1;
-  const WINNER_POINT = 1.25;
-
   playersPerformance.forEach((player) => {
-    const strikeRate = (player.runsScored / player.ballsFaced) * 100;
+    let curPlayerPoints = 0;
 
-    function calculateEconomyScore(economyRate: number, balls: number) {
-      if (balls < 12) return 1;
-      const score = 1 * ((36 - economyRate) / (36 - 1));
-      return Math.max(0, Math.min(2, score));
+    // Batting points
+    curPlayerPoints += player.runsScored * 1;
+    curPlayerPoints += player.fours * 1;
+    curPlayerPoints += player.sixes * 2;
+    curPlayerPoints += player.is30 ? 4 : 0;
+    curPlayerPoints += player.is50 ? 8 : 0;
+    curPlayerPoints += player.is100 ? 16 : 0;
+    curPlayerPoints += player.isDuck ? -2 : 0;
+
+    // Bowling Points
+    curPlayerPoints += player.wicketsTaken * 20;
+    if (player.is2) curPlayerPoints += 4;
+    if (player.is3) curPlayerPoints += 8;
+    curPlayerPoints += player.maidens * 12;
+
+    // Fielding Points
+    curPlayerPoints += player.catches * 8;
+    curPlayerPoints += player.stumpings * 12;
+    curPlayerPoints += player.runOuts * 6;
+
+    // Economy Points, if min 6 balls bowled
+    if (player.ballsBowled > 6) {
+      if (player.economy < 5) curPlayerPoints += 6;
+      else if (player.economy >= 5 && player.economy < 6) curPlayerPoints += 4;
+      else if (player.economy >= 6 && player.economy < 7) curPlayerPoints += 2;
+      else if (player.economy >= 10 && player.economy < 11)
+        curPlayerPoints -= 2;
+      else if (player.economy >= 11 && player.economy < 12)
+        curPlayerPoints -= 4;
+      else if (player.economy >= 12) curPlayerPoints -= 6;
     }
-    const economy = (player.runConceded / player.ballsBowled) * 6;
-    const economyScore = calculateEconomyScore(economy, player.ballsBowled);
 
-    const performanceScore =
-      player.runsScored + player.wicketsTaken * WICKET_POINT;
-
-    const adjustedPerformanceScore =
-      performanceScore *
-      (((strikeRate || 100) / 100) * STRIKE_RATE_POINT) *
-      (player.isWinner ? WINNER_POINT : 1) *
-      economyScore;
-
-    if (adjustedPerformanceScore > bestPerformance) {
-      bestPerformance = adjustedPerformanceScore;
-      playerOfTheMatch = player;
+    // Strike rate Points, if min 6 balls faced
+    if (player.ballsFaced > 6) {
+      if (player.strikeRate > 170) curPlayerPoints += 6;
+      else if (player.strikeRate >= 150 && player.strikeRate <= 170)
+        curPlayerPoints += 4;
+      else if (player.strikeRate >= 130 && player.strikeRate <= 150)
+        curPlayerPoints += 2;
+      else if (player.strikeRate >= 60 && player.strikeRate <= 70)
+        curPlayerPoints -= 2;
+      else if (player.strikeRate >= 50 && player.strikeRate <= 60)
+        curPlayerPoints -= 4;
+      else if (player.strikeRate < 50) curPlayerPoints -= 6;
     }
+
+    // Winner points
+    if (player.isWinner) curPlayerPoints += 25;
+
+    player.points = curPlayerPoints;
   });
 
-  return playerOfTheMatch;
+  return playersPerformance.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
 }
 
 function calculateWinner({
@@ -536,7 +546,7 @@ export {
   abbreviateEntity,
   abbreviateName,
   calculateFallOfWickets,
-  calculatePlayerOfTheMatch,
+  calcBestPerformance,
   calculateWinner,
   getIsNotOut,
   toastError,

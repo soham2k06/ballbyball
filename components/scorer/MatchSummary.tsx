@@ -4,20 +4,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MatchExtended, OverlayStateProps, PlayerPerformance } from "@/types";
+import {
+  EventType,
+  MatchExtended,
+  OverlayStateProps,
+  PlayerPerformance,
+} from "@/types";
 import { Dispatch, SetStateAction } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
 import { Separator } from "../ui/separator";
 import {
-  calculatePlayerOfTheMatch,
+  calcBestPerformance,
   calculateWinner,
   cn,
   getIsNotOut,
   getOverStr,
   getScore,
   abbreviateEntity,
+  calculateMaidenOvers,
 } from "@/lib/utils";
 import { BallEvent } from "@prisma/client";
 import { CreateBallEventSchema } from "@/lib/validation/ballEvent";
@@ -154,7 +160,12 @@ function MatchSummary({
   const playersPerformance: PlayerPerformance[] = Object.values(
     groupedEvents,
   ).map(({ playerId, batType, bowlType, fieldType }) => {
-    const { runs: runsScored, totalBalls: ballsFaced } = getScore({
+    const {
+      runs: runsScored,
+      totalBalls: ballsFaced,
+      wickets: outs,
+      runRate,
+    } = getScore({
       balls: batType,
       forBatsman: true,
     });
@@ -162,16 +173,40 @@ function MatchSummary({
       runs: runConceded,
       wickets: wicketsTaken,
       totalBalls: ballsBowled,
+      runRate: economy,
     } = getScore({
       balls: bowlType,
       forBowler: true,
     });
 
+    const strikeRate = (runRate / 6) * 100;
+    const noWicketEvents = batType.filter(
+      (event) => !event.includes("-1") && !event.includes("-4"),
+    );
+
+    const boundaries = runsScored
+      ? noWicketEvents.filter(
+          (event) => event.includes("4") || event.includes("6"),
+        )
+      : [];
+
+    const maidens = calculateMaidenOvers(bowlType as EventType[]);
+
+    const fours = boundaries.filter((event) => event.includes("4")).length;
+    const sixes = boundaries.filter((event) => event.includes("6")).length;
+    const is30 = runsScored >= 30 && runsScored < 50;
+    const is50 = runsScored >= 50 && runsScored < 100;
+    const is100 = runsScored >= 100;
+    const isDuck = runsScored === 0 && outs === 1;
+
+    const is2 = wicketsTaken === 2;
+    const is3 = wicketsTaken >= 3;
+
     const catches = fieldType.filter(
       (type) => type.includes("_3_") || type === "-1_4",
-    );
-    const runOuts = fieldType.filter((type) => type.includes("_5_"));
-    const stumpings = fieldType.filter((type) => type.includes("_6_"));
+    ).length;
+    const runOuts = fieldType.filter((type) => type.includes("_5_")).length;
+    const stumpings = fieldType.filter((type) => type.includes("_6_")).length;
 
     return {
       playerId,
@@ -180,9 +215,20 @@ function MatchSummary({
       wicketsTaken,
       ballsFaced,
       ballsBowled,
-      catches: catches.length,
-      runOuts: runOuts.length,
-      stumpings: stumpings.length,
+      catches,
+      runOuts,
+      stumpings,
+      maidens,
+      strikeRate,
+      economy,
+      fours,
+      sixes,
+      is30,
+      is50,
+      is100,
+      isDuck,
+      is2,
+      is3,
       team:
         match?.teams.find(
           ({ players }) =>
@@ -230,9 +276,9 @@ function MatchSummary({
   }
 
   const playerOfTheMatchData = hasEnded
-    ? calculatePlayerOfTheMatch({
+    ? calcBestPerformance({
         playersPerformance,
-      })
+      })[0]
     : null;
 
   const playerOfTheMatch = playerOfTheMatchData
