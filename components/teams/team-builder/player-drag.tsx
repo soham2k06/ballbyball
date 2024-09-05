@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Player } from "@prisma/client";
 import { memo } from "react";
 import { useDrag } from "react-dnd";
@@ -5,8 +6,10 @@ import { useDrag } from "react-dnd";
 type PlayerProps = Pick<Player, "name" | "id">;
 export const PlayerDrag = memo(function Player({
   player,
+  isLoading,
 }: {
   player: PlayerProps;
+  isLoading?: boolean;
 }) {
   const [{ opacity }, drag] = useDrag(
     () => ({
@@ -22,7 +25,9 @@ export const PlayerDrag = memo(function Player({
   return (
     <li
       ref={drag}
-      className="rounded-md border bg-card px-2 py-3 text-sm"
+      className={cn("rounded-md border bg-card px-2 py-3 text-sm", {
+        "cursor-not-allowed": isLoading,
+      })}
       style={{ opacity }}
     >
       {player.name}

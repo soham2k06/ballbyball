@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -20,6 +20,11 @@ import LoadingButton from "@/components/ui/loading-button";
 import { toastError } from "@/lib/utils";
 import { toast } from "sonner";
 import { PlayerSimplified } from "@/types";
+import {
+  usePlayers,
+  useSortedPlayersByPerformance,
+} from "@/apiHooks/player/usePlayers";
+import { SortDesc } from "lucide-react";
 
 export const ItemTypes = {
   FOOD: "food",
@@ -41,7 +46,18 @@ export interface ContainerState {
   boxes: BoxSpec[];
 }
 
-function TeamBuilder({ players }: { players: PlayerSimplified[] }) {
+function TeamBuilder() {
+  const { players: normalPlayers, isLoading, isFetched } = usePlayers();
+  const [sortPlayers, setSortPlayers] = useState(false);
+
+  const {
+    sortedPlayers,
+    isLoading: isSorting,
+    isSorted,
+    sort,
+  } = useSortedPlayersByPerformance({ enabled: sortPlayers });
+
+  const [players, setPlayers] = useState<PlayerSimplified[]>([]);
   const [open, setOpen] = useState(false);
 
   const [teams, setTeams] = useState<TeamState[]>([
@@ -63,9 +79,14 @@ function TeamBuilder({ players }: { players: PlayerSimplified[] }) {
     captain: team.players[0]?.id,
   }));
 
-  const unselectedPlayers = players.filter(
-    (player) => !teams.some((team) => team.players.includes(player)),
-  );
+  const unselectedPlayers = isLoading
+    ? Array.from({ length: 10 }, (_, i) => ({
+        id: i.toString(),
+        name: "Loading...",
+      }))
+    : players.filter(
+        (player) => !teams.some((team) => team.players.includes(player)),
+      );
 
   const handleDrop = useCallback(
     (index: number, player: Player) => {
@@ -128,6 +149,11 @@ function TeamBuilder({ players }: { players: PlayerSimplified[] }) {
     [mutate, teamsPayload],
   );
 
+  useEffect(() => {
+    if (sortedPlayers.length && isSorted) setPlayers(sortedPlayers);
+    else if (isFetched) setPlayers(normalPlayers);
+  }, [isFetched, isSorted]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -154,11 +180,32 @@ function TeamBuilder({ players }: { players: PlayerSimplified[] }) {
               ))}
             </ul>
 
-            <ul className="flex max-h-32 flex-wrap gap-3 overflow-y-auto">
-              {unselectedPlayers.map((player, i) => (
-                <PlayerDrag player={player} key={player.id} />
-              ))}
-            </ul>
+            <div>
+              <div className="mb-4 flex items-center justify-between gap-2">
+                <h3 className="text-lg font-semibold">Players</h3>
+                <LoadingButton
+                  size="icon"
+                  variant="secondary"
+                  type="button"
+                  loading={isSorting}
+                  onClick={() => {
+                    setSortPlayers(true);
+                    sort();
+                  }}
+                >
+                  {!isSorting && <SortDesc className="size-4" />}
+                </LoadingButton>
+              </div>
+              <ul className="flex max-h-32 flex-wrap gap-3 overflow-y-auto">
+                {unselectedPlayers.map((player) => (
+                  <PlayerDrag
+                    player={player}
+                    isLoading={isLoading}
+                    key={player.id}
+                  />
+                ))}
+              </ul>
+            </div>
 
             <LoadingButton type="submit" className="mt-6" loading={isPending}>
               Create teams

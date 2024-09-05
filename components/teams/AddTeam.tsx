@@ -15,27 +15,33 @@ import { Button } from "@/components/ui/button";
 
 import CreateTeamDialog from "./AddUpdateTeamDialog";
 import Link from "next/link";
-import { PlayerSimplified } from "@/types";
+import { getAllPlayers } from "@/lib/actions/player";
+import { useQuery } from "@tanstack/react-query";
 
-function AddPlayerButton({ players }: { players: PlayerSimplified[] }) {
+function AddPlayerButton() {
+  const { data: players = [] } = useQuery({
+    queryKey: ["players"],
+    queryFn: () => getAllPlayers(),
+  });
+
   const [open, setOpen] = useState(false);
 
-  const [showCreateTeam, setShowCreateTeam] = useState(false);
+  const [showCreatePlayer, setShowCreatePlayer] = useState(false);
 
   return (
     <>
       <Button
         onClick={() => {
-          if (!players?.length) setShowCreateTeam(true);
+          if (!players.length) setShowCreatePlayer(true);
           else setOpen(true);
         }}
       >
         Add single
       </Button>
 
-      <CreateTeamDialog open={open} setOpen={setOpen} players={players} />
+      <CreateTeamDialog open={open} setOpen={setOpen} />
 
-      <Dialog open={showCreateTeam} onOpenChange={setShowCreateTeam}>
+      <Dialog open={showCreatePlayer} onOpenChange={setShowCreatePlayer}>
         <DialogContent>
           <DialogHeader className="mb-4">
             <DialogTitle>Add players first</DialogTitle>
@@ -44,7 +50,7 @@ function AddPlayerButton({ players }: { players: PlayerSimplified[] }) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowCreateTeam(false)}>
+            <Button variant="ghost" onClick={() => setShowCreatePlayer(false)}>
               Close
             </Button>
             <Button asChild>

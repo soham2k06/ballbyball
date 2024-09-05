@@ -6,7 +6,7 @@ import {
   UpdateTeamSchema,
   createTeamSchema,
 } from "@/lib/validation/team";
-import { OverlayStateProps, PlayerSimplified } from "@/types";
+import { OverlayStateProps } from "@/types";
 
 import {
   Dialog,
@@ -39,9 +39,9 @@ import {
 } from "../ui/select";
 import { useActionMutate } from "@/lib/hooks";
 import { createTeam, updateTeam } from "@/lib/actions/team";
+import { usePlayers } from "@/apiHooks/player/usePlayers";
 
 interface AddUpdateTeamDialogProps extends OverlayStateProps {
-  players: PlayerSimplified[];
   teamToUpdate?: UpdateTeamSchema & { matchId: string | null };
 }
 
@@ -49,8 +49,9 @@ function AddUpdateTeamDialog({
   open,
   setOpen,
   teamToUpdate,
-  players,
 }: AddUpdateTeamDialogProps) {
+  const { players, isLoading } = usePlayers();
+
   const form = useForm<CreateTeamSchema>({
     resolver: zodResolver(createTeamSchema),
     defaultValues: {
@@ -157,44 +158,61 @@ function AddUpdateTeamDialog({
                     </div>
                     {players?.length ? (
                       <ul className="grid max-h-40 grid-cols-2 gap-2 overflow-auto">
-                        {players?.map((item) => (
-                          <FormField
-                            key={item.id}
-                            control={control}
-                            name="playerIds"
-                            render={({ field }) => {
-                              const isSelected = field.value.includes(item.id);
+                        {isLoading
+                          ? Array.from({ length: 8 }).map((_, i) => (
+                              <PlayerLabel
+                                key={i}
+                                title="Loading..."
+                                isOpacityDown
+                                isBrightnessDown
+                              />
+                            ))
+                          : players.map((player) => (
+                              <FormField
+                                key={player.id}
+                                control={control}
+                                name="playerIds"
+                                render={({ field }) => {
+                                  const isSelected = field.value.includes(
+                                    player.id,
+                                  );
 
-                              return (
-                                <FormItem key={item.id} className="space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      className="sr-only"
-                                      checked={field.value.includes(item.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              item.id,
-                                            ])
-                                          : field.onChange(
-                                              field.value.filter(
-                                                (value) => value !== item.id,
-                                              ),
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
+                                  return (
+                                    <FormItem
+                                      key={player.id}
+                                      className="space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="sr-only"
+                                          checked={field.value.includes(
+                                            player.id,
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([
+                                                  ...field.value,
+                                                  player.id,
+                                                ])
+                                              : field.onChange(
+                                                  field.value.filter(
+                                                    (value) =>
+                                                      value !== player.id,
+                                                  ),
+                                                );
+                                          }}
+                                        />
+                                      </FormControl>
 
-                                  <PlayerLabel
-                                    title={item.name}
-                                    isSelected={isSelected}
-                                  />
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
+                                      <PlayerLabel
+                                        title={player.name}
+                                        isSelected={isSelected}
+                                      />
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            ))}
                       </ul>
                     ) : (
                       <p>No players</p>
