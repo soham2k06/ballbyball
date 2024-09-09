@@ -6,6 +6,7 @@ import BowlingRecords from "@/components/records/bowling-records";
 import BattingRecords from "@/components/records/batting-records";
 import { Suspense } from "react";
 import RecordsSkeleton from "@/components/records/records-skeleton";
+import MVP from "@/components/records/mvp";
 
 interface Props {
   searchParams: {
@@ -31,6 +32,7 @@ async function Records({ searchParams }: Props) {
     <>
       <BattingRecords players={players} />
       <BowlingRecords players={players} />
+      <MVP players={players} userId={userId} />
     </>
   );
 }
@@ -45,6 +47,7 @@ function RecordsPage({ searchParams }: Props) {
         <TabsList className="mb-4">
           <TabsTrigger value="runs">Most Runs</TabsTrigger>
           <TabsTrigger value="wickets">Most Wickets</TabsTrigger>
+          <TabsTrigger value="mvp">MVP</TabsTrigger>
         </TabsList>
         <Suspense fallback={<RecordsSkeleton />}>
           <Records searchParams={searchParams} />

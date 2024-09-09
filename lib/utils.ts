@@ -277,9 +277,9 @@ function calcBestPerformance({
     curPlayerPoints += player.runsScored * 1;
     curPlayerPoints += player.fours * 1;
     curPlayerPoints += player.sixes * 2;
-    curPlayerPoints += player.is30 ? 4 : 0;
-    curPlayerPoints += player.is50 ? 8 : 0;
-    curPlayerPoints += player.is100 ? 16 : 0;
+    curPlayerPoints += player.thirties * 4;
+    curPlayerPoints += player.fifties * 8;
+    curPlayerPoints += player.centuries * 16;
     curPlayerPoints += player.isDuck ? -2 : 0;
 
     // Bowling Points

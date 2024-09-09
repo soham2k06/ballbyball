@@ -11,7 +11,6 @@ import {
 import { TabsContent } from "../ui/tabs";
 import {
   calcBestSpells,
-  calculateMaidenOvers,
   getOverStr,
   getScore,
   mapGroupedMatches,
@@ -53,8 +52,6 @@ function BowlingRecords({
         runRate,
       } = getScore({ balls: bowlEvents, forBowler: true });
 
-      const maidens = calculateMaidenOvers(bowlEvents);
-
       const dots = bowlEvents.filter((event) => event === "0").length;
 
       const strikeRate = wickets ? totalBalls / wickets || 0 : 0;
@@ -67,7 +64,6 @@ function BowlingRecords({
         economy: runRate,
         strikeRate,
         bestSpell,
-        maidens,
         runsConceded,
         dots,
       };
@@ -115,9 +111,6 @@ function BowlingRecords({
                   SR
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
-                  Maidens
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
                   Dots
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
@@ -141,7 +134,6 @@ function BowlingRecords({
                       strikeRate,
                       runsConceded,
                       totalBalls,
-                      maidens,
                       dots,
                     },
                     i,
@@ -165,7 +157,6 @@ function BowlingRecords({
                         <TableCell className="text-center">
                           {strikeRate ? round(strikeRate) : "-"}
                         </TableCell>
-                        <TableCell className="text-center">{maidens}</TableCell>
                         <TableCell className="text-center">{dots}</TableCell>
                         <TableCell className="text-center">
                           {getOverStr(totalBalls)}

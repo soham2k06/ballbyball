@@ -41,9 +41,9 @@ type PlayerPerformance = {
   sixes: number;
   economy: number;
   strikeRate: number;
-  is30: boolean;
-  is50: boolean;
-  is100: boolean;
+  thirties: number;
+  fifties: number;
+  centuries: number;
   is2: boolean;
   is3: boolean;
   isDuck: boolean;
@@ -73,7 +73,6 @@ type PlayerStats = {
     runs: number;
     balls: number;
     wickets: number;
-    maidenOvers: number;
     dotBalls: number;
     dotBallsRate: number;
     bestSpell: {

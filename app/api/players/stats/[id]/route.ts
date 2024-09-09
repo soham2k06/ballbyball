@@ -3,7 +3,6 @@ import {
   calcBestSpells,
   calcMilestones,
   calcRuns,
-  calculateMaidenOvers,
   calcWicketHauls,
   getScore,
   getValidatedUser,
@@ -140,8 +139,6 @@ export async function GET(
       runRate,
     } = getScore({ balls: bowlingEvents, forBowler: true });
 
-    const maidenOverCount = calculateMaidenOvers(bowlingEvents as EventType[]);
-
     const dotBalls = bowlingEvents.filter((event) => event === "0").length;
     const dotBallsRate = (dotBalls / bowlingEvents.length) * 100 || 0;
 
@@ -149,7 +146,6 @@ export async function GET(
       runs: runsConceded,
       balls: ballsBowled,
       wickets: wicketsTaken,
-      maidenOvers: maidenOverCount,
       dotBallsRate,
       dotBalls,
       bestSpell,

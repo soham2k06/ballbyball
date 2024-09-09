@@ -30,7 +30,6 @@ function MoreBowling({ data }: { data: PlayerStats }) {
             data={wicketsTaken ? round(ballStrikeRate) : "-"}
             dataKey="Strike Rate"
           />
-          <Stat data={data.bowling.dotBalls} dataKey="Dots" />
           <Stat
             data={round(data.bowling.dotBallsRate) + "%"}
             dataKey="Dots rate"

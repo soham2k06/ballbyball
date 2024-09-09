@@ -105,11 +105,6 @@ function PlayerStats({
               />
               <Stat
                 isLoading={isLoading}
-                data={data?.bowling.maidenOvers}
-                dataKey="Maidens"
-              />
-              <Stat
-                isLoading={isLoading}
                 data={
                   data?.bowling.economy ? round(data?.bowling.economy) : "-"
                 }
@@ -123,6 +118,11 @@ function PlayerStats({
                     : "-"
                 }
                 dataKey="Best"
+              />
+              <Stat
+                isLoading={isLoading}
+                data={data?.bowling.dotBalls}
+                dataKey="Dots"
               />
             </div>
           </div>
