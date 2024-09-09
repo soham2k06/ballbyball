@@ -21,6 +21,7 @@ export async function GET(
         allowSinglePlayer: true,
         createdAt: true,
         matchTeams: {
+          orderBy: { batFirst: "desc" },
           select: {
             team: {
               select: {
