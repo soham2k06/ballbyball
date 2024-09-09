@@ -65,7 +65,7 @@ type PlayerStats = {
     boundaryRate: number;
     dotsPlayed: number;
     singles: number;
-    twos: number;
+    thirties: number;
     fours: number;
     sixes: number;
   };

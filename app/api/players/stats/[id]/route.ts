@@ -9,7 +9,7 @@ import {
   getValidatedUser,
   mapGroupedMatches,
 } from "@/lib/utils";
-import { EventType } from "@/types";
+import { EventType, PlayerStats } from "@/types";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -73,7 +73,7 @@ export async function GET(
       stumpings: stumpings.length,
     };
 
-    const { fifties, centuries, highestScore, isNotout } =
+    const { thirties, fifties, centuries, highestScore, isNotout } =
       calcMilestones(groupedMatchesBat);
 
     const { fives: fiveHauls, threes: threeHauls } =
@@ -106,7 +106,6 @@ export async function GET(
 
     const dotsPlayed = noWicketEvents.filter((event) => event === "0").length;
     const singles = noWicketEvents.filter((event) => event === "1").length;
-    const twos = noWicketEvents.filter((event) => event === "2").length;
     const fours = boundaries.filter((event) => event.includes("4")).length;
     const sixes = boundaries.filter((event) => event.includes("6")).length;
 
@@ -119,11 +118,11 @@ export async function GET(
       wickets: outs,
       fifties,
       centuries,
+      thirties,
       highestScore,
       boundaryRate,
       dotsPlayed,
       singles,
-      twos,
       fours,
       sixes,
       isNotoutOnHighestScore: isNotout,
@@ -168,7 +167,7 @@ export async function GET(
       },
     });
 
-    const playerStats = {
+    const playerStats: PlayerStats = {
       matchesPlayed,
       batting: battingStats,
       bowling: bowlingStats,

@@ -464,6 +464,7 @@ async function createOrUpdateWithUniqueName(
 }
 
 function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
+  let thirties = 0;
   let fifties = 0;
   let centuries = 0;
   let highestScore = 0;
@@ -476,6 +477,7 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
       forBatsman: true,
     });
 
+    if (runs >= 30 && runs < 50) thirties++;
     if (runs >= 50 && runs < 100) fifties++;
     if (runs >= 100) centuries++;
     if (runs > highestScore) {
@@ -484,7 +486,7 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
     }
   }
 
-  return { fifties, centuries, highestScore, isNotout };
+  return { thirties, fifties, centuries, highestScore, isNotout };
 }
 
 function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {

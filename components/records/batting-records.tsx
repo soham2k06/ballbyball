@@ -110,6 +110,9 @@ function BattingRecords({
                   SR
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
+                  30s
+                </TableHead>
+                <TableHead className="text-center text-primary-foreground">
                   50s
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
@@ -162,6 +165,9 @@ function BattingRecords({
                         </TableCell>
                         <TableCell className="text-center">
                           {round(strikeRate)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {milestones.thirties}
                         </TableCell>
                         <TableCell className="text-center">
                           {milestones.fifties}
