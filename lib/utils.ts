@@ -36,10 +36,7 @@ const calcRuns = (
         : event.includes("-5")
           ? (Number(!forPlayerRuns) * Number(event.slice(2))).toString()
           : event.includes("-2")
-            ? (
-                Number(!forPlayerRuns) +
-                Number(!forPlayerRuns) * Number(event.slice(2))
-              ).toString()
+            ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
             : event.replace("-4", "0").slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
@@ -86,8 +83,8 @@ function getScore({
     .map((event) =>
       event.includes("-5")
         ? Number(event.slice(2)).toString()
-        : event.includes("-2")
-          ? (Number(event.slice(2)) + Number(!forBatsman)).toString()
+        : event.includes("-3")
+          ? "1"
           : event.includes("-3")
             ? "1"
             : "1",
