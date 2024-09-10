@@ -21,6 +21,7 @@ import { getOverStr, getScore } from "@/lib/utils";
 import { updateMatch } from "@/lib/actions/match";
 import { useActionMutate } from "@/lib/hooks";
 import { saveBallEvents } from "@/lib/actions/ball-event";
+import TeamSelect from "./TeamSelect";
 
 interface StatsAndSettingsProps {
   match: MatchExtended | undefined;
@@ -49,9 +50,9 @@ function StatsAndSettings({
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
   const [showSelectBowler, setShowSelectBowler] = useState(false);
 
-  const [selectedTeam, setSelectedTeam] = useState<{
-    index: 0 | 1;
-  }>({ index: 0 });
+  const [selectedTeam, setSelectedTeam] = useState<string>(
+    match?.teams[0].name ?? "",
+  );
 
   const { mutate: createBallEvent } = useActionMutate(saveBallEvents);
   const { mutate: updateMutate } = useActionMutate(updateMatch);
@@ -60,18 +61,31 @@ function StatsAndSettings({
   const opposingTeam = match?.teams[match.curTeam === 0 ? 1 : 0];
 
   const firstTeam = match?.teams[0];
+  const secondTeam = match?.teams[1];
 
   const fTeamPlayerIds = firstTeam?.players.map((player) => player.id) || [];
+  const sTeamPlayerIds = secondTeam?.players.map((player) => player.id) || [];
+
+  const selectedTeamEvents = events.filter(
+    (event) =>
+      (selectedTeam === firstTeam?.name &&
+        fTeamPlayerIds.includes(event.batsmanId)) ||
+      (selectedTeam === secondTeam?.name &&
+        sTeamPlayerIds.includes(event.batsmanId)),
+  );
 
   const fTeamEvents = events
     .filter((event) => fTeamPlayerIds.includes(event.batsmanId))
     .map((event) => event.type as EventType);
 
   const sTeamEvents = events
-    .filter((event) => fTeamPlayerIds.includes(event.bowlerId))
+    .filter((event) => sTeamPlayerIds.includes(event.batsmanId))
     .map((event) => event.type as EventType);
 
-  const ballEventsArr = [fTeamEvents, sTeamEvents];
+  const ballEventsObj = {
+    [firstTeam?.name || ""]: fTeamEvents,
+    [secondTeam?.name || ""]: sTeamEvents,
+  };
 
   const {
     runs: runs1,
@@ -85,7 +99,9 @@ function StatsAndSettings({
     wickets: wickets2,
   } = getScore({ balls: sTeamEvents });
 
-  const { runRate } = getScore({ balls: ballEventsArr[selectedTeam.index] });
+  const { runRate } = getScore({
+    balls: selectedTeamEvents.map((evt) => evt.type),
+  });
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
     if (!match?.id) return;
@@ -204,7 +220,7 @@ function StatsAndSettings({
           </SheetContent>
         )}
       </Sheet>
-      {match && curTeam && opposingTeam && (
+      {match && curTeam && (
         <>
           <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
             <DrawerContent>
@@ -215,7 +231,7 @@ function StatsAndSettings({
                 runRate={runRate}
               />
               <OverStats
-                ballEvents={ballEventsArr[selectedTeam.index]}
+                ballEvents={ballEventsObj[selectedTeam]}
                 totalOvers={match.overs}
                 runRate={runRate}
               />
@@ -229,7 +245,7 @@ function StatsAndSettings({
                 setSelectedTeam={setSelectedTeam}
                 runRate={runRate}
               />
-              <FullOverSummary ballEvents={ballEventsArr[selectedTeam.index]} />
+              <FullOverSummary ballEvents={ballEventsObj[selectedTeam]} />
             </DrawerContent>
           </Drawer>
           <Drawer open={showWormChart} onOpenChange={setShowWormChart}>
@@ -237,17 +253,20 @@ function StatsAndSettings({
               <DrawerHeader className="mb-2 pb-4 pt-6">
                 <DrawerTitle className="space-x-4 text-center text-2xl">
                   <span className="text-sm text-muted-foreground">
-                    {curTeam.name} {runs1}/{wickets1} ({getOverStr(totalBalls1)}
-                    )
+                    {firstTeam?.name} {runs1}/{wickets1} (
+                    {getOverStr(totalBalls1)})
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    {opposingTeam.name} {runs2}/{wickets2} (
+                    {secondTeam?.name} {runs2}/{wickets2} (
                     {getOverStr(totalBalls2)})
                   </span>
                 </DrawerTitle>
               </DrawerHeader>
               <WormChart
-                ballEvents={ballEventsArr}
+                ballEvents={[
+                  ballEventsObj[firstTeam?.name ?? ""],
+                  ballEventsObj[secondTeam?.name ?? ""],
+                ]}
                 teams={match.teams}
                 totalOvers={match.overs}
               />
