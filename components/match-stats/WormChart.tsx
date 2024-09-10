@@ -21,7 +21,7 @@ function WormChart({
   teams: Team[];
   totalOvers: number;
 }) {
-  const adjustedExtras = (events: string[]): string[] => {
+  const adjustExtras = (events: string[]): string[] => {
     const adjustedEvents: string[] = [];
 
     let consicutiveExtras = 0;
@@ -52,8 +52,8 @@ function WormChart({
     return adjustedEvents;
   };
 
-  const adjustBallEvents1 = adjustedExtras(ballEvents[0]);
-  const adjustBallEvents2 = adjustedExtras(ballEvents[1]);
+  const adjustBallEvents1 = adjustExtras(ballEvents[0]);
+  const adjustBallEvents2 = adjustExtras(ballEvents[1]);
 
   const combineData = () => {
     const data = [];
@@ -74,8 +74,16 @@ function WormChart({
       const curEvent1 = adjustBallEvents1?.[i];
       const curEvent2 = adjustBallEvents2?.[i];
 
-      const score1 = curEvent1 ? getScore({ balls: [curEvent1] }) : null;
-      const score2 = curEvent2 ? getScore({ balls: [curEvent2] }) : null;
+      const score1 = curEvent1
+        ? parseInt(curEvent1) >= 10
+          ? { ...getScore({ balls: [curEvent1] }), runs: parseInt(curEvent1) }
+          : getScore({ balls: [curEvent1] })
+        : null;
+      const score2 = curEvent2
+        ? parseInt(curEvent2) >= 10
+          ? { ...getScore({ balls: [curEvent2] }), runs: parseInt(curEvent2) }
+          : getScore({ balls: [curEvent2] })
+        : null;
 
       if (score1 !== null) {
         team1TotalRuns += score1.runs;
