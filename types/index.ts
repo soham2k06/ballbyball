@@ -1,3 +1,4 @@
+import { commentsCollection } from "@/lib/constants";
 import { BallEvent, Match, Player, Team } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
 
@@ -138,6 +139,8 @@ type TopPerformant = PlayerPerformance & {
 //   dots: number;
 // };
 
+type CommentKey = keyof typeof commentsCollection;
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };
@@ -150,6 +153,7 @@ type MatchExtended = Match & {
 };
 
 export type {
+  CommentKey,
   EventType,
   OverlayStateProps,
   PlayerPerformance,

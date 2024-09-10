@@ -17,7 +17,9 @@ import FullOverSummary from "./FullOverSummary";
 import { useStatsOpenContext } from "@/contexts/StatsOpenContext";
 import StatsDrawerHeader from "./StatsDrawerHeader";
 import WormChart from "./WormChart";
-import { getOverStr, getScore } from "@/lib/utils";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import { cn, getOverStr, getScore } from "@/lib/utils";
 import { updateMatch } from "@/lib/actions/match";
 import { useActionMutate } from "@/lib/hooks";
 import { saveBallEvents } from "@/lib/actions/ball-event";
@@ -45,6 +47,8 @@ function StatsAndSettings({
     showOverSummaries,
     showWormChart,
     setShowWormChart,
+    showComments,
+    setShowComments,
   } = useStatsOpenContext();
 
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
@@ -239,13 +243,33 @@ function StatsAndSettings({
           </Drawer>
           <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>
             <DrawerContent>
-              <StatsDrawerHeader
-                match={match}
-                selectedTeam={selectedTeam}
-                setSelectedTeam={setSelectedTeam}
-                runRate={runRate}
+              <DrawerHeader className="relative mb-2 flex items-center justify-between gap-2 pb-4 pt-6">
+                <DrawerTitle className="text-xl">
+                  <span className={cn({ "sr-only": !runRate })}>
+                    CRR: {runRate}
+                  </span>
+                </DrawerTitle>
+                <div className="flex gap-2">
+                  <div className="flex items-center gap-1">
+                    <Checkbox
+                      id="showComments"
+                      checked={showComments}
+                      onCheckedChange={() => setShowComments(!showComments)}
+                    />
+                    <Label htmlFor="showComments">Comments</Label>
+                  </div>
+                  <TeamSelect
+                    selectedTeam={selectedTeam}
+                    setSelectedTeam={setSelectedTeam}
+                    teams={match.teams}
+                  />
+                </div>
+              </DrawerHeader>
+              <FullOverSummary
+                ballEvents={selectedTeamEvents}
+                showComments={showComments}
+                players={match.teams.flatMap((team) => team.players)}
               />
-              <FullOverSummary ballEvents={ballEventsObj[selectedTeam]} />
             </DrawerContent>
           </Drawer>
           <Drawer open={showWormChart} onOpenChange={setShowWormChart}>

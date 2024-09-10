@@ -22,6 +22,7 @@ import {
   useSortedPlayersByPerformance,
 } from "@/apiHooks/player/usePlayers";
 import { SortDesc } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const ItemTypes = {
   FOOD: "food",
@@ -88,6 +89,7 @@ function TeamBuilder() {
       ? toPercentage(team1Points, team2Points)
       : null;
 
+  const qc = useQueryClient();
   const { mutate, isPending } = useActionMutate(createMultipleTeams);
 
   const teamsPayload = teams.map((team) => ({
@@ -170,6 +172,7 @@ function TeamBuilder() {
       await mutate(teamsPayload, {
         onError: (error) => toastError(error),
         onSuccess: () => {
+          qc.invalidateQueries({ queryKey: ["allTeams"] });
           toast.success("Teams created successfully");
           setOpen(false);
         },
