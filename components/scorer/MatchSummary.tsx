@@ -48,8 +48,9 @@ function MatchSummary({
   handleUndo,
   match,
   playerIds,
-  hasEnded,
+  hasEnded: hasEndedState,
 }: MatchSummaryProps) {
+  const hasEnded = hasEndedState || match?.hasEnded;
   const searchParams = useSearchParams();
   const userRef = searchParams.get("user");
 
@@ -343,10 +344,10 @@ function MatchSummary({
               <p className="text-center font-medium">{winInfo}</p>
             ) : opponentEvents.length ? (
               <TargetInfo
-                target={runs2 + 1}
+                target={runs1 + 1}
                 ballsRemaining={matchBalls - totalBalls}
-                runs={runs1}
-                curTeam={teams[0].name}
+                runs={runs2}
+                curTeam={teams[1].name}
               />
             ) : (
               <p className="text-center font-medium">

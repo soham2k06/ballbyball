@@ -9,13 +9,15 @@ import {
   mapGroupedMatches,
 } from "@/lib/utils";
 import { EventType, PlayerStats } from "@/types";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _: unknown,
-  { params: { id } }: { params: { id: string } },
+  req: NextRequest,
+  { params: { id } }: { params: { id?: string } },
 ) {
-  const userId = await getValidatedUser();
+  const user = req.nextUrl.searchParams.get("user");
+
+  const userId = user ?? (await getValidatedUser());
   try {
     const player = await prisma.player.findUnique({
       where: { id },
@@ -33,44 +35,43 @@ export async function GET(
     const groupedMatchesBat = mapGroupedMatches(battingEventsExtended);
     const groupedMatchesBowl = mapGroupedMatches(bowlingEventsExtended);
 
-    const playerFieldEvents = player
-      ? await prisma.ballEvent.findMany({
+    //// Field Stats
+    const catches = id
+      ? await prisma.ballEvent.count({
           where: {
             userId,
             OR: [
-              { AND: [{ type: "-1_4" }, { bowlerId: player.id }] },
+              { AND: [{ type: "-1_4" }, { bowlerId: id }] },
               {
                 AND: [
-                  { type: { contains: player.id } },
+                  { type: { contains: id } },
                   {
-                    OR: [
-                      { type: { contains: "_3_" } },
-                      { type: { contains: "_5_" } },
-                      { type: { contains: "_6_" } },
-                    ],
+                    OR: [{ type: { contains: "_3_" } }],
                   },
                 ],
               },
             ],
           },
         })
-      : [];
+      : 0;
 
-    const catches = playerFieldEvents.filter(
-      (event) => event.type.includes("_3_") || event.type === "-1_4",
-    );
-    const runOuts = playerFieldEvents.filter((event) =>
-      event.type.includes("_5_"),
-    );
-    const stumpings = playerFieldEvents.filter((event) =>
-      event.type.includes("_6_"),
-    );
+    const runOuts = id
+      ? await prisma.ballEvent.count({
+          where: {
+            AND: [{ type: { contains: "_5_" } }, { type: { contains: id } }],
+          },
+        })
+      : 0;
 
-    const fieldingStats = {
-      catches: catches.length,
-      runOuts: runOuts.length,
-      stumpings: stumpings.length,
-    };
+    const stumpings = id
+      ? await prisma.ballEvent.count({
+          where: {
+            AND: [{ type: { contains: "_6_" } }, { type: { contains: id } }],
+          },
+        })
+      : 0;
+
+    const fieldingStats = { catches, runOuts, stumpings };
 
     const { thirties, fifties, centuries, highestScore, isNotout } =
       calcMilestones(groupedMatchesBat);

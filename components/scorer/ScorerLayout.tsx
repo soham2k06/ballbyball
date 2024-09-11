@@ -55,7 +55,7 @@ function ScorerLayout({
     useActionMutate(deleteAllBallEvents);
 
   // ** States
-  const [hasEnded, setHasEnded] = useState(false);
+  const [hasEnded, setHasEnded] = useState(match.hasEnded);
   const [showMatchSummary, setShowMatchSummary] = useState(false);
   const [curTeam, setCurTeam] = useState(match?.curTeam ?? 0);
   const [curPlayers, setCurPlayers] = useState<CurPlayer[]>(
