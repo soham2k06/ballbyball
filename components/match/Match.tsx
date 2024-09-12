@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, Eye, MoreHorizontal, Play, Trash2 } from "lucide-react";
 
 import { EventType, MatchExtended } from "@/types";
 import { calculateWinner, getOverStr, getScore } from "@/lib/utils";
@@ -20,6 +20,7 @@ import {
 import { Button } from "../ui/button";
 import { TypographyP } from "../ui/typography";
 import { UpdateMatchSchema } from "@/lib/validation/match";
+import { useSearchParams } from "next/navigation";
 
 type Team = { teams: { id: string }[] };
 
@@ -30,6 +31,9 @@ interface MatchProps {
 }
 
 function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
+  const searchParams = useSearchParams();
+  const userRef = searchParams.get("user");
+
   const matchToUpdateVar = {
     ...match,
     teamIds: match.teams.map((team) => team.id),
@@ -40,12 +44,12 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
       .filter((event) => match.teams[i].playerIds.includes(event.batsmanId))
       .map((event) => event.type);
 
-  const { runs: runs1 } = getScore(ballEventsbyTeam(0));
+  const { runs: runs1 } = getScore({ balls: ballEventsbyTeam(0) });
   const {
     runs: runs2,
     wickets: wickets2,
     totalBalls: totalBalls2,
-  } = getScore(ballEventsbyTeam(1));
+  } = getScore({ balls: ballEventsbyTeam(1) });
   const totalWickets = match.teams[1].playerIds.length;
 
   const { winInfo } = calculateWinner({
@@ -64,33 +68,41 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle>{match.name}</CardTitle>
         <div className="flex items-center space-x-4">
-          <Button asChild>
-            <Link href={`/match/${match.id}`}>
-              {!match.hasEnded ? "Play" : "Summary"}
+          <Button asChild size="icon">
+            <Link
+              href={`/match/${match.id}${userRef ? `?user=${userRef}` : ""}`}
+            >
+              {!match.hasEnded && !userRef ? (
+                <Play className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
             </Link>
           </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="ghost">
-                <MoreHorizontal size={20} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="gap-2 font-bold"
-                onClick={() => setMatchToUpdate(matchToUpdateVar)}
-              >
-                <Edit size={20} /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="gap-2 font-bold"
-                onClick={() => setMatchToDelete(match.id)}
-              >
-                <Trash2 size={20} /> Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {!userRef && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost">
+                  <MoreHorizontal size={20} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="gap-2 font-bold"
+                  onClick={() => setMatchToUpdate(matchToUpdateVar)}
+                >
+                  <Edit size={20} /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-2 font-bold"
+                  onClick={() => setMatchToDelete(match.id)}
+                >
+                  <Trash2 size={20} /> Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -99,7 +111,9 @@ function Match({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
             .filter((event) => playerIds.includes(event.batsmanId))
             .map((event) => event.type as EventType);
 
-          const { runs, totalBalls, wickets } = getScore(ballEventsByTeam);
+          const { runs, totalBalls, wickets } = getScore({
+            balls: ballEventsByTeam,
+          });
 
           return (
             <TypographyP

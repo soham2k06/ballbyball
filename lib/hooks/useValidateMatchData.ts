@@ -1,16 +1,13 @@
-import { useTeamById } from "@/apiHooks/team";
+import { TeamWithPlayers } from "@/types";
 import { useState, useEffect } from "react";
 
-function useValidateMatchData(teamIds: string[]) {
+function useValidateMatchData(teams: (TeamWithPlayers | undefined)[]) {
   const [containsSamePlayer, setContainsSamePlayer] = useState(false);
   const [isDifferentPlayerLengthTeams, setIsDifferentPlayerLengthTeams] =
     useState(false);
 
-  const { team: team1 } = useTeamById(teamIds[0]);
-  const { team: team2 } = useTeamById(teamIds[1]);
-
-  const team1Ids = team1?.players.map((player) => player.id) ?? [];
-  const team2Ids = team2?.players.map((player) => player.id) ?? [];
+  const team1Ids = teams[0]?.players.map((player) => player.id) ?? [];
+  const team2Ids = teams[1]?.players.map((player) => player.id) ?? [];
 
   useEffect(() => {
     const idSet = new Set(team2Ids);

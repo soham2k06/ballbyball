@@ -9,8 +9,12 @@ function Layout({ children }: { children: React.ReactNode }) {
       defaultTheme="system"
       disableTransitionOnChange
     >
-      <div className="p-4">{children}</div>
-      <Footer />
+      <div className="flex h-dvh w-full flex-col items-center overflow-y-auto">
+        <div className="my-auto">
+          <div className="flex h-full items-center">{children}</div>
+        </div>
+        <Footer />
+      </div>
     </Provider>
   );
 }

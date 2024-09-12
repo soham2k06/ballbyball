@@ -1,13 +1,13 @@
 import { MatchExtended } from "@/types";
 import { DrawerHeader, DrawerTitle } from "../ui/drawer";
-import TeamTabs from "./TeamTabs";
 import { Dispatch, SetStateAction } from "react";
 import { cn } from "@/lib/utils";
+import TeamSelect from "./TeamSelect";
 
 interface StatsDrawerHeaderProps {
   runRate?: number;
-  selectedTeam: { index: 0 | 1 };
-  setSelectedTeam: Dispatch<SetStateAction<{ index: 0 | 1 }>>;
+  selectedTeam: string;
+  setSelectedTeam: Dispatch<SetStateAction<string>>;
   match: MatchExtended;
 }
 
@@ -18,11 +18,11 @@ function StatsDrawerHeader({
   setSelectedTeam,
 }: StatsDrawerHeaderProps) {
   return (
-    <DrawerHeader className="relative mb-2 flex items-center justify-end pb-4 pt-6">
-      <DrawerTitle className="absolute left-1/2 -translate-x-1/2 text-center text-2xl">
+    <DrawerHeader className="relative mb-2 flex items-center justify-between gap-2 pb-4 pt-6">
+      <DrawerTitle className="text-xl">
         <span className={cn({ "sr-only": !runRate })}>CRR: {runRate}</span>
       </DrawerTitle>
-      <TeamTabs
+      <TeamSelect
         selectedTeam={selectedTeam}
         setSelectedTeam={setSelectedTeam}
         teams={match.teams}

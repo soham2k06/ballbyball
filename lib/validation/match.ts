@@ -16,16 +16,13 @@ export const createMatchSchema = z.object({
   overs: z
     .number({
       required_error: "Overs is required",
-      invalid_type_error: "Overs is required",
+      invalid_type_error: "Invalid Number",
     })
     .min(1, "Overs must be greater than 0")
     .max(50),
+  batFirst: z.string(),
   curPlayers: z.array(curPlayer).optional(),
   allowSinglePlayer: z.boolean().optional(),
-  curTeam: z
-    .number({ required_error: "Please select batting first team" })
-    .min(0)
-    .max(1),
 });
 
 export type CreateMatchSchema = z.infer<typeof createMatchSchema>;
@@ -37,6 +34,7 @@ export const updateMatchSchema = z.object({
   curPlayers: z.array(curPlayer.nullable()).optional(),
   curTeam: z.number().min(0).max(1).optional(),
   teamIds: z.array(z.string()).optional(),
+  batFirst: z.string().optional(),
   strikeIndex: z.number().optional(),
   hasEnded: z.boolean().optional(),
   allowSinglePlayer: z.boolean().optional(),

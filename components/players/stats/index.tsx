@@ -105,11 +105,6 @@ function PlayerStats({
               />
               <Stat
                 isLoading={isLoading}
-                data={data?.bowling.maidenOvers}
-                dataKey="Maidens"
-              />
-              <Stat
-                isLoading={isLoading}
                 data={
                   data?.bowling.economy ? round(data?.bowling.economy) : "-"
                 }
@@ -123,6 +118,33 @@ function PlayerStats({
                     : "-"
                 }
                 dataKey="Best"
+              />
+              <Stat
+                isLoading={isLoading}
+                data={data?.bowling.dotBalls}
+                dataKey="Dots"
+              />
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-xl">
+            <div className="mb-1 flex h-12 items-center bg-primary p-2 text-primary-foreground">
+              <h4 className="text-lg font-semibold md:text-xl">Fielding</h4>
+            </div>
+            <div className="grid grid-cols-3 gap-1">
+              <Stat
+                isLoading={isLoading}
+                data={data?.fielding.catches ?? 0}
+                dataKey="Catches"
+              />
+              <Stat
+                isLoading={isLoading}
+                data={data?.fielding.runOuts ?? 0}
+                dataKey="Runouts"
+              />
+              <Stat
+                isLoading={isLoading}
+                data={data?.fielding.stumpings ?? 0}
+                dataKey="Stumpings"
               />
             </div>
           </div>

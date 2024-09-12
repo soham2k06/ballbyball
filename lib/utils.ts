@@ -2,8 +2,8 @@ import { BallEvent, Player, PrismaClient } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { EventType, PlayerPerformance } from "@/types";
-import { invalidBalls } from "./constants";
+import { CommentKey, EventType, PlayerPerformance } from "@/types";
+import { commentsCollection, invalidBalls, wicketTypes } from "./constants";
 import { toast } from "sonner";
 import getCachedSession from "./auth/session";
 import { redirect } from "next/navigation";
@@ -36,30 +36,43 @@ const calcRuns = (
         : event.includes("-5")
           ? (Number(!forPlayerRuns) * Number(event.slice(2))).toString()
           : event.includes("-2")
-            ? (
-                Number(!forPlayerRuns) +
-                Number(!forPlayerRuns) * Number(event.slice(2))
-              ).toString()
+            ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
             : event.replace("-4", "0").slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
-const calcWickets = (ballEvents: EventType[] | string[]) =>
-  ballEvents?.filter((ball) => ball.includes("-1")).length;
+const calcWickets = (ballEvents: EventType[] | string[], forPlayer?: boolean) =>
+  ballEvents?.filter((ball) => {
+    if (ball.includes("-1")) {
+      if (!forPlayer) return true;
+      const typeId = Number(ball.split("_")[1]);
+      const wicketType = wicketTypes.find((item) => item.id === typeId);
+      if (wicketType?.isNotBowlersWicket) return false;
+      return ball.includes("-1");
+    }
+  }).length;
 
 const getIsvalidBall = (ball: EventType | string, countNB?: boolean) =>
   !invalidBalls.includes(ball) &&
   !ball.includes("-2") &&
   !(!countNB && ball.includes("-3"));
 
-function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
-  const runs = calcRuns(balls, forPlayerRuns);
+function getScore({
+  balls,
+  forBatsman,
+  forBowler,
+}: {
+  balls: (EventType | string)[];
+  forBatsman?: boolean;
+  forBowler?: boolean;
+}) {
+  const runs = calcRuns(balls, forBatsman);
 
   const totalBalls = balls?.filter(
-    (ball) => ball !== "-4" && getIsvalidBall(ball, forPlayerRuns),
+    (ball) => ball !== "-4" && getIsvalidBall(ball, forBatsman),
   ).length;
 
-  const wickets = calcWickets(balls);
+  const wickets = calcWickets(balls, forBowler);
   const runRate = totalBalls ? round((runs / totalBalls) * 6) : 0;
 
   const extras = balls
@@ -70,8 +83,8 @@ function getScore(balls: (EventType | string)[], forPlayerRuns?: boolean) {
     .map((event) =>
       event.includes("-5")
         ? Number(event.slice(2)).toString()
-        : event.includes("-2")
-          ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
+        : event.includes("-3")
+          ? "1"
           : event.includes("-3")
             ? "1"
             : "1",
@@ -104,6 +117,72 @@ function generateOverSummary(ballEvents: EventType[]) {
   }
 
   return { overSummaries, ballLimitInOver };
+}
+
+function getCommentByEvent({
+  batsman,
+  bowler,
+  event,
+  fielder,
+  randomIndex,
+}: {
+  batsman: string;
+  bowler: string;
+  event: CommentKey;
+  fielder?: string;
+  randomIndex: number;
+}) {
+  function replacePlaceHolder(str: string) {
+    return str
+      .replace(/{batsman}/g, batsman)
+      .replace(/{bowler}/g, bowler)
+      .replace(/{fielder}/g, fielder ?? "fielder");
+  }
+
+  const getRandomComment = (comments: string[]) => comments[randomIndex];
+
+  // Handle wicket events
+  if (event.startsWith("-1_")) {
+    const comments = commentsCollection[event.substring(0, 4) as CommentKey];
+    if (comments)
+      return replacePlaceHolder(getRandomComment(comments) ?? comments[0]);
+  } else if (
+    event.startsWith("-3") ||
+    event.startsWith("-2") ||
+    event.startsWith("-5")
+  ) {
+    // No ball, Wide, Byes with runs
+    const baseEvent = event.substring(0, 2) as CommentKey;
+    const runEvent = event.substring(2) as CommentKey;
+
+    const baseComments = commentsCollection[baseEvent];
+    const runComments = runEvent !== "0" ? commentsCollection[runEvent] : [];
+
+    if (baseComments && runComments) {
+      const baseComment = replacePlaceHolder(
+        getRandomComment(baseComments) ?? baseComments[0],
+      );
+      const runComment =
+        runEvent !== "0"
+          ? replacePlaceHolder(getRandomComment(runComments) ?? runComments[0])
+          : "";
+      return `${baseComment}${runComment ? ` and ${runComment}` : ""}`;
+    } else if (baseComments)
+      return replacePlaceHolder(
+        getRandomComment(baseComments) ?? baseComments[0],
+      );
+    else if (runComments)
+      return replacePlaceHolder(
+        getRandomComment(runComments) ?? runComments[0],
+      );
+  } else {
+    // Normal events
+    const comments = commentsCollection[event];
+    if (comments)
+      return replacePlaceHolder(getRandomComment(comments) ?? comments[0]);
+  }
+  // Default comment
+  return "An unusual event occurred!";
 }
 
 function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
@@ -155,9 +234,15 @@ function calculateMaidenOvers(ballsThrown: EventType[]) {
 
   for (let i = 0; i < ballsThrown.length; i++) {
     const ball = ballsThrown[i];
-    ballsInCurrentOver++;
 
-    if (!(ball === "0" || ball.includes("-1") || ball.split("_")[3] === "0"))
+    const isDot = ball === "0";
+    const isWicket = ball.includes("-1");
+    const isRunWithRunoutZero = ball.split("_")[3] === "0";
+    const isExtra = ball.includes("-2") || ball.includes("-3");
+
+    if (!isExtra) ballsInCurrentOver++;
+
+    if (!(isDot || isWicket || isRunWithRunoutZero) || isExtra)
       didRunCome = true;
 
     if (ballsInCurrentOver === 6) {
@@ -171,13 +256,26 @@ function calculateMaidenOvers(ballsThrown: EventType[]) {
   return maidenOvers;
 }
 
-function getOverStr(numBalls: number) {
-  return `${Math.floor(numBalls / 6)}${numBalls % 6 ? `.${numBalls % 6}` : ""}`;
+function mapGroupedMatches(events: BallEvent[]) {
+  const groupedMatches: { [matchId: string]: BallEvent[] } = {};
+  for (const event of events) {
+    const matchId = event.matchId ?? "no-data";
+    if (!groupedMatches[matchId]) {
+      groupedMatches[matchId] = [];
+    }
+    groupedMatches[matchId].push(event);
+  }
+
+  return groupedMatches;
 }
 
-const truncStr = (str: string, n: number) => {
-  return str.length > n ? str.substring(0, n - 1) + "..." : str;
-};
+function getOverStr(numBalls: number, show6?: boolean) {
+  if (show6) {
+    const isLastBall = numBalls % 6 === 0;
+    return `${Math.floor(numBalls / 6) - (isLastBall ? 1 : 0)}.${isLastBall ? 6 : numBalls % 6}`;
+  }
+  return `${Math.floor(numBalls / 6)}${numBalls % 6 ? `.${numBalls % 6}` : ""}`;
+}
 
 function abbreviateName(fullName: string) {
   fullName = fullName.trim();
@@ -189,8 +287,11 @@ function abbreviateName(fullName: string) {
   return abbreviatedName;
 }
 
-function processTeamName(input: string) {
-  const words = input.trim().split(/\s+/);
+function abbreviateEntity(input: string) {
+  const words = input
+    .trim()
+    .replace(/[^a-zA-Z0-9\s]/g, "")
+    .split(/\s+/);
 
   if (words.length === 1) return input.substring(0, 3);
   else {
@@ -202,14 +303,16 @@ function processTeamName(input: string) {
 
 function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
   const fallOfWickets = [];
-  const validBalls = ballsThrown.filter((ball) => getIsvalidBall(ball.type));
 
-  for (let i = 0; i < validBalls.length; i++) {
-    const ball = validBalls[i];
+  let totalBalls = 0;
+
+  for (let i = 0; i < ballsThrown.length; i++) {
+    if (getIsvalidBall(ballsThrown[i].type)) totalBalls++;
+    const ball = ballsThrown[i];
 
     if (ball.type.includes("-1")) {
       const scoreAtWicket = calcRuns(
-        validBalls.map(({ type }) => type).slice(0, i + 1),
+        ballsThrown.map(({ type }) => type).slice(0, i + 1),
       );
       const outBatsman = players.find(
         (player) => player.id === ball.batsmanId,
@@ -217,7 +320,7 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
 
       fallOfWickets.push({
         score: scoreAtWicket,
-        ball: i + 1,
+        ball: totalBalls,
         batsman: outBatsman,
       });
     }
@@ -225,54 +328,67 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
   return fallOfWickets;
 }
 
-function calculatePlayerOfTheMatch({
+function calcBestPerformance({
   playersPerformance,
 }: {
   playersPerformance: PlayerPerformance[];
 }) {
-  let bestPerformance = -1;
-  let playerOfTheMatch: PlayerPerformance = {
-    playerId: "",
-    runsScored: 0,
-    ballsFaced: 0,
-    wicketsTaken: 0,
-    runConceded: 0,
-    ballsBowled: 0,
-    team: "",
-    isWinner: false,
-  };
-
-  const WICKET_POINT = 20;
-  const STRIKE_RATE_POINT = 1.1;
-  const WINNER_POINT = 1.25;
-
   playersPerformance.forEach((player) => {
-    const strikeRate = (player.runsScored / player.ballsFaced) * 100;
+    let curPlayerPoints = 0;
 
-    function calculateEconomyScore(economyRate: number, balls: number) {
-      if (balls < 12) return 1;
-      const score = 1 * ((36 - economyRate) / (36 - 1));
-      return Math.max(0, Math.min(2, score));
+    // Batting points
+    curPlayerPoints += player.runsScored * 1;
+    curPlayerPoints += player.fours * 1;
+    curPlayerPoints += player.sixes * 2;
+    curPlayerPoints += player.thirties * 4;
+    curPlayerPoints += player.fifties * 8;
+    curPlayerPoints += player.centuries * 16;
+    curPlayerPoints += player.isDuck ? -2 : 0;
+
+    // Bowling Points
+    curPlayerPoints += player.wicketsTaken * 20;
+    if (player.is2) curPlayerPoints += 4;
+    if (player.is3) curPlayerPoints += 8;
+    curPlayerPoints += player.maidens * 12;
+
+    // Fielding Points
+    curPlayerPoints += player.catches * 8;
+    curPlayerPoints += player.stumpings * 12;
+    curPlayerPoints += player.runOuts * 6;
+
+    // Economy Points, if min 6 balls bowled
+    if (player.ballsBowled > 6) {
+      if (player.economy < 5) curPlayerPoints += 6;
+      else if (player.economy >= 5 && player.economy < 6) curPlayerPoints += 4;
+      else if (player.economy >= 6 && player.economy < 7) curPlayerPoints += 2;
+      else if (player.economy >= 10 && player.economy < 11)
+        curPlayerPoints -= 2;
+      else if (player.economy >= 11 && player.economy < 12)
+        curPlayerPoints -= 4;
+      else if (player.economy >= 12) curPlayerPoints -= 6;
     }
-    const economy = (player.runConceded / player.ballsBowled) * 6;
-    const economyScore = calculateEconomyScore(economy, player.ballsBowled);
 
-    const performanceScore =
-      player.runsScored + player.wicketsTaken * WICKET_POINT;
-
-    const adjustedPerformanceScore =
-      performanceScore *
-      (((strikeRate || 100) / 100) * STRIKE_RATE_POINT) *
-      (player.isWinner ? WINNER_POINT : 1) *
-      economyScore;
-
-    if (adjustedPerformanceScore > bestPerformance) {
-      bestPerformance = adjustedPerformanceScore;
-      playerOfTheMatch = player;
+    // Strike rate Points, if min 6 balls faced
+    if (player.ballsFaced > 6) {
+      if (player.strikeRate > 170) curPlayerPoints += 6;
+      else if (player.strikeRate >= 150 && player.strikeRate <= 170)
+        curPlayerPoints += 4;
+      else if (player.strikeRate >= 130 && player.strikeRate <= 150)
+        curPlayerPoints += 2;
+      else if (player.strikeRate >= 60 && player.strikeRate <= 70)
+        curPlayerPoints -= 2;
+      else if (player.strikeRate >= 50 && player.strikeRate <= 60)
+        curPlayerPoints -= 4;
+      else if (player.strikeRate < 50) curPlayerPoints -= 6;
     }
+
+    // Winner points
+    if (player.isWinner) curPlayerPoints += 25;
+
+    player.points = curPlayerPoints;
   });
 
-  return playerOfTheMatch;
+  return playersPerformance.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
 }
 
 function calculateWinner({
@@ -298,11 +414,11 @@ function calculateWinner({
   let winner;
 
   if (runs1 > runs2) {
-    winInfo = `${processTeamName(teams[0])} won by ${runs1 - runs2} runs`;
+    winInfo = `${abbreviateEntity(teams[0])} won by ${runs1 - runs2} runs`;
     winner = 0;
   } else if (runs2 > runs1) {
     const wicketMargin = totalWickets - wickets2 - Number(!allowSinglePlayer);
-    winInfo = `${processTeamName(teams[1])} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
+    winInfo = `${abbreviateEntity(teams[1])} won by ${wicketMargin} wicket${wicketMargin > 1 ? "s" : ""} (${matchBalls - totalBalls} balls left)`;
     winner = 1;
   } else {
     winInfo =
@@ -340,10 +456,18 @@ function round(num: number, places = 2) {
   return Math.round(num * Math.pow(10, places)) / Math.pow(10, places);
 }
 
+function toPercentage(value1: number, value2: number) {
+  const total = value1 + value2;
+  const percentage1 = Math.round((value1 / total) * 100);
+  const percentage2 = 100 - percentage1;
+  return [percentage1, percentage2];
+}
+
 // ** Backend
 
 async function getValidatedUser() {
   const session = await getCachedSession();
+
   if (!session?.user?.id) throw new Error("User not authenticated");
 
   return session.user.id;
@@ -363,24 +487,28 @@ async function createOrUpdateWithUniqueName(
   let entityExists = true;
 
   if (entityId) {
-    const existingEntity = await (schema as PrismaClient["player"]).findFirst({
-      where: {
-        AND: [{ id: { not: entityId } }, { userId: userId }, { name: newName }],
-      },
-    });
+    while (entityExists) {
+      const existingEntity = await (schema as PrismaClient["player"]).findFirst(
+        {
+          where: {
+            AND: [{ id: { not: entityId } }, { userId }, { name: newName }],
+          },
+        },
+      );
 
-    if (existingEntity) {
-      counter++;
-      newName = `${name} (${counter})`;
-    } else {
-      entityExists = false;
+      if (existingEntity) {
+        counter++;
+        newName = `${name} (${counter})`;
+      } else {
+        entityExists = false;
+      }
     }
   } else {
     while (entityExists) {
       const existingEntity = await (schema as PrismaClient["player"]).findFirst(
         {
           where: {
-            userId: userId,
+            userId,
             name: newName,
           },
         },
@@ -399,6 +527,7 @@ async function createOrUpdateWithUniqueName(
 }
 
 function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
+  let thirties = 0;
   let fifties = 0;
   let centuries = 0;
   let highestScore = 0;
@@ -406,11 +535,12 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
 
-    const { runs, wickets } = getScore(
-      matchEvents.map((event) => event.type),
-      true,
-    );
+    const { runs, wickets } = getScore({
+      balls: matchEvents.map((event) => event.type),
+      forBatsman: true,
+    });
 
+    if (runs >= 30 && runs < 50) thirties++;
     if (runs >= 50 && runs < 100) fifties++;
     if (runs >= 100) centuries++;
     if (runs > highestScore) {
@@ -419,7 +549,7 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
     }
   }
 
-  return { fifties, centuries, highestScore, isNotout };
+  return { thirties, fifties, centuries, highestScore, isNotout };
 }
 
 function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {
@@ -428,10 +558,10 @@ function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
 
-    const { wickets } = getScore(
-      matchEvents.map((event) => event.type),
-      true,
-    );
+    const { wickets } = getScore({
+      balls: matchEvents.map((event) => event.type),
+      forBowler: true,
+    });
 
     if (wickets === 3 || wickets === 4) threes++;
     if (wickets >= 5) fives++;
@@ -441,7 +571,7 @@ function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {
 }
 
 function calcBestSpells(data: EventType[][], topN: number = 1) {
-  const playerStats = data.map((balls) => getScore(balls));
+  const playerStats = data.map((balls) => getScore({ balls, forBowler: true }));
 
   playerStats.sort((a, b) => {
     if (b.wickets === a.wickets) return a.runRate - b.runRate;
@@ -472,22 +602,24 @@ export {
   getScore,
   generateOverSummary,
   getBatsmanStats,
-  truncStr,
   calcRuns,
   calcWickets,
   getIsvalidBall,
   getOverStr,
   getBattingStats,
   calculateMaidenOvers,
-  processTeamName,
+  abbreviateEntity,
   abbreviateName,
   calculateFallOfWickets,
-  calculatePlayerOfTheMatch,
+  calcBestPerformance,
   calculateWinner,
   getIsNotOut,
   toastError,
   round,
+  getCommentByEvent,
+  mapGroupedMatches,
   calcBestSpells,
+  toPercentage,
   // Backend
   getValidatedUser,
   createOrUpdateWithUniqueName,

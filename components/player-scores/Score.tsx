@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { wicketTypes } from "../score-buttons/WicketPopover";
+import { wicketTypes } from "@/lib/constants";
 
 function Score({
   players,
@@ -51,17 +51,19 @@ function Score({
     return !(isBatsman || isBowler);
   });
 
+  const teamEvents = ballEvents.map((event) => event.type as EventType);
+
   const {
     runs: teamRuns,
     wickets: teamWickets,
     totalBalls: teamBalls,
     extras: teamExtras,
-  } = getScore(ballEvents.map((event) => event.type as EventType));
+  } = getScore({ balls: teamEvents });
 
   return (
     <>
       <Table>
-        {!isBowlingScore && (
+        {!isBowlingScore && !!hasYetToBat.length && (
           <TableCaption className="mt-8 border-t py-2 font-bold uppercase">
             Yet to bat
           </TableCaption>
@@ -129,41 +131,43 @@ function Score({
 
             const { fours, sixes } = getBattingStats(legalEvents);
 
-            const { runs, totalBalls, runRate, wickets } = getScore(
-              ballEvents
-                ?.filter(
-                  (event) =>
-                    event[isBowlingScore ? "bowlerId" : "batsmanId"] ===
-                    player.id,
-                )
-                .map((event) => event.type as EventType),
-              !isBowlingScore,
-            );
+            const playerEvents = ballEvents
+              .filter(
+                (ball) =>
+                  player.id === ball[isBowlingScore ? "bowlerId" : "batsmanId"],
+              )
+              .map((ball) => ball.type as EventType);
+
+            const { runs, totalBalls, runRate, wickets } = getScore({
+              balls: playerEvents,
+              forBatsman: !isBowlingScore,
+              forBowler: isBowlingScore,
+            });
 
             if (!totalBalls) return null;
 
             if (!totalBalls && hasYetToBatTeam === teamIndex)
               return (
-                <TableRow>
+                <TableRow key={player.id}>
                   <TableCell colSpan={6} className="text-left font-semibold">
                     {player.name}
                   </TableCell>
                 </TableRow>
               );
 
-            const maidenOverCount = calculateMaidenOvers(
-              ballEvents
-                .filter(
-                  (ball) =>
-                    ball.type !== "-2" &&
-                    player.id ===
-                      ball[isBowlingScore ? "bowlerId" : "batsmanId"],
+            const maidenOverCount = isBowlingScore
+              ? calculateMaidenOvers(
+                  ballEvents
+                    .filter(
+                      (ball) =>
+                        player.id === ball.bowlerId && ball.type !== "-4",
+                    )
+                    .map((ball) => ball.type as EventType),
                 )
-                .map((ball) => ball.type as EventType),
-            );
+              : 0;
 
             return (
-              <TableRow>
+              <TableRow key={player.id}>
                 <TableCell className="text-left font-semibold">
                   <p>
                     {player.name} {!outBy && !isBowlingScore && "*"}
@@ -199,7 +203,7 @@ function Score({
             </li>
           ))}
         </ul>
-      ) : (
+      ) : fallOfWickets.length ? (
         <div>
           <h6 className="mt-8 border-t px-2 py-2 text-center text-sm font-bold uppercase text-muted-foreground">
             Fall of wickets
@@ -209,13 +213,13 @@ function Score({
               <li key={index} className="my-1 px-2 text-sm">
                 {score}/{index + 1}{" "}
                 <span className="text-muted-foreground">
-                  ({abbreviateName(batsman ?? "")}, {getOverStr(ball)} ov)
+                  ({abbreviateName(batsman ?? "")}, {getOverStr(ball, true)} ov)
                 </span>
               </li>
             ))}
           </ul>
         </div>
-      )}
+      ) : null}
 
       <div className="sticky bottom-0.5 m-2 flex justify-between rounded-md bg-muted p-2">
         <span>

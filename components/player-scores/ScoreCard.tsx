@@ -1,7 +1,7 @@
 import { BallEvent, Player } from "@prisma/client";
 
 import { MatchExtended } from "@/types";
-import { calculateFallOfWickets, processTeamName } from "@/lib/utils";
+import { calculateFallOfWickets, abbreviateEntity } from "@/lib/utils";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ScrollArea } from "../ui/scroll-area";
@@ -19,18 +19,14 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
   const teams = match.teams;
 
   const curTeam = match.curTeam;
-  const notCurTeam = match.curTeam === 0 ? 1 : 0;
 
   const isInSecondInning = !new Set(
     match.teams[curTeam].players.map((player) => player.id),
   ).has(ballEvents[0]?.batsmanId);
 
-  const firstBattingTeamIndex = isInSecondInning ? notCurTeam : curTeam;
-  const secondBattingTeamIndex = isInSecondInning ? curTeam : notCurTeam;
-
-  const firstBattingTeam = teams[firstBattingTeamIndex];
-  const secondBattingTeam = teams[secondBattingTeamIndex];
-  const hasYetToBatTeam = isInSecondInning ? null : secondBattingTeamIndex;
+  const firstBattingTeam = teams[0];
+  const secondBattingTeam = teams[1];
+  const hasYetToBatTeam = isInSecondInning ? null : 1;
 
   function getScoreProps(
     players: Player[],
@@ -43,17 +39,18 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
         .includes(event[isBowlingScore ? "bowlerId" : "batsmanId"]),
     );
 
+    const selectedTeam = teams[i];
+
+    const fallOfWickets = !isBowlingScore
+      ? []
+      : calculateFallOfWickets(ballEventsToPass, selectedTeam.players);
+
     return {
       ballEvents: ballEventsToPass,
       isBowlingScore,
       players,
       hasYetToBatTeam,
-      fallOfWickets: !isBowlingScore
-        ? []
-        : calculateFallOfWickets(
-            ballEventsToPass,
-            teams.map((team) => team.players).flat(),
-          ),
+      fallOfWickets,
       teamIndex: i,
       teams,
     };
@@ -62,22 +59,22 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
   const tabs = [
     {
       id: "1-bat",
-      name: `${processTeamName(firstBattingTeam.name)} - Bat`,
+      name: `${abbreviateEntity(firstBattingTeam.name)} - Bat`,
       content: <Score {...getScoreProps(firstBattingTeam.players, 0)} />,
     },
     {
       id: "2-bowl",
-      name: `${processTeamName(secondBattingTeam.name)} - Bowl`,
+      name: `${abbreviateEntity(secondBattingTeam.name)} - Bowl`,
       content: <Score {...getScoreProps(secondBattingTeam.players, 0, true)} />,
     },
     {
       id: "2-bat",
-      name: `${processTeamName(secondBattingTeam.name)} - Bat`,
+      name: `${abbreviateEntity(secondBattingTeam.name)} - Bat`,
       content: <Score {...getScoreProps(secondBattingTeam.players, 1)} />,
     },
     {
       id: "1-bowl",
-      name: `${processTeamName(firstBattingTeam.name)} - Bowl`,
+      name: `${abbreviateEntity(firstBattingTeam.name)} - Bowl`,
       content: <Score {...getScoreProps(firstBattingTeam.players, 1, true)} />,
     },
   ];
@@ -86,8 +83,8 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
     <Tabs defaultValue="1-bat">
       <div className="px-2">
         <TabsList className="justify-normal divide-x divide-foreground/40 px-0 max-md:w-full">
-          {tabs.map((tab, i) => (
-            <div className="w-full px-1">
+          {tabs.map((tab) => (
+            <div className="w-full px-1" key={tab.id}>
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}

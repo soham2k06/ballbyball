@@ -8,11 +8,13 @@ interface BowlerScoresProps {
 }
 
 function BowlerScores({ player, events }: BowlerScoresProps) {
-  const { runs, totalBalls, runRate, wickets } = getScore(
-    events
-      .filter((event) => event.bowlerId === player?.id)
-      .map(({ type }) => type),
-  );
+  const bowlerEvents = events
+    .filter((event) => event.bowlerId === player?.id)
+    .map(({ type }) => type);
+  const { runs, totalBalls, runRate, wickets } = getScore({
+    balls: bowlerEvents,
+    forBowler: false,
+  });
 
   return (
     <div className="flex w-full flex-col gap-1 rounded-md bg-muted p-2 text-lg">

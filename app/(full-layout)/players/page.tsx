@@ -10,15 +10,23 @@ export const metadata: Metadata = {
   description: "List of players",
 };
 
-async function page() {
-  await checkSession();
-  const players = await getAllPlayers();
+interface Props {
+  searchParams: {
+    user: string;
+  };
+}
+
+async function page({ searchParams }: Props) {
+  const userRef = searchParams.user;
+  if (!userRef) await checkSession();
+  const players = await getAllPlayers(userRef);
+
   return (
     <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Players
       </h1>
-      <PlayerList players={players as Player[]} />
+      <PlayerList players={players as Player[]} userRef={userRef} />
     </div>
   );
 }

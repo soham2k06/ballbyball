@@ -21,6 +21,7 @@ export async function GET(
         allowSinglePlayer: true,
         createdAt: true,
         matchTeams: {
+          orderBy: { batFirst: "desc" },
           select: {
             team: {
               select: {
@@ -47,12 +48,12 @@ export async function GET(
           .filter((event) => teams[i].playerIds.includes(event.batsmanId))
           .map((event) => event.type);
 
-      const { runs: runs1 } = getScore(ballEventsbyTeam(0));
+      const { runs: runs1 } = getScore({ balls: ballEventsbyTeam(0) });
       const {
         runs: runs2,
         wickets: wickets2,
         totalBalls,
-      } = getScore(ballEventsbyTeam(1));
+      } = getScore({ balls: ballEventsbyTeam(1) });
 
       const playerBatEvents = ballEvents
         .filter((event) => event.batsmanId === id)
@@ -62,8 +63,8 @@ export async function GET(
         .filter((event) => event.bowlerId === id)
         .map((event) => event.type);
 
-      const batScore = getScore(playerBatEvents, true);
-      const bowlScore = getScore(playerBowlEvents);
+      const batScore = getScore({ balls: playerBatEvents, forBatsman: true });
+      const bowlScore = getScore({ balls: playerBowlEvents, forBowler: true });
 
       const { winInfo, winner } = calculateWinner({
         allowSinglePlayer: match.allowSinglePlayer,

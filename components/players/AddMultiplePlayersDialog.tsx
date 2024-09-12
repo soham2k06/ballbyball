@@ -48,9 +48,6 @@ function AddMultiplePlayersDialog({
 }: AddMultiplePlayersDialogProps) {
   const form = useForm<{ names: string[] }>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      names: [" "],
-    },
   });
 
   const { handleSubmit, control, reset } = form;
@@ -111,10 +108,13 @@ function AddMultiplePlayersDialog({
         <Form {...form}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex max-h-[calc(100dvh-120px)] min-h-96 flex-col justify-between overflow-y-auto p-1"
+            className="flex h-96 flex-col justify-between"
           >
-            <ul className="space-y-4">
-              {fields.map((name, index) => (
+            <ul className="h-full space-y-4 overflow-y-auto p-1">
+              {(fields.length
+                ? fields
+                : [{ id: Math.random().toString(36), name: "" }]
+              ).map((name, index) => (
                 <div key={name.id} className="flex items-center gap-4">
                   <FormField
                     name={`names.${index}`}
@@ -153,9 +153,8 @@ function AddMultiplePlayersDialog({
               ))}
             </ul>
 
-            <div className="flex gap-2">
+            <div className="sticky bottom-0 mt-4 flex gap-2 bg-popover">
               <Button
-                size="sm"
                 type="button"
                 variant="secondary"
                 onClick={() => handleAdd(fields.length)}
@@ -163,7 +162,6 @@ function AddMultiplePlayersDialog({
                 <Plus /> Add Field
               </Button>
               <LoadingButton
-                size="sm"
                 type="submit"
                 disabled={isPending}
                 loading={isPending}

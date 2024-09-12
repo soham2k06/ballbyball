@@ -1,4 +1,4 @@
-import { getOverStr, processTeamName } from "@/lib/utils";
+import { getOverStr, abbreviateEntity } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { TypographyH2 } from "../ui/typography";
 
@@ -18,7 +18,7 @@ function ScoreDisplay({
   return (
     <div className="relative mt-6 flex items-end justify-center pb-2">
       <TypographyH2 className="absolute left-0">
-        {processTeamName(curTeam ?? "TEAM 1")}
+        {abbreviateEntity(curTeam ?? "TEAM 1")}
       </TypographyH2>
       <div>
         <h2 className="mb-3 text-center text-6xl font-semibold tabular-nums">

@@ -39,10 +39,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { cn } from "@/lib/utils";
+import { cn, abbreviateEntity } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface StartUpdateMatchDialogProps extends OverlayStateProps {
-  matchToUpdate?: UpdateMatchSchema & { teams: { id: string }[] };
+  matchToUpdate?: UpdateMatchSchema & {
+    teams: { id: string; batFirst?: boolean }[];
+  };
   teams: TeamWithPlayers[];
 }
 
@@ -52,6 +55,7 @@ function StartUpdateMatchDialog({
   matchToUpdate,
   teams,
 }: StartUpdateMatchDialogProps) {
+  const router = useRouter();
   const form = useForm<CreateMatchSchema | UpdateMatchSchema>({
     resolver: zodResolver(createMatchSchema),
     defaultValues: {
@@ -77,9 +81,14 @@ function StartUpdateMatchDialog({
   const selectedTeams = watchedTeamIds.map((id) =>
     teams.find((team) => team.id === id),
   );
+  const defBatFirstTeam = matchToUpdate
+    ? teams.find((team) =>
+        matchToUpdate?.teams.some((t) => t.batFirst && t.id === team.id),
+      )
+    : null;
 
   const { containsSamePlayer, isDifferentPlayerLengthTeams } =
-    useValidateMatchData((watchedTeamIds ?? []) || []);
+    useValidateMatchData(selectedTeams ?? []);
 
   const isPending = isCreating || isUpdating;
 
@@ -98,18 +107,39 @@ function StartUpdateMatchDialog({
       return;
     }
     createMutate(data as CreateMatchSchema, {
-      onSuccess: () => {
+      onSuccess: (newMatchId) => {
         reset();
         setOpen(false);
+        router.push(`/match/${newMatchId}`);
       },
     });
   }
 
   useEffect(() => {
     if (open && matchToUpdate) {
+      matchToUpdate.batFirst = defBatFirstTeam?.id;
       reset(matchToUpdate);
     }
   }, [open, matchToUpdate]);
+
+  useEffect(() => {
+    const numTeams = (form.watch("teamIds") || []).length;
+    if (!form.watch("name") && numTeams === 2) {
+      const formattedTime = Intl.DateTimeFormat("en-US", {
+        hour: "2-digit",
+        minute: "numeric",
+        hour12: true,
+      })
+        .format(new Date())
+        .replace(/\s[AP]M/, "");
+
+      const matchName = `${selectedTeams
+        .map((team) => (team?.name ? abbreviateEntity(team.name) : ""))
+        .join(" vs ")} (${formattedTime})`;
+
+      form.resetField("name", { defaultValue: matchName });
+    }
+  }, [form.watch("teamIds")]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -152,7 +182,7 @@ function StartUpdateMatchDialog({
                             (field.value ?? "").length >= 2 && !isSelected;
 
                           return (
-                            <FormItem key={item.id} className="space-y-0">
+                            <FormItem key={item.id} className="flex space-y-0">
                               <FormControl>
                                 <Checkbox
                                   disabled={disabled}
@@ -199,19 +229,17 @@ function StartUpdateMatchDialog({
 
             <FormField
               control={control}
-              name="curTeam"
+              name="batFirst"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Batting First Team</FormLabel>
                   <FormControl>
                     <Select
-                      defaultValue={
-                        matchToUpdate ? String(matchToUpdate?.curTeam) : ""
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={
+                        !(watchedTeamIds ?? []).length || field.disabled
                       }
-                      onValueChange={(val) => {
-                        field.onChange(val ? parseInt(val) : 0);
-                      }}
-                      disabled={!(watchedTeamIds ?? []).length}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -219,8 +247,8 @@ function StartUpdateMatchDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {selectedTeams.map((team, i) => (
-                          <SelectItem value={String(i)}>
+                        {selectedTeams.map((team) => (
+                          <SelectItem value={team?.id ?? ""} key={team?.id}>
                             {team?.name}
                           </SelectItem>
                         ))}
@@ -235,10 +263,6 @@ function StartUpdateMatchDialog({
             <FormField
               control={form.control}
               name="overs"
-              rules={{
-                min: { value: 1, message: "Enter Mininum 1 over" },
-                max: { value: 50, message: "Enter Maximum 50 overs" },
-              }}
               render={({ field }) => {
                 return (
                   <FormItem>
@@ -248,9 +272,10 @@ function StartUpdateMatchDialog({
                         placeholder="Match Overs"
                         type="number"
                         {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(parseInt(value.replace(/^0+/, "")));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -283,24 +308,21 @@ function StartUpdateMatchDialog({
               )}
             />
 
-            <DialogDescription>
-              {(form.watch("teamIds")?.length ?? 0) >= 2 && (
-                <>
-                  {containsSamePlayer && (
-                    <p className="text-sm text-destructive">
-                      Both teams should not have same player, it may lead to
-                      bugs.
-                    </p>
-                  )}
-                  {isDifferentPlayerLengthTeams && (
-                    <p className="text-sm text-destructive">
-                      Both teams should have same number of players, please look
-                      into it.
-                    </p>
-                  )}
-                </>
-              )}
-            </DialogDescription>
+            {(form.watch("teamIds")?.length ?? 0) >= 2 && (
+              <>
+                {containsSamePlayer && (
+                  <DialogDescription className=" text-destructive">
+                    Both teams should not have same player, it may lead to bugs.
+                  </DialogDescription>
+                )}
+                {isDifferentPlayerLengthTeams && (
+                  <DialogDescription className="text-destructive">
+                    Both teams should have same number of players, please look
+                    into it.
+                  </DialogDescription>
+                )}
+              </>
+            )}
 
             <DialogFooter className="sticky bottom-0">
               <LoadingButton

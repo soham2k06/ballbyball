@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { processTeamName } from "@/lib/utils";
+import { abbreviateEntity } from "@/lib/utils";
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import {
@@ -95,7 +95,7 @@ function SelectBowler({
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <TypographyH3 className="text-2xl font-bold">
-              Select Bowler - {processTeamName(team?.name ?? "")}
+              Select Bowler - {abbreviateEntity(team?.name ?? "")}
             </TypographyH3>
             {!!curPlayers.find((player) => player.type === "bowler") && (
               <Button

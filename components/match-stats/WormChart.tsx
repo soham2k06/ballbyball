@@ -1,4 +1,4 @@
-import { generateOverSummary, getScore } from "@/lib/utils";
+import { calcRuns, getIsvalidBall, getOverStr, getScore } from "@/lib/utils";
 import { EventType } from "@/types";
 import { Team } from "@prisma/client";
 import {
@@ -21,29 +21,41 @@ function WormChart({
   teams: Team[];
   totalOvers: number;
 }) {
-  const { overSummaries } = generateOverSummary(ballEvents[0]);
-  const { overSummaries: overSummaries2 } = generateOverSummary(ballEvents[1]);
+  const adjustExtras = (events: string[]): string[] => {
+    const adjustedEvents: string[] = [];
 
-  const team1Score = overSummaries.map((summary) => {
-    const { runs, wickets } = getScore(summary);
-    return {
-      runs,
-      wickets,
-    };
-  });
-  const team2Score = overSummaries2.map((summary) => {
-    const { runs, wickets } = getScore(summary);
-    return {
-      runs,
-      wickets,
-    };
-  });
+    let consicutiveExtras = 0;
 
-  const combineData = (
-    team1Score: { runs: number; wickets: number }[],
-    team2Score: { runs: number; wickets: number }[],
-    totalOvers: number,
-  ) => {
+    events.forEach((event) => {
+      if (event === "-4") return;
+      let curBallRun = 0;
+
+      const isExtra = !getIsvalidBall(event);
+
+      if (isExtra) {
+        const extraRuns = calcRuns([event]);
+        consicutiveExtras += extraRuns;
+        return;
+      }
+
+      const isWicket = event.includes("-1");
+      const run = calcRuns([event]);
+
+      curBallRun += run + consicutiveExtras;
+
+      adjustedEvents.push(
+        isWicket ? "-1_x_x_" + consicutiveExtras : curBallRun.toString(),
+      );
+      consicutiveExtras = 0;
+    });
+
+    return adjustedEvents;
+  };
+
+  const adjustBallEvents1 = adjustExtras(ballEvents[0]);
+  const adjustBallEvents2 = adjustExtras(ballEvents[1]);
+
+  const combineData = () => {
     const data = [];
 
     let team1TotalRuns = 0;
@@ -52,24 +64,42 @@ function WormChart({
     let team1TotalWickets = 0;
     let team2TotalWickets = 0;
 
-    for (let i = 0; i < totalOvers; i++) {
-      const aggrTeam1Score = i < team1Score.length ? team1Score[i] : null;
-      const aggrTeam2Runs = i < team2Score.length ? team2Score[i] : null;
+    const maxBalls = Math.max(
+      adjustBallEvents1.length,
+      adjustBallEvents2.length,
+      totalOvers * 6,
+    );
 
-      if (aggrTeam1Score !== null) {
-        team1TotalRuns += aggrTeam1Score.runs;
-        team1TotalWickets += aggrTeam1Score.wickets;
+    for (let i = 0; i < maxBalls; i++) {
+      const curEvent1 = adjustBallEvents1?.[i];
+      const curEvent2 = adjustBallEvents2?.[i];
+
+      const score1 = curEvent1
+        ? parseInt(curEvent1) >= 10
+          ? { ...getScore({ balls: [curEvent1] }), runs: parseInt(curEvent1) }
+          : getScore({ balls: [curEvent1] })
+        : null;
+      const score2 = curEvent2
+        ? parseInt(curEvent2) >= 10
+          ? { ...getScore({ balls: [curEvent2] }), runs: parseInt(curEvent2) }
+          : getScore({ balls: [curEvent2] })
+        : null;
+
+      if (score1 !== null) {
+        team1TotalRuns += score1.runs;
+        team1TotalWickets += score1.wickets;
       }
 
-      if (aggrTeam2Runs !== null) {
-        team2TotalRuns += aggrTeam2Runs.runs;
-        team2TotalWickets += aggrTeam2Runs.wickets;
+      if (score2 !== null) {
+        team2TotalRuns += score2.runs;
+        team2TotalWickets += score2.wickets;
       }
 
       data.push({
-        over: i + 1,
-        [teams[0].name]: aggrTeam1Score !== null ? team1TotalRuns : null,
-        [teams[1].name]: aggrTeam2Runs !== null ? team2TotalRuns : null,
+        over: (i + 1) % 6 === 0 ? (i + 1) / 6 : "",
+        overStr: getOverStr(i + 1, true),
+        [teams[0].name]: score1 !== null ? team1TotalRuns : null,
+        [teams[1].name]: score2 !== null ? team2TotalRuns : null,
         wickets: {
           [teams[0].name]: team1TotalWickets,
           [teams[1].name]: team2TotalWickets,
@@ -83,6 +113,7 @@ function WormChart({
   const chartData = [
     {
       over: "",
+      overStr: "0.0",
       [teams[0].name]: 0,
       [teams[1].name]: 0,
       wickets: {
@@ -90,27 +121,44 @@ function WormChart({
         [teams[1].name]: 0,
       },
     },
-    ...combineData(team1Score, team2Score, totalOvers),
+    ...combineData(),
   ];
 
   const CustomDot1 = (props: JSX.Element["props"]) => {
     const { cx, cy, index } = props;
+
+    const r = 3;
     if (
       chartData[index].wickets?.[teams[0].name] >
       chartData[index - 1]?.wickets?.[teams[0].name]
     )
-      return <circle cx={cx} cy={cy} r={6} fill="#605cbd" />;
+      return (
+        <circle
+          cx={cx - r / (r * 2)}
+          cy={cy - r / (r * 2)}
+          r={r}
+          fill="#1d4ed8"
+        />
+      );
     else return null;
   };
 
   const CustomDot2 = (props: JSX.Element["props"]) => {
     const { cx, cy, index } = props;
 
+    const r = 3;
     if (
       chartData[index].wickets?.[teams[1].name] >
       chartData[index - 1]?.wickets?.[teams[1].name]
     )
-      return <circle cx={cx} cy={cy} r={6} fill="#467055" />;
+      return (
+        <circle
+          cx={cx - r / (r * 2)}
+          cy={cy - r / (r * 2)}
+          r={r}
+          fill="#b45309"
+        />
+      );
     else return null;
   };
 
@@ -124,6 +172,7 @@ function WormChart({
           margin={{ top: 20, left: -32, bottom: 5 }}
         >
           <XAxis
+            tickCount={totalOvers}
             dataKey="over"
             tickLine={false}
             fontSize={12}
@@ -138,7 +187,7 @@ function WormChart({
             cursor={{
               style: { stroke: "hsla(var(--muted-foreground) / 0.5)" },
             }}
-            content={({ payload, label }) => {
+            content={({ payload }) => {
               const wickets = payload?.map(
                 (payload) => payload.payload.wickets,
               )[0];
@@ -146,7 +195,11 @@ function WormChart({
               return (
                 <Card>
                   <CardContent>
-                    <CardTitle className="mb-2 text-lg">Over {label}</CardTitle>
+                    <CardTitle className="mb-2 text-lg">
+                      Over{" "}
+                      {payload?.[0]?.payload.overStr ||
+                        payload?.[1]?.payload.overStr}
+                    </CardTitle>
                     <div className="text-sm font-semibold text-muted-foreground">
                       {payload?.[0] && (
                         <>
@@ -171,18 +224,18 @@ function WormChart({
           <Legend wrapperStyle={{ fontSize: 12, left: 0 }} />
           <Line
             strokeLinecap="round"
-            type="monotone"
+            type="bump"
             dataKey={teams[0].name}
-            stroke="#8884d8"
-            strokeWidth={6}
+            stroke="#3b82f6"
+            strokeWidth="2.5"
             dot={<CustomDot1 />}
           />
           <Line
             strokeLinecap="round"
-            type="monotone"
+            type="bump"
             dataKey={teams[1].name}
-            stroke="#82ca9d"
-            strokeWidth={6}
+            stroke="#f59e0b"
+            strokeWidth="2.5"
             dot={<CustomDot2 />}
           />
         </LineChart>

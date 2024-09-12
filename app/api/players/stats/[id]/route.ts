@@ -3,31 +3,21 @@ import {
   calcBestSpells,
   calcMilestones,
   calcRuns,
-  calculateMaidenOvers,
   calcWicketHauls,
   getScore,
+  getValidatedUser,
+  mapGroupedMatches,
 } from "@/lib/utils";
-import { EventType } from "@/types";
-import { BallEvent } from "@prisma/client";
-import { NextResponse } from "next/server";
-
-function mapGroupedMatches(events: BallEvent[]) {
-  const groupedMatches: { [matchId: string]: BallEvent[] } = {};
-  for (const event of events) {
-    const matchId = event.matchId ?? "no-data";
-    if (!groupedMatches[matchId]) {
-      groupedMatches[matchId] = [];
-    }
-    groupedMatches[matchId].push(event);
-  }
-
-  return groupedMatches;
-}
+import { EventType, PlayerStats } from "@/types";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _: unknown,
-  { params: { id } }: { params: { id: string } },
+  req: NextRequest,
+  { params: { id } }: { params: { id?: string } },
 ) {
+  const user = req.nextUrl.searchParams.get("user");
+
+  const userId = user ?? (await getValidatedUser());
   try {
     const player = await prisma.player.findUnique({
       where: { id },
@@ -45,7 +35,45 @@ export async function GET(
     const groupedMatchesBat = mapGroupedMatches(battingEventsExtended);
     const groupedMatchesBowl = mapGroupedMatches(bowlingEventsExtended);
 
-    const { fifties, centuries, highestScore, isNotout } =
+    //// Field Stats
+    const catches = id
+      ? await prisma.ballEvent.count({
+          where: {
+            userId,
+            OR: [
+              { AND: [{ type: "-1_4" }, { bowlerId: id }] },
+              {
+                AND: [
+                  { type: { contains: id } },
+                  {
+                    OR: [{ type: { contains: "_3_" } }],
+                  },
+                ],
+              },
+            ],
+          },
+        })
+      : 0;
+
+    const runOuts = id
+      ? await prisma.ballEvent.count({
+          where: {
+            AND: [{ type: { contains: "_5_" } }, { type: { contains: id } }],
+          },
+        })
+      : 0;
+
+    const stumpings = id
+      ? await prisma.ballEvent.count({
+          where: {
+            AND: [{ type: { contains: "_6_" } }, { type: { contains: id } }],
+          },
+        })
+      : 0;
+
+    const fieldingStats = { catches, runOuts, stumpings };
+
+    const { thirties, fifties, centuries, highestScore, isNotout } =
       calcMilestones(groupedMatchesBat);
 
     const { fives: fiveHauls, threes: threeHauls } =
@@ -56,7 +84,7 @@ export async function GET(
         events.map((event) => event.type as EventType),
       ) || [];
 
-    const bestSpell = calcBestSpells(playerBallEventsByMatches)[0];
+    const bestSpell = calcBestSpells(playerBallEventsByMatches, 1)[0];
 
     const battingEvents = battingEventsExtended.map((event) => event.type);
 
@@ -64,10 +92,10 @@ export async function GET(
       runs: runsScored,
       totalBalls: ballsFaced,
       wickets: outs,
-    } = getScore(battingEvents, true);
+    } = getScore({ balls: battingEvents, forBatsman: true });
 
     const noWicketEvents = battingEvents.filter(
-      (event) => !["-1"].includes(event),
+      (event) => !event.includes("-1") && !event.includes("-4"),
     );
 
     const boundaries = runsScored
@@ -78,7 +106,6 @@ export async function GET(
 
     const dotsPlayed = noWicketEvents.filter((event) => event === "0").length;
     const singles = noWicketEvents.filter((event) => event === "1").length;
-    const twos = noWicketEvents.filter((event) => event === "2").length;
     const fours = boundaries.filter((event) => event.includes("4")).length;
     const sixes = boundaries.filter((event) => event.includes("6")).length;
 
@@ -91,11 +118,11 @@ export async function GET(
       wickets: outs,
       fifties,
       centuries,
+      thirties,
       highestScore,
       boundaryRate,
       dotsPlayed,
       singles,
-      twos,
       fours,
       sixes,
       isNotoutOnHighestScore: isNotout,
@@ -111,9 +138,7 @@ export async function GET(
       wickets: wicketsTaken,
       extras,
       runRate,
-    } = getScore(bowlingEvents);
-
-    const maidenOverCount = calculateMaidenOvers(bowlingEvents as EventType[]);
+    } = getScore({ balls: bowlingEvents, forBowler: true });
 
     const dotBalls = bowlingEvents.filter((event) => event === "0").length;
     const dotBallsRate = (dotBalls / bowlingEvents.length) * 100 || 0;
@@ -122,7 +147,6 @@ export async function GET(
       runs: runsConceded,
       balls: ballsBowled,
       wickets: wicketsTaken,
-      maidenOvers: maidenOverCount,
       dotBallsRate,
       dotBalls,
       bestSpell,
@@ -140,10 +164,11 @@ export async function GET(
       },
     });
 
-    const playerStats = {
+    const playerStats: PlayerStats = {
       matchesPlayed,
       batting: battingStats,
       bowling: bowlingStats,
+      fielding: fieldingStats,
     };
 
     if (!playerStats)

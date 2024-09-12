@@ -37,12 +37,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Player } from "@prisma/client";
 import { useActionMutate } from "@/lib/hooks";
 import { createTeam, updateTeam } from "@/lib/actions/team";
+import { usePlayers } from "@/apiHooks/player/usePlayers";
 
 interface AddUpdateTeamDialogProps extends OverlayStateProps {
-  players: Player[];
   teamToUpdate?: UpdateTeamSchema & { matchId: string | null };
 }
 
@@ -50,8 +49,9 @@ function AddUpdateTeamDialog({
   open,
   setOpen,
   teamToUpdate,
-  players,
 }: AddUpdateTeamDialogProps) {
+  const { players, isLoading } = usePlayers();
+
   const form = useForm<CreateTeamSchema>({
     resolver: zodResolver(createTeamSchema),
     defaultValues: {
@@ -122,14 +122,14 @@ function AddUpdateTeamDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="rounded-md p-0">
-          <DialogHeader className="p-4">
+        <DialogContent className="max-h-[95%] rounded-md">
+          <DialogHeader>
             <DialogTitle>{teamToUpdate ? "Update" : "Add"} Team</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
               onSubmit={handleSubmitOwn}
-              className="max-h-full space-y-3 overflow-y-auto p-4 pt-0"
+              className="space-y-3 overflow-y-auto p-1"
             >
               <FormField
                 control={control}
@@ -157,45 +157,62 @@ function AddUpdateTeamDialog({
                       </FormDescription>
                     </div>
                     {players?.length ? (
-                      <ul className="grid max-h-96 grid-cols-2 gap-2 overflow-auto">
-                        {players?.map((item) => (
-                          <FormField
-                            key={item.id}
-                            control={control}
-                            name="playerIds"
-                            render={({ field }) => {
-                              const isSelected = field.value.includes(item.id);
+                      <ul className="grid max-h-40 grid-cols-2 gap-2 overflow-auto">
+                        {isLoading
+                          ? Array.from({ length: 8 }).map((_, i) => (
+                              <PlayerLabel
+                                key={i}
+                                title="Loading..."
+                                isOpacityDown
+                                isBrightnessDown
+                              />
+                            ))
+                          : players.map((player) => (
+                              <FormField
+                                key={player.id}
+                                control={control}
+                                name="playerIds"
+                                render={({ field }) => {
+                                  const isSelected = field.value.includes(
+                                    player.id,
+                                  );
 
-                              return (
-                                <FormItem key={item.id} className="space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      className="sr-only"
-                                      checked={field.value.includes(item.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              item.id,
-                                            ])
-                                          : field.onChange(
-                                              field.value.filter(
-                                                (value) => value !== item.id,
-                                              ),
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
+                                  return (
+                                    <FormItem
+                                      key={player.id}
+                                      className="space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          className="sr-only"
+                                          checked={field.value.includes(
+                                            player.id,
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([
+                                                  ...field.value,
+                                                  player.id,
+                                                ])
+                                              : field.onChange(
+                                                  field.value.filter(
+                                                    (value) =>
+                                                      value !== player.id,
+                                                  ),
+                                                );
+                                          }}
+                                        />
+                                      </FormControl>
 
-                                  <PlayerLabel
-                                    title={item.name}
-                                    isSelected={isSelected}
-                                  />
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
+                                      <PlayerLabel
+                                        title={player.name}
+                                        isSelected={isSelected}
+                                      />
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            ))}
                       </ul>
                     ) : (
                       <p>No players</p>
@@ -225,7 +242,9 @@ function AddUpdateTeamDialog({
                       <SelectContent>
                         {selectedPlayers?.length ? (
                           selectedPlayers?.map(({ id, name }) => (
-                            <SelectItem value={id}>{name}</SelectItem>
+                            <SelectItem value={id} key={id}>
+                              {name}
+                            </SelectItem>
                           ))
                         ) : (
                           <SelectItem value="disabled" disabled>

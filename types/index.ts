@@ -1,3 +1,4 @@
+import { commentsCollection } from "@/lib/constants";
 import { BallEvent, Match, Player, Team } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
 
@@ -34,8 +35,23 @@ type PlayerPerformance = {
   runConceded: number;
   ballsBowled: number;
   wicketsTaken: number;
+  catches: number;
+  runOuts: number;
+  stumpings: number;
+  fours: number;
+  sixes: number;
+  economy: number;
+  strikeRate: number;
+  thirties: number;
+  fifties: number;
+  centuries: number;
+  is2: boolean;
+  is3: boolean;
+  isDuck: boolean;
+  maidens: number;
   team: string;
   isWinner: boolean;
+  points?: number;
 };
 
 type PlayerStats = {
@@ -50,7 +66,7 @@ type PlayerStats = {
     boundaryRate: number;
     dotsPlayed: number;
     singles: number;
-    twos: number;
+    thirties: number;
     fours: number;
     sixes: number;
   };
@@ -58,7 +74,6 @@ type PlayerStats = {
     runs: number;
     balls: number;
     wickets: number;
-    maidenOvers: number;
     dotBalls: number;
     dotBallsRate: number;
     bestSpell: {
@@ -71,6 +86,7 @@ type PlayerStats = {
     fiveHauls: number;
     threeHauls: number;
   };
+  fielding: { catches: number; runOuts: number; stumpings: number };
   matchesPlayed: number;
 };
 
@@ -89,16 +105,55 @@ type TopPerformant = PlayerPerformance & {
   name: string;
 };
 
+// type BattingRecordsType = {
+//   player: Player;
+//   runs: number;
+//   innings: number;
+//   matches: number;
+//   average: number;
+//   strikeRate: number;
+//   milestones: {
+//     fifties: number;
+//     centuries: number;
+//     highestScore: number;
+//     isNotout: boolean;
+//   };
+//   fours: number;
+//   sixes: number;
+// };
+
+// type BowlingRecordsType = {
+//   player: Player;
+//   wickets: number;
+//   totalBalls: number;
+//   matches: number;
+//   economy: number;
+//   strikeRate: number;
+//   bestSpell: {
+//     wickets: number;
+//     runs: number;
+//     balls: number;
+//   };
+//   maidens: number;
+//   runsConceded: number;
+//   dots: number;
+// };
+
+type CommentKey = keyof typeof commentsCollection;
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };
 
+type PlayerSimplified = Pick<Player, "id" | "name">;
+
 type MatchExtended = Match & {
-  teams: (TeamWithPlayers & { playerIds: string[] })[];
+  teams: (TeamWithPlayers & { batFirst?: boolean; playerIds: string[] })[];
   ballEvents: BallEvent[];
 };
 
 export type {
+  CommentKey,
   EventType,
   OverlayStateProps,
   PlayerPerformance,
@@ -107,5 +162,6 @@ export type {
   MatchExtended,
   PlayerMatches,
   PlayerScore,
+  PlayerSimplified,
   TopPerformant,
 };

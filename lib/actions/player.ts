@@ -6,6 +6,8 @@ import {
   createOrUpdateWithUniqueName,
   handleError,
   getValidatedUser,
+  getScore,
+  calcRuns,
 } from "../utils";
 import {
   createPlayerSchema,
@@ -14,8 +16,8 @@ import {
   UpdatePlayerSchema,
 } from "../validation/player";
 
-export async function getAllPlayers() {
-  const userId = await getValidatedUser();
+export async function getAllPlayers(user?: string | null) {
+  const userId = user ?? (await getValidatedUser());
   try {
     const players = await prisma.player.findMany({
       where: { userId },
@@ -23,6 +25,64 @@ export async function getAllPlayers() {
       select: { id: true, name: true },
     });
     return players;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+export async function getPlayerBySortedPerformance() {
+  const userId = await getValidatedUser();
+  try {
+    const players = await prisma.player.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        name: true,
+        playerBatEvents: {
+          select: {
+            type: true,
+            matchId: true,
+          },
+        },
+        playerBallEvents: { select: { type: true, matchId: true } },
+      },
+    });
+
+    const playersWithScores = players.map((player) => {
+      const runsScored = calcRuns(
+        player.playerBatEvents.map((evt) => evt.type),
+        true,
+      );
+
+      const {
+        wickets,
+        runRate: economy,
+        totalBalls: ballsDelivered,
+      } = getScore({
+        balls: player.playerBallEvents.map((evt) => evt.type),
+        forBowler: true,
+      });
+
+      const matches = new Set(
+        [...player.playerBatEvents, ...player.playerBallEvents].map(
+          (evt) => evt.matchId,
+        ),
+      ).size;
+
+      const runsPoints = runsScored * 1;
+      const wicketsPoints = wickets * 20;
+      const economyPoints = ballsDelivered > 24 ? 100 / economy : 0;
+      const totalPoints =
+        (runsPoints + wicketsPoints + economyPoints) / matches;
+
+      return {
+        id: player.id,
+        name: player.name,
+        totalPoints,
+      };
+    });
+
+    return playersWithScores.sort((a, b) => b.totalPoints - a.totalPoints);
   } catch (error) {
     handleError(error);
   }
@@ -101,7 +161,7 @@ export async function updatePlayer(data: UpdatePlayerSchema) {
 export async function deletePlayer(id: string) {
   try {
     const playerToDelete = await prisma.player.findUnique({ where: { id } });
-  
+
     if (!playerToDelete) throw new Error("Player not found!");
     await prisma.teamPlayer.deleteMany({ where: { playerId: id } });
     await prisma.player.delete({ where: { id } });

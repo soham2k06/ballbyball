@@ -27,10 +27,9 @@ function MoreBowling({ data }: { data: PlayerStats }) {
         </DialogHeader>
         <div className="grid grid-cols-3 gap-1 overflow-hidden rounded-lg">
           <Stat
-            data={wicketsTaken ? ballStrikeRate : "-"}
+            data={wicketsTaken ? round(ballStrikeRate) : "-"}
             dataKey="Strike Rate"
           />
-          <Stat data={data.bowling.dotBalls} dataKey="Dots" />
           <Stat
             data={round(data.bowling.dotBallsRate) + "%"}
             dataKey="Dots rate"

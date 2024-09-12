@@ -1,8 +1,9 @@
-import { calcRuns, generateOverSummary } from "@/lib/utils";
+import { calcRuns, calcWickets, generateOverSummary } from "@/lib/utils";
 import { EventType } from "@/types";
 import {
   Bar,
   BarChart,
+  LabelList,
   ReferenceLine,
   ResponsiveContainer,
   XAxis,
@@ -28,7 +29,8 @@ function OverStats({
 
     chartSummaryData.push({
       name: overName,
-      runs: calcRuns(summary),
+      runs: calcRuns(summary) || null,
+      wickets: calcWickets(summary),
     });
   }
 
@@ -64,13 +66,34 @@ function OverStats({
                 dataKey="runs"
                 style={{ fill: "hsl(var(--primary))" }}
                 radius={[5, 5, 0, 0]}
-                label={{
-                  position: "top",
-                  stroke: "hsl(var(--foreground))",
-                  strokeWidth: 0.5,
-                  fontSize: 12,
-                }}
-              />
+              >
+                <LabelList
+                  dataKey="wickets"
+                  position="top"
+                  content={(props: any) => {
+                    const { x, y, width, value } = props;
+                    const radius = 10;
+                    return Array.from({
+                      length: value ? parseInt(value as string) : 0,
+                    }).map((_, i) => (
+                      <g>
+                        <circle
+                          cx={x + width / 2}
+                          cy={y - radius - i * radius * 2}
+                          r={radius}
+                          fill="#dc2626"
+                        />
+                      </g>
+                    ));
+                  }}
+                />
+                <LabelList
+                  dataKey="runs"
+                  position="center"
+                  fontSize={12}
+                  fill="hsl(var(--primary-foreground))"
+                />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

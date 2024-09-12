@@ -1,32 +1,33 @@
-# Ballbyball | Your cricket partner
+# Ballbyball | Your cricket scoring partner
 
 ---
 
 ## Overview:
 
-The Ballbyball is a comprehensive tool designed to streamline the scoring process for cricket matches. Whether you're a seasoned scorer or just starting out, this app offers intuitive features to accurately record every aspect of the game.
+The Ballbyball is a fully featured tool built for the scoring process for cricket matches. Whether you're a seasoned scorer or just starting out, it offers intuitive features to accurately record every aspect of the game.
 
 ## Key Features:
 
 1. **Live Scoring:** Score matches in real-time, keeping track of runs, wickets, overs, and more.
-2. **Player Management:** Easily add, edit, and remove player profiles.
-3. **Match History:** Access a detailed history of past matches, including scores, player performances, and match outcomes.
+2. **Entity Management:** Easily add, edit, and remove player, teams and matches
+3. **Match Overview:** Access a detailed history of past matches, including scores, player performances, and match outcomes.
 4. **Statistical Analysis:** View detailed statistics and analytics for matches
-
-## Extra Features:
-
-- **Mobile Compatibility:** Enjoy the convenience of scoring matches on the go with full mobile responsiveness.
+5. **Mobile Compatibility:** Enjoy the convenience of scoring matches on the go with full mobile responsiveness.
 
 ## Demo:
 
-<img width="368" alt="dark" src="https://github.com/soham2k06/cricket-scorer/assets/118199354/09b1100a-bc15-4a39-95f8-e35d07bd7bee">
-<img width="368" alt="light" src="https://github.com/soham2k06/cricket-scorer/assets/118199354/020ac427-163d-4043-a0c5-64521ae8c914">
-<img width="368" alt="chart" src="https://github.com/soham2k06/cricket-scorer/assets/118199354/da33f8e3-05b3-4e28-a2c8-6c64deeb6e0f">
+https://github.com/user-attachments/assets/7f0ce100-c672-43ef-996c-f0c5c69d4c9a
+
+<img width="1648" alt="Screenshot 2024-08-30 at 2 01 25 PM" src="https://github.com/user-attachments/assets/a12c1d90-81f3-44d4-aca2-7dfb5ebaea71">
+<img width="500" alt="Screenshot 2024-08-30 at 2 02 01 PM" src="https://github.com/user-attachments/assets/3bfea7b5-bf32-4e53-a017-7cfaaf92c243">
+<img width="500" alt="Screenshot 2024-08-30 at 2 03 20 PM" src="https://github.com/user-attachments/assets/ebd159ce-6017-4798-b488-5d7220e23796">
 
 ## Tech Stack:
 
 - **Core:** React.js, Next.js, Typescript
-- **Backend:** MongoDB, Prisma, Next.js API routes
+
+
+- **Backend:** MongoDB, Prisma, Next.js API routes, server actions
 - **UI:** Tailwind CSS, shadcn-ui
 - **Authentication:** next-auth
 - **Deployment:** Vercel
@@ -36,10 +37,6 @@ The Ballbyball is a comprehensive tool designed to streamline the scoring proces
 
 For any inquiries or assistance, please contact me at sohmm.dev@gmail.com
 
-## License:
-
-This project is licensed under the MIT License.
-
 ---
 
-Thank you for choosing the ballbyball Web App! We hope it enhances your cricket scoring experience.
+Thank you for choosing the ballbyball cricket scoring Web App! We hope it enhances your cricket scoring experience.

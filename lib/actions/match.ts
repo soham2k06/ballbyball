@@ -16,8 +16,9 @@ import { revalidatePath } from "next/cache";
 import { updateMatchSchema } from "../validation/match";
 import { CurPlayer } from "@prisma/client";
 
-export async function getAllMatches() {
-  const userId = await getValidatedUser();
+export async function getAllMatches(user?: string | null) {
+  const userId = user ?? (await getValidatedUser());
+
   const matches = await prisma.match.findMany({
     where: { userId },
     select: {
@@ -27,11 +28,13 @@ export async function getAllMatches() {
       overs: true,
       createdAt: true,
       curTeam: true,
+      allowSinglePlayer: true,
       ballEvents: {
         select: { batsmanId: true, type: true },
         orderBy: { id: "asc" },
       },
       matchTeams: {
+        orderBy: { batFirst: "desc" },
         include: {
           team: {
             select: {
@@ -50,6 +53,7 @@ export async function getAllMatches() {
       const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
       return {
         playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
+        batFirst: matchTeam.batFirst,
         ...teamWithoutPlayers,
       };
     });
@@ -62,8 +66,8 @@ export async function getAllMatches() {
   return matchesSimplified;
 }
 
-export async function getMatchById(id: string) {
-  const userId = await getValidatedUser();
+export async function getMatchById(id: string, user?: string | null) {
+  const userId = user ?? (await getValidatedUser());
 
   const fetchedMatch = await prisma.match.findFirst({
     where: { userId, id },
@@ -73,6 +77,7 @@ export async function getMatchById(id: string) {
         orderBy: { id: "asc" },
       },
       matchTeams: {
+        orderBy: { batFirst: "desc" },
         select: {
           team: {
             select: {
@@ -114,10 +119,8 @@ export async function createMatch(data: CreateMatchSchema) {
 
   if (!parsedRes.success) throw new Error("Invalid inputs");
 
-  const { name, teamIds, curTeam, overs, curPlayers, allowSinglePlayer } =
+  const { name, teamIds, batFirst, overs, curPlayers, allowSinglePlayer } =
     parsedRes.data;
-
-  const newTeams = curTeam === 0 ? teamIds : teamIds.reverse();
 
   try {
     const newName = await createOrUpdateWithUniqueName(name, prisma.team);
@@ -130,7 +133,10 @@ export async function createMatch(data: CreateMatchSchema) {
         curTeam: 0,
         matchTeams: {
           createMany: {
-            data: newTeams.map((teamId) => ({ teamId })),
+            data: teamIds.map((teamId) => ({
+              teamId,
+              batFirst: teamId === batFirst,
+            })),
           },
         },
         overs,
@@ -142,11 +148,12 @@ export async function createMatch(data: CreateMatchSchema) {
       where: { id: { in: teamIds } },
       data: { matchId: match.id },
     });
+
+    revalidatePath("/match");
+    return match.id;
   } catch (error) {
     handleError(error);
   }
-
-  revalidatePath("/match");
 }
 
 export async function updateMatch(data: UpdateMatchSchema) {
@@ -164,12 +171,13 @@ export async function updateMatch(data: UpdateMatchSchema) {
   const {
     id: matchId,
     curPlayers,
-    curTeam,
     name,
     overs,
+    batFirst,
     strikeIndex,
     hasEnded,
     allowSinglePlayer,
+    curTeam,
   } = parsedRes.data;
 
   try {
@@ -179,16 +187,28 @@ export async function updateMatch(data: UpdateMatchSchema) {
       matchId,
     );
 
+    if (batFirst) {
+      await prisma.matchTeam.updateMany({
+        where: { matchId, batFirst: true },
+        data: { batFirst: false },
+      });
+
+      await prisma.matchTeam.updateMany({
+        where: { matchId, teamId: batFirst },
+        data: { batFirst: true },
+      });
+    }
+
     await prisma.match.update({
       where: { id: matchId },
       data: {
         name: newName || name,
         overs,
         curPlayers: curPlayers as CurPlayer[],
-        curTeam,
         strikeIndex,
         hasEnded,
         allowSinglePlayer,
+        curTeam,
       },
       select: { id: true },
     });
