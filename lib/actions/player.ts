@@ -164,7 +164,13 @@ export async function deletePlayer(id: string) {
 
     if (!playerToDelete) throw new Error("Player not found!");
     await prisma.teamPlayer.deleteMany({ where: { playerId: id } });
+    await prisma.ballEvent.deleteMany({
+      where: {
+        OR: [{ batsmanId: id }, { bowlerId: id }],
+      },
+    });
     await prisma.player.delete({ where: { id } });
+
     revalidatePath("/players");
   } catch (error) {
     handleError(error);

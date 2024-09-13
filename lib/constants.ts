@@ -72,6 +72,7 @@ const navItems = [
   { name: "Teams", href: "/teams" },
   { name: "Players", href: "/players" },
   { name: "Records", href: "/records" },
+  { name: "Rivalries", href: "/rivalries" },
   { name: "Instant Scoring", href: "/scorer" },
   { name: "Guide", href: "/guide" },
 ] as const;

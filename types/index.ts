@@ -139,6 +139,22 @@ type TopPerformant = PlayerPerformance & {
 //   dots: number;
 // };
 
+interface RivalriesResult {
+  batsmanId: string;
+  bowlerId: string;
+  batsman: string;
+  bowler: string;
+  wickets: number;
+  strikeRate: number;
+  runs: number;
+  balls: number;
+  dots: number;
+  boundaries: number;
+  weight: number;
+  matches: number;
+  dominance: [number, number];
+}
+
 type CommentKey = keyof typeof commentsCollection;
 
 // ** Schema relations types
@@ -164,4 +180,5 @@ export type {
   PlayerScore,
   PlayerSimplified,
   TopPerformant,
+  RivalriesResult,
 };
