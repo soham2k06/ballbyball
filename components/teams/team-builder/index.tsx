@@ -23,6 +23,7 @@ import {
 } from "@/apiHooks/player/usePlayers";
 import { SortDesc } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import ProgressSplit from "@/components/progress-split";
 
 export const ItemTypes = {
   FOOD: "food",
@@ -213,25 +214,7 @@ function TeamBuilder() {
             ))}
           </ul>
           {winPercentages && (
-            <div className="mt-2 flex flex-col items-center justify-center gap-1 sm:gap-2">
-              <h4 className="font-medium max-sm:text-sm sm:font-semibold">
-                Winning chances
-              </h4>
-              <div className="flex w-full">
-                <div
-                  className="flex h-4 items-center justify-center rounded-l-md bg-emerald-500 text-xs font-semibold"
-                  style={{ width: winPercentages[0] + "%" }}
-                >
-                  {winPercentages[0]}%
-                </div>
-                <div
-                  className="flex h-4 items-center justify-center rounded-r-md bg-amber-500 text-xs font-semibold"
-                  style={{ width: winPercentages[1] + "%" }}
-                >
-                  {winPercentages[1]}%
-                </div>
-              </div>
-            </div>
+            <ProgressSplit points={winPercentages} title="Winning chances" />
           )}
 
           <div>
