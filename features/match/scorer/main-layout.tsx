@@ -127,14 +127,14 @@ function ScorerLayout({
 
     const hasBowler = getHasPlayer("bowler");
     if (!hasBowler) setShowSelectBowler(!hasBowler && !showSelectBatsman);
-  }, [showSelectBatsman, hasEnded, userRef, curPlayers]);
+  }, [showSelectBatsman, hasEnded]);
 
   // Handling strike change on last ball of over
   useEffect(() => {
     if (userRef) return;
     const isLastBallOfOver = totalBalls % 6 === 0 && totalBalls > 0;
     if (isLastBallOfOver && curBatsmenIds.length === 2) changeStrike();
-  }, [curBatsmenIds.length, totalBalls, userRef]);
+  }, [totalBalls]);
 
   // Handling Succesfull Chase
   useEffect(() => {
@@ -142,7 +142,7 @@ function ScorerLayout({
     const remainingRuns = opponentRuns - runs + 1;
     if (!opponentEvents.length) return;
     if (remainingRuns <= 0) handleFinish();
-  }, [runs, opponentRuns, userRef, opponentEvents.length]);
+  }, [runs, opponentRuns]);
 
   // Handling All out win
   useEffect(() => {
@@ -158,15 +158,7 @@ function ScorerLayout({
         handleInningChange();
       }
     }
-  }, [
-    wickets,
-    hasEnded,
-    userRef,
-    team?.players.length,
-    match?.allowSinglePlayer,
-    match.hasEnded,
-    isInSecondInning,
-  ]);
+  }, [wickets, hasEnded]);
 
   // Handle last ball of over & inning change
   useEffect(() => {
@@ -183,7 +175,7 @@ function ScorerLayout({
         else handleInningChange();
       }
     }
-  }, [hasEnded, isInSecondInning, match?.overs, totalBalls, userRef]);
+  }, [totalBalls]);
 
   useEffect(() => {
     if (userRef) setShowMatchSummary(true);
