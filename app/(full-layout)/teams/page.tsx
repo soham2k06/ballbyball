@@ -1,7 +1,9 @@
-import TeamList from "@/components/teams/TeamList";
+import { Metadata } from "next";
+
 import { getAllTeams } from "@/lib/actions/team";
 import { checkSession } from "@/lib/utils";
-import { Metadata } from "next";
+
+import TeamList from "@/features/teams/list";
 
 export const metadata: Metadata = {
   title: "Teams | BallByBall",

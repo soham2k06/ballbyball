@@ -1,8 +1,10 @@
+import { NextRequest, NextResponse } from "next/server";
+
+import { BallEvent, Prisma } from "@prisma/client";
+
 import prisma from "@/lib/db/prisma";
 import { getScore, getValidatedUser } from "@/lib/utils";
 import { RivalriesResult } from "@/types";
-import { BallEvent, Prisma } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
 
 function getAllRivalries(
   events: (Omit<BallEvent, "userId" | "id" | "matchId"> & {

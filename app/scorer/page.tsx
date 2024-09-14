@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import ScorerLayout from "@/components/scorer/NormalScorerLayout";
+
+import ScorerLayout from "@/features/match/scorer/instant-layout";
 
 export const metadata: Metadata = {
   title: "Instant scoring - BallByBall",

@@ -1,6 +1,7 @@
+import { NextResponse } from "next/server";
+
 import prisma from "@/lib/db/prisma";
 import { calculateWinner, getScore } from "@/lib/utils";
-import { NextResponse } from "next/server";
 
 export async function GET(
   _: unknown,

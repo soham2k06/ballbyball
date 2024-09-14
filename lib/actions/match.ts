@@ -1,6 +1,11 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
+import { CurPlayer } from "@prisma/client";
+
 import { MatchExtended } from "@/types";
+
 import prisma from "../db/prisma";
 import {
   createOrUpdateWithUniqueName,
@@ -12,9 +17,7 @@ import {
   CreateMatchSchema,
   UpdateMatchSchema,
 } from "../validation/match";
-import { revalidatePath } from "next/cache";
 import { updateMatchSchema } from "../validation/match";
-import { CurPlayer } from "@prisma/client";
 
 export async function getAllMatches(user?: string | null) {
   const userId = user ?? (await getValidatedUser());
@@ -50,6 +53,7 @@ export async function getAllMatches(user?: string | null) {
 
   const matchesSimplified = matches.map((match) => {
     const teams = match.matchTeams.map((matchTeam) => {
+      // eslint-disable-next-line no-unused-vars
       const { teamPlayers, ...teamWithoutPlayers } = matchTeam.team;
       return {
         playerIds: matchTeam.team.teamPlayers.map(({ playerId }) => playerId),
@@ -58,6 +62,7 @@ export async function getAllMatches(user?: string | null) {
       };
     });
 
+    // eslint-disable-next-line no-unused-vars
     const { matchTeams, ...matchWithoutMatchTeams } = match;
 
     return { ...matchWithoutMatchTeams, teams };

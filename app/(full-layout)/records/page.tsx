@@ -1,12 +1,14 @@
+import { Suspense } from "react";
+
 import prisma from "@/lib/db/prisma";
 import { checkSession, getValidatedUser } from "@/lib/utils";
 
+import BattingRecords from "@/features/records/batting-records";
+import BowlingRecords from "@/features/records/bowling-records";
+import MVP from "@/features/records/mvp";
+import RecordsSkeleton from "@/features/records/records-skeleton";
+
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import BowlingRecords from "@/components/records/bowling-records";
-import BattingRecords from "@/components/records/batting-records";
-import { Suspense } from "react";
-import RecordsSkeleton from "@/components/records/records-skeleton";
-import MVP from "@/components/records/mvp";
 
 interface Props {
   searchParams: {

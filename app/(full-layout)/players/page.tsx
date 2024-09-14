@@ -1,9 +1,11 @@
 import { Metadata } from "next";
 
-import PlayerList from "@/components/players/PlayerList";
-import { getAllPlayers } from "@/lib/actions/player";
 import { Player } from "@prisma/client";
+
+import { getAllPlayers } from "@/lib/actions/player";
 import { checkSession } from "@/lib/utils";
+
+import PlayerList from "@/features/players/list";
 
 export const metadata: Metadata = {
   title: "Players - BallByBall",

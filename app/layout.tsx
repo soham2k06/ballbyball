@@ -1,12 +1,14 @@
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import type { Metadata } from "next";
+
 import { Lato } from "next/font/google";
+
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SessionProvider } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 
 // If loading a variable font, you don't need to specify the font weight
 const lato = Lato({

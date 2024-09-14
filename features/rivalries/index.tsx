@@ -2,9 +2,11 @@
 
 import { useQueryState } from "nuqs";
 
-import { useRivalries } from "@/apiHooks/useRivalries";
+import { useRivalries } from "@/api-hooks/use-rivalries";
 import { PlayerSimplified } from "@/types";
 
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,11 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 import RivalryCard from "./rivalry-card";
 import RivalryCardSkeleton from "./rivalry-card-skeleton";
-import { Button } from "@/components/ui/button";
 
 function RivalriesList({
   players,

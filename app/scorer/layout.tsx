@@ -1,5 +1,5 @@
-import Footer from "@/components/Footer";
-import { Provider } from "@/components/Provider";
+import Footer from "@/components/footer";
+import { Provider } from "@/components/providers";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,6 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { TeamWithPlayers } from "@/types";
+
 import prisma from "../db/prisma";
 import {
   createOrUpdateWithUniqueName,
@@ -13,7 +16,6 @@ import {
   updateTeamSchema,
   UpdateTeamSchema,
 } from "../validation/team";
-import { revalidatePath } from "next/cache";
 
 export async function getAllTeams(user?: string | null) {
   const userId = user ?? (await getValidatedUser());
@@ -34,6 +36,7 @@ export async function getAllTeams(user?: string | null) {
     const teamsSimplified = teams.map((team) => {
       const players = team.teamPlayers.map((teamPlayer) => teamPlayer.player);
 
+      // eslint-disable-next-line no-unused-vars
       const { teamPlayers, ...playerWithoutTeamPlayers } = team;
 
       return { ...playerWithoutTeamPlayers, players };

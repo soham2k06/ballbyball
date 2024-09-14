@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import DarkModeToggle from "./DarkModeToggle";
+
+import DarkModeToggle from "./dark-mode-toggle";
 
 function Footer() {
   return (

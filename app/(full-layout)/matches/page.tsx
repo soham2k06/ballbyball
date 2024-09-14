@@ -1,8 +1,10 @@
 import { Metadata } from "next";
-import MatchList from "@/components/match/MatchList";
+
 import { getAllMatches } from "@/lib/actions/match";
 import { checkSession } from "@/lib/utils";
 import { MatchExtended } from "@/types";
+
+import MatchList from "@/features/matches/list";
 
 export const metadata: Metadata = {
   title: "Matches - BallByBall",

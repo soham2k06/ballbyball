@@ -1,7 +1,9 @@
+import Link from "next/link";
+
+import { CaretSortIcon } from "@radix-ui/react-icons";
+
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-import Link from "next/link";
 
 function LoadingSelect({
   label,

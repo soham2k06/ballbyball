@@ -1,8 +1,17 @@
 "use client";
 
+import { useState } from "react";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+
 import { Menu } from "lucide-react";
+import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
+import { toast } from "sonner";
+
 import { navItems } from "@/lib/constants";
+import { abbreviateEntity } from "@/lib/utils";
 
 import {
   Sheet,
@@ -10,14 +19,11 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { TypographyH2 } from "./ui/typography";
 
-import NavItem from "./NavItem";
-import { useState } from "react";
-import { Skeleton } from "./ui/skeleton";
-import { signOut } from "next-auth/react";
+import GoogleButton from "./google-button";
+import NavItem from "./nav-item";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { abbreviateEntity } from "@/lib/utils";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,11 +32,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import GoogleButton from "./google-button";
-import { useSearchParams } from "next/navigation";
-import { Button } from "./ui/button";
-import { toast } from "sonner";
-import { Session } from "next-auth";
+import { Skeleton } from "./ui/skeleton";
+import { TypographyH2 } from "./ui/typography";
 
 function Nav({
   session,

@@ -1,4 +1,4 @@
-import MatchSkeleton from "@/components/match/MatchSkeleton";
+import MatchSkeleton from "@/features/matches/skeleton";
 
 function Loading() {
   return (

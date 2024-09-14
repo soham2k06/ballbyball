@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const steps = [
@@ -204,19 +203,19 @@ async function page() {
           Cricket scoring has never been easier with BallByBall, your ultimate
           cricket scoring partner. Our platform allows you to effortlessly add
           players, teams, and matches, and keep track of the score ball by ball.
-          Whether you're playing a friendly match or an intense tournament,
+          Whether you&apos;re playing a friendly match or an intense tournament,
           BallByBall ensures that every moment is recorded accurately and
           conveniently. Share the scorecard with your friends and teammates, and
           relive the excitement of every match with ease.
         </p>
         <p className="mb-4">
-          With BallByBall, you don't need to worry about complex setups or
+          With BallByBall, you don&apos;t need to worry about complex setups or
           hidden fees. Our service is completely free, providing you with all
           the tools you need to manage your cricket scoring efficiently. Simply
-          sign in and start scoring – it's that simple! The intuitive interface
-          and comprehensive features make BallByBall the perfect choice for both
-          amateur cricketers and seasoned professionals. Cheers to making every
-          match memorable with BallByBall!
+          sign in and start scoring – it&apos;s that simple! The intuitive
+          interface and comprehensive features make BallByBall the perfect
+          choice for both amateur cricketers and seasoned professionals. Cheers
+          to making every match memorable with BallByBall!
         </p>
         <p>
           From detailed scorecards to real-time updates, BallByBall covers all
@@ -224,8 +223,8 @@ async function page() {
           cricket experience, offering features like scorecard generators,
           templates, and live scoring options. Whether you prefer using our app,
           software, or online tools, BallByBall is here to support your cricket
-          journey. Join us today and see why we're the preferred cricket scoring
-          partner for enthusiasts worldwide.
+          journey. Join us today and see why we&apos;re the preferred cricket
+          scoring partner for enthusiasts worldwide.
         </p>
       </section>
       <section className="pt-8 md:pt-8 lg:pt-16">

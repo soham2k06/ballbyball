@@ -1,6 +1,6 @@
-import { TypographyH3 } from "@/components/ui/typography";
-import { faqs, guideSteps } from "@/lib/constants";
 import Link from "next/link";
+
+import { faqs, guideSteps } from "@/lib/constants";
 
 import {
   Accordion,
@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { TypographyH3 } from "@/components/ui/typography";
 
 function page() {
   return (

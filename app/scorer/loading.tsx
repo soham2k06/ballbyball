@@ -1,9 +1,11 @@
-import ScoreButtonsSkeleton from "@/components/score-buttons/ScoreButtonsSkeleton";
+import { MoreVertical } from "lucide-react";
+
+import ScoreButtonsSkeleton from "@/features/match/score-buttons/skeleton";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MoreVertical } from "lucide-react";
 
 function Loading() {
   return (

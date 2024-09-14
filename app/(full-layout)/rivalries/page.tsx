@@ -1,10 +1,12 @@
 import { Metadata } from "next";
+
 import Link from "next/link";
 
 import prisma from "@/lib/db/prisma";
 import { checkSession, getValidatedUser } from "@/lib/utils";
 
 import RivalriesList from "@/features/rivalries";
+
 import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {

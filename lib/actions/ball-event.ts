@@ -1,12 +1,13 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
+import prisma from "../db/prisma";
+import { getValidatedUser } from "../utils";
 import {
   createBallEventSchema,
   CreateBallEventSchema,
-} from "../validation/ballEvent";
-import prisma from "../db/prisma";
-import { getValidatedUser } from "../utils";
-import { revalidatePath } from "next/cache";
+} from "../validation/ball-event";
 
 export async function saveBallEvents(data: CreateBallEventSchema[]) {
   const userId = await getValidatedUser();

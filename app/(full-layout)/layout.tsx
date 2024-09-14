@@ -1,8 +1,10 @@
-import { Provider } from "@/components/Provider";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import getSession from "@/lib/auth/session";
 import { Suspense } from "react";
+
+import getSession from "@/lib/auth/session";
+
+import Footer from "@/components/footer";
+import Nav from "@/components/nav";
+import { Provider } from "@/components/providers";
 
 async function AsyncNav() {
   const session = await getSession();

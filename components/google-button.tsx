@@ -1,8 +1,9 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Button } from "./ui/button";
+
 import GoogleIcon from "./google-icon";
+import { Button } from "./ui/button";
 
 function GoogleButton() {
   return (

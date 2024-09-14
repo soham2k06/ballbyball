@@ -1,8 +1,10 @@
 import { Metadata } from "next";
-import ScorerLayout from "@/components/scorer/ScorerLayout";
+
 import { getMatchById } from "@/lib/actions/match";
-import NoMatchFound from "@/components/scorer/NoMatchFound";
 import { checkSession } from "@/lib/utils";
+
+import ScorerLayout from "@/features/match/scorer/main-layout";
+import NoMatchFound from "@/features/match/scorer/no-match-found";
 
 export const metadata: Metadata = {
   title: "Match - BallByBall",
