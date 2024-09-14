@@ -58,7 +58,7 @@ function getAllRivalries(
       rivalry.boundaries++;
 
     rivalry.weight =
-      rivalry.wickets * 25 +
+      rivalry.wickets * 15 +
       rivalry.runs +
       rivalry.boundaries * 2 +
       rivalry.dots / 2;
@@ -134,29 +134,24 @@ export async function GET(req: NextRequest) {
           batsmanPoints += rivalry.runs;
           batsmanPoints += rivalry.boundaries * 2;
           if (rivalry.balls > 12) {
-            if (rivalry.strikeRate > 170) batsmanPoints += 6;
-            else if (rivalry.strikeRate >= 150 && rivalry.strikeRate <= 170)
-              batsmanPoints += 4;
-            else if (rivalry.strikeRate >= 130 && rivalry.strikeRate <= 150)
-              batsmanPoints += 2;
-            else if (rivalry.strikeRate >= 60 && rivalry.strikeRate <= 70)
-              batsmanPoints -= 2;
-            else if (rivalry.strikeRate >= 50 && rivalry.strikeRate <= 60)
-              batsmanPoints -= 4;
-            else if (rivalry.strikeRate < 50) batsmanPoints -= 6;
+            const sr = rivalry.strikeRate;
+            const srPoints = (sr - 100) / 2;
+            console.log(srPoints, rivalry.batsman, rivalry.bowler);
+            batsmanPoints += srPoints;
           }
 
-          bowlerPoints += rivalry.wickets * 25;
-          bowlerPoints += rivalry.dots / 2;
+          bowlerPoints += rivalry.wickets * 30;
+          bowlerPoints += rivalry.dots;
 
           const batsmanDominance =
             (batsmanPoints / (batsmanPoints + bowlerPoints)) * 100;
           const bowlerDominance =
             (bowlerPoints / (batsmanPoints + bowlerPoints)) * 100;
 
+          // min 0 % max 100%
           rivalry.dominance = [
-            Math.round(batsmanDominance),
-            Math.round(bowlerDominance),
+            Math.round(Math.min(100, Math.max(0, batsmanDominance))),
+            Math.round(Math.min(100, Math.max(0, bowlerDominance))),
           ];
 
           rivalry.matches = matches;
