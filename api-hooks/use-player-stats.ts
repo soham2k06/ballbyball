@@ -1,6 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { getPlayerStats } from "@/services/player/getPlayerStats";
 import { useSearchParams } from "next/navigation";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { getPlayerStats } from "@/services/get-player-stats";
 
 export function usePlayerStats(id: string | undefined) {
   const sp = useSearchParams();

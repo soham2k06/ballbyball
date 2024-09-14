@@ -1,8 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
+
 import {
   getAllPlayers,
   getPlayerBySortedPerformance,
 } from "@/lib/actions/player";
-import { useQuery } from "@tanstack/react-query";
 
 export function usePlayers() {
   const {

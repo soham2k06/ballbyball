@@ -1,5 +1,6 @@
 import { RivalriesResult } from "@/types";
-import { axiosInstance } from "./axiosInstance";
+
+import { axiosInstance } from "./axios-instance";
 
 export interface GetRivalriesParams {
   user: string | null;

@@ -1,7 +1,8 @@
 import { useSearchParams } from "next/navigation";
+
 import { useQuery } from "@tanstack/react-query";
 
-import { getRivalries, GetRivalriesParams } from "@/services/getRivalries";
+import { getRivalries, GetRivalriesParams } from "@/services/get-rivalries";
 
 export function useRivalries({
   player,
