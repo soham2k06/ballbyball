@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { BallEvent, Prisma } from "@prisma/client";
 
 import prisma from "@/lib/db/prisma";
-import { getScore, getValidatedUser } from "@/lib/utils";
+import { getIsvalidBall, getScore, getValidatedUser } from "@/lib/utils";
 import { RivalriesResult } from "@/types";
 
 function getAllRivalries(
@@ -43,14 +43,17 @@ function getAllRivalries(
       forBatsman: true,
     });
 
-    rivalry.balls += totalBalls;
+    const isValidBall = getIsvalidBall(type);
+
+    if (isValidBall) rivalry.balls += totalBalls;
     rivalry.wickets += wickets;
     rivalry.runs += runs;
     rivalry.strikeRate = (rivalry.runs / rivalry.balls) * 100;
-    if (event.type === "0") rivalry.dots++;
+    if (type === "0") rivalry.dots++;
     if (
-      !event.type.includes("-1") &&
-      (event.type.includes("4") || event.type.includes("6"))
+      !type.includes("-1") &&
+      !type.includes("-4") &&
+      (type.includes("4") || type.includes("6"))
     )
       rivalry.boundaries++;
 

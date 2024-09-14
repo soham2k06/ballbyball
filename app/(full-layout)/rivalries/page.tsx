@@ -25,6 +25,8 @@ async function Rivalries({ searchParams }: Props) {
   const { user: userRef, all } = searchParams;
   if (!userRef) await checkSession();
 
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   const user = userRef ?? (await getValidatedUser());
   const players = await prisma.player.findMany({
     where: { userId: user },

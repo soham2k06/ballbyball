@@ -48,10 +48,13 @@ function loading() {
         </Link>
       </div>
       <div className="p-1">
-        <div className="mb-4 grid grid-cols-3 gap-1 sm:gap-4">
+        <div className="mb-4 grid grid-cols-1 gap-1 sm:grid-cols-[1fr_2fr] sm:gap-4">
           <LoadingSelect label="Player">Select a player</LoadingSelect>
-          <LoadingSelect label="Batsman">Select a batsman</LoadingSelect>
-          <LoadingSelect label="Bowler">Select a bowler</LoadingSelect>
+          <div className="flex w-full items-end gap-1 sm:grid sm:grid-cols-[3fr_3fr_1fr] sm:gap-4">
+            <LoadingSelect label="Batsman">Select</LoadingSelect>
+            <LoadingSelect label="Bowler">Select</LoadingSelect>
+            <Button disabled>Swap</Button>
+          </div>
         </div>
       </div>
     </div>

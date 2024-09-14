@@ -1,3 +1,4 @@
+import ProgressSplit from "@/components/progress-split";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -35,6 +36,7 @@ function RivalryCardSkeleton() {
             <Skeleton className="h-3 w-7 rounded-sm sm:h-4" />
           </li>
         </ul>
+        <ProgressSplit points={[0, 0]} title="Dominance" isLoading />
       </CardContent>
     </Card>
   );

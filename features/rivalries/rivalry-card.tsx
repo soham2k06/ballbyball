@@ -1,3 +1,6 @@
+import { cn, round } from "@/lib/utils";
+import { RivalriesResult } from "@/types";
+
 import ProgressSplit from "@/components/progress-split";
 import {
   Card,
@@ -6,8 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn, round } from "@/lib/utils";
-import { RivalriesResult } from "@/types";
 
 function RivalryCard({
   rivalry,
@@ -71,7 +72,6 @@ function RivalryCard({
             <p>{rivalry.dots}</p>
           </li>
         </ul>
-        {/* TODO: Make it reusable */}
         <ProgressSplit points={rivalry.dominance} title="Dominance" />
       </CardContent>
     </Card>
