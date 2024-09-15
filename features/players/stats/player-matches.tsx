@@ -67,7 +67,7 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
               data.map((match) => {
                 const didBat = match.batScore.totalBalls > 0;
                 const didBowl =
-                  match.bowlScore.totalBalls > 0 && match.bowlScore.runs > 0;
+                  match.bowlScore.totalBalls > 0 || match.bowlScore.runs > 0;
                 const isNotout = match.batScore.isNotout;
 
                 return (
