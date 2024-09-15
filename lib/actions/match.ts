@@ -24,6 +24,7 @@ export async function getAllMatches(user?: string | null) {
 
   const matches = await prisma.match.findMany({
     where: { userId },
+    orderBy: { createdAt: "desc" },
     select: {
       id: true,
       name: true,
