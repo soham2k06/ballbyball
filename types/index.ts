@@ -1,6 +1,8 @@
-import { commentsCollection } from "@/lib/constants";
-import { BallEvent, Match, Player, Team } from "@prisma/client";
 import { Dispatch, SetStateAction } from "react";
+
+import { BallEvent, Match, Player, Team } from "@prisma/client";
+
+import { commentsCollection } from "@/lib/constants";
 
 type EventType =
   | "0"

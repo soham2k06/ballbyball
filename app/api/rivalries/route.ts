@@ -136,7 +136,6 @@ export async function GET(req: NextRequest) {
           if (rivalry.balls > 12) {
             const sr = rivalry.strikeRate;
             const srPoints = (sr - 100) / 2;
-            console.log(srPoints, rivalry.batsman, rivalry.bowler);
             batsmanPoints += srPoints;
           }
 

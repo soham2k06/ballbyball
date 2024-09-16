@@ -59,7 +59,10 @@ function BowlingRecords({
       const strikeRate = wickets ? totalBalls / wickets || 0 : 0;
 
       return {
-        player: player,
+        player: {
+          id: player.id,
+          name: player.name,
+        },
         wickets,
         totalBalls,
         matches: Object.keys(groupedMatches).length,

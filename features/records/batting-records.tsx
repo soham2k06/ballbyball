@@ -60,7 +60,10 @@ function BattingRecords({
       ).length;
 
       return {
-        player: player,
+        player: {
+          id: player.id,
+          name: player.name,
+        },
         runs,
         matches: Object.keys(groupedMatches).length,
         innings,
