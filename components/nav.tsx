@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -58,10 +59,14 @@ function Nav({
   return (
     <nav className="sticky top-0 z-10 border-b bg-card py-4 max-xl:p-4">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
-        <Link href={userRef ? `/?user=${userRef}` : "/"}>
-          <div className="text-2xl font-semibold tracking-tighter">
+        <Link
+          href={userRef ? `/?user=${userRef}` : "/"}
+          className="inline-flex items-center gap-2"
+        >
+          <Image src="/logo.png" alt="Logo" width={40} height={40} />
+          <h2 className="text-2xl font-semibold tracking-tighter md:hidden lg:block">
             ballbyball.
-          </div>
+          </h2>
         </Link>
         <ul className="hidden md:flex">
           {navItems.map((item) => (

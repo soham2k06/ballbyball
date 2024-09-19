@@ -24,12 +24,10 @@ function SuspensedLayout({ children }: { children: React.ReactNode }) {
         <Suspense fallback={<Nav session={null} loading />}>
           <AsyncNav />
         </Suspense>
-        <div className="mb-auto flex p-4">
-          <main className="mx-auto w-full max-w-7xl overflow-hidden">
-            {children}
-          </main>
+        <div className="flex h-full flex-col justify-between overflow-y-auto">
+          <main className="mx-auto w-full max-w-7xl p-4">{children}</main>
+          <Footer />
         </div>
-        <Footer />
       </div>
     </Provider>
   );
