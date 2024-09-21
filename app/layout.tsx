@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 
 import "./globals.css";
 
+import { Provider } from "@/components/providers";
+
 // If loading a variable font, you don't need to specify the font weight
 const lato = Lato({
   subsets: ["latin"],
@@ -150,7 +152,16 @@ export default async function RootLayout({
         ></meta>
       </head>
       <body className={cn("antialiased", lato.className)}>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <Provider
+            attribute="class"
+            enableSystem
+            defaultTheme="system"
+            disableTransitionOnChange
+          >
+            {children}
+          </Provider>
+        </SessionProvider>
         <Analytics />
         <SpeedInsights />
       </body>

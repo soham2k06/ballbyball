@@ -4,7 +4,6 @@ import getSession from "@/lib/auth/session";
 
 import Footer from "@/components/footer";
 import Nav from "@/components/nav";
-import { Provider } from "@/components/providers";
 
 async function AsyncNav() {
   const session = await getSession();
@@ -14,22 +13,15 @@ async function AsyncNav() {
 
 function SuspensedLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Provider
-      attribute="class"
-      enableSystem
-      defaultTheme="system"
-      disableTransitionOnChange
-    >
-      <div className="flex h-dvh flex-col">
-        <Suspense fallback={<Nav session={null} loading />}>
-          <AsyncNav />
-        </Suspense>
-        <div className="flex h-full flex-col justify-between overflow-y-auto">
-          <main className="mx-auto w-full max-w-7xl p-4">{children}</main>
-          <Footer />
-        </div>
+    <div className="flex h-dvh flex-col">
+      <Suspense fallback={<Nav session={null} loading />}>
+        <AsyncNav />
+      </Suspense>
+      <div className="flex h-full flex-col justify-between overflow-y-auto">
+        <main className="mx-auto w-full max-w-7xl p-4">{children}</main>
+        <Footer />
       </div>
-    </Provider>
+    </div>
   );
 }
 
