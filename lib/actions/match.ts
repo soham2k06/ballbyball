@@ -19,12 +19,13 @@ import {
 } from "../validation/match";
 import { updateMatchSchema } from "../validation/match";
 
-export async function getAllMatches(user?: string | null) {
+export async function getAllMatches(user?: string | null, size: string = "5") {
   const userId = user ?? (await getValidatedUser());
 
   const matches = await prisma.match.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    take: parseInt(size),
     select: {
       id: true,
       name: true,

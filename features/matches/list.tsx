@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,14 +15,23 @@ import { MatchExtended } from "@/types";
 
 import AlertNote from "@/components/alert-note";
 import EmptyState from "@/components/empty-state";
+import { Button } from "@/components/ui/button";
 
 import Match from "./match-card";
 import Start from "./start";
 import StartUpdateMatchDialog from "./start-update-dialog";
 
-function MatchList({ matches }: { matches: MatchExtended[] | undefined }) {
+function MatchList({
+  matches,
+  matchesCount,
+}: {
+  matches: MatchExtended[] | undefined;
+  matchesCount: number;
+}) {
   const searchParams = useSearchParams();
   const userRef = searchParams.get("user");
+
+  const router = useRouter();
 
   const { data: teams = [], isLoading } = useQuery({
     queryKey: ["allTeams"],
@@ -38,6 +47,8 @@ function MatchList({ matches }: { matches: MatchExtended[] | undefined }) {
 
   const [matchToDelete, setMatchToDelete] = useState<string | null>(null);
 
+  console.log(matchesCount, matches?.length);
+
   return (
     <div
       className={cn("py-4", {
@@ -46,16 +57,36 @@ function MatchList({ matches }: { matches: MatchExtended[] | undefined }) {
     >
       {!userRef && <Start teams={teams} isLoading={isLoading} />}
       {matches?.length ? (
-        <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {matches?.map((match) => (
-            <Match
-              key={match.id}
-              match={match}
-              setMatchToDelete={setMatchToDelete}
-              setMatchToUpdate={setMatchToUpdate}
-            />
-          ))}
-        </ul>
+        <>
+          <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {matches?.map((match) => (
+              <Match
+                key={match.id}
+                match={match}
+                setMatchToDelete={setMatchToDelete}
+                setMatchToUpdate={setMatchToUpdate}
+              />
+            ))}
+          </ul>
+          <div className="mt-8 flex justify-center">
+            <Button
+              className="w-full max-w-md"
+              disabled={matchesCount <= matches.length}
+              onClick={() => {
+                const curSize = parseInt(searchParams.get("size") ?? "5");
+                const newRoute = `/matches?size=${curSize + 5}`;
+                router.push(
+                  userRef ? `${newRoute}&user=${userRef}` : newRoute,
+                  {
+                    scroll: false,
+                  },
+                );
+              }}
+            >
+              Show more
+            </Button>
+          </div>
+        </>
       ) : (
         <EmptyState document="matches" />
       )}
