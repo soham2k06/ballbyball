@@ -1,6 +1,6 @@
 import { BallEvent, Player } from "@prisma/client";
 
-import { calculateFallOfWickets, abbreviateEntity } from "@/lib/utils";
+import { calculateFallOfWickets } from "@/lib/utils";
 import { MatchExtended } from "@/types";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -58,45 +58,45 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
 
   const tabs = [
     {
-      id: "1-bat",
-      name: `${abbreviateEntity(firstBattingTeam.name)} - Bat`,
-      content: <Score {...getScoreProps(firstBattingTeam.players, 0)} />,
+      id: "1",
+      name: firstBattingTeam.name,
+      content: (
+        <>
+          <Score {...getScoreProps(firstBattingTeam.players, 0)} />
+          <Score {...getScoreProps(secondBattingTeam.players, 0, true)} />
+        </>
+      ),
     },
     {
-      id: "2-bowl",
-      name: `${abbreviateEntity(secondBattingTeam.name)} - Bowl`,
-      content: <Score {...getScoreProps(secondBattingTeam.players, 0, true)} />,
-    },
-    {
-      id: "2-bat",
-      name: `${abbreviateEntity(secondBattingTeam.name)} - Bat`,
-      content: <Score {...getScoreProps(secondBattingTeam.players, 1)} />,
-    },
-    {
-      id: "1-bowl",
-      name: `${abbreviateEntity(firstBattingTeam.name)} - Bowl`,
-      content: <Score {...getScoreProps(firstBattingTeam.players, 1, true)} />,
+      id: "2",
+      name: secondBattingTeam.name,
+      content: (
+        <>
+          <Score {...getScoreProps(secondBattingTeam.players, 1)} />
+          <Score {...getScoreProps(firstBattingTeam.players, 1, true)} />
+        </>
+      ),
     },
   ];
 
   return (
-    <Tabs defaultValue="1-bat">
-      <div className="px-2">
-        <TabsList className="justify-normal divide-x divide-foreground/40 px-0 max-md:w-full">
+    <Tabs defaultValue={tabs[0].id}>
+      <div className="px-2 pb-2">
+        <TabsList className="divide-x divide-foreground/40 px-0 max-sm:w-full">
           {tabs.map((tab) => (
-            <div className="w-full px-1" key={tab.id}>
+            <div className="px-1 max-sm:w-1/2 sm:min-w-32" key={tab.id}>
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="w-full px-2 text-xs font-semibold md:text-sm"
+                className="w-full px-2 text-sm font-semibold"
               >
-                {tab.name}
+                <p className="w-full truncate">{tab.name}</p>
               </TabsTrigger>
             </div>
           ))}
         </TabsList>
       </div>
-      <ScrollArea className="h-[calc(100dvh-180px)]">
+      <ScrollArea className="h-[calc(100dvh-160px)]">
         {tabs.map((tab) => (
           <TabsContent key={tab.id} value={tab.id}>
             {tab.content}

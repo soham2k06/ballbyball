@@ -221,12 +221,14 @@ function Score({
         </div>
       ) : null}
 
-      <div className="sticky bottom-0.5 m-2 flex justify-between rounded-md bg-muted p-2">
-        <span>
-          {teamRuns}/{teamWickets} ({getOverStr(teamBalls)})
-        </span>
-        <span>Extras: {teamExtras}</span>
-      </div>
+      {!isBowlingScore && (
+        <div className="sticky bottom-0.5 flex justify-between bg-muted p-2">
+          <span>
+            {teamRuns}/{teamWickets} ({getOverStr(teamBalls)})
+          </span>
+          <span>Extras: {teamExtras}</span>
+        </div>
+      )}
     </>
   );
 }
