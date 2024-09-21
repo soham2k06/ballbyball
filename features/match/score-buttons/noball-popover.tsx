@@ -58,7 +58,7 @@ function NoballPopver({
                   setIsPopoverOpen(false);
                 }}
               >
-                {event !== "-4" ? event : "Manual Strike"}
+                {event}
               </Button>
             ))}
         </div>

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { BallEvent, CurPlayer, Player } from "@prisma/client";
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { abbreviateEntity } from "@/lib/utils";
@@ -54,6 +55,10 @@ function SelectBatsman({
   handleSelectPlayer,
   allowSinglePlayer,
 }: SelectBatsmanProps) {
+  const curTeamEvents = events?.filter((event) =>
+    team?.players?.some((player) => player.id === event.batsmanId),
+  );
+
   const schema = z.object({
     playerIds: z
       .array(z.string(), {
@@ -96,6 +101,7 @@ function SelectBatsman({
       .map((id) => ({ id, type: "batsman" }));
 
     const prevBowler = curPlayers.find((player) => player.type === "bowler");
+
     const payload = prevBowler
       ? [
           ...newCurPlayers,
@@ -140,7 +146,6 @@ function SelectBatsman({
           )}
         </div>
         <Form {...form}>
-          {/* TODO: Search field HERE to filter players */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               disabled={!getValues("playerIds")?.length}
@@ -159,6 +164,10 @@ function SelectBatsman({
                           const isBothSelected = field.value.length === 2;
                           const isOut = outPlayers?.includes(item.id);
 
+                          const isAlreadyPlaying = curPlayers.find(
+                            (player) => player.id === item.id,
+                          );
+
                           return (
                             <FormItem key={item.id}>
                               <FormControl>
@@ -166,6 +175,14 @@ function SelectBatsman({
                                   className="sr-only"
                                   checked={field.value.includes(item.id)}
                                   onCheckedChange={(checked) => {
+                                    if (isAlreadyPlaying && !isManualMode) {
+                                      toast.info("Player is already playing", {
+                                        description:
+                                          "Go to manual mode to hard change",
+                                      });
+                                      return;
+                                    }
+
                                     if (
                                       (isBothSelected && !isSelected) ||
                                       isOut
@@ -189,17 +206,22 @@ function SelectBatsman({
                               <PlayerLabel
                                 title={item.name}
                                 isSelected={isSelected}
-                                isOpacityDown={isBothSelected && !isSelected}
+                                isOpacityDown={
+                                  (isBothSelected && !isSelected) ||
+                                  (isAlreadyPlaying && !isManualMode)
+                                }
                                 isBrightnessDown={isOut}
                                 subTitle={
                                   isOut
                                     ? "Out"
-                                    : Array.from(
-                                        { length: 2 },
-                                        (_: unknown, i) =>
-                                          field.value?.[i] === item.id &&
-                                          playerPositions[i],
-                                      )
+                                    : !curTeamEvents.length
+                                      ? Array.from(
+                                          { length: 2 },
+                                          (_: unknown, i) =>
+                                            field.value?.[i] === item.id &&
+                                            playerPositions[i],
+                                        )
+                                      : undefined
                                 }
                               />
                             </FormItem>
