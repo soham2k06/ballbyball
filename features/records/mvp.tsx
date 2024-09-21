@@ -1,4 +1,5 @@
 import { BallEvent, Player } from "@prisma/client";
+import { endOfDay, startOfDay } from "date-fns";
 
 import prisma from "@/lib/db/prisma";
 import {
@@ -24,14 +25,25 @@ import { TabsContent } from "@/components/ui/tabs";
 async function MVP({
   players,
   userId,
+  date,
 }: {
   players: (Player & {
     playerBatEvents: BallEvent[];
     playerBallEvents: BallEvent[];
   })[];
   userId: string;
+  date: string | null;
 }) {
-  // const userId =
+  const ballEventsFilter = date
+    ? {
+        Match: {
+          createdAt: {
+            gte: startOfDay(new Date(date)),
+            lte: endOfDay(new Date(date)),
+          },
+        },
+      }
+    : {};
   const playersPerformance = players.map(async (player) => {
     const groupedMatchesBat = mapGroupedMatches(player.playerBatEvents);
     const batEvents = (player.playerBatEvents ?? []).map(
@@ -76,6 +88,7 @@ async function MVP({
     const catches = await prisma.ballEvent.count({
       where: {
         userId,
+        ...ballEventsFilter,
         OR: [
           { AND: [{ type: "-1_4" }, { bowlerId: player.id }] },
           {
@@ -92,12 +105,16 @@ async function MVP({
 
     const runOuts = await prisma.ballEvent.count({
       where: {
+        userId,
+        ...ballEventsFilter,
         AND: [{ type: { contains: "_5_" } }, { type: { contains: player.id } }],
       },
     });
 
     const stumpings = await prisma.ballEvent.count({
       where: {
+        userId,
+        ...ballEventsFilter,
         AND: [{ type: { contains: "_6_" } }, { type: { contains: player.id } }],
       },
     });
@@ -210,6 +227,7 @@ async function MVP({
                   ) => {
                     const matches = await prisma.matchTeam.count({
                       where: {
+                        match: ballEventsFilter.Match,
                         team: {
                           teamPlayers: { some: { playerId } },
                         },
