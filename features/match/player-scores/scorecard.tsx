@@ -61,20 +61,20 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
       id: "1",
       name: firstBattingTeam.name,
       content: (
-        <>
+        <div className="space-y-2">
           <Score {...getScoreProps(firstBattingTeam.players, 0)} />
           <Score {...getScoreProps(secondBattingTeam.players, 0, true)} />
-        </>
+        </div>
       ),
     },
     {
       id: "2",
       name: secondBattingTeam.name,
       content: (
-        <>
+        <div className="space-y-2">
           <Score {...getScoreProps(secondBattingTeam.players, 1)} />
           <Score {...getScoreProps(firstBattingTeam.players, 1, true)} />
-        </>
+        </div>
       ),
     },
   ];
