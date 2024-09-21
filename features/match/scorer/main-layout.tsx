@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { BallEvent, CurPlayer } from "@prisma/client";
+import { BallEvent, CurPlayer, Player } from "@prisma/client";
 import { toast } from "sonner";
 
 import { StatsOpenProvider } from "@/contexts/stats-open-context";
@@ -85,6 +85,10 @@ function ScorerLayout({
   const curBatsmenIds = curPlayers
     .filter((player) => player.type === "batsman")
     .map((player) => player.id);
+
+  const curBatsmen = curBatsmenIds
+    .map((id) => team.players.find((player) => player.id === id))
+    .filter((player) => player !== undefined);
 
   const balls =
     events
@@ -208,25 +212,29 @@ function ScorerLayout({
     );
   }
 
-  function handleScore(e: React.MouseEvent<HTMLButtonElement>) {
+  function handleScore(
+    e: React.MouseEvent<HTMLButtonElement>,
+    customBatsman?: string,
+  ) {
     setIsModified(true);
 
     const event = e.currentTarget.value;
 
+    const batsman = customBatsman ?? curPlayers[onStrikeBatsman].id;
     setEvents([
       ...events,
       {
         type: event,
-        batsmanId: curPlayers?.[onStrikeBatsman].id!,
+        batsmanId: batsman,
         bowlerId: curBowlerId,
         matchId,
       },
     ] as CreateBallEventSchema[]);
 
     if (event.includes("-1")) {
-      const updatedPlayers = curPlayers.filter((player) => {
-        return player.id !== curPlayers?.[onStrikeBatsman].id;
-      });
+      const updatedPlayers = curPlayers.filter(
+        (player) => player.id !== batsman,
+      );
       setCurPlayers(updatedPlayers as CurPlayer[]);
     }
 
@@ -270,18 +278,27 @@ function ScorerLayout({
     } else setWicketTypeId(wicketType.id);
   }
 
-  function handleWicketWithFielder(
-    wicketTypeId: number,
-    fielderId: string,
-    runsAlongWithRunOut?: number,
-  ) {
+  function handleWicketWithFielder({
+    fielderId,
+    wicketTypeId,
+    customBatsman,
+    runsAlongWithRunOut,
+  }: {
+    wicketTypeId: number;
+    fielderId: string;
+    runsAlongWithRunOut?: number;
+    customBatsman?: string;
+  }) {
     if (!isSLastPlayer) setShowSelectBatsman(true);
     handleLastBallInWicket("-1");
-    handleScore({
-      currentTarget: {
-        value: `-1_${wicketTypeId}_${fielderId}_${runsAlongWithRunOut}`,
-      },
-    } as React.MouseEvent<HTMLButtonElement>);
+    handleScore(
+      {
+        currentTarget: {
+          value: `-1_${wicketTypeId}_${fielderId}_${runsAlongWithRunOut}`,
+        },
+      } as React.MouseEvent<HTMLButtonElement>,
+      customBatsman,
+    );
   }
 
   function handleSave() {
@@ -466,6 +483,7 @@ function ScorerLayout({
           )}
 
           <FieldersDialog
+            curBatsmen={curBatsmen as Player[]}
             wicketTypeId={wicketTypeId}
             setWicketTypeId={setWicketTypeId}
             fielders={opposingTeam?.players}

@@ -47,8 +47,6 @@ function MatchList({
 
   const [matchToDelete, setMatchToDelete] = useState<string | null>(null);
 
-  console.log(matchesCount, matches?.length);
-
   return (
     <div
       className={cn("py-4", {
