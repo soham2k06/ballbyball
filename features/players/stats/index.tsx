@@ -123,8 +123,8 @@ function PlayerStats({
               />
               <Stat
                 isLoading={isLoading}
-                data={data?.bowling.dotBalls}
-                dataKey="Dots"
+                data={data?.bowling.maidens}
+                dataKey="Maidens"
               />
             </div>
           </div>

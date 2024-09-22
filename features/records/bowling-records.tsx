@@ -2,6 +2,8 @@ import { BallEvent, Player } from "@prisma/client";
 
 import {
   calcBestSpells,
+  calculateMaidenOvers,
+  calcWicketHauls,
   getOverStr,
   getScore,
   mapGroupedMatches,
@@ -34,18 +36,26 @@ function BowlingRecords({
         [...player?.playerBatEvents, ...player?.playerBallEvents] ?? [],
       );
 
+      const groupedMatchesBowl = mapGroupedMatches(player.playerBallEvents);
+
       const bowlEvents = (player?.playerBallEvents ?? []).map(
         (event) => event.type as EventType,
       );
 
       const bowlEventsByMatches =
-        Object.values(groupedMatches).map((events) =>
-          events
-            .filter((event) => event.bowlerId === player.id)
-            .map((event) => event.type as EventType),
+        Object.values(groupedMatchesBowl).map((events) =>
+          events.map((event) => event.type as EventType),
         ) || [];
 
       const bestSpell = calcBestSpells(bowlEventsByMatches, 1)[0];
+
+      const { threes: threeHauls, fives: fiveHauls } =
+        calcWicketHauls(groupedMatchesBowl);
+
+      const maidens = bowlEventsByMatches.reduce(
+        (acc, events) => acc + calculateMaidenOvers(events),
+        0,
+      );
 
       const {
         runs: runsConceded,
@@ -68,6 +78,9 @@ function BowlingRecords({
         matches: Object.keys(groupedMatches).length,
         economy: runRate,
         strikeRate,
+        maidens,
+        threeHauls,
+        fiveHauls,
         bestSpell,
         runsConceded,
         dots,
@@ -116,6 +129,15 @@ function BowlingRecords({
                   SR
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
+                  3W
+                </TableHead>
+                <TableHead className="text-center text-primary-foreground">
+                  5W
+                </TableHead>
+                <TableHead className="text-center text-primary-foreground">
+                  Maidens
+                </TableHead>
+                <TableHead className="text-center text-primary-foreground">
                   Dots
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
@@ -137,6 +159,9 @@ function BowlingRecords({
                       bestSpell,
                       economy,
                       strikeRate,
+                      maidens,
+                      threeHauls,
+                      fiveHauls,
                       runsConceded,
                       totalBalls,
                       dots,
@@ -162,6 +187,13 @@ function BowlingRecords({
                         <TableCell className="text-center">
                           {strikeRate ? round(strikeRate) : "-"}
                         </TableCell>
+                        <TableCell className="text-center">
+                          {threeHauls}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {fiveHauls}
+                        </TableCell>
+                        <TableCell className="text-center">{maidens}</TableCell>
                         <TableCell className="text-center">{dots}</TableCell>
                         <TableCell className="text-center">
                           {getOverStr(totalBalls)}

@@ -41,13 +41,17 @@ function BattingRecords({
 
       const milestones = calcMilestones(groupedInnings);
 
-      const { runs, totalBalls, wickets } = getScore({
+      const {
+        runs,
+        totalBalls: ballsFaced,
+        wickets,
+      } = getScore({
         balls: batEvents,
         forBatsman: true,
       });
 
       const average = runs / wickets || 0;
-      const strikeRate = (runs / totalBalls) * 100 || 0;
+      const strikeRate = (runs / ballsFaced) * 100 || 0;
 
       const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
       const fours = noWicketEvents.filter((event) =>
@@ -63,6 +67,7 @@ function BattingRecords({
           name: player.name,
         },
         runs,
+        ballsFaced,
         matches: Object.keys(groupedMatches).length,
         innings,
         milestones,
@@ -80,6 +85,7 @@ function BattingRecords({
         b.matches - a.matches,
     )
     .slice(0, 10);
+
   return (
     <TabsContent value="runs">
       <Card className="overflow-x-auto">
@@ -113,6 +119,9 @@ function BattingRecords({
                   SR
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
+                  BF
+                </TableHead>
+                <TableHead className="text-center text-primary-foreground">
                   30s
                 </TableHead>
                 <TableHead className="text-center text-primary-foreground">
@@ -139,6 +148,7 @@ function BattingRecords({
                       matches,
                       innings,
                       milestones,
+                      ballsFaced,
                       average,
                       strikeRate,
                       fours,
@@ -168,6 +178,9 @@ function BattingRecords({
                         </TableCell>
                         <TableCell className="text-center">
                           {round(strikeRate)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {ballsFaced}
                         </TableCell>
                         <TableCell className="text-center">
                           {milestones.thirties}

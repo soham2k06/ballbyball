@@ -5,6 +5,7 @@ import {
   calcBestSpells,
   calcMilestones,
   calcRuns,
+  calculateMaidenOvers,
   calcWicketHauls,
   getScore,
   getValidatedUser,
@@ -85,6 +86,11 @@ export async function GET(
         events.map((event) => event.type as EventType),
       ) || [];
 
+    const maidens = playerBallEventsByMatches.reduce(
+      (acc, events) => acc + calculateMaidenOvers(events),
+      0,
+    );
+
     const bestSpell = calcBestSpells(playerBallEventsByMatches, 1)[0];
 
     const battingEvents = battingEventsExtended.map((event) => event.type);
@@ -148,6 +154,7 @@ export async function GET(
       runs: runsConceded,
       balls: ballsBowled,
       wickets: wicketsTaken,
+      maidens,
       dotBallsRate,
       dotBalls,
       bestSpell,

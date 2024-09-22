@@ -5,6 +5,7 @@ import prisma from "@/lib/db/prisma";
 import {
   calcBestPerformance,
   calcMilestones,
+  calculateMaidenOvers,
   getScore,
   mapGroupedMatches,
   round,
@@ -75,6 +76,15 @@ async function MVP({
       (event) => event.type as EventType,
     );
 
+    const bowlEventsByMatches = Object.values(
+      mapGroupedMatches(player?.playerBallEvents ?? []),
+    ).map((events) => events.map((event) => event.type as EventType));
+
+    const maidens = bowlEventsByMatches.reduce(
+      (acc, events) => acc + calculateMaidenOvers(events),
+      0,
+    );
+
     const {
       runs: runConceded,
       totalBalls: ballsBowled,
@@ -136,7 +146,7 @@ async function MVP({
       ballsBowled,
       runConceded,
       economy,
-      maidens: 0,
+      maidens,
       // Field
       catches,
       runOuts,

@@ -65,6 +65,7 @@ type PlayerStats = {
     runs: number;
     balls: number;
     wickets: number;
+    maidens: number;
     dotBalls: number;
     dotBallsRate: number;
     bestSpell: {
