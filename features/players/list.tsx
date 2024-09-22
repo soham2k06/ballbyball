@@ -51,8 +51,17 @@ function PlayerList({
           "flex flex-col items-center md:p-8": !playerData?.length,
         })}
       >
+        {!userRef && (
+          <AddPlayerButton
+            setPlayerData={
+              setPlayerData as React.Dispatch<
+                React.SetStateAction<(Player | undefined)[]>
+              >
+            }
+          />
+        )}
         {playerData?.length ? (
-          <ul className="grid grid-cols-2 gap-2 pb-4 md:grid-cols-4 lg:grid-cols-6">
+          <ul className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
             {playerData.map((player) => {
               return (
                 <PlayerCard
@@ -69,15 +78,6 @@ function PlayerList({
           </ul>
         ) : (
           <EmptyState document="players" />
-        )}
-        {!userRef && (
-          <AddPlayerButton
-            setPlayerData={
-              setPlayerData as React.Dispatch<
-                React.SetStateAction<(Player | undefined)[]>
-              >
-            }
-          />
         )}
       </div>
       {!userRef && (
@@ -126,12 +126,10 @@ function PlayerList({
           />
         </>
       )}
-
       <PlayerStats
         openedPlayer={openedPlayer}
         setOpenedPlayer={() => setOpenedPlayer(undefined)}
       />
-
       <PlayerMatches
         playerId={playerMatchesOpen}
         setPlayerMatchesOpen={() => setPlayerMatchesOpen(undefined)}

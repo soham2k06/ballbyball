@@ -9,8 +9,8 @@ function MatchSkeleton() {
           <Skeleton className="h-7 w-16 bg-muted-foreground/20"></Skeleton>
         </CardTitle>
         <div className="flex items-center space-x-4">
-          <Skeleton className="h-10 w-16 bg-muted-foreground/20"></Skeleton>
-          <Skeleton className="h-10 w-10 bg-muted-foreground/20"></Skeleton>
+          <Skeleton className="size-9 bg-muted-foreground/20"></Skeleton>
+          <Skeleton className="size-9 bg-muted-foreground/20"></Skeleton>
         </div>
       </CardHeader>
       <CardContent>

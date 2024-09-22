@@ -19,12 +19,13 @@ function AddPlayerButton({
   const [openMultiple, setOpenMultiple] = useState(false);
 
   return (
-    <div className="space-x-2">
-      <Button onClick={() => setOpen(true)}>Add Player</Button>
-      <Button onClick={() => setOpenMultiple(true)} className="relative">
-        Add Multiple Players
-      </Button>
-
+    <>
+      <div className="max-sm:grid max-sm:gap-2 sm:space-x-2">
+        <Button onClick={() => setOpen(true)}>Add Player</Button>
+        <Button onClick={() => setOpenMultiple(true)} className="relative">
+          Add Multiple Players
+        </Button>
+      </div>
       <AddPlayerFormDialog
         open={open}
         setOpen={setOpen}
@@ -35,7 +36,7 @@ function AddPlayerButton({
         setOpen={setOpenMultiple}
         setPlayerData={setPlayerData}
       />
-    </div>
+    </>
   );
 }
 

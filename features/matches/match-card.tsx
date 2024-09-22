@@ -68,8 +68,8 @@ function MatchCard({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
 
   return (
     <Card className="relative flex flex-col justify-between">
-      <CardHeader className="flex-row items-center justify-between space-y-0">
-        <CardTitle>{match.name}</CardTitle>
+      <CardHeader className="flex-row items-center justify-between gap-1 space-y-0">
+        <CardTitle className="text-xl">{match.name}</CardTitle>
         <div className="flex items-center space-x-4">
           <Button asChild size="icon">
             <Link

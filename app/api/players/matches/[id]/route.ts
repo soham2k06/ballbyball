@@ -34,6 +34,7 @@ export async function GET(
         },
         ballEvents: { select: { batsmanId: true, bowlerId: true, type: true } },
       },
+      orderBy: { createdAt: "desc" },
     });
 
     const matches = playerMatches.map((match) => {

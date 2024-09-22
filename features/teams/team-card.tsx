@@ -44,7 +44,7 @@ function TeamCard({
   return (
     <>
       <Card className="flex items-center justify-between p-2 sm:p-4">
-        <CardTitle className="truncate py-1">{team.name}</CardTitle>
+        <CardTitle className="truncate py-1 text-xl">{team.name}</CardTitle>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button size="icon" variant="ghost" className="shrink-0">

@@ -49,7 +49,7 @@ function MatchList({
 
   return (
     <div
-      className={cn("py-4", {
+      className={cn({
         "flex flex-col items-center": !matches?.length,
       })}
     >

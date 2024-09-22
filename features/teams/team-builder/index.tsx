@@ -190,7 +190,7 @@ function TeamBuilder() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="mr-4">Build teams</Button>
+        <Button>Build teams</Button>
       </DialogTrigger>
       <DialogContent className="max-h-[95%] overflow-y-auto">
         <DialogHeader>
