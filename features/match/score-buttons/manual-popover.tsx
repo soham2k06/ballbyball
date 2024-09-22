@@ -67,7 +67,6 @@ function ManualScorePopover({
         <Button
           variant="secondary"
           className="size-20 w-full text-lg text-muted-foreground"
-          value="-4"
         >
           {isPopoverOpen ? (
             <X className="size-5" />

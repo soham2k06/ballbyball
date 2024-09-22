@@ -4,18 +4,7 @@ import { BallEvent, Match, Player, Team } from "@prisma/client";
 
 import { commentsCollection } from "@/lib/constants";
 
-type EventType =
-  | "0"
-  | "1"
-  | "2"
-  | "3"
-  | "4"
-  | "6"
-  | "-1"
-  | "-2"
-  | "-3"
-  | "-4"
-  | "-5";
+type EventType = "0" | "1" | "2" | "3" | "4" | "6" | "-1" | "-2" | "-3" | "-5";
 
 type OverlayStateProps = {
   open: boolean;

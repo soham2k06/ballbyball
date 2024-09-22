@@ -29,7 +29,6 @@ function WormChart({
     let consicutiveExtras = 0;
 
     events.forEach((event) => {
-      if (event === "-4") return;
       let curBallRun = 0;
 
       const isExtra = !getIsvalidBall(event);

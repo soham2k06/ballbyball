@@ -50,11 +50,7 @@ function getAllRivalries(
     rivalry.runs += runs;
     rivalry.strikeRate = (rivalry.runs / rivalry.balls) * 100;
     if (type === "0") rivalry.dots++;
-    if (
-      !type.includes("-1") &&
-      !type.includes("-4") &&
-      (type.includes("4") || type.includes("6"))
-    )
+    if (!type.includes("-1") && (type.includes("4") || type.includes("6")))
       rivalry.boundaries++;
 
     rivalry.weight =

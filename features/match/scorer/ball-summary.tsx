@@ -21,7 +21,6 @@ function BallSummary({
       variant: {
         default: "bg-muted",
         "0": "bg-muted text-muted-foreground flex justify-center items-center",
-        "-4": "bg-muted text-muted-foreground flex justify-center items-center", // Manual Strike change without runs
         "1": "bg-muted text-foreground",
         "2": "bg-muted text-foreground",
         "3": "bg-muted text-foreground",
@@ -48,14 +47,12 @@ function BallSummary({
 
   switch (event) {
     case "0":
-    case "-4":
       summaryToShow = (
         <span
           className={cn("bg-muted-foreground", {
             "size-3": size === "sm",
             "size-4 max-sm:size-3": size === "default",
             "rounded-full": event === "0",
-            "rounded-[2px]": event === "-4",
           })}
         />
       );

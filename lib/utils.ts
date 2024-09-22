@@ -39,7 +39,7 @@ const calcRuns = (
           ? (Number(!forPlayerRuns) * Number(event.slice(2))).toString()
           : event.includes("-2")
             ? (Number(event.slice(2)) + Number(!forPlayerRuns)).toString()
-            : event.replace("-4", "0").slice(-1),
+            : event.slice(-1),
     )
     .reduce((acc, cur) => acc + Number(cur), 0);
 
@@ -70,8 +70,8 @@ function getScore({
 }) {
   const runs = calcRuns(balls, forBatsman);
 
-  const totalBalls = balls?.filter(
-    (ball) => ball !== "-4" && getIsvalidBall(ball, forBatsman),
+  const totalBalls = balls?.filter((ball) =>
+    getIsvalidBall(ball, forBatsman),
   ).length;
 
   const wickets = calcWickets(balls, forBowler);

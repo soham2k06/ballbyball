@@ -50,9 +50,7 @@ async function MVP({
       (event) => event.type as EventType,
     );
 
-    const noWicketEvents = batEvents.filter(
-      (event) => !event.includes("-1") && !event.includes("-4"),
-    );
+    const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
 
     const { runs: runsScored, totalBalls: ballsFaced } = getScore({
       balls: batEvents,

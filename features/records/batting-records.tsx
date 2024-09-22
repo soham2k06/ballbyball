@@ -49,9 +49,7 @@ function BattingRecords({
       const average = runs / wickets || 0;
       const strikeRate = (runs / totalBalls) * 100 || 0;
 
-      const noWicketEvents = batEvents.filter(
-        (event) => !event.includes("-1") && !event.includes("-4"),
-      );
+      const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
       const fours = noWicketEvents.filter((event) =>
         event.includes("4"),
       ).length;

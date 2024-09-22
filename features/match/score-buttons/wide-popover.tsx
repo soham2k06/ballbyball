@@ -50,7 +50,6 @@ function WideballPopver({
                   "bg-emerald-500 text-emerald-50 hover:bg-emerald-400 dark:bg-emerald-600":
                     event === "4",
                   "hover:brightness-95": event === "6" || event === "4",
-                  "col-span-3": event === "-4",
                 })}
                 value={`-2${event}`}
                 onClick={(e) => {

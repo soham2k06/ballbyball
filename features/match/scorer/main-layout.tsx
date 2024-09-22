@@ -221,15 +221,17 @@ function ScorerLayout({
     const event = e.currentTarget.value;
 
     const batsman = customBatsman ?? curPlayers[onStrikeBatsman].id;
-    setEvents([
-      ...events,
-      {
-        type: event,
-        batsmanId: batsman,
-        bowlerId: curBowlerId,
-        matchId,
-      },
-    ] as CreateBallEventSchema[]);
+
+    if (event !== "-4")
+      setEvents([
+        ...events,
+        {
+          type: event,
+          batsmanId: batsman,
+          bowlerId: curBowlerId,
+          matchId,
+        },
+      ] as CreateBallEventSchema[]);
 
     if (event.includes("-1")) {
       const updatedPlayers = curPlayers.filter(
@@ -238,15 +240,7 @@ function ScorerLayout({
       setCurPlayers(updatedPlayers as CurPlayer[]);
     }
 
-    handleStrikeChange(
-      (event.includes("-3")
-        ? event.slice(-1)
-        : event.includes("-5")
-          ? event.slice(-1)
-          : event.includes("-2")
-            ? event.slice(-1)
-            : event) as EventType,
-    );
+    handleStrikeChange((event === "-4" ? "-4" : event.slice(-1)) as EventType);
   }
 
   function handleLastBallInWicket(event: string) {

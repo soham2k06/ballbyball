@@ -96,7 +96,7 @@ export async function GET(
     } = getScore({ balls: battingEvents, forBatsman: true });
 
     const noWicketEvents = battingEvents.filter(
-      (event) => !event.includes("-1") && !event.includes("-4"),
+      (event) => !event.includes("-1"),
     );
 
     const boundaries = runsScored

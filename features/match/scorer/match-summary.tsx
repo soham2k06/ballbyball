@@ -186,9 +186,7 @@ function MatchSummary({
     });
 
     const strikeRate = (runRate / 6) * 100;
-    const noWicketEvents = batType.filter(
-      (event) => !event.includes("-1") && !event.includes("-4"),
-    );
+    const noWicketEvents = batType.filter((event) => !event.includes("-1"));
 
     const boundaries = runsScored
       ? noWicketEvents.filter(
