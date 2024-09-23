@@ -106,7 +106,8 @@ function MatchSummary({
     if (
       type === "-1_4" ||
       type.includes("_3_") ||
-      type.includes("_5_" || type.includes("_6_"))
+      type.includes("_5_") ||
+      type.includes("_6_")
     ) {
       let fielderId;
 

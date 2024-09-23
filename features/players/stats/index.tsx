@@ -38,7 +38,7 @@ function PlayerStats({
     ) / 100;
 
   const outTimes = data?.batting.wickets;
-  const batAverage = (data?.batting.runs ?? 0) / (outTimes ?? 0) ?? 0;
+  const batAverage = (data?.batting.runs ?? 0) / (outTimes ?? 0);
 
   const bestSpell = data?.bowling.bestSpell;
 

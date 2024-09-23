@@ -154,6 +154,7 @@ async function MVP({
       runOuts,
       stumpings,
       // Other
+      team: "",
       isWinner: false,
     };
   });

@@ -61,7 +61,7 @@ function FooterSummary({
             <OverStats ballEvents={ballEvents} runRate={runRate} />
           </DrawerContent>
         </Drawer>
-        <Drawer preventScrollRestoration>
+        <Drawer>
           <DrawerTrigger asChild>
             <Button size="icon" name="over-summary" title="over-summary">
               <ListOrdered />

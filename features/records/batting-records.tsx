@@ -28,9 +28,10 @@ function BattingRecords({
 }) {
   const records = players
     .map((player) => {
-      const groupedMatches = mapGroupedMatches(
-        [...player?.playerBatEvents, ...player?.playerBallEvents] ?? [],
-      );
+      const groupedMatches = mapGroupedMatches([
+        ...player?.playerBatEvents,
+        ...player?.playerBallEvents,
+      ]);
       const groupedInnings = mapGroupedMatches(player?.playerBatEvents ?? []);
       const innings = Object.keys(groupedInnings).length;
       const batEvents = (player?.playerBatEvents).map((event) => event.type);

@@ -32,9 +32,10 @@ function BowlingRecords({
 }) {
   const records = players
     .map((player) => {
-      const groupedMatches = mapGroupedMatches(
-        [...player?.playerBatEvents, ...player?.playerBallEvents] ?? [],
-      );
+      const groupedMatches = mapGroupedMatches([
+        ...player?.playerBatEvents,
+        ...player?.playerBallEvents,
+      ]);
 
       const groupedMatchesBowl = mapGroupedMatches(player.playerBallEvents);
 

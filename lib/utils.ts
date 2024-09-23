@@ -333,7 +333,7 @@ function calculateFallOfWickets(ballsThrown: BallEvent[], players: Player[]) {
 function calcBestPerformance({
   playersPerformance,
 }: {
-  playersPerformance: Omit<PlayerPerformance, 'team'>[];
+  playersPerformance: PlayerPerformance[];
 }) {
   playersPerformance.forEach((player) => {
     let curPlayerPoints = 0;
