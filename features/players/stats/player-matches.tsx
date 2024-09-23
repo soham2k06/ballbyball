@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -52,9 +53,10 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {data?.length} Matches - {matchesWon} ({winRate}%) Won
-          </DialogTitle>
+          <DialogTitle>{data?.length} Matches</DialogTitle>
+          <DialogDescription>
+            {matchesWon} ({winRate}%) Won
+          </DialogDescription>
         </DialogHeader>
         <ScrollArea className="max-h-96">
           <ul className="space-y-3">

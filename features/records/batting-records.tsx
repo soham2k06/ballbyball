@@ -33,11 +33,7 @@ function BattingRecords({
       );
       const groupedInnings = mapGroupedMatches(player?.playerBatEvents ?? []);
       const innings = Object.keys(groupedInnings).length;
-      const batEvents = (
-        player?.playerBatEvents.filter(
-          (event) => event.batsmanId === player.id,
-        ) ?? []
-      ).map((event) => event.type);
+      const batEvents = (player?.playerBatEvents).map((event) => event.type);
 
       const milestones = calcMilestones(groupedInnings);
 
@@ -61,6 +57,11 @@ function BattingRecords({
         event.includes("6"),
       ).length;
 
+      const notOuts = Object.values(groupedInnings).reduce((acc, events) => {
+        const isNotOut = !events.some((evt) => evt.type.includes("-1"));
+        return isNotOut ? acc + 1 : acc;
+      }, 0);
+
       return {
         player: {
           id: player.id,
@@ -73,6 +74,7 @@ function BattingRecords({
         milestones,
         average,
         strikeRate,
+        notOuts,
         fours,
         sixes,
       };
@@ -95,47 +97,22 @@ function BattingRecords({
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="bg-primary hover:bg-primary/90">
-                <TableHead className="text-primary-foreground">Pos</TableHead>
-                <TableHead className="min-w-24 text-primary-foreground">
-                  Player
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Runs
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Matches
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Innings
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Best
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  AVG
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  SR
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  BF
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  30s
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  50s
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  100s
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  4s
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  6s
-                </TableHead>
+              <TableRow className="bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
+                <TableHead className="!text-left">Pos</TableHead>
+                <TableHead className="min-w-24 !text-left">Player</TableHead>
+                <TableHead>Runs</TableHead>
+                <TableHead>Matches</TableHead>
+                <TableHead>Innings</TableHead>
+                <TableHead>NO</TableHead>
+                <TableHead>Best</TableHead>
+                <TableHead>AVG</TableHead>
+                <TableHead>SR</TableHead>
+                <TableHead>BF</TableHead>
+                <TableHead>30s</TableHead>
+                <TableHead>50s</TableHead>
+                <TableHead>100s</TableHead>
+                <TableHead>4s</TableHead>
+                <TableHead>6s</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -149,6 +126,7 @@ function BattingRecords({
                       innings,
                       milestones,
                       ballsFaced,
+                      notOuts,
                       average,
                       strikeRate,
                       fours,
@@ -165,6 +143,7 @@ function BattingRecords({
                         </TableCell>
                         <TableCell className="text-center">{matches}</TableCell>
                         <TableCell className="text-center">{innings}</TableCell>
+                        <TableCell className="text-center">{notOuts}</TableCell>
                         <TableCell className="text-center">
                           {milestones.highestScore}
                           {milestones.isNotout ? "*" : ""}

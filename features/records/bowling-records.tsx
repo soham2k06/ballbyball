@@ -108,44 +108,20 @@ function BowlingRecords({
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="bg-primary hover:bg-primary/90">
-                <TableHead className="text-primary-foreground">Pos</TableHead>
-                <TableHead className="min-w-24 text-primary-foreground">
-                  Player
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Wickets
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Matches
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Econ.
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Best
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  SR
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  3W
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  5W
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Maidens
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Dots
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Overs
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Runs
-                </TableHead>
+              <TableRow className="bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
+                <TableHead className="!text-left">Pos</TableHead>
+                <TableHead className="min-w-24 !text-left">Player</TableHead>
+                <TableHead>Wickets</TableHead>
+                <TableHead>Matches</TableHead>
+                <TableHead>Econ.</TableHead>
+                <TableHead>Best</TableHead>
+                <TableHead>SR</TableHead>
+                <TableHead>3W</TableHead>
+                <TableHead>5W</TableHead>
+                <TableHead>Maidens</TableHead>
+                <TableHead>Dots</TableHead>
+                <TableHead>Overs</TableHead>
+                <TableHead>Runs</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

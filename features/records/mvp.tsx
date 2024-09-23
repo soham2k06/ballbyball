@@ -154,7 +154,6 @@ async function MVP({
       runOuts,
       stumpings,
       // Other
-      team: "",
       isWinner: false,
     };
   });
@@ -172,47 +171,21 @@ async function MVP({
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="bg-primary hover:bg-primary/90">
-                <TableHead className="text-primary-foreground">Pos</TableHead>
-                <TableHead className="min-w-24 text-primary-foreground">
-                  Player
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Points
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Matches
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Runs
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Wickets
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  SR
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Economy
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  30s
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  50s
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  100s
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Catches
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Runouts
-                </TableHead>
-                <TableHead className="text-center text-primary-foreground">
-                  Stumpings
-                </TableHead>
+              <TableRow className="bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
+                <TableHead className="!text-left">Pos</TableHead>
+                <TableHead className="min-w-24 !text-left">Player</TableHead>
+                <TableHead>Points</TableHead>
+                <TableHead>Matches</TableHead>
+                <TableHead>Runs</TableHead>
+                <TableHead>Wickets</TableHead>
+                <TableHead>SR</TableHead>
+                <TableHead>Economy</TableHead>
+                <TableHead>30s</TableHead>
+                <TableHead>50s</TableHead>
+                <TableHead>100s</TableHead>
+                <TableHead>Catches</TableHead>
+                <TableHead>Runouts</TableHead>
+                <TableHead>Stumpings</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

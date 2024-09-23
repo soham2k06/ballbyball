@@ -1,7 +1,14 @@
 import { usePlayerStats } from "@/api-hooks/use-player-stats";
 import { getOverStr, round } from "@/lib/utils";
 
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import MoreBatting from "./more-batting";
 import MoreBowling from "./more-bowling";
@@ -41,9 +48,14 @@ function PlayerStats({
       onOpenChange={() => setOpenedPlayer(playerId ? undefined : playerId)}
     >
       <DialogContent>
-        <DialogHeader className="flex-row items-center gap-4 space-y-0">
-          <div className="text-lg font-bold">{playerName}</div>
-          <div className="text-sm font-bold">Matches - {matchesPlayed}</div>
+        <DialogHeader>
+          <DialogTitle>{playerName}</DialogTitle>
+
+          {isLoading ? (
+            <Skeleton className="h-5 w-20" />
+          ) : (
+            <DialogDescription>{matchesPlayed} Matches</DialogDescription>
+          )}
         </DialogHeader>
         <div className="space-y-4">
           <div className="overflow-hidden rounded-xl">
@@ -79,7 +91,11 @@ function PlayerStats({
               />
               <Stat
                 isLoading={isLoading}
-                data={`${data?.batting.highestScore}${data?.batting.isNotoutOnHighestScore ? "*" : ""}`}
+                data={
+                  data
+                    ? `${data?.batting.highestScore}${data?.batting.isNotoutOnHighestScore ? "*" : ""}`
+                    : "-"
+                }
                 dataKey="Best"
               />
             </div>
