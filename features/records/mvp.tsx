@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/table";
 import { TabsContent } from "@/components/ui/tabs";
 
+export const runtime = "edge";
+
 async function MVP({
   players,
   userId,
