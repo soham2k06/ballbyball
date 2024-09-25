@@ -1,7 +1,5 @@
 import { BallEvent, Player } from "@prisma/client";
-import { endOfDay, startOfDay } from "date-fns";
 
-import prisma from "@/lib/db/prisma";
 import {
   calcBestPerformance,
   calcMilestones,
@@ -10,7 +8,7 @@ import {
   mapGroupedMatches,
   round,
 } from "@/lib/utils";
-import { EventType } from "@/types";
+import { EventType, PlayerPerformance } from "@/types";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -23,35 +21,27 @@ import {
 } from "@/components/ui/table";
 import { TabsContent } from "@/components/ui/tabs";
 
-export const runtime = "edge";
-
-async function MVP({
+function MVP({
   players,
-  userId,
-  date,
 }: {
   players: (Player & {
     playerBatEvents: BallEvent[];
     playerBallEvents: BallEvent[];
+    catches: number;
+    runOuts: number;
+    stumpings: number;
   })[];
-  userId: string;
-  date: string | null;
 }) {
-  const ballEventsFilter = date
-    ? {
-        Match: {
-          createdAt: {
-            gte: startOfDay(new Date(date)),
-            lte: endOfDay(new Date(date)),
-          },
-        },
-      }
-    : {};
-  const playersPerformance = players.map(async (player) => {
+  const playersPerformance = players.map((player) => {
     const groupedMatchesBat = mapGroupedMatches(player.playerBatEvents);
     const batEvents = (player.playerBatEvents ?? []).map(
       (event) => event.type as EventType,
     );
+
+    const groupedMatches = mapGroupedMatches([
+      ...player?.playerBatEvents,
+      ...player?.playerBallEvents,
+    ]);
 
     const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
 
@@ -94,41 +84,6 @@ async function MVP({
       runRate: economy,
     } = getScore({ balls: bowlEvents, forBowler: true });
 
-    //// Field Stats
-    const catches = await prisma.ballEvent.count({
-      where: {
-        userId,
-        ...ballEventsFilter,
-        OR: [
-          { AND: [{ type: "-1_4" }, { bowlerId: player.id }] },
-          {
-            AND: [
-              { type: { contains: player.id } },
-              {
-                OR: [{ type: { contains: "_3_" } }],
-              },
-            ],
-          },
-        ],
-      },
-    });
-
-    const runOuts = await prisma.ballEvent.count({
-      where: {
-        userId,
-        ...ballEventsFilter,
-        AND: [{ type: { contains: "_5_" } }, { type: { contains: player.id } }],
-      },
-    });
-
-    const stumpings = await prisma.ballEvent.count({
-      where: {
-        userId,
-        ...ballEventsFilter,
-        AND: [{ type: { contains: "_6_" } }, { type: { contains: player.id } }],
-      },
-    });
-
     return {
       playerId: player.id,
       // Bat
@@ -150,18 +105,35 @@ async function MVP({
       economy,
       maidens,
       // Field
-      catches,
-      runOuts,
-      stumpings,
+      catches: player.catches,
+      runOuts: player.runOuts,
+      stumpings: player.stumpings,
       // Other
       team: "",
       isWinner: false,
+      matches: Object.keys(groupedMatches).length,
     };
   });
 
-  const mvp = calcBestPerformance({
-    playersPerformance: await Promise.all(playersPerformance),
-  });
+  const calculateMVP = (
+    player: (PlayerPerformance & {
+      matches: number;
+    })[],
+  ) => {
+    const performance = calcBestPerformance({ playersPerformance: player });
+    return performance.map((p) => {
+      const matches = playersPerformance.find(
+        (player) => player.playerId === p.playerId,
+      )?.matches;
+
+      return {
+        ...p,
+        matches,
+      };
+    });
+  };
+
+  const mvp = calculateMVP(playersPerformance);
 
   return (
     <TabsContent value="mvp">
@@ -184,15 +156,12 @@ async function MVP({
                 <TableHead>30s</TableHead>
                 <TableHead>50s</TableHead>
                 <TableHead>100s</TableHead>
-                <TableHead>Catches</TableHead>
-                <TableHead>Runouts</TableHead>
-                <TableHead>Stumpings</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {mvp.length ? (
                 mvp.map(
-                  async (
+                  (
                     {
                       playerId,
                       points,
@@ -203,55 +172,29 @@ async function MVP({
                       thirties,
                       fifties,
                       centuries,
-                      catches,
-                      runOuts,
-                      stumpings,
+                      matches,
                     },
                     i,
                   ) => {
-                    const matches = await prisma.matchTeam.count({
-                      where: {
-                        match: ballEventsFilter.Match,
-                        team: {
-                          teamPlayers: { some: { playerId } },
-                        },
-                      },
-                    });
-
                     const player = players.find((p) => p.id === playerId);
 
                     return (
-                      <TableRow key={player?.id}>
-                        <TableCell>{i + 1}</TableCell>
-                        <TableCell>{player?.name}</TableCell>
-                        <TableCell className="bg-primary/5 text-center">
-                          {points}
+                      <TableRow key={player?.id} className="[&>td]:text-center">
+                        <TableCell className="!text-left">{i + 1}</TableCell>
+                        <TableCell className="!text-left">
+                          {player?.name}
                         </TableCell>
-                        <TableCell className="text-center">{matches}</TableCell>
-                        <TableCell className="text-center">
-                          {runsScored}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {wicketsTaken}
-                        </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="bg-primary/5">{points}</TableCell>
+                        <TableCell>{matches}</TableCell>
+                        <TableCell>{runsScored}</TableCell>
+                        <TableCell>{wicketsTaken}</TableCell>
+                        <TableCell>
                           {strikeRate ? round(strikeRate) : "-"}
                         </TableCell>
-                        <TableCell className="text-center">
-                          {economy ? round(economy) : "-"}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {thirties}
-                        </TableCell>
-                        <TableCell className="text-center">{fifties}</TableCell>
-                        <TableCell className="text-center">
-                          {centuries}
-                        </TableCell>
-                        <TableCell className="text-center">{catches}</TableCell>
-                        <TableCell className="text-center">{runOuts}</TableCell>
-                        <TableCell className="text-center">
-                          {stumpings}
-                        </TableCell>
+                        <TableCell>{economy ? round(economy) : "-"}</TableCell>
+                        <TableCell>{thirties}</TableCell>
+                        <TableCell>{fifties}</TableCell>
+                        <TableCell>{centuries}</TableCell>
                       </TableRow>
                     );
                   },

@@ -39,24 +39,86 @@ async function Records({ searchParams }: Props) {
       }
     : true;
 
-  const players = (
-    await prisma.player.findMany({
-      where: { userId },
-      include: {
-        playerBallEvents: date ? dateFilter : true,
-        playerBatEvents: date ? dateFilter : true,
-      },
-    })
-  ).filter(
+  const ballEventsFilter = date
+    ? {
+        Match: {
+          createdAt: {
+            gte: startOfDay(new Date(date)),
+            lte: endOfDay(new Date(date)),
+          },
+        },
+      }
+    : {};
+
+  const players = await prisma.player.findMany({
+    where: { userId },
+    include: {
+      playerBallEvents: date ? dateFilter : true,
+      playerBatEvents: date ? dateFilter : true,
+    },
+  });
+
+  const playerStats = await Promise.all(
+    players.map(async (player) => {
+      const [catches, runOuts, stumpings] = await Promise.all([
+        prisma.ballEvent.count({
+          where: {
+            userId,
+            ...ballEventsFilter,
+            OR: [
+              { AND: [{ type: "-1_4" }, { bowlerId: player.id }] },
+              {
+                AND: [
+                  { type: { contains: player.id } },
+                  {
+                    OR: [{ type: { contains: "_3_" } }],
+                  },
+                ],
+              },
+            ],
+          },
+        }),
+        prisma.ballEvent.count({
+          where: {
+            userId,
+            ...ballEventsFilter,
+            AND: [
+              { type: { contains: "_5_" } },
+              { type: { contains: player.id } },
+            ],
+          },
+        }),
+        prisma.ballEvent.count({
+          where: {
+            userId,
+            ...ballEventsFilter,
+            AND: [
+              { type: { contains: "_6_" } },
+              { type: { contains: player.id } },
+            ],
+          },
+        }),
+      ]);
+
+      return {
+        ...player,
+        catches,
+        runOuts,
+        stumpings,
+      };
+    }),
+  );
+
+  const filteredPlayers = playerStats.filter(
     (player) =>
       player.playerBatEvents.length > 0 || player.playerBallEvents.length > 0,
   );
 
   return (
     <>
-      <BattingRecords players={players} />
-      <BowlingRecords players={players} />
-      <MVP players={players} userId={userId} date={date} />
+      <BattingRecords players={filteredPlayers} />
+      <BowlingRecords players={filteredPlayers} />
+      <MVP players={filteredPlayers} />
     </>
   );
 }
