@@ -72,10 +72,10 @@ function MVP({
       mapGroupedMatches(player?.playerBallEvents ?? []),
     ).map((events) => events.map((event) => event.type as EventType));
 
-    const maidens = bowlEventsByMatches.reduce(
-      (acc, events) => acc + calculateMaidenOvers(events),
-      0,
-    );
+    const maidens = bowlEventsByMatches.reduce((acc, events) => {
+      const maidensForMatch = calculateMaidenOvers(events);
+      return acc + maidensForMatch;
+    }, 0);
 
     const {
       runs: runConceded,
@@ -126,9 +126,12 @@ function MVP({
         (player) => player.playerId === p.playerId,
       )?.matches;
 
+      const ppm = matches ? (p.points ?? 0) / matches : 0;
+
       return {
         ...p,
         matches,
+        ppm,
       };
     });
   };
@@ -149,13 +152,14 @@ function MVP({
                 <TableHead className="min-w-24 !text-left">Player</TableHead>
                 <TableHead>Points</TableHead>
                 <TableHead>Matches</TableHead>
+                <TableHead>AVG</TableHead>
                 <TableHead>Runs</TableHead>
                 <TableHead>Wickets</TableHead>
-                <TableHead>SR</TableHead>
-                <TableHead>Economy</TableHead>
-                <TableHead>30s</TableHead>
                 <TableHead>50s</TableHead>
                 <TableHead>100s</TableHead>
+                <TableHead>Catches</TableHead>
+                <TableHead>Runouts</TableHead>
+                <TableHead>Stumps</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -167,12 +171,13 @@ function MVP({
                       points,
                       runsScored,
                       wicketsTaken,
-                      economy,
-                      strikeRate,
-                      thirties,
                       fifties,
                       centuries,
                       matches,
+                      catches,
+                      runOuts,
+                      stumpings,
+                      ppm,
                     },
                     i,
                   ) => {
@@ -186,15 +191,14 @@ function MVP({
                         </TableCell>
                         <TableCell className="bg-primary/5">{points}</TableCell>
                         <TableCell>{matches}</TableCell>
+                        <TableCell>{ppm ? round(ppm) : 0}</TableCell>
                         <TableCell>{runsScored}</TableCell>
                         <TableCell>{wicketsTaken}</TableCell>
-                        <TableCell>
-                          {strikeRate ? round(strikeRate) : "-"}
-                        </TableCell>
-                        <TableCell>{economy ? round(economy) : "-"}</TableCell>
-                        <TableCell>{thirties}</TableCell>
                         <TableCell>{fifties}</TableCell>
                         <TableCell>{centuries}</TableCell>
+                        <TableCell>{catches}</TableCell>
+                        <TableCell>{runOuts}</TableCell>
+                        <TableCell>{stumpings}</TableCell>
                       </TableRow>
                     );
                   },

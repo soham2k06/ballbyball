@@ -26,19 +26,6 @@ async function Records({ searchParams }: Props) {
 
   const userId = userRef ?? (await getValidatedUser());
 
-  const dateFilter = date
-    ? {
-        where: {
-          Match: {
-            createdAt: {
-              gte: startOfDay(new Date(date)),
-              lte: endOfDay(new Date(date)),
-            },
-          },
-        },
-      }
-    : true;
-
   const ballEventsFilter = date
     ? {
         Match: {
@@ -53,8 +40,13 @@ async function Records({ searchParams }: Props) {
   const players = await prisma.player.findMany({
     where: { userId },
     include: {
-      playerBallEvents: date ? dateFilter : true,
-      playerBatEvents: date ? dateFilter : true,
+      playerBallEvents: {
+        where: ballEventsFilter,
+        orderBy: { id: "asc" },
+      },
+      playerBatEvents: {
+        where: ballEventsFilter,
+      },
     },
   });
 
