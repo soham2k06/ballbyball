@@ -53,9 +53,7 @@ function PlayerCard({
     setPlayerMatchesOpen(playerId);
   return (
     <Card className="flex items-center justify-between p-2 sm:p-4">
-      <CardTitle className="truncate py-1 max-sm:text-xl">
-        {player.name}
-      </CardTitle>
+      <CardTitle className="truncate py-1 text-xl">{player.name}</CardTitle>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="shrink-0">
           <Button size="icon" variant="ghost">
