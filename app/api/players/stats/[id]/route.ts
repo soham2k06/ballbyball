@@ -23,7 +23,12 @@ export async function GET(
   try {
     const player = await prisma.player.findUnique({
       where: { id },
-      include: { playerBallEvents: true, playerBatEvents: true },
+      include: {
+        playerBallEvents: {
+          orderBy: { id: "asc" },
+        },
+        playerBatEvents: true,
+      },
     });
 
     const playerBallEvents = player?.playerBallEvents ?? [];
