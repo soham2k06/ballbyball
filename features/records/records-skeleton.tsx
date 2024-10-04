@@ -9,11 +9,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-function RecordsSkeleton() {
+function RecordsSkeleton({ title }: { title: string }) {
   return (
     <Card className="mt-2 overflow-x-auto">
       <CardHeader>
-        <CardTitle>Most runs</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>

@@ -97,40 +97,6 @@ type TopPerformant = PlayerPerformance & {
   name: string;
 };
 
-// type BattingRecordsType = {
-//   player: Player;
-//   runs: number;
-//   innings: number;
-//   matches: number;
-//   average: number;
-//   strikeRate: number;
-//   milestones: {
-//     fifties: number;
-//     centuries: number;
-//     highestScore: number;
-//     isNotout: boolean;
-//   };
-//   fours: number;
-//   sixes: number;
-// };
-
-// type BowlingRecordsType = {
-//   player: Player;
-//   wickets: number;
-//   totalBalls: number;
-//   matches: number;
-//   economy: number;
-//   strikeRate: number;
-//   bestSpell: {
-//     wickets: number;
-//     runs: number;
-//     balls: number;
-//   };
-//   maidens: number;
-//   runsConceded: number;
-//   dots: number;
-// };
-
 interface RivalriesResult {
   batsmanId: string;
   bowlerId: string;
@@ -147,6 +113,46 @@ interface RivalriesResult {
   dominance: [number, number];
 }
 
+type BattingRecordsType = {
+  player: {
+    id: string;
+    name: string;
+  };
+  runs: number;
+  ballsFaced: number;
+  matches: number;
+  innings: number;
+  milestones: {
+    highestScore: number;
+    isNotout: boolean;
+    thirties: number;
+    fifties: number;
+    centuries: number;
+  };
+  average: number;
+  strikeRate: number;
+  notOuts: number;
+  fours: number;
+  sixes: number;
+};
+
+type BowlingRecordsType = {
+  player: {
+    id: string;
+    name: string;
+  };
+  wickets: number;
+  totalBalls: number;
+  matches: number;
+  economy: number;
+  strikeRate: number;
+  maidens: number;
+  threeHauls: number;
+  fiveHauls: number;
+  bestSpell: { wickets: number; runs: number; balls: number };
+  runsConceded: number;
+  dots: number;
+};
 type CommentKey = keyof typeof commentsCollection;
 
 // ** Schema relations types
@@ -173,4 +179,6 @@ export type {
   PlayerSimplified,
   TopPerformant,
   RivalriesResult,
+  BattingRecordsType,
+  BowlingRecordsType,
 };

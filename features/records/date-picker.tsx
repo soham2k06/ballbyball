@@ -26,7 +26,7 @@ export default function DatePicker() {
 
   return (
     <Popover>
-      <div className="relative">
+      <div className="relative max-sm:w-full">
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
