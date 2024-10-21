@@ -1,12 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
 
 interface TeamSelectProps {
   selectedTeam: string;
@@ -18,20 +12,16 @@ function TeamSelect({ selectedTeam, setSelectedTeam, teams }: TeamSelectProps) {
   return (
     <Select
       value={selectedTeam}
-      onValueChange={(val) => {
-        setSelectedTeam(val);
+      onChange={(e) => {
+        setSelectedTeam(e.target.value);
       }}
+      className="w-fit"
     >
-      <SelectTrigger className="w-fit">
-        <SelectValue>{selectedTeam}</SelectValue>
-      </SelectTrigger>
-      <SelectContent align="end">
-        {teams.map((team) => (
-          <SelectItem value={team.name} key={team.name}>
-            {team.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
+      {teams.map((team) => (
+        <option key={team.id} value={team.name}>
+          {team.name}
+        </option>
+      ))}
     </Select>
   );
 }

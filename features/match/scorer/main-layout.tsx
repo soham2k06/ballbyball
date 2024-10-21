@@ -194,8 +194,7 @@ function ScorerLayout({
 
   // ** Handlers
   function handleStrikeChange(ballEventType: EventType) {
-    if (strikeChangers.includes(ballEventType) && curBatsmenIds.length === 2)
-      changeStrike();
+    if (strikeChangers.includes(ballEventType)) changeStrike();
   }
 
   function handleSelectPlayer(payload: CurPlayer[], onSuccess?: () => void) {
@@ -240,7 +239,8 @@ function ScorerLayout({
       setCurPlayers(updatedPlayers as CurPlayer[]);
     }
 
-    handleStrikeChange((event === "-4" ? "-4" : event.slice(-1)) as EventType);
+    const strikeEvent = !event.includes("-1") ? event : event.slice(0, -2);
+    handleStrikeChange((event === "-4" ? "-4" : strikeEvent) as EventType);
   }
 
   function handleLastBallInWicket(event: string) {

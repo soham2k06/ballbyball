@@ -52,6 +52,7 @@ type PlayerStats = {
     wickets: number;
     fifties: number;
     centuries: number;
+    ducks: number;
     highestScore: number;
     isNotoutOnHighestScore: boolean;
     boundaryRate: number;

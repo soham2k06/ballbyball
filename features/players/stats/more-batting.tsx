@@ -34,6 +34,7 @@ function MoreBatting({ data }: { data: PlayerStats }) {
           <Stat data={data.batting.dotsPlayed} dataKey="Dots" />
           <Stat data={data.batting.singles} dataKey="Singles" />
           <Stat data={data.batting.thirties} dataKey="30s" />
+          <Stat data={data.batting.ducks} dataKey="Ducks" />
         </div>
       </DialogContent>
     </Dialog>

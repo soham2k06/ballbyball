@@ -1,11 +1,5 @@
 import { Player } from "@prisma/client";
-import {
-  AreaChart,
-  Edit,
-  LandPlot,
-  MoreHorizontal,
-  Trash2,
-} from "lucide-react";
+import { Edit, LandPlot, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { UpdatePlayerSchema } from "@/lib/validation/player";
@@ -53,7 +47,17 @@ function PlayerCard({
     setPlayerMatchesOpen(playerId);
   return (
     <Card className="flex items-center justify-between p-2 sm:p-4">
-      <CardTitle className="truncate py-1 text-xl">{player.name}</CardTitle>
+      <CardTitle
+        onClick={() =>
+          setOpenedPlayer({
+            id: player.id,
+            name: player.name,
+          })
+        }
+        className="w-full cursor-pointer truncate py-1 text-xl"
+      >
+        {player.name}
+      </CardTitle>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="shrink-0">
           <Button size="icon" variant="ghost">
@@ -61,17 +65,6 @@ function PlayerCard({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            className="gap-2 font-medium"
-            onClick={() =>
-              setOpenedPlayer({
-                id: player.id,
-                name: player.name,
-              })
-            }
-          >
-            <AreaChart size={20} /> Stats
-          </DropdownMenuItem>
           <DropdownMenuItem
             className="gap-2 font-medium"
             onClick={() => handleShowMatches(player.id)}

@@ -110,7 +110,10 @@ function FullOverSummary({
                   balls: over.map((b) => b.type),
                 });
                 return (
-                  <div key={overI} className="flex flex-col gap-4 py-4">
+                  <div
+                    key={overI}
+                    className="mx-auto flex max-w-7xl flex-col gap-4 py-4"
+                  >
                     <div className="flex gap-2 text-sm font-bold">
                       <h3>
                         Over {overI + 1}, {runs}/{wickets}
@@ -153,7 +156,7 @@ function FullOverSummary({
                 return (
                   <div
                     key={overI}
-                    className="flex items-center gap-4 py-4 first:pt-0"
+                    className="mx-auto flex max-w-7xl items-center gap-4 py-4 first:pt-0"
                   >
                     <div className="flex min-w-20 gap-2 whitespace-nowrap text-sm font-bold">
                       <h3>O. {overI + 1}</h3>

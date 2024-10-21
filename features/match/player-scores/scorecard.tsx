@@ -3,7 +3,6 @@ import { BallEvent, Player } from "@prisma/client";
 import { calculateFallOfWickets } from "@/lib/utils";
 import { MatchExtended } from "@/types";
 
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import Score from "./score";
@@ -80,8 +79,8 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
   ];
 
   return (
-    <Tabs defaultValue={tabs[0].id}>
-      <div className="px-2 pb-2">
+    <Tabs defaultValue={tabs[0].id} className="h-full overflow-y-auto">
+      <div className="sticky top-0 z-10 mx-auto w-full max-w-7xl bg-white pb-2 max-[1300px]:px-2">
         <TabsList className="divide-x divide-foreground/40 px-0 max-sm:w-full">
           {tabs.map((tab) => (
             <div className="px-1 max-sm:w-1/2 sm:min-w-32" key={tab.id}>
@@ -96,13 +95,15 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
           ))}
         </TabsList>
       </div>
-      <ScrollArea className="h-[calc(100dvh-160px)]">
-        {tabs.map((tab) => (
-          <TabsContent key={tab.id} value={tab.id}>
-            {tab.content}
-          </TabsContent>
-        ))}
-      </ScrollArea>
+      {tabs.map((tab) => (
+        <TabsContent
+          key={tab.id}
+          value={tab.id}
+          className="mx-auto h-full w-full max-w-7xl"
+        >
+          {tab.content}
+        </TabsContent>
+      ))}
     </Tabs>
   );
 }

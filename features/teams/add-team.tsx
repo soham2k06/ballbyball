@@ -4,9 +4,7 @@ import { useState } from "react";
 
 import Link from "next/link";
 
-import { useQuery } from "@tanstack/react-query";
-
-import { getAllPlayers } from "@/lib/actions/player";
+import { usePlayers } from "@/api-hooks/use-players";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,11 +18,8 @@ import {
 
 import CreateTeamDialog from "./add-update-team-dialog";
 
-function AddPlayerButton() {
-  const { data: players = [] } = useQuery({
-    queryKey: ["players"],
-    queryFn: () => getAllPlayers(),
-  });
+function AddTeamButton() {
+  const { players = [], isLoading } = usePlayers();
 
   const [open, setOpen] = useState(false);
 
@@ -37,6 +32,7 @@ function AddPlayerButton() {
           if (!players.length) setShowCreatePlayer(true);
           else setOpen(true);
         }}
+        disabled={isLoading}
       >
         Add single
       </Button>
@@ -65,4 +61,4 @@ function AddPlayerButton() {
   );
 }
 
-export default AddPlayerButton;
+export default AddTeamButton;

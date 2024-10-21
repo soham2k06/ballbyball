@@ -16,6 +16,7 @@ import { Provider } from "@/components/providers";
 const lato = Lato({
   subsets: ["latin"],
   weight: "400",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

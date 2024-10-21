@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
@@ -15,11 +15,11 @@ import { navItems } from "@/lib/constants";
 import { abbreviateEntity } from "@/lib/utils";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 import GoogleButton from "./google-button";
 import NavItem from "./nav-item";
@@ -46,7 +46,7 @@ function Nav({
   const searchParams = useSearchParams();
   const userRef = searchParams.get("user");
 
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   function handleCopyLink() {
     const userId = session?.user?.id;
@@ -76,7 +76,11 @@ function Nav({
           ))}
         </ul>
 
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <Drawer
+          open={isDrawerOpen}
+          onOpenChange={setIsDrawerOpen}
+          direction="right"
+        >
           <div className="flex gap-3">
             {userRef && (
               <Button variant="secondary" asChild>
@@ -109,31 +113,39 @@ function Nav({
             ) : (
               <GoogleButton />
             )}
-            <SheetTrigger className="md:hidden">
+            <DrawerTrigger className="md:hidden">
               <Menu />
-            </SheetTrigger>
+            </DrawerTrigger>
           </div>
-          <SheetContent>
-            <SheetHeader className="mb-4 text-left">
+          <DrawerContent direction="right">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-4"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              <X className="size-5" />
+            </Button>
+            <DrawerHeader className="mb-4 text-left">
               <Link href="/">
                 <TypographyH2 className="text-2xl font-semibold tracking-tighter">
                   ballbyball.
                 </TypographyH2>
               </Link>
-            </SheetHeader>
+            </DrawerHeader>
             <ul>
               {navItems.map((item) => (
                 <NavItem
                   key={item.name}
                   href={item.href}
-                  onClick={() => setIsSheetOpen(false)}
+                  onClick={() => setIsDrawerOpen(false)}
                 >
                   {item.name}
                 </NavItem>
               ))}
             </ul>
-          </SheetContent>
-        </Sheet>
+          </DrawerContent>
+        </Drawer>
       </div>
     </nav>
   );

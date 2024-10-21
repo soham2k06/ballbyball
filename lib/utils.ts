@@ -529,6 +529,7 @@ async function createOrUpdateWithUniqueName(
 }
 
 function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
+  let ducks = 0;
   let thirties = 0;
   let fifties = 0;
   let centuries = 0;
@@ -537,11 +538,11 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
 
-    const { runs, wickets } = getScore({
+    const { runs, wickets, totalBalls } = getScore({
       balls: matchEvents.map((event) => event.type),
       forBatsman: true,
     });
-
+    if (totalBalls > 0 && runs === 0 && wickets === 1) ducks++;
     if (runs >= 30 && runs < 50) thirties++;
     if (runs >= 50 && runs < 100) fifties++;
     if (runs >= 100) centuries++;
@@ -551,7 +552,7 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
     }
   }
 
-  return { thirties, fifties, centuries, highestScore, isNotout };
+  return { ducks, thirties, fifties, centuries, highestScore, isNotout };
 }
 
 function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {

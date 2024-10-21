@@ -54,7 +54,7 @@ function Tools({
         <DrawerTrigger asChild>
           <Button className="w-full">Scorecard</Button>
         </DrawerTrigger>
-        <DrawerContent className="h-full max-h-[95dvh]">
+        <DrawerContent className="max-h-[95dvh] overflow-y-hidden">
           <DrawerHeader className="sm:mb-2 sm:py-4">
             <DrawerTitle className="text-center text-2xl">
               {team1Name} vs {team2Name}

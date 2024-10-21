@@ -8,14 +8,14 @@ import {
 export function usePlayers() {
   const {
     data: players = [],
-    isLoading,
+    isFetching,
     isFetched,
   } = useQuery({
     queryKey: ["players"],
     queryFn: () => getAllPlayers(),
   });
 
-  return { players, isLoading, isFetched };
+  return { players, isLoading: isFetching, isFetched };
 }
 
 export function useSortedPlayersByPerformance(options?: { enabled?: boolean }) {

@@ -31,6 +31,7 @@ export async function getAllTeams(user?: string | null) {
           select: { player: { select: { id: true, name: true } } },
         },
       },
+      orderBy: { createdAt: "desc" },
     });
 
     const teamsSimplified = teams.map((team) => {

@@ -33,7 +33,11 @@ function MatchList({
 
   const router = useRouter();
 
-  const { data: teams = [], isLoading } = useQuery({
+  const {
+    data: teams = [],
+    isLoading,
+    isFetching,
+  } = useQuery({
     queryKey: ["allTeams"],
     queryFn: () => getAllTeams(),
   });
@@ -53,7 +57,9 @@ function MatchList({
         "flex flex-col items-center": !matches?.length,
       })}
     >
-      {!userRef && <Start teams={teams} isLoading={isLoading} />}
+      {!userRef && (
+        <Start teams={teams} isLoading={isLoading} isFetching={isFetching} />
+      )}
       {matches?.length ? (
         <>
           <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -66,24 +72,25 @@ function MatchList({
               />
             ))}
           </ul>
-          <div className="mt-8 flex justify-center">
-            <Button
-              className="w-full max-w-md"
-              disabled={matchesCount <= matches.length}
-              onClick={() => {
-                const curSize = parseInt(searchParams.get("size") ?? "5");
-                const newRoute = `/matches?size=${curSize + 5}`;
-                router.push(
-                  userRef ? `${newRoute}&user=${userRef}` : newRoute,
-                  {
-                    scroll: false,
-                  },
-                );
-              }}
-            >
-              Show more
-            </Button>
-          </div>
+          {matchesCount > matches.length && (
+            <div className="mt-8 flex justify-center">
+              <Button
+                className="w-full max-w-md"
+                onClick={() => {
+                  const curSize = parseInt(searchParams.get("size") ?? "5");
+                  const newRoute = `/matches?size=${curSize + 5}`;
+                  router.push(
+                    userRef ? `${newRoute}&user=${userRef}` : newRoute,
+                    {
+                      scroll: false,
+                    },
+                  );
+                }}
+              >
+                Show more
+              </Button>
+            </div>
+          )}
         </>
       ) : (
         <EmptyState document="matches" />
@@ -95,6 +102,7 @@ function MatchList({
             setOpen={() => setMatchToUpdate(undefined)}
             matchToUpdate={matchToUpdate}
             teams={teams}
+            isTeamsFetching={isFetching}
           />
           <AlertNote
             open={!!matchToDelete}

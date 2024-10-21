@@ -21,9 +21,11 @@ import StartMatchDialog from "./start-update-dialog";
 function StartMatchButton({
   teams,
   isLoading,
+  isFetching,
 }: {
   teams: TeamWithPlayers[];
   isLoading: boolean;
+  isFetching: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -32,17 +34,22 @@ function StartMatchButton({
   return (
     <>
       <Button
-        disabled={isLoading}
         onClick={() => {
           if (teams.length < 2) setShowCreateTeam(true);
           else setOpen(true);
         }}
+        disabled={isLoading}
         className="max-sm:w-full"
       >
         Start match
       </Button>
 
-      <StartMatchDialog open={open} setOpen={setOpen} teams={teams} />
+      <StartMatchDialog
+        open={open}
+        setOpen={setOpen}
+        teams={teams}
+        isTeamsFetching={isFetching}
+      />
 
       <Dialog open={showCreateTeam} onOpenChange={setShowCreateTeam}>
         <DialogContent>

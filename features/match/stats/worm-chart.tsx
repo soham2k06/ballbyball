@@ -164,7 +164,7 @@ function WormChart({
   };
 
   return (
-    <div className="h-96 p-2">
+    <div className="mx-auto h-96 w-full max-w-7xl p-2">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           width={800}

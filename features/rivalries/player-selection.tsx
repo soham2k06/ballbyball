@@ -1,18 +1,10 @@
 import React from "react";
 
-import { Cross1Icon } from "@radix-ui/react-icons";
-
 import { PlayerSimplified } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
 
 type QueryType = string | null;
 type SetQueryType = React.Dispatch<React.SetStateAction<string | null>>;
@@ -26,26 +18,6 @@ interface PlayerSelectionProps {
   player: QueryType;
   setPlayer: SetQueryType;
   setAllState: SetQueryType;
-}
-
-function ClearButton({
-  val,
-  onClick,
-}: {
-  val: QueryType;
-  onClick: React.MouseEventHandler;
-}) {
-  return (
-    !!val && (
-      <Button
-        className="absolute right-2 top-1/2 size-6 -translate-y-1/2 p-0"
-        variant="ghost"
-        onClick={onClick}
-      >
-        <Cross1Icon className="size-3" />
-      </Button>
-    )
-  );
 }
 
 function PlayerSelection({
@@ -67,26 +39,19 @@ function PlayerSelection({
         <Label htmlFor="rivalries-player">Player</Label>
         <Select
           value={player ?? ""}
-          onValueChange={(val) => {
+          onChange={(e) => {
+            setAllState(null);
             setBatsman(null);
             setBowler(null);
-            setAllState(null);
-            setPlayer(val);
+            setPlayer(e.target.value);
           }}
         >
-          <div className="relative">
-            <SelectTrigger id="rivalries-player" hideIcon={!!player}>
-              <SelectValue placeholder="Select a player" />
-            </SelectTrigger>
-            <ClearButton val={player} onClick={() => setPlayer(null)} />
-          </div>
-          <SelectContent align="start">
-            {players.map((player) => (
-              <SelectItem key={player.id} value={player.id}>
-                {player.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
+          <option value="">None*</option>
+          {players.map((player) => (
+            <option key={player.id} value={player.id}>
+              {player.name}
+            </option>
+          ))}
         </Select>
       </div>
       <div className="flex w-full items-end gap-1 sm:grid sm:grid-cols-[3fr_3fr_1fr] sm:gap-4">
@@ -94,50 +59,37 @@ function PlayerSelection({
           <Label htmlFor="rivalries-batsman">Batsman</Label>
           <Select
             value={batsman ?? ""}
-            onValueChange={(val) => {
+            onChange={(e) => {
               setAllState(null);
               setPlayer(null);
-              setBatsman(val);
+              setBatsman(e.target.value);
             }}
           >
-            <div className="relative">
-              <SelectTrigger id="rivalries-batsman" hideIcon={!!batsman}>
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <ClearButton val={batsman} onClick={() => setBatsman(null)} />
-            </div>
-            <SelectContent align="center">
-              {batsmanOptions.map((player) => (
-                <SelectItem key={player.id} value={player.id}>
-                  {player.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            <option value="">None*</option>
+            {batsmanOptions.map((player) => (
+              <option key={player.id} value={player.id}>
+                {player.name}
+              </option>
+            ))}
           </Select>
         </div>
         <div className="w-full">
           <Label htmlFor="rivalries-bowler">Bowler</Label>
+
           <Select
             value={bowler ?? ""}
-            onValueChange={(val) => {
+            onChange={(e) => {
               setAllState(null);
               setPlayer(null);
-              setBowler(val);
+              setBowler(e.target.value);
             }}
           >
-            <div className="relative">
-              <SelectTrigger id="rivalries-bowler" hideIcon={!!bowler}>
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <ClearButton val={bowler} onClick={() => setBowler(null)} />
-            </div>
-            <SelectContent align="end">
-              {bowlerOptions.map((player) => (
-                <SelectItem key={player.id} value={player.id}>
-                  {player.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            <option value="">None*</option>
+            {bowlerOptions.map((player) => (
+              <option key={player.id} value={player.id}>
+                {player.name}
+              </option>
+            ))}
           </Select>
         </div>
         <Button

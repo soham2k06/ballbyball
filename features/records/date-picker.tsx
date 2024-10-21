@@ -8,10 +8,12 @@ import { Cross1Icon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -24,7 +26,22 @@ export default function DatePicker() {
   const selectedDate = sp.get("date");
   const user = sp.get("user");
 
-  return (
+  const isMobile = useMediaQuery("(max-width: 640px)");
+
+  return isMobile ? (
+    <Input
+      type="date"
+      className="justify-center"
+      max={format(new Date(), "yyyy-MM-dd")}
+      value={selectedDate ?? undefined}
+      onChange={(e) => {
+        const val = e.target.value;
+        router.push(
+          user ? `/records?${user}&date=${val}` : `/records?date=${val}`,
+        );
+      }}
+    />
+  ) : (
     <Popover>
       <div className="relative max-sm:w-full">
         <PopoverTrigger asChild>

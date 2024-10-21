@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
 
 import { BallEvent, CurPlayer } from "@prisma/client";
-import { BarChartBig, LineChart, ListOrdered } from "lucide-react";
+import { BarChartBig, LineChart, ListOrdered, X } from "lucide-react";
 
 import { useStatsOpenContext } from "@/contexts/stats-open-context";
 import { saveBallEvents } from "@/lib/actions/ball-event";
@@ -25,14 +25,9 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { TypographyH2, TypographyP } from "@/components/ui/typography";
 
 import FullOverSummary from "./full-over-summary";
@@ -54,7 +49,7 @@ function StatsAndSettings({
   match,
   setCurPlayers,
 }: StatsAndSettingsProps) {
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const {
     setShowRunrateChart,
@@ -143,17 +138,29 @@ function StatsAndSettings({
 
   return (
     <>
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetTrigger asChild>
+      <Drawer
+        open={isDrawerOpen}
+        onOpenChange={setIsDrawerOpen}
+        direction="right"
+      >
+        <DrawerTrigger asChild>
           <Button className="w-full">Stats & Settings</Button>
-        </SheetTrigger>
+        </DrawerTrigger>
         {!match || !curTeam || !opposingTeam ? null : (
-          <SheetContent>
-            <SheetHeader className="text-left">
+          <DrawerContent direction="right" className="p-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-4"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              <X className="size-5" />
+            </Button>
+            <DrawerHeader className="text-left">
               <TypographyH2 className="text-2xl font-semibold tracking-tighter">
                 Stats & Settings
               </TypographyH2>
-            </SheetHeader>
+            </DrawerHeader>
             <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
               Manual Selection
             </TypographyP>
@@ -179,7 +186,7 @@ function StatsAndSettings({
               handleSelectPlayer={(payload) => {
                 handleSelectPlayer(payload, () => {
                   setShowSelectBatsman(false);
-                  setIsSheetOpen(false);
+                  setIsDrawerOpen(false);
                 });
               }}
               team={curTeam}
@@ -206,7 +213,7 @@ function StatsAndSettings({
               handleSelectPlayer={(payload) => {
                 handleSelectPlayer(payload, () => {
                   setShowSelectBatsman(false);
-                  setIsSheetOpen(false);
+                  setIsDrawerOpen(false);
                 });
               }}
               team={opposingTeam}
@@ -237,24 +244,26 @@ function StatsAndSettings({
                 <span>Over Summaries</span>
               </Button>
             </div>
-          </SheetContent>
+          </DrawerContent>
         )}
-      </Sheet>
+      </Drawer>
       {match && curTeam && (
         <>
           <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
             <DrawerContent>
-              <StatsDrawerHeader
-                match={match}
-                selectedTeam={selectedTeam}
-                setSelectedTeam={setSelectedTeam}
-                runRate={runRate}
-              />
-              <OverStats
-                ballEvents={ballEventsObj[selectedTeam]}
-                totalOvers={match.overs}
-                runRate={runRate}
-              />
+              <div className="mx-auto w-full max-w-7xl">
+                <StatsDrawerHeader
+                  match={match}
+                  selectedTeam={selectedTeam}
+                  setSelectedTeam={setSelectedTeam}
+                  runRate={runRate}
+                />
+                <OverStats
+                  ballEvents={ballEventsObj[selectedTeam]}
+                  totalOvers={match.overs}
+                  runRate={runRate}
+                />
+              </div>
             </DrawerContent>
           </Drawer>
           <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>

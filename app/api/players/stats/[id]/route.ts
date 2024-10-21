@@ -80,7 +80,7 @@ export async function GET(
 
     const fieldingStats = { catches, runOuts, stumpings };
 
-    const { thirties, fifties, centuries, highestScore, isNotout } =
+    const { ducks, thirties, fifties, centuries, highestScore, isNotout } =
       calcMilestones(groupedMatchesBat);
 
     const { fives: fiveHauls, threes: threeHauls } =
@@ -130,6 +130,7 @@ export async function GET(
       wickets: outs,
       fifties,
       centuries,
+      ducks,
       thirties,
       highestScore,
       boundaryRate,

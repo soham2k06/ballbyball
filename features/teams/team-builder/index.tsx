@@ -1,7 +1,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { SortDesc } from "lucide-react";
+import { Loader2, SortDesc } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -236,23 +236,30 @@ function TeamBuilder() {
                 </LoadingButton>
               </div>
             </div>
-            <ul className="flex max-h-32 flex-wrap gap-3 overflow-y-auto">
-              {unselectedPlayers.length ? (
-                unselectedPlayers.map((player) => (
-                  <PlayerSelect
-                    isSelected={selectedPlayer?.id === player.id}
-                    setSelectedPlayer={setSelectedPlayer}
-                    player={player}
-                    isLoading={isLoading}
-                    key={player.id}
-                  />
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No players available
-                </p>
-              )}
-            </ul>
+            {!isLoading ? (
+              <ul className="flex max-h-32 flex-wrap gap-3 overflow-y-auto">
+                {unselectedPlayers.length ? (
+                  unselectedPlayers.map((player) => (
+                    <PlayerSelect
+                      isSelected={selectedPlayer?.id === player.id}
+                      setSelectedPlayer={setSelectedPlayer}
+                      player={player}
+                      isLoading={isLoading}
+                      key={player.id}
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No players available
+                  </p>
+                )}
+              </ul>
+            ) : (
+              <div className="flex items-center gap-1 rounded-md bg-muted p-4">
+                <p className="text-xs">Loading players</p>
+                <Loader2 className="size-3 animate-spin" />
+              </div>
+            )}
           </div>
 
           <LoadingButton

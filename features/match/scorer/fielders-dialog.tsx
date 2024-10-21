@@ -55,7 +55,7 @@ function FieldersDialog({
     handleScore({
       wicketTypeId: Number(wicketTypeId),
       fielderId: fielder,
-      runsAlongWithRunOut: runs,
+      runsAlongWithRunOut: runs || 0,
       customBatsman: batsmanToRunout,
     });
     setWicketTypeId(null);
@@ -77,7 +77,7 @@ function FieldersDialog({
                     type="number"
                     value={runs}
                     onChange={(e) => {
-                      const value = Number(e.target.value);
+                      const value = parseInt(e.target.value);
                       if (value < 0) return;
                       setRuns(value);
                     }}
