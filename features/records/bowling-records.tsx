@@ -1,3 +1,5 @@
+"use client";
+
 import { useRecords } from "@/api-hooks/use-records";
 import { getOverStr, round } from "@/lib/utils";
 import { BowlingRecordsType } from "@/types";

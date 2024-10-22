@@ -80,7 +80,7 @@ function Scorecard({ match, ballEvents }: ScorecardProps) {
 
   return (
     <Tabs defaultValue={tabs[0].id} className="h-full overflow-y-auto">
-      <div className="sticky top-0 z-10 mx-auto w-full max-w-7xl bg-white pb-2 max-[1300px]:px-2">
+      <div className="sticky top-0 z-10 mx-auto w-full max-w-7xl bg-background pb-2 max-[1300px]:px-2">
         <TabsList className="divide-x divide-foreground/40 px-0 max-sm:w-full">
           {tabs.map((tab) => (
             <div className="px-1 max-sm:w-1/2 sm:min-w-32" key={tab.id}>

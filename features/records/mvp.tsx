@@ -1,3 +1,5 @@
+"use client";
+
 import { useRecords } from "@/api-hooks/use-records";
 import { calcBestPerformance, round } from "@/lib/utils";
 import { PlayerPerformance } from "@/types";

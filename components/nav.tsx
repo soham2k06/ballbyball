@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { Menu, X } from "lucide-react";
+import { Eye, Menu, X } from "lucide-react";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
+import DarkModeToggle from "./dark-mode-toggle";
 import GoogleButton from "./google-button";
 import NavItem from "./nav-item";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -81,11 +82,12 @@ function Nav({
           onOpenChange={setIsDrawerOpen}
           direction="right"
         >
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <DarkModeToggle />
             {userRef && (
-              <Button variant="secondary" asChild>
-                <Link href="/">Leave</Link>
-              </Button>
+              <div className="flex size-10 items-center justify-center rounded-full border bg-muted/40">
+                <Eye className="size-5" />
+              </div>
             )}
             {loading ? (
               <Skeleton className="size-10 animate-pulse rounded-full text-center leading-10" />
@@ -144,6 +146,17 @@ function Nav({
                 </NavItem>
               ))}
             </ul>
+            <p className="mb-2 mt-auto text-center text-sm">
+              Made with ❤️ by{" "}
+              <a
+                href="https://sohamb.tech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                Soham Bhikadiya
+              </a>
+            </p>
           </DrawerContent>
         </Drawer>
       </div>

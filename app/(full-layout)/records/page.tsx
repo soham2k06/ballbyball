@@ -1,5 +1,3 @@
-"use client";
-
 import BattingRecords from "@/features/records/batting-records";
 import BowlingRecords from "@/features/records/bowling-records";
 import DatePicker from "@/features/records/date-picker";

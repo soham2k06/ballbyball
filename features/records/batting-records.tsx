@@ -1,3 +1,5 @@
+"use client";
+
 import { useRecords } from "@/api-hooks/use-records";
 import { round } from "@/lib/utils";
 import { BattingRecordsType } from "@/types";
