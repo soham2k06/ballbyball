@@ -25,9 +25,12 @@ async function page({ searchParams }: Props) {
 
   return (
     <div className="w-full">
-      <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
+      <h1 className="mb-1 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Players
       </h1>
+      <p className="mb-4 text-sm text-muted-foreground">
+        Click on a player to view their stats
+      </p>
       <PlayerList players={players as Player[]} userRef={userRef} />
     </div>
   );

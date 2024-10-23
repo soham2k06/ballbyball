@@ -68,7 +68,9 @@ function MVP() {
               <TableHeader>
                 <TableRow className="bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
                   <TableHead className="!text-left">Pos</TableHead>
-                  <TableHead className="min-w-24 !text-left">Player</TableHead>
+                  <TableHead className="sticky left-0 min-w-24 bg-primary !text-left">
+                    Player
+                  </TableHead>
                   <TableHead>Points</TableHead>
                   <TableHead>Matches</TableHead>
                   <TableHead>AVG</TableHead>
@@ -104,7 +106,9 @@ function MVP() {
                       return (
                         <TableRow key={playerId} className="[&>td]:text-center">
                           <TableCell className="!text-left">{i + 1}</TableCell>
-                          <TableCell className="!text-left">{name}</TableCell>
+                          <TableCell className="sticky left-0 bg-background !text-left">
+                            {name}
+                          </TableCell>
                           <TableCell className="bg-primary/5">
                             {points}
                           </TableCell>

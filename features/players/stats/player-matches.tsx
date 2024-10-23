@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { usePlayerMatches } from "@/api-hooks/use-player-matches";
 import { getOverStr, round } from "@/lib/utils";
@@ -36,6 +36,8 @@ function MatchSkeleton() {
 
 function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
   const router = useRouter();
+  const sp = useSearchParams();
+  const userRef = sp.get("user");
   const { data, isFetching } = usePlayerMatches(playerId);
 
   const matchesWon = data?.filter((match) => match.hasPlayerWon).length;
@@ -77,7 +79,13 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
                   <Card
                     key={match.id}
                     className="cursor-pointer rounded-md border shadow"
-                    onClick={() => router.push(`/match/${match.id}`)}
+                    onClick={() =>
+                      router.push(
+                        userRef
+                          ? `/match/${match.id}?user=${userRef}`
+                          : `/match/${match.id}`,
+                      )
+                    }
                   >
                     <CardHeader className="flex flex-row justify-between gap-2 space-y-0 !pb-1">
                       <CardTitle className="text-lg leading-none">

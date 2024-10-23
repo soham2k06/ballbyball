@@ -2,9 +2,11 @@
 
 import * as React from "react";
 
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { Cross1Icon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { useQueryState } from "nuqs";
 
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
 import { cn } from "@/lib/utils";
@@ -19,7 +21,10 @@ import {
 } from "@/components/ui/popover";
 
 export default function DatePicker() {
-  const [selectedDate, setSelectedDate] = useQueryState("date");
+  const router = useRouter();
+  const sp = useSearchParams();
+  const selectedDate = sp.get("date");
+  const user = sp.get("user");
 
   const isMobile = useMediaQuery("(max-width: 640px)");
 
@@ -28,14 +33,16 @@ export default function DatePicker() {
       {isMobile ? (
         <Input
           type="date"
-          className="w-full justify-center"
+          className="justify-center"
           max={format(new Date(), "yyyy-MM-dd")}
           value={selectedDate ?? undefined}
-          placeholder="Filter by date"
           onChange={(e) => {
             const val = e.target.value;
-            if (val) setSelectedDate(val);
-            else setSelectedDate(null);
+            router.push(
+              user
+                ? `/records?$user={user}&date=${val}`
+                : `/records?date=${val}`,
+            );
           }}
         />
       ) : (
@@ -57,6 +64,17 @@ export default function DatePicker() {
                 )}
               </Button>
             </PopoverTrigger>
+            {selectedDate && (
+              <Button
+                className="absolute right-2 top-1/2 size-6 -translate-y-1/2 p-0"
+                variant="ghost"
+                onClick={() => {
+                  router.push(user ? `/records?user=${user}` : "/records");
+                }}
+              >
+                <Cross1Icon className="size-3" />
+              </Button>
+            )}
           </div>
           <PopoverContent className="w-auto p-0">
             <Calendar
@@ -64,8 +82,12 @@ export default function DatePicker() {
               selected={selectedDate ? new Date(selectedDate) : undefined}
               onSelect={(date) => {
                 if (date) {
-                  const formatted = format(date, "yyyy-MM-dd");
-                  setSelectedDate(formatted);
+                  const dateQuery = `date=${format(date, "yyyy-MM-dd")}`;
+                  router.push(
+                    user
+                      ? `/records?$user={user}&${dateQuery}`
+                      : `/records?${dateQuery}`,
+                  );
                 }
               }}
               toDate={new Date()}
@@ -75,10 +97,10 @@ export default function DatePicker() {
       )}
       <Button
         variant="secondary"
-        onClick={() => setSelectedDate(null)}
+        onClick={() => router.push(user ? `/records?user=${user}` : "/records")}
         disabled={!selectedDate}
       >
-        Clear
+        All time
       </Button>
     </div>
   );

@@ -38,7 +38,9 @@ function BowlingRecords() {
               <TableHeader>
                 <TableRow className="bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
                   <TableHead className="!text-left">Pos</TableHead>
-                  <TableHead className="min-w-24 !text-left">Player</TableHead>
+                  <TableHead className="sticky left-0 min-w-24 bg-primary !text-left">
+                    Player
+                  </TableHead>
                   <TableHead>Wickets</TableHead>
                   <TableHead>Matches</TableHead>
                   <TableHead>Econ.</TableHead>
@@ -75,7 +77,9 @@ function BowlingRecords() {
                       return (
                         <TableRow key={player.id}>
                           <TableCell>{i + 1}</TableCell>
-                          <TableCell>{player.name}</TableCell>
+                          <TableCell className="sticky left-0 bg-background">
+                            {player.name}
+                          </TableCell>
                           <TableCell className="bg-primary/5 text-center">
                             {wickets}
                           </TableCell>
