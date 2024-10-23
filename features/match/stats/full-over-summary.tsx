@@ -2,11 +2,12 @@ import { BallEvent } from "@prisma/client";
 
 import {
   calcRuns,
-  generateOverSummary,
+  // generateOverSummary,
   getCommentByEvent,
   getIsvalidBall,
   getOverStr,
   getScore,
+  round,
 } from "@/lib/utils";
 import { CreateBallEventSchema } from "@/lib/validation/ball-event";
 import { CommentKey, EventType, PlayerSimplified } from "@/types";
@@ -33,9 +34,187 @@ function FullOverSummary({
   showComments: boolean;
   players?: PlayerSimplified[];
 }) {
-  const { overSummaries: normalSummaries } = generateOverSummary(
-    ballEvents.map((b) => b.type as EventType),
-  );
+  function generateOverSummary(ballEvents: Event[]) {
+    let ballLimitInOver = 6;
+    const overSummaries: {
+      teamScore: { runs: number; wickets: number };
+      over: Event[];
+      batsmen: {
+        name: string | undefined;
+        runs: number;
+        balls: number;
+      }[];
+      bowler: {
+        name: string | undefined;
+        runs: number;
+        balls: number;
+        wickets: number;
+      }[];
+    }[] = [];
+
+    let validBallCount = 0;
+    let currentOver: Event[] = [];
+    let accumulatedBatsmanEvents: { [key: string]: Event[] } = {};
+    let accumulatedBowlerEvents: { [key: string]: Event[] } = {};
+    let batsmanOut: { [key: string]: boolean } = {};
+
+    let totalRuns = 0;
+    let totalWickets = 0;
+
+    for (const ballEvent of ballEvents) {
+      const isInvalidBall = getIsvalidBall(ballEvent.type);
+
+      currentOver.push(ballEvent);
+
+      totalRuns += calcRuns([ballEvent.type]);
+      if (ballEvent.type.includes("-1")) totalWickets++;
+
+      if (ballEvent.batsmanId && !batsmanOut[ballEvent.batsmanId]) {
+        if (!accumulatedBatsmanEvents[ballEvent.batsmanId]) {
+          accumulatedBatsmanEvents[ballEvent.batsmanId] = [];
+        }
+        accumulatedBatsmanEvents[ballEvent.batsmanId].push(ballEvent);
+      }
+
+      if (ballEvent.type.includes("-1")) {
+        batsmanOut[ballEvent.batsmanId] = true;
+      }
+
+      if (ballEvent.bowlerId) {
+        if (!accumulatedBowlerEvents[ballEvent.bowlerId]) {
+          accumulatedBowlerEvents[ballEvent.bowlerId] = [];
+        }
+        accumulatedBowlerEvents[ballEvent.bowlerId].push(ballEvent);
+      }
+
+      if (isInvalidBall) {
+        validBallCount++;
+        if (validBallCount === 6) {
+          const currentBowlerId = currentOver[0].bowlerId;
+
+          const currentBatsmanEvents: { id: string; events: Event[] }[] = [];
+          for (const batsmanId in accumulatedBatsmanEvents) {
+            if (
+              accumulatedBatsmanEvents.hasOwnProperty(batsmanId) &&
+              !batsmanOut[batsmanId]
+            ) {
+              currentBatsmanEvents.push({
+                id: batsmanId,
+                events: [...accumulatedBatsmanEvents[batsmanId]],
+              });
+            }
+          }
+
+          const currentBowlerEvents: { id: string; events: Event[] }[] = [];
+          if (accumulatedBowlerEvents[currentBowlerId]) {
+            currentBowlerEvents.push({
+              id: currentBowlerId,
+              events: [...accumulatedBowlerEvents[currentBowlerId]],
+            });
+          }
+
+          overSummaries.push({
+            over: [...currentOver],
+            teamScore: {
+              runs: totalRuns,
+              wickets: totalWickets,
+            },
+            batsmen: currentBatsmanEvents.map((b) => {
+              const score = getScore({
+                balls: b.events.map((e) => e.type),
+                forBatsman: true,
+              });
+
+              return {
+                name: players?.find((p) => p.id === b.id)?.name,
+                runs: score.runs,
+                balls: score.totalBalls,
+                wickets: score.wickets,
+              };
+            }),
+            bowler: currentBowlerEvents.map((b) => {
+              const score = getScore({
+                balls: b.events.map((e) => e.type),
+                forBowler: true,
+              });
+
+              return {
+                name: players?.find((p) => p.id === b.id)?.name,
+                runs: score.runs,
+                balls: score.totalBalls,
+                wickets: score.wickets,
+              };
+            }),
+          });
+
+          currentOver = [];
+          validBallCount = 0;
+          ballLimitInOver = 6;
+        }
+      } else if (ballLimitInOver !== undefined) ballLimitInOver++;
+    }
+
+    if (validBallCount >= 0 && currentOver.length > 0) {
+      const currentBowlerId = currentOver[0].bowlerId;
+
+      const finalBatsmanEvents: { id: string; events: Event[] }[] = [];
+      for (const batsmanId in accumulatedBatsmanEvents) {
+        if (
+          accumulatedBatsmanEvents.hasOwnProperty(batsmanId) &&
+          !batsmanOut[batsmanId]
+        ) {
+          finalBatsmanEvents.push({
+            id: batsmanId,
+            events: [...accumulatedBatsmanEvents[batsmanId]],
+          });
+        }
+      }
+
+      const finalBowlerEvents: { id: string; events: Event[] }[] = [];
+      if (accumulatedBowlerEvents[currentBowlerId]) {
+        finalBowlerEvents.push({
+          id: currentBowlerId,
+          events: [...accumulatedBowlerEvents[currentBowlerId]],
+        });
+      }
+
+      overSummaries.push({
+        over: [...currentOver],
+        teamScore: {
+          runs: totalRuns,
+          wickets: totalWickets,
+        },
+        batsmen: finalBatsmanEvents.map((b) => {
+          const score = getScore({
+            balls: b.events.map((e) => e.type),
+            forBatsman: true,
+          });
+          return {
+            name: players?.find((p) => p.id === b.id)?.name,
+            runs: score.runs,
+            balls: score.totalBalls,
+          };
+        }),
+        bowler: finalBowlerEvents.map((b) => {
+          const score = getScore({
+            balls: b.events.map((e) => e.type),
+            forBowler: true,
+          });
+
+          return {
+            name: players?.find((p) => p.id === b.id)?.name,
+            runs: score.runs,
+            balls: score.totalBalls,
+            wickets: score.wickets,
+          };
+        }),
+      });
+    }
+
+    return { overSummaries, ballLimitInOver };
+  }
+
+  const { overSummaries: normalSummaries } = generateOverSummary(ballEvents);
 
   function getFullOverSummary(ballEvents: Event[]) {
     let ballLimitInOver = 6;
@@ -100,6 +279,7 @@ function FullOverSummary({
 
   const fullOverSummary = showComments ? getFullOverSummary(ballEvents) : [];
 
+  console.log(normalSummaries);
   return (
     <>
       {ballEvents.length > 0 ? (
@@ -148,30 +328,70 @@ function FullOverSummary({
                   </div>
                 );
               })
-            : normalSummaries.map((over, overI) => {
-                const runs = calcRuns(over);
-                const wickets = over.filter((ball) =>
-                  ball.includes("-1"),
-                ).length;
-                return (
-                  <div
-                    key={overI}
-                    className="mx-auto flex max-w-7xl items-center gap-4 py-4 first:pt-0"
-                  >
-                    <div className="flex min-w-20 gap-2 whitespace-nowrap text-sm font-bold">
-                      <h3>O. {overI + 1}</h3>
-                      <span>
-                        ({runs}/{wickets})
-                      </span>
+            : normalSummaries.map(
+                ({ over, teamScore, batsmen, bowler }, overI) => {
+                  const runs = calcRuns(over.map((b) => b.type));
+                  const wickets = over.filter((ball) =>
+                    ball.type.includes("-1"),
+                  ).length;
+                  return (
+                    <div
+                      key={overI}
+                      className="mx-auto flex max-w-7xl flex-col gap-2 py-4 first:pt-0"
+                    >
+                      <div className="space-y-2 rounded-md bg-muted p-2">
+                        <div className="flex justify-between">
+                          <div className="flex flex-col gap-0.5 text-sm font-semibold">
+                            <h3>End of over {overI + 1}</h3>
+                            <p className="text-xs">
+                              {runs}/{wickets}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-0.5 text-sm font-semibold">
+                            <p>
+                              {teamScore.runs}/{teamScore.wickets}
+                            </p>
+                            <p className="text-xs">
+                              RR: {round(teamScore.runs / (overI + 1))}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex justify-between">
+                          <ul className="flex flex-col gap-1 text-xs leading-none">
+                            {batsmen.map((batsman, batsmanI) => (
+                              <li key={batsmanI} className="flex gap-2">
+                                <p>{batsman.name}</p>
+                                <p>
+                                  {batsman.runs} ({batsman.balls})
+                                </p>
+                              </li>
+                            ))}
+                          </ul>
+                          <ul className="flex flex-col gap-1 text-xs leading-none">
+                            {bowler.map((b, bI) => (
+                              <li key={bI} className="flex gap-2">
+                                <p>{b.name}</p>
+                                <p>
+                                  {b.runs}/{b.wickets} ({getOverStr(b.balls)})
+                                </p>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                      <ul className="flex items-center gap-2 overflow-x-auto">
+                        {over.map((ball, ballI) => (
+                          <BallSummary
+                            key={ballI}
+                            event={ball.type as EventType}
+                            size="sm"
+                          />
+                        ))}
+                      </ul>
                     </div>
-                    <ul className="flex h-12 items-center gap-2 overflow-x-auto">
-                      {over.map((ball, ballI) => (
-                        <BallSummary key={ballI} event={ball} size="sm" />
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
+                  );
+                },
+              )}
         </ul>
       ) : (
         <div className="flex h-full min-h-96 flex-col items-center justify-center space-y-2 text-center">
