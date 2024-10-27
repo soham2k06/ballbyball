@@ -4,10 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getRecords } from "@/services/get-records";
 
-export function useRecords({ recordType }: { recordType: string }) {
+export function useRecords() {
   const sp = useSearchParams();
   const user = sp.get("user");
-  const date = sp.get("date");
 
   const {
     data: records,
@@ -15,8 +14,8 @@ export function useRecords({ recordType }: { recordType: string }) {
     isFetching,
     error,
   } = useQuery({
-    queryKey: ["records", date, user, recordType],
-    queryFn: () => getRecords({ user, date, recordType }),
+    queryKey: ["records", user],
+    queryFn: () => getRecords({ user }),
   });
 
   return {

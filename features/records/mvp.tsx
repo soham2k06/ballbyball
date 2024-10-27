@@ -1,8 +1,18 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { useRecords } from "@/api-hooks/use-records";
-import { calcBestPerformance, round } from "@/lib/utils";
-import { PlayerPerformance } from "@/types";
+import {
+  calcBestPerformance,
+  calcMilestones,
+  calculateMaidenOvers,
+  filterRecords,
+  getScore,
+  mapGroupedMatches,
+  round,
+} from "@/lib/utils";
+import { EventType, PlayerPerformance } from "@/types";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,14 +28,130 @@ import { TabsContent } from "@/components/ui/tabs";
 import RecordsSkeleton from "./records-skeleton";
 
 function MVP() {
-  const recordsData = useRecords({
-    recordType: "mvp",
-  });
+  const { records = [], isFetching } = useRecords();
 
-  const records = (recordsData.records || []) as (PlayerPerformance & {
-    name: string;
-    matches: number;
-  })[];
+  const sp = useSearchParams();
+  const date = sp.get("date");
+
+  const mvpRecords = records
+    .filter((player) => {
+      const filteredBatEvents = filterRecords(player?.playerBatEvents, date);
+      const filteredBallEvents = filterRecords(player?.playerBallEvents, date);
+      const filteredFieldEvents = filterRecords(
+        player?.playerFieldEvents,
+        date,
+      );
+
+      return (
+        filteredBatEvents.length ||
+        filteredBallEvents.length ||
+        filteredFieldEvents.length
+      );
+    })
+    .map((player) => {
+      const filteredBatEvents = filterRecords(player?.playerBatEvents, date);
+      const filteredBallEvents = filterRecords(player?.playerBallEvents, date);
+      const filteredFieldEvents = filterRecords(
+        player?.playerFieldEvents,
+        date,
+      );
+
+      const groupedMatchesBat = mapGroupedMatches(filteredBatEvents);
+      const batEvents = (filteredBatEvents ?? []).map(
+        (event) => event.type as EventType,
+      );
+
+      const groupedMatches = mapGroupedMatches([
+        ...filteredBatEvents,
+        ...filteredBallEvents,
+      ]);
+
+      const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
+
+      const { runs: runsScored, totalBalls: ballsFaced } = getScore({
+        balls: batEvents,
+        forBatsman: true,
+      });
+
+      const strikeRate = runsScored ? (runsScored / ballsFaced) * 100 : 0;
+
+      const { thirties, fifties, centuries } =
+        calcMilestones(groupedMatchesBat);
+
+      const boundaries = runsScored
+        ? noWicketEvents.filter(
+            (event) => event.includes("4") || event.includes("6"),
+          )
+        : [];
+
+      const fours = boundaries.filter((event) => event.includes("4")).length;
+      const sixes = boundaries.filter((event) => event.includes("6")).length;
+
+      //// Bowl Stats
+      const bowlEvents = (filteredBallEvents ?? []).map(
+        (event) => event.type as EventType,
+      );
+
+      const bowlEventsByMatches = Object.values(
+        mapGroupedMatches(filteredBallEvents ?? []),
+      ).map((events) => events.map((event) => event.type as EventType));
+
+      const maidens = bowlEventsByMatches.reduce((acc, events) => {
+        const maidensForMatch = calculateMaidenOvers(events);
+        return acc + maidensForMatch;
+      }, 0);
+
+      const {
+        runs: runConceded,
+        totalBalls: ballsBowled,
+        wickets,
+        runRate: economy,
+      } = getScore({ balls: bowlEvents, forBowler: true });
+
+      //// Field Stats
+      const catches = filteredFieldEvents.filter(
+        (event) => event.type.includes("-1_3") || event.type.includes("-1_4"),
+      ).length;
+
+      const runOuts = filteredFieldEvents.filter((event) =>
+        event.type.includes("-1_5"),
+      ).length;
+
+      const stumpings = filteredFieldEvents.filter((event) =>
+        event.type.includes("-1_6"),
+      ).length;
+
+      return {
+        name: player.name,
+        playerId: player.id,
+        // Bat
+        runsScored,
+        ballsFaced,
+        strikeRate,
+        fours,
+        sixes,
+        thirties,
+        fifties,
+        centuries,
+        is2: false,
+        is3: false,
+        isDuck: false,
+        // Bowl
+        wicketsTaken: wickets,
+        ballsBowled,
+        runConceded,
+        economy,
+        maidens,
+        // Field
+        catches,
+        runOuts,
+        stumpings,
+        // Other
+        team: "",
+        isWinner: false,
+        matches: Object.keys(groupedMatches).length,
+      };
+    });
 
   const calculateMVP = (
     player: (PlayerPerformance & {
@@ -35,7 +161,7 @@ function MVP() {
   ) => {
     const performance = calcBestPerformance({ playersPerformance: player });
     return performance.map((p) => {
-      const curRecord = records.find(
+      const curRecord = mvpRecords.find(
         (record) => record.playerId === p.playerId,
       );
       const matches = curRecord?.matches ?? 0;
@@ -52,11 +178,11 @@ function MVP() {
     });
   };
 
-  const mvp = calculateMVP(records);
+  const mvp = calculateMVP(mvpRecords);
 
   return (
     <TabsContent value="mvp">
-      {recordsData.isFetching ? (
+      {isFetching ? (
         <RecordsSkeleton title="Most Valuable Players" />
       ) : (
         <Card className="overflow-x-auto">

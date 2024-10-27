@@ -279,7 +279,6 @@ function FullOverSummary({
 
   const fullOverSummary = showComments ? getFullOverSummary(ballEvents) : [];
 
-  console.log(normalSummaries);
   return (
     <>
       {ballEvents.length > 0 ? (

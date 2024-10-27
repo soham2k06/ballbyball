@@ -379,7 +379,7 @@ function MatchSummary({
                     {!!playerOfTheMatchData.ballsBowled &&
                       !!playerOfTheMatchData.ballsFaced &&
                       " & "}
-                    {playerOfTheMatchData.ballsFaced && (
+                    {!!playerOfTheMatchData.ballsFaced && (
                       <>
                         {playerOfTheMatchData.runsScored}
                         {playerOfTheMatchNotout && "*"} (

@@ -2,10 +2,17 @@ import { redirect } from "next/navigation";
 
 import { BallEvent, Player, PrismaClient } from "@prisma/client";
 import { type ClassValue, clsx } from "clsx";
+import { isSameDay } from "date-fns";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
-import { CommentKey, EventType, PlayerPerformance } from "@/types";
+import {
+  BallEventSemi,
+  CommentKey,
+  EventType,
+  PlayerPerformance,
+  RecordType,
+} from "@/types";
 
 import getCachedSession from "./auth/session";
 import { commentsCollection, invalidBalls, wicketTypes } from "./constants";
@@ -258,8 +265,8 @@ function calculateMaidenOvers(ballsThrown: EventType[]) {
   return maidenOvers;
 }
 
-function mapGroupedMatches(events: BallEvent[]) {
-  const groupedMatches: { [matchId: string]: BallEvent[] } = {};
+function mapGroupedMatches(events: BallEventSemi[]) {
+  const groupedMatches: { [matchId: string]: BallEventSemi[] } = {};
   for (const event of events) {
     const matchId = event.matchId ?? "no-data";
     if (!groupedMatches[matchId]) {
@@ -528,7 +535,9 @@ async function createOrUpdateWithUniqueName(
   return newName;
 }
 
-function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
+function calcMilestones(groupedMatches: {
+  [matchId: string]: BallEventSemi[];
+}) {
   let ducks = 0;
   let thirties = 0;
   let fifties = 0;
@@ -555,7 +564,9 @@ function calcMilestones(groupedMatches: { [matchId: string]: BallEvent[] }) {
   return { ducks, thirties, fifties, centuries, highestScore, isNotout };
 }
 
-function calcWicketHauls(groupedMatches: { [matchId: string]: BallEvent[] }) {
+function calcWicketHauls(groupedMatches: {
+  [matchId: string]: BallEventSemi[];
+}) {
   let threes = 0;
   let fives = 0;
   for (const matchId in groupedMatches) {
@@ -588,6 +599,17 @@ function calcBestSpells(data: EventType[][], topN: number = 1) {
       wickets: spell.wickets,
     }))
     .slice(0, topN);
+}
+
+function filterRecords(
+  events: RecordType["playerBatEvents"],
+  date: string | null,
+) {
+  return events.filter((event) => {
+    const matchDate = event.Match?.createdAt;
+    if (!date || !matchDate) return true;
+    return isSameDay(new Date(matchDate), new Date(date));
+  });
 }
 
 function handleError(err: unknown) {
@@ -623,6 +645,7 @@ export {
   mapGroupedMatches,
   calcBestSpells,
   toPercentage,
+  filterRecords,
   // Backend
   getValidatedUser,
   createOrUpdateWithUniqueName,

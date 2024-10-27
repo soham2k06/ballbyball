@@ -1,8 +1,15 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { useRecords } from "@/api-hooks/use-records";
-import { round } from "@/lib/utils";
-import { BattingRecordsType } from "@/types";
+import {
+  calcMilestones,
+  filterRecords,
+  getScore,
+  mapGroupedMatches,
+  round,
+} from "@/lib/utils";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,15 +25,86 @@ import { TabsContent } from "@/components/ui/tabs";
 import RecordsSkeleton from "./records-skeleton";
 
 function BattingRecords() {
-  const recordsData = useRecords({
-    recordType: "batting",
-  });
+  const { records = [], isFetching } = useRecords();
 
-  const records = (recordsData.records || []) as BattingRecordsType[];
+  const sp = useSearchParams();
+  const date = sp.get("date");
+
+  const battingRecords = records
+    .filter((record) => {
+      const filteredBatEvents = filterRecords(record?.playerBatEvents, date);
+      const filteredBallEvents = filterRecords(record?.playerBallEvents, date);
+
+      return filteredBatEvents.length || filteredBallEvents.length;
+    })
+    .map((player) => {
+      const filteredBatEvents = filterRecords(player?.playerBatEvents, date);
+      const filteredBallEvents = filterRecords(player?.playerBallEvents, date);
+
+      const groupedMatches = mapGroupedMatches([
+        ...filteredBatEvents,
+        ...filteredBallEvents,
+      ]);
+      const groupedInnings = mapGroupedMatches(filteredBatEvents ?? []);
+      const innings = Object.keys(groupedInnings).length;
+      const batEvents = filteredBatEvents.map((event) => event.type);
+
+      const milestones = calcMilestones(groupedInnings);
+
+      const {
+        runs,
+        totalBalls: ballsFaced,
+        wickets,
+      } = getScore({
+        balls: batEvents,
+        forBatsman: true,
+      });
+
+      const average = runs / wickets || 0;
+      const strikeRate = (runs / ballsFaced) * 100 || 0;
+
+      const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
+      const fours = noWicketEvents.filter((event) =>
+        event.includes("4"),
+      ).length;
+      const sixes = noWicketEvents.filter((event) =>
+        event.includes("6"),
+      ).length;
+
+      const notOuts = Object.values(groupedInnings).reduce((acc, events) => {
+        const isNotOut = !events.some((evt) => evt.type.includes("-1"));
+        return isNotOut ? acc + 1 : acc;
+      }, 0);
+
+      return {
+        player: {
+          id: player.id,
+          name: player.name,
+        },
+        runs,
+        ballsFaced,
+        matches: Object.keys(groupedMatches).length,
+        innings,
+        milestones,
+        average,
+        strikeRate,
+        notOuts,
+        fours,
+        sixes,
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.runs - a.runs ||
+        b.strikeRate - a.strikeRate ||
+        b.innings - a.innings ||
+        b.matches - a.matches,
+    )
+    .slice(0, 10);
 
   return (
     <TabsContent value="runs">
-      {recordsData.isFetching ? (
+      {isFetching ? (
         <RecordsSkeleton title="Most runs" />
       ) : (
         <Card className="overflow-x-auto">
@@ -57,8 +135,8 @@ function BattingRecords() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {records.length ? (
-                  records.map(
+                {battingRecords.length ? (
+                  battingRecords.map(
                     (
                       {
                         player,

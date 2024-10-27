@@ -297,7 +297,13 @@ function StartUpdateMatchDialog({
                       }
                       placeholder="Select the team that'll bat first"
                     >
-                      {selectedTeams.map((team) => (
+                      {[
+                        {
+                          id: "",
+                          name: "Select the team that'll bat first",
+                        },
+                        ...selectedTeams,
+                      ].map((team) => (
                         <option value={team.id} key={team.id}>
                           {team.name}
                         </option>

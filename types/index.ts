@@ -156,6 +156,24 @@ type BowlingRecordsType = {
 };
 type CommentKey = keyof typeof commentsCollection;
 
+type RecordBallEvent = {
+  type: string;
+  batsmanId: string;
+  bowlerId: string;
+  matchId: string | null;
+  Match: {
+    createdAt: Date;
+  } | null;
+};
+
+type RecordType = {
+  id: string;
+  name: string;
+  playerBatEvents: RecordBallEvent[];
+  playerBallEvents: RecordBallEvent[];
+  playerFieldEvents: RecordBallEvent[];
+};
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };
@@ -166,6 +184,11 @@ type MatchExtended = Match & {
   teams: (TeamWithPlayers & { batFirst?: boolean; playerIds: string[] })[];
   ballEvents: BallEvent[];
 };
+
+type BallEventSemi = Pick<
+  BallEvent,
+  "batsmanId" | "bowlerId" | "type" | "matchId"
+>;
 
 export type {
   CommentKey,
@@ -182,4 +205,6 @@ export type {
   RivalriesResult,
   BattingRecordsType,
   BowlingRecordsType,
+  BallEventSemi,
+  RecordType,
 };

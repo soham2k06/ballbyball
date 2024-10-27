@@ -82,6 +82,7 @@ function ScorerLayout({
   const isInSecondInning = curTeam === 1;
 
   const curBowlerId = curPlayers.find((player) => player.type === "bowler")?.id;
+  // filter if out
   const curBatsmenIds = curPlayers
     .filter((player) => player.type === "batsman")
     .map((player) => player.id);
@@ -240,7 +241,9 @@ function ScorerLayout({
     }
 
     const strikeEvent = !event.includes("-1") ? event : event.slice(0, -2);
-    handleStrikeChange((event === "-4" ? "-4" : strikeEvent) as EventType);
+    if (curBatsmen.length === 2)
+      handleStrikeChange((event === "-4" ? "-4" : strikeEvent) as EventType);
+    else handleStrikeChange((event === "-4" ? "-4" : "0") as EventType);
   }
 
   function handleLastBallInWicket(event: string) {

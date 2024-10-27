@@ -1,8 +1,4 @@
-import {
-  BattingRecordsType,
-  BowlingRecordsType,
-  PlayerPerformance,
-} from "@/types";
+import { RecordType } from "@/types";
 
 import { axiosInstance } from "./axios-instance";
 
@@ -16,16 +12,7 @@ export const getRecords = async ({
   recordType?: string | null;
 }) => {
   try {
-    const res = await axiosInstance.get<
-      (
-        | BattingRecordsType
-        | BowlingRecordsType
-        | (PlayerPerformance & {
-            name: string;
-            matches: number;
-          })
-      )[]
-    >("players/records", {
+    const res = await axiosInstance.get<RecordType[]>("players/records", {
       params: { user, date, recordType },
     });
 

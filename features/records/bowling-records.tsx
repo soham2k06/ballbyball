@@ -1,8 +1,19 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { useRecords } from "@/api-hooks/use-records";
-import { getOverStr, round } from "@/lib/utils";
-import { BowlingRecordsType } from "@/types";
+import {
+  calcBestSpells,
+  calculateMaidenOvers,
+  calcWicketHauls,
+  filterRecords,
+  getOverStr,
+  getScore,
+  mapGroupedMatches,
+  round,
+} from "@/lib/utils";
+import { EventType } from "@/types";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,15 +29,93 @@ import { TabsContent } from "@/components/ui/tabs";
 import RecordsSkeleton from "./records-skeleton";
 
 function BowlingRecords() {
-  const recordsData = useRecords({
-    recordType: "bowling",
-  });
+  const { records = [], isFetching } = useRecords();
 
-  const records = (recordsData.records || []) as BowlingRecordsType[];
+  const sp = useSearchParams();
+  const date = sp.get("date");
+
+  const bowlingRecords = records
+    .filter((record) => {
+      const filteredBatEvents = filterRecords(record?.playerBatEvents, date);
+      const filteredBallEvents = filterRecords(record?.playerBallEvents, date);
+
+      return filteredBatEvents.length || filteredBallEvents.length;
+    })
+    .map((player) => {
+      const filteredBatEvents = filterRecords(player?.playerBatEvents, date);
+      const filteredBallEvents = filterRecords(player?.playerBallEvents, date);
+
+      const groupedMatches = mapGroupedMatches([
+        ...filteredBatEvents,
+        ...filteredBallEvents,
+      ]);
+
+      const groupedMatchesBowl = mapGroupedMatches(filteredBallEvents);
+
+      const bowlEvents = (filteredBallEvents ?? []).map(
+        (event) => event.type as EventType,
+      );
+
+      const bowlEventsByMatches =
+        Object.values(groupedMatchesBowl).map((events) =>
+          events.map((event) => event.type as EventType),
+        ) || [];
+
+      const bestSpell = calcBestSpells(bowlEventsByMatches, 1)[0];
+
+      const { threes: threeHauls, fives: fiveHauls } =
+        calcWicketHauls(groupedMatchesBowl);
+
+      const maidens = bowlEventsByMatches.reduce(
+        (acc, events) => acc + calculateMaidenOvers(events),
+        0,
+      );
+
+      const {
+        runs: runsConceded,
+        totalBalls,
+        wickets,
+        runRate,
+      } = getScore({ balls: bowlEvents, forBowler: true });
+
+      const dots = bowlEvents.filter((event) => event === "0").length;
+
+      const strikeRate = wickets ? totalBalls / wickets || 0 : 0;
+
+      return {
+        player: {
+          id: player.id,
+          name: player.name,
+        },
+        wickets,
+        totalBalls,
+        matches: Object.keys(groupedMatches).length,
+        economy: runRate,
+        strikeRate,
+        maidens,
+        threeHauls,
+        fiveHauls,
+        bestSpell,
+        runsConceded,
+        dots,
+      };
+    })
+    .sort((a, b) => {
+      return a.matches === 0 && b.matches === 0
+        ? 0
+        : a.matches === 0
+          ? 1
+          : b.matches === 0
+            ? -1
+            : b.wickets - a.wickets ||
+              a.economy - b.economy ||
+              a.matches - b.matches;
+    })
+    .slice(0, 10);
 
   return (
     <TabsContent value="wickets">
-      {recordsData.isFetching ? (
+      {isFetching ? (
         <RecordsSkeleton title="Most Wickets" />
       ) : (
         <Card className="overflow-x-auto">
@@ -55,8 +144,8 @@ function BowlingRecords() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {records.length ? (
-                  records.map(
+                {bowlingRecords.length ? (
+                  bowlingRecords.map(
                     (
                       {
                         player,
