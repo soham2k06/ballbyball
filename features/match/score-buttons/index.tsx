@@ -11,9 +11,11 @@ import WideballPopver from "./wide-popover";
 function ScoreButtons({
   handleScore,
   handleWicket,
+  mode,
 }: {
   handleScore: MouseEventHandler<HTMLButtonElement>;
   handleWicket?: MouseEventHandler<HTMLButtonElement>;
+  mode: "instant" | "players";
 }) {
   return (
     <div className="space-y-4">
@@ -27,7 +29,7 @@ function ScoreButtons({
           <Button
             size="lg"
             variant="destructive"
-            className="h-20 w-full px-4 text-lg font-bold"
+            className="h-20 w-full rounded-none px-4 text-lg font-bold"
             value="-1"
             onClick={handleScore}
           >
@@ -64,7 +66,7 @@ function ScoreButtons({
             {event}
           </Button>
         ))}
-        <ManualScorePopover handleScore={handleScore} />
+        <ManualScorePopover handleScore={handleScore} mode={mode} />
       </div>
     </div>
   );

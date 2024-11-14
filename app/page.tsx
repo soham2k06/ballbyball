@@ -14,6 +14,7 @@ import {
 
 import getSession from "@/lib/auth/session";
 
+import BannerImage from "@/components/banner-image";
 import Footer from "@/components/footer";
 import Nav from "@/components/nav";
 import { Button } from "@/components/ui/button";
@@ -113,13 +114,7 @@ async function HomePage({ searchParams: { user } }: Props) {
           </div>
 
           <div className="ml-8 aspect-[1/2] w-80 rounded-lg bg-muted max-md:hidden">
-            <Image
-              src="/banner-demo-dark.png"
-              alt="Cricket Scorer demo"
-              width={320}
-              height={800}
-              className="size-full max-md:mx-auto"
-            />
+            <BannerImage />
           </div>
         </section>
 

@@ -433,7 +433,11 @@ function ScorerLayout({
             events={events as BallEvent[]}
           />
           <Separator className="my-3" />
-          <ScoreButtons handleScore={handleScore} handleWicket={handleWicket} />
+          <ScoreButtons
+            handleScore={handleScore}
+            handleWicket={handleWicket}
+            mode="players"
+          />
 
           <div className="mt-4 md:mt-6" />
           <Tools

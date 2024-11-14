@@ -82,7 +82,7 @@ function ScorerLayout() {
           />
         </CardContent>
         <Separator className="my-4" />
-        <ScoreButtons handleScore={handleScore} />
+        <ScoreButtons handleScore={handleScore} mode="instant" />
       </Card>
     </div>
   );

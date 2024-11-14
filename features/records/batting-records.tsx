@@ -114,9 +114,9 @@ function BattingRecords() {
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow className="bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
+                <TableRow className="group bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
                   <TableHead className="!text-left">Pos</TableHead>
-                  <TableHead className="sticky left-0 min-w-24 bg-primary !text-left">
+                  <TableHead className="sticky left-0 min-w-24 bg-primary !text-left transition-colors group-hover:bg-primary/0">
                     Player
                   </TableHead>
                   <TableHead>Runs</TableHead>
@@ -154,9 +154,9 @@ function BattingRecords() {
                       i,
                     ) => {
                       return (
-                        <TableRow key={player.id}>
+                        <TableRow key={player.id} className="group">
                           <TableCell>{i + 1}</TableCell>
-                          <TableCell className="sticky left-0 bg-background">
+                          <TableCell className="sticky left-0 bg-background duration-300 group-hover:bg-muted/50">
                             {player.name}
                           </TableCell>
                           <TableCell className="bg-primary/5 text-center">

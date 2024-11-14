@@ -74,7 +74,7 @@ function FooterSummary({
               </DrawerTitle>
             </DrawerHeader>
             {overSummaries.length > 0 ? (
-              <ul className="h-[calc(100dvh-160px)] divide-y overflow-y-auto p-2">
+              <ul className="mx-auto h-[calc(100dvh-160px)] w-full max-w-7xl divide-y overflow-y-auto p-2">
                 {overSummaries.map((over, overI) => {
                   const runs = calcRuns(over);
                   const wickets = over.filter((ball) =>

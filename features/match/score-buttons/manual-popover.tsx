@@ -22,8 +22,10 @@ import {
 
 function ManualScorePopover({
   handleScore,
+  mode,
 }: {
   handleScore: MouseEventHandler<HTMLButtonElement>;
+  mode: "instant" | "players";
 }) {
   const limitError = "Enter Manual runs between 1 and 9";
   const schema = z.object({
@@ -39,9 +41,9 @@ function ManualScorePopover({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const ballEvents = [
-    { type: "-4", label: "Swap Strike" },
-    { type: "3", label: "3" },
-    { type: "5", label: "5" },
+    { type: "-4", label: "Swap Strike", mode: ["players"] },
+    { type: "3", label: "3", mode: ["players", "instant"] },
+    { type: "5", label: "5", mode: ["players", "instant"] },
   ];
 
   function handleManualRuns(data: z.infer<typeof schema>) {
@@ -78,20 +80,22 @@ function ManualScorePopover({
       <PopoverContent className="w-80" align="end">
         <div className="space-y-4">
           <ul className="flex gap-2">
-            {ballEvents.map((event, i) => (
-              <Button
-                key={i}
-                variant="secondary"
-                className="w-full"
-                value={event.type}
-                onClick={(e) => {
-                  handleScore(e);
-                  setIsPopoverOpen(false);
-                }}
-              >
-                {event.label}
-              </Button>
-            ))}
+            {ballEvents
+              .filter((event) => event.mode.includes(mode))
+              .map((event, i) => (
+                <Button
+                  key={i}
+                  variant="secondary"
+                  className="w-full"
+                  value={event.type}
+                  onClick={(e) => {
+                    handleScore(e);
+                    setIsPopoverOpen(false);
+                  }}
+                >
+                  {event.label}
+                </Button>
+              ))}
           </ul>
           {
             <Form {...form}>

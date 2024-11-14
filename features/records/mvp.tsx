@@ -192,9 +192,9 @@ function MVP() {
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow className="bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
+                <TableRow className="group bg-primary hover:bg-primary/90 [&>th]:text-center [&>th]:text-primary-foreground">
                   <TableHead className="!text-left">Pos</TableHead>
-                  <TableHead className="sticky left-0 min-w-24 bg-primary !text-left">
+                  <TableHead className="sticky left-0 min-w-24 bg-primary !text-left transition-colors group-hover:bg-primary/0">
                     Player
                   </TableHead>
                   <TableHead>Points</TableHead>
@@ -230,9 +230,12 @@ function MVP() {
                       i,
                     ) => {
                       return (
-                        <TableRow key={playerId} className="[&>td]:text-center">
+                        <TableRow
+                          key={playerId}
+                          className="group [&>td]:text-center"
+                        >
                           <TableCell className="!text-left">{i + 1}</TableCell>
-                          <TableCell className="sticky left-0 bg-background !text-left">
+                          <TableCell className="sticky left-0 bg-background !text-left duration-300 group-hover:bg-muted/50">
                             {name}
                           </TableCell>
                           <TableCell className="bg-primary/5">
