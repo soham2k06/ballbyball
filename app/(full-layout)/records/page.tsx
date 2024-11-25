@@ -1,9 +1,16 @@
+import { Metadata } from "next";
+
 import BattingRecords from "@/features/records/batting-records";
 import BowlingRecords from "@/features/records/bowling-records";
 import DatePicker from "@/features/records/date-picker";
 import MVP from "@/features/records/mvp";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+export const metadata: Metadata = {
+  title: "Records | Ballbyball",
+  description: "Player records"
+}
 
 function RecordsPage() {
   return (
