@@ -5,15 +5,15 @@ import { axiosInstance } from "./axios-instance";
 export const getRecords = async ({
   user,
   date,
-  recordType,
+  matches,
 }: {
   user?: string | null;
   date?: string | null;
-  recordType?: string | null;
+  matches?: string | null;
 }) => {
   try {
     const res = await axiosInstance.get<RecordType[]>("players/records", {
-      params: { user, date, recordType },
+      params: { user, date, matches },
     });
 
     if (res.status !== 200) throw new Error("Network response was not ok");

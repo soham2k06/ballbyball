@@ -174,6 +174,11 @@ type RecordType = {
   playerFieldEvents: RecordBallEvent[];
 };
 
+type RecordsProps = {
+  date: string | null;
+  matches: string | null;
+};
+
 // ** Schema relations types
 
 type TeamWithPlayers = Team & { players: Player[] };
@@ -207,4 +212,5 @@ export type {
   BowlingRecordsType,
   BallEventSemi,
   RecordType,
+  RecordsProps,
 };

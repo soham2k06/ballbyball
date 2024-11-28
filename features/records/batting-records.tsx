@@ -1,7 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-
 import { useRecords } from "@/api-hooks/use-records";
 import {
   calcMilestones,
@@ -10,6 +8,7 @@ import {
   mapGroupedMatches,
   round,
 } from "@/lib/utils";
+import { RecordsProps } from "@/types";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,19 +23,13 @@ import { TabsContent } from "@/components/ui/tabs";
 
 import RecordsSkeleton from "./records-skeleton";
 
-function BattingRecords() {
-  const { records = [], isFetching } = useRecords();
-
-  const sp = useSearchParams();
-  const date = sp.get("date");
+function BattingRecords({ date, matches }: RecordsProps) {
+  const { records = [], isFetching } = useRecords({
+    matches,
+    date,
+  });
 
   const battingRecords = records
-    .filter((record) => {
-      const filteredBatEvents = filterRecords(record?.playerBatEvents, date);
-      const filteredBallEvents = filterRecords(record?.playerBallEvents, date);
-
-      return filteredBatEvents.length || filteredBallEvents.length;
-    })
     .map((player) => {
       const filteredBatEvents = filterRecords(player?.playerBatEvents, date);
       const filteredBallEvents = filterRecords(player?.playerBallEvents, date);
