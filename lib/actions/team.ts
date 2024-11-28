@@ -157,7 +157,13 @@ export async function updateTeam(data: UpdateTeamSchema) {
 }
 
 export async function deleteTeam(id: string) {
+  const userId = await getValidatedUser();
   try {
+    const teamExists = await prisma.team.findFirst({
+      where: { userId, id },
+    });
+    if (!teamExists) throw new Error("Match not found");
+
     await prisma.teamPlayer.deleteMany({ where: { teamId: id } });
     await prisma.team.delete({ where: { id } });
 

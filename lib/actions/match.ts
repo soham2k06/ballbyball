@@ -226,10 +226,17 @@ export async function updateMatch(data: UpdateMatchSchema) {
 }
 
 export async function deleteMatch(id: string) {
+  const userId = await getValidatedUser();
   try {
+    const matchExists = await prisma.match.findFirst({
+      where: { userId, id },
+    });
+
+    if (!matchExists) throw new Error("Match not found");
+
     await prisma.matchTeam.deleteMany({ where: { matchId: id } });
     await prisma.ballEvent.deleteMany({ where: { matchId: id } });
-    await prisma.match.delete({ where: { id } });
+    await prisma.match.delete({ where: { userId, id } });
     revalidatePath("/match");
   } catch (error) {
     handleError(error);

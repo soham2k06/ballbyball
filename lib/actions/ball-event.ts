@@ -39,9 +39,20 @@ export async function saveBallEvents(data: CreateBallEventSchema[]) {
 }
 
 export async function deleteAllBallEvents(matchId: string) {
-  await prisma.ballEvent.deleteMany({
-    where: { matchId },
-  });
+  const userId = await getValidatedUser();
+  try {
+    const matchExists = await prisma.match.findFirst({
+      where: { userId, id: matchId },
+    });
 
-  revalidatePath("/match");
+    if (!matchExists) throw new Error("Match not found");
+
+    await prisma.ballEvent.deleteMany({
+      where: { matchId },
+    });
+
+    revalidatePath("/match");
+  } catch (error) {
+    return { ok: false, error: (error as Error).message };
+  }
 }
