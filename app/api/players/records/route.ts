@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
         data.ballEvents.forEach((event) => {
           const { batsman, bowler } = event;
 
-          // Add batsman
+          // Batsman
           if (!players.has(batsman.id)) {
             players.set(batsman.id, {
               id: batsman.id,
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
             });
           }
 
-          // Add bowler
+          // Bowler
           if (!players.has(bowler.id)) {
             players.set(bowler.id, {
               id: bowler.id,
@@ -73,7 +73,6 @@ export async function GET(req: NextRequest) {
             type: event.type,
             matchId: event.matchId,
           };
-          // Push events to respective arrays
           players.get(batsman.id).playerBatEvents.push(eventSemi);
           players.get(bowler.id).playerBallEvents.push(eventSemi);
         });
@@ -83,9 +82,11 @@ export async function GET(req: NextRequest) {
         data.ballEvents.forEach((event) => {
           const { type } = event;
 
-          // Check if type contains any player ID for fielding events
           players.forEach((player, playerId) => {
-            if (type.includes(playerId)) {
+            if (
+              type.includes(playerId) ||
+              (type === "-1_4" && playerId === event.bowler.id)
+            ) {
               player.playerFieldEvents.push({
                 id: event.id,
                 type: event.type,
@@ -96,95 +97,10 @@ export async function GET(req: NextRequest) {
         });
       });
 
-      // Convert Map values to an array
       return Array.from(players.values());
     };
 
     const players = getPlayers(matches);
-
-    // const players = await prisma.player.findMany({
-    //   where: { userId },
-    //   select: {
-    //     id: true,
-    //     name: true,
-
-    //     playerBallEvents: {
-    //       select: {
-    //         Match: {
-    //           select: {
-    //             createdAt: true,
-    //           },
-    //         },
-    //         batsmanId: true,
-    //         bowlerId: true,
-    //         type: true,
-    //         matchId: true,
-    //       },
-    //       orderBy: { id: "asc" },
-    //     },
-    //     playerBatEvents: {
-    //       select: {
-    //         Match: {
-    //           select: {
-    //             createdAt: true,
-    //           },
-    //         },
-    //         batsmanId: true,
-    //         bowlerId: true,
-    //         type: true,
-    //         matchId: true,
-    //       },
-    //       orderBy: { id: "asc" },
-    //     },
-    //   },
-    // });
-
-    // const playerStats = await Promise.all(
-    //   players.map(async (player) => {
-    //     const playerFieldEvents = await prisma.ballEvent.findMany({
-    //       where: {
-    //         OR: [
-    //           {
-    //             type: {
-    //               contains: `-1_3_${player.id}`, // Catches
-    //             },
-    //           },
-    //           {
-    //             type: {
-    //               contains: `-1_6_${player.id}`, // Stumpings
-    //             },
-    //           },
-    //           {
-    //             type: {
-    //               contains: `-1_5_${player.id}`, // Runouts
-    //             },
-    //           },
-    //           {
-    //             AND: [
-    //               {
-    //                 type: {
-    //                   contains: `-1_4`, // Caught and Bowled
-    //                 },
-    //               },
-    //               {
-    //                 bowlerId: player.id,
-    //               },
-    //             ],
-    //           },
-    //         ],
-    //       },
-    //       select: {
-    //         Match: { select: { createdAt: true } },
-    //         type: true,
-    //       },
-    //     });
-
-    //     return {
-    //       ...player,
-    //       playerFieldEvents,
-    //     };
-    //   }),
-    // );
 
     return NextResponse.json(players);
   } catch (error) {
