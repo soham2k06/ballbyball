@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { useRecords } from "@/api-hooks/use-records";
 import {
   calcMilestones,
@@ -10,6 +12,7 @@ import {
 } from "@/lib/utils";
 import { RecordsProps } from "@/types";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -92,8 +95,11 @@ function BattingRecords({ date, matches }: RecordsProps) {
         b.strikeRate - a.strikeRate ||
         b.innings - a.innings ||
         b.matches - a.matches,
-    )
-    .slice(0, 10);
+    );
+
+  const [numRecordsToShow, setNumRecordsToShow] = useState(10);
+
+  const recordsToShow = battingRecords.slice(0, numRecordsToShow);
 
   return (
     <TabsContent value="runs">
@@ -128,8 +134,8 @@ function BattingRecords({ date, matches }: RecordsProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {battingRecords.length ? (
-                  battingRecords.map(
+                {recordsToShow.length ? (
+                  recordsToShow.map(
                     (
                       {
                         player,
@@ -205,6 +211,16 @@ function BattingRecords({ date, matches }: RecordsProps) {
                 )}
               </TableBody>
             </Table>
+            <div className="flex flex-col">
+              {battingRecords.length > numRecordsToShow && (
+                <Button
+                  className="mt-4 w-full max-w-sm self-center"
+                  onClick={() => setNumRecordsToShow(battingRecords.length)}
+                >
+                  Show all
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

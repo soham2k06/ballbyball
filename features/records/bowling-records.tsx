@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { useRecords } from "@/api-hooks/use-records";
 import {
   calcBestSpells,
@@ -13,6 +15,7 @@ import {
 } from "@/lib/utils";
 import { EventType, RecordsProps } from "@/types";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -99,8 +102,11 @@ function BowlingRecords({ date, matches }: RecordsProps) {
             : b.wickets - a.wickets ||
               a.economy - b.economy ||
               a.matches - b.matches;
-    })
-    .slice(0, 10);
+    });
+
+  const [numRecordsToShow, setNumRecordsToShow] = useState(10);
+
+  const recordsToShow = bowlingRecords.slice(0, numRecordsToShow);
 
   return (
     <TabsContent value="wickets">
@@ -133,8 +139,8 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {bowlingRecords.length ? (
-                  bowlingRecords.map(
+                {recordsToShow.length ? (
+                  recordsToShow.map(
                     (
                       {
                         player,
@@ -204,6 +210,16 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                 )}
               </TableBody>
             </Table>
+            <div className="flex flex-col">
+              {bowlingRecords.length > numRecordsToShow && (
+                <Button
+                  className="mt-4 w-full max-w-sm self-center"
+                  onClick={() => setNumRecordsToShow(bowlingRecords.length)}
+                >
+                  Show all
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

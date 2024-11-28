@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { useRecords } from "@/api-hooks/use-records";
 import {
   calcBestPerformance,
@@ -12,6 +14,7 @@ import {
 } from "@/lib/utils";
 import { EventType, PlayerPerformance, RecordsProps } from "@/types";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -156,6 +159,10 @@ function MVP({ date, matches }: RecordsProps) {
 
   const mvp = calculateMVP(mvpRecords);
 
+  const [numRecordsToShow, setNumRecordsToShow] = useState(10);
+
+  const recordsToShow = mvp.slice(0, numRecordsToShow);
+
   return (
     <TabsContent value="mvp">
       {isFetching ? (
@@ -186,8 +193,8 @@ function MVP({ date, matches }: RecordsProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mvp.length ? (
-                  mvp.map(
+                {recordsToShow.length ? (
+                  recordsToShow.map(
                     (
                       {
                         name,
@@ -239,6 +246,16 @@ function MVP({ date, matches }: RecordsProps) {
                 )}
               </TableBody>
             </Table>
+            <div className="flex flex-col">
+              {mvp.length > numRecordsToShow && (
+                <Button
+                  className="mt-4 w-full max-w-sm self-center"
+                  onClick={() => setNumRecordsToShow(mvp.length)}
+                >
+                  Show all
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
