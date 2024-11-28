@@ -122,6 +122,7 @@ function StartUpdateMatchDialog({
       name: "",
       teamIds: [],
       overs: 0,
+      allowSinglePlayer: true,
     },
   });
 
