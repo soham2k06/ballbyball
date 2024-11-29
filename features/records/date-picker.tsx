@@ -93,6 +93,7 @@ export default function DatePicker({ date, setDate }: DatePickerProps) {
 
         <div className="flex h-fit gap-2">
           <Select
+            autoFocus={false}
             value={monthYear?.year}
             onChange={(e) => {
               setMonthYear((prev) => ({
@@ -108,6 +109,7 @@ export default function DatePicker({ date, setDate }: DatePickerProps) {
             ))}
           </Select>
           <Select
+            autoFocus={false}
             value={monthYear?.month}
             onChange={(e) => {
               setMonthYear((prev) => ({
@@ -124,6 +126,7 @@ export default function DatePicker({ date, setDate }: DatePickerProps) {
           </Select>
         </div>
         <Calendar
+          initialFocus
           className="p-0"
           mode="single"
           selected={date ? new Date(date) : undefined}
