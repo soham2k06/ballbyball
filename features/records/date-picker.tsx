@@ -43,6 +43,7 @@ export default function DatePicker({ date, setDate }: DatePickerProps) {
       {isMobile ? (
         <Input
           type="date"
+          placeholder="Filter by a date"
           className="w-full justify-center"
           max={format(new Date(), "yyyy-MM-dd")}
           value={date ?? undefined}
