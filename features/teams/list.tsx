@@ -68,10 +68,12 @@ function TeamList({
         "flex flex-col items-center": !teams?.length,
       })}
     >
-      <div className="max-sm:grid max-sm:gap-2 sm:space-x-2">
-        <TeamBuilder />
-        <AddTeam />
-      </div>
+      {!userRef && (
+        <div className="max-sm:grid max-sm:gap-2 sm:space-x-2">
+          <TeamBuilder />
+          <AddTeam />
+        </div>
+      )}
       {teams?.length ? (
         <ul className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
           {teams.map((team, i) => {
