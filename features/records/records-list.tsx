@@ -11,11 +11,16 @@ import { Select } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function RecordsList() {
+  const [tab, setTab] = useQueryState("tab");
   const [date, setDate] = useQueryState("date");
   const [matches, setMatches] = useQueryState("matches");
 
   return (
-    <Tabs defaultValue="runs" className="m-1">
+    <Tabs
+      defaultValue="runs"
+      value={tab ?? "runs"}
+      onValueChange={(val) => setTab(val)}
+    >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <TabsList className="max-sm:w-full">
           <TabsTrigger className="max-sm:w-full" value="runs">

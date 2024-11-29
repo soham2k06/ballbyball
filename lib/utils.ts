@@ -601,6 +601,107 @@ function calcBestSpells(data: EventType[][], topN: number = 1) {
     .slice(0, topN);
 }
 
+function getMVP(records: RecordType[]) {
+  const result = records.map((player) => {
+    const groupedMatchesBat = mapGroupedMatches(player.playerBatEvents);
+    const batEvents = (player.playerBatEvents ?? []).map(
+      (event) => event.type as EventType,
+    );
+
+    const groupedMatches = mapGroupedMatches([
+      ...player.playerBatEvents,
+      ...player.playerBallEvents,
+    ]);
+
+    const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
+
+    const { runs: runsScored, totalBalls: ballsFaced } = getScore({
+      balls: batEvents,
+      forBatsman: true,
+    });
+
+    const strikeRate = runsScored ? (runsScored / ballsFaced) * 100 : 0;
+
+    const { thirties, fifties, centuries } = calcMilestones(groupedMatchesBat);
+
+    const boundaries = runsScored
+      ? noWicketEvents.filter(
+          (event) => event.includes("4") || event.includes("6"),
+        )
+      : [];
+
+    const fours = boundaries.filter((event) => event.includes("4")).length;
+    const sixes = boundaries.filter((event) => event.includes("6")).length;
+
+    //// Bowl Stats
+    const bowlEvents = (player.playerBallEvents ?? []).map(
+      (event) => event.type as EventType,
+    );
+
+    const bowlEventsByMatches = Object.values(
+      mapGroupedMatches(player.playerBallEvents ?? []),
+    ).map((events) => events.map((event) => event.type as EventType));
+
+    const maidens = bowlEventsByMatches.reduce((acc, events) => {
+      const maidensForMatch = calculateMaidenOvers(events);
+      return acc + maidensForMatch;
+    }, 0);
+
+    const {
+      runs: runConceded,
+      totalBalls: ballsBowled,
+      wickets,
+      runRate: economy,
+    } = getScore({ balls: bowlEvents, forBowler: true });
+
+    //// Field Stats
+    const catches = player.playerFieldEvents.filter(
+      (event) => event.type.includes("-1_3") || event.type.includes("-1_4"),
+    ).length;
+
+    const runOuts = player.playerFieldEvents.filter((event) =>
+      event.type.includes("-1_5"),
+    ).length;
+
+    const stumpings = player.playerFieldEvents.filter((event) =>
+      event.type.includes("-1_6"),
+    ).length;
+
+    return {
+      name: player.name,
+      playerId: player.id,
+      // Bat
+      runsScored,
+      ballsFaced,
+      strikeRate,
+      fours,
+      sixes,
+      thirties,
+      fifties,
+      centuries,
+      is2: false,
+      is3: false,
+      isDuck: false,
+      // Bowl
+      wicketsTaken: wickets,
+      ballsBowled,
+      runConceded,
+      economy,
+      maidens,
+      // Field
+      catches,
+      runOuts,
+      stumpings,
+      // Other
+      team: "",
+      isWinner: false,
+      matches: Object.keys(groupedMatches).length,
+    };
+  });
+
+  return result;
+}
+
 function filterRecords(
   events: RecordType["playerBatEvents"],
   date: string | null,
@@ -620,6 +721,76 @@ function handleError(err: unknown) {
 async function checkSession() {
   const session = await getCachedSession();
   if (!session) redirect("/");
+}
+
+async function getPlayersFromMatches(
+  dataArr: {
+    id: string;
+    createdAt: Date;
+    ballEvents: (Pick<BallEvent, "id" | "type" | "matchId"> & {
+      batsman: Pick<Player, "id" | "name">;
+      bowler: Pick<Player, "id" | "name">;
+    })[];
+  }[],
+) {
+  const players = new Map();
+
+  dataArr.forEach((data) => {
+    data.ballEvents.forEach((event) => {
+      const { batsman, bowler } = event;
+
+      // Batsman
+      if (!players.has(batsman.id)) {
+        players.set(batsman.id, {
+          id: batsman.id,
+          name: batsman.name,
+          playerBatEvents: [],
+          playerBallEvents: [],
+          playerFieldEvents: [],
+        });
+      }
+
+      // Bowler
+      if (!players.has(bowler.id)) {
+        players.set(bowler.id, {
+          id: bowler.id,
+          name: bowler.name,
+          playerBatEvents: [],
+          playerBallEvents: [],
+          playerFieldEvents: [],
+        });
+      }
+
+      const eventSemi = {
+        id: event.id,
+        type: event.type,
+        matchId: event.matchId,
+      };
+      players.get(batsman.id).playerBatEvents.push(eventSemi);
+      players.get(bowler.id).playerBallEvents.push(eventSemi);
+    });
+  });
+
+  dataArr.forEach((data) => {
+    data.ballEvents.forEach((event) => {
+      const { type } = event;
+
+      players.forEach((player, playerId) => {
+        if (
+          type.includes(playerId) ||
+          (type === "-1_4" && playerId === event.bowler.id)
+        ) {
+          player.playerFieldEvents.push({
+            id: event.id,
+            type: event.type,
+            matchId: event.matchId,
+          });
+        }
+      });
+    });
+  });
+
+  return Array.from(players.values());
 }
 
 export {
@@ -646,6 +817,7 @@ export {
   calcBestSpells,
   toPercentage,
   filterRecords,
+  getMVP,
   // Backend
   getValidatedUser,
   createOrUpdateWithUniqueName,
@@ -653,4 +825,5 @@ export {
   calcWicketHauls,
   handleError,
   checkSession,
+  getPlayersFromMatches,
 };

@@ -7,8 +7,9 @@ import {
   createOrUpdateWithUniqueName,
   handleError,
   getValidatedUser,
-  getScore,
-  calcRuns,
+  getPlayersFromMatches,
+  getMVP,
+  calcBestPerformance,
 } from "../utils";
 import {
   createPlayerSchema,
@@ -34,56 +35,46 @@ export async function getAllPlayers(user?: string | null) {
 export async function getPlayerBySortedPerformance() {
   const userId = await getValidatedUser();
   try {
-    const players = await prisma.player.findMany({
-      where: { userId },
+    const matches = await prisma.match.findMany({
+      where: {
+        userId,
+      },
       select: {
         id: true,
-        name: true,
-        playerBatEvents: {
+        createdAt: true,
+        ballEvents: {
           select: {
-            type: true,
             matchId: true,
+            id: true,
+            batsman: { select: { id: true, name: true } },
+            bowler: { select: { id: true, name: true } },
+            type: true,
           },
         },
-        playerBallEvents: { select: { type: true, matchId: true } },
       },
     });
 
-    const playersWithScores = players.map((player) => {
-      const runsScored = calcRuns(
-        player.playerBatEvents.map((evt) => evt.type),
-        true,
-      );
+    const players = await getPlayersFromMatches(matches);
 
-      const {
-        wickets,
-        runRate: economy,
-        totalBalls: ballsDelivered,
-      } = getScore({
-        balls: player.playerBallEvents.map((evt) => evt.type),
-        forBowler: true,
-      });
+    const mvpPerformance = getMVP(players);
 
-      const matches = new Set(
-        [...player.playerBatEvents, ...player.playerBallEvents].map(
-          (evt) => evt.matchId,
-        ),
-      ).size;
-
-      const runsPoints = runsScored * 1;
-      const wicketsPoints = wickets * 20;
-      const economyPoints = ballsDelivered > 24 ? 100 / economy : 0;
-      const totalPoints =
-        (runsPoints + wicketsPoints + economyPoints) / matches;
-
-      return {
-        id: player.id,
-        name: player.name,
-        totalPoints,
-      };
+    const bestPlayers = calcBestPerformance({
+      playersPerformance: mvpPerformance,
     });
 
-    return playersWithScores.sort((a, b) => b.totalPoints - a.totalPoints);
+    return bestPlayers.map((player) => {
+      const curRecord = mvpPerformance.find(
+        (record) => record.playerId === player.playerId,
+      );
+
+      const name = curRecord?.name ?? "";
+
+      return {
+        id: player.playerId,
+        name,
+        points: player.points,
+      };
+    });
   } catch (error) {
     handleError(error);
   }

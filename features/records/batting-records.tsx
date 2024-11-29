@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRecords } from "@/api-hooks/use-records";
 import {
   calcMilestones,
-  filterRecords,
   getScore,
   mapGroupedMatches,
   round,
@@ -34,16 +33,13 @@ function BattingRecords({ date, matches }: RecordsProps) {
 
   const battingRecords = records
     .map((player) => {
-      const filteredBatEvents = filterRecords(player?.playerBatEvents, date);
-      const filteredBallEvents = filterRecords(player?.playerBallEvents, date);
-
       const groupedMatches = mapGroupedMatches([
-        ...filteredBatEvents,
-        ...filteredBallEvents,
+        ...player.playerBatEvents,
+        ...player.playerBallEvents,
       ]);
-      const groupedInnings = mapGroupedMatches(filteredBatEvents ?? []);
+      const groupedInnings = mapGroupedMatches(player.playerBatEvents ?? []);
       const innings = Object.keys(groupedInnings).length;
-      const batEvents = filteredBatEvents.map((event) => event.type);
+      const batEvents = player.playerBatEvents.map((event) => event.type);
 
       const milestones = calcMilestones(groupedInnings);
 

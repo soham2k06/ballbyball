@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { endOfDay, startOfDay } from "date-fns";
 
 import prisma from "@/lib/db/prisma";
-import { getValidatedUser } from "@/lib/utils";
+import { getPlayersFromMatches, getValidatedUser } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
@@ -39,68 +39,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const getPlayers = (dataArr: (typeof matches)[0][]) => {
-      const players = new Map();
-
-      dataArr.forEach((data) => {
-        data.ballEvents.forEach((event) => {
-          const { batsman, bowler } = event;
-
-          // Batsman
-          if (!players.has(batsman.id)) {
-            players.set(batsman.id, {
-              id: batsman.id,
-              name: batsman.name,
-              playerBatEvents: [],
-              playerBallEvents: [],
-              playerFieldEvents: [],
-            });
-          }
-
-          // Bowler
-          if (!players.has(bowler.id)) {
-            players.set(bowler.id, {
-              id: bowler.id,
-              name: bowler.name,
-              playerBatEvents: [],
-              playerBallEvents: [],
-              playerFieldEvents: [],
-            });
-          }
-
-          const eventSemi = {
-            id: event.id,
-            type: event.type,
-            matchId: event.matchId,
-          };
-          players.get(batsman.id).playerBatEvents.push(eventSemi);
-          players.get(bowler.id).playerBallEvents.push(eventSemi);
-        });
-      });
-
-      dataArr.forEach((data) => {
-        data.ballEvents.forEach((event) => {
-          const { type } = event;
-
-          players.forEach((player, playerId) => {
-            if (
-              type.includes(playerId) ||
-              (type === "-1_4" && playerId === event.bowler.id)
-            ) {
-              player.playerFieldEvents.push({
-                id: event.id,
-                type: event.type,
-                matchId: event.matchId,
-              });
-            }
-          });
-        });
-      });
-
-      return Array.from(players.values());
-    };
-
-    const players = getPlayers(matches);
+    const players = await getPlayersFromMatches(matches);
 
     return NextResponse.json(players);
   } catch (error) {
