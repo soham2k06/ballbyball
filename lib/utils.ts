@@ -343,6 +343,7 @@ function calcBestPerformance({
   playersPerformance: PlayerPerformance[];
 }) {
   playersPerformance.forEach((player) => {
+    const matches = player.matches ?? 1;
     let curPlayerPoints = 0;
 
     // Batting points
@@ -365,31 +366,27 @@ function calcBestPerformance({
     curPlayerPoints += player.stumpings * 12;
     curPlayerPoints += player.runOuts * 6;
 
-    // Economy Points, if min 6 balls bowled
-    if (player.ballsBowled > 6) {
-      if (player.economy < 5) curPlayerPoints += 6;
-      else if (player.economy >= 5 && player.economy < 6) curPlayerPoints += 4;
-      else if (player.economy >= 6 && player.economy < 7) curPlayerPoints += 2;
-      else if (player.economy >= 10 && player.economy < 11)
-        curPlayerPoints -= 2;
-      else if (player.economy >= 11 && player.economy < 12)
-        curPlayerPoints -= 4;
-      else if (player.economy >= 12) curPlayerPoints -= 6;
-    }
+    let strikeRatePoints = 0;
+    if (player.strikeRate > 200) strikeRatePoints += 8;
+    else if (player.strikeRate >= 170 && player.strikeRate <= 200)
+      strikeRatePoints += 6;
+    else if (player.strikeRate >= 150 && player.strikeRate <= 170)
+      strikeRatePoints += 4;
+    else if (player.strikeRate >= 130 && player.strikeRate <= 150)
+      strikeRatePoints += 2;
+    else if (player.strikeRate >= 70 && player.strikeRate <= 100)
+      strikeRatePoints -= 4;
+    else if (player.strikeRate <= 70) strikeRatePoints -= 8;
 
-    // Strike rate Points, if min 6 balls faced
-    if (player.ballsFaced > 6) {
-      if (player.strikeRate > 170) curPlayerPoints += 6;
-      else if (player.strikeRate >= 150 && player.strikeRate <= 170)
-        curPlayerPoints += 4;
-      else if (player.strikeRate >= 130 && player.strikeRate <= 150)
-        curPlayerPoints += 2;
-      else if (player.strikeRate >= 60 && player.strikeRate <= 70)
-        curPlayerPoints -= 2;
-      else if (player.strikeRate >= 50 && player.strikeRate <= 60)
-        curPlayerPoints -= 4;
-      else if (player.strikeRate < 50) curPlayerPoints -= 6;
-    }
+    let economyPoints = 0;
+    if (player.economy <= 4) economyPoints += 8;
+    else if (player.economy > 4 && player.economy <= 6) economyPoints += 6;
+    else if (player.economy > 6 && player.economy <= 8) economyPoints += 4;
+    else if (player.economy > 8 && player.economy <= 10) economyPoints += 2;
+    else if (player.economy > 10 && player.economy <= 12) economyPoints -= 4;
+    else if (player.economy > 12) economyPoints -= 8;
+
+    curPlayerPoints += strikeRatePoints * matches + economyPoints * matches;
 
     // Winner points
     if (player.isWinner) curPlayerPoints += 25;

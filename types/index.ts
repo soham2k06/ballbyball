@@ -20,6 +20,7 @@ type PlayerScore = {
 };
 
 type PlayerPerformance = {
+  matches?: number;
   playerId: string;
   runsScored: number;
   ballsFaced: number;
