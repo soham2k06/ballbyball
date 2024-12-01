@@ -43,7 +43,7 @@ function Content({
   const bestSpell = data?.bowling.bestSpell;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1 sm:space-y-4">
       <div className="overflow-hidden rounded-xl">
         <div className="mb-1 flex h-12 items-center justify-between bg-primary p-2 text-primary-foreground">
           <h4 className="text-lg font-semibold md:text-xl">Batting</h4>
