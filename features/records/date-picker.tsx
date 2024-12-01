@@ -68,9 +68,9 @@ export default function DatePicker({ date, setDate }: DatePickerProps) {
             onClick={() => setDate(null)}
             disabled={!date}
             size="icon"
-            className="absolute right-2 top-1/2 size-5 -translate-y-1/2"
+            className="absolute right-1.5 top-1/2 size-6 -translate-y-1/2"
           >
-            <Cross1Icon className="size-3" />
+            <Cross1Icon className="size-4" />
           </Button>
         )}
         <DialogTrigger asChild>

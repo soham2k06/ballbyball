@@ -108,10 +108,10 @@ function MVP({ date, matches }: RecordsProps) {
                       return (
                         <TableRow
                           key={playerId}
-                          className="group [&>td]:text-center"
+                          className="group hover:bg-secondary [&>td]:text-center"
                         >
                           <TableCell className="!text-left">{i + 1}</TableCell>
-                          <TableCell className="sticky left-0 bg-background !text-left duration-300 group-hover:bg-muted">
+                          <TableCell className="sticky left-0 bg-background !text-left duration-300 group-hover:bg-secondary">
                             {name}
                           </TableCell>
                           <TableCell className="bg-primary/5">

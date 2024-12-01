@@ -159,9 +159,12 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                       i,
                     ) => {
                       return (
-                        <TableRow key={player.id} className="group">
+                        <TableRow
+                          key={player.id}
+                          className="group hover:bg-secondary"
+                        >
                           <TableCell>{i + 1}</TableCell>
-                          <TableCell className="sticky left-0 bg-background duration-300 group-hover:bg-muted">
+                          <TableCell className="sticky left-0 bg-background duration-300 group-hover:bg-secondary">
                             {player.name}
                           </TableCell>
                           <TableCell className="bg-primary/5 text-center">

@@ -23,8 +23,8 @@ interface PlayerMatchesProps {
 function MatchSkeleton() {
   return (
     <Card>
-      <CardHeader>
-        <Skeleton className="h-9 w-full" />
+      <CardHeader className="!pb-1">
+        <Skeleton className="h-[19.5px] w-full" />
       </CardHeader>
       <CardContent className="space-y-2">
         <Skeleton className="h-5 w-1/3" />
@@ -60,10 +60,12 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
             {matchesWon} ({winRate}%) Won
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="max-h-96">
-          <ul className="space-y-3">
+        <ScrollArea className="max-h-[480px]">
+          <ul className="space-y-3 px-0.5">
             {isFetching ? (
               <>
+                <MatchSkeleton />
+                <MatchSkeleton />
                 <MatchSkeleton />
                 <MatchSkeleton />
                 <MatchSkeleton />
