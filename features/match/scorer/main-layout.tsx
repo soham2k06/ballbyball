@@ -241,9 +241,14 @@ function ScorerLayout({
     }
 
     const strikeEvent = !event.includes("-1") ? event : event.slice(0, -2);
-    if (curBatsmen.length === 2)
+    if (curBatsmen.length === 2) {
+      // Tackle extras
+      if (strikeEvent.includes("-2") || strikeEvent.includes("-3")) {
+        const runsAlongWithExtras = strikeEvent.slice(-1);
+        handleStrikeChange(runsAlongWithExtras as EventType);
+      }
       handleStrikeChange((event === "-4" ? "-4" : strikeEvent) as EventType);
-    else handleStrikeChange((event === "-4" ? "-4" : "0") as EventType);
+    } else handleStrikeChange((event === "-4" ? "-4" : "0") as EventType);
   }
 
   function handleLastBallInWicket(event: string) {
