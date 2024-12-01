@@ -157,7 +157,7 @@ export default async function RootLayout({
           sizes="512x512"
         />
         <link rel="manifest" href="/favicons/site.webmanifest" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta
           name="google-site-verification"
           content="VoqGlTAQWR5pCGtJXLewyVpsxWiR1LZr4yRhSg30U-o"

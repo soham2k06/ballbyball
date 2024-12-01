@@ -20,7 +20,7 @@ export function Stat({
         <Skeleton className="h-8 w-20 max-md:h-7" />
       ) : (
         <p className="text-2xl font-bold max-md:text-xl">
-          {data}
+          {data ?? "-"}
           {showStar && "*"}
         </p>
       )}

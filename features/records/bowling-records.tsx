@@ -7,6 +7,7 @@ import {
   calcBestSpells,
   calculateMaidenOvers,
   calcWicketHauls,
+  countHatTricks,
   filterRecords,
   getOverStr,
   getScore,
@@ -63,6 +64,12 @@ function BowlingRecords({ date, matches }: RecordsProps) {
         0,
       );
 
+      const hattricks = Object.values(groupedMatchesBowl)
+        .map((events) =>
+          countHatTricks(events.map((event) => event.type as string)),
+        )
+        .reduce((acc, curr) => acc + curr, 0);
+
       const {
         runs: runsConceded,
         totalBalls,
@@ -90,6 +97,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
         bestSpell,
         runsConceded,
         dots,
+        hattricks,
       };
     })
     .sort((a, b) => {
@@ -132,6 +140,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                   <TableHead>SR</TableHead>
                   <TableHead>3W</TableHead>
                   <TableHead>5W</TableHead>
+                  <TableHead>Hattricks</TableHead>
                   <TableHead>Maidens</TableHead>
                   <TableHead>Dots</TableHead>
                   <TableHead>Overs</TableHead>
@@ -155,6 +164,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                         runsConceded,
                         totalBalls,
                         dots,
+                        hattricks,
                       },
                       i,
                     ) => {
@@ -189,6 +199,9 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                           </TableCell>
                           <TableCell className="text-center">
                             {fiveHauls}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {hattricks}
                           </TableCell>
                           <TableCell className="text-center">
                             {maidens}

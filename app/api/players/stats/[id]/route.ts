@@ -7,6 +7,7 @@ import {
   calcRuns,
   calculateMaidenOvers,
   calcWicketHauls,
+  countHatTricks,
   getScore,
   getValidatedUser,
   mapGroupedMatches,
@@ -78,7 +79,11 @@ export async function GET(
         })
       : 0;
 
-    const fieldingStats = { catches, runOuts, stumpings };
+    const fieldingStats: PlayerStats["fielding"] = {
+      catches,
+      runOuts,
+      stumpings,
+    };
 
     const { ducks, thirties, fifties, centuries, highestScore, isNotout } =
       calcMilestones(groupedMatchesBat);
@@ -124,7 +129,7 @@ export async function GET(
     const boundaryRuns = boundaries.length ? calcRuns(boundaries, true) : 0;
     const boundaryRate = (boundaryRuns / runsScored) * 100 || 0;
 
-    const battingStats = {
+    const battingStats: PlayerStats["batting"] = {
       runs: runsScored,
       balls: ballsFaced,
       wickets: outs,
@@ -154,20 +159,27 @@ export async function GET(
     } = getScore({ balls: bowlingEvents, forBowler: true });
 
     const dotBalls = bowlingEvents.filter((event) => event === "0").length;
-    const dotBallsRate = (dotBalls / bowlingEvents.length) * 100 || 0;
+    // const dotBallsRate = (dotBalls / bowlingEvents.length) * 100 || 0;
 
-    const bowlingStats = {
+    const hattricks = Object.values(groupedMatchesBowl)
+      .map((events) =>
+        countHatTricks(events.map((event) => event.type as string)),
+      )
+      .reduce((acc, curr) => acc + curr, 0);
+
+    const bowlingStats: PlayerStats["bowling"] = {
       runs: runsConceded,
       balls: ballsBowled,
       wickets: wicketsTaken,
       maidens,
-      dotBallsRate,
+      // dotBallsRate,
       dotBalls,
       bestSpell,
       extras,
       economy: runRate,
       fiveHauls,
       threeHauls,
+      hattricks,
     };
 
     const matchesPlayed = await prisma.match.count({

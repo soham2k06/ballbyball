@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -23,6 +24,7 @@ function MoreBatting({ data }: { data: PlayerStats }) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>More batting stats</DialogTitle>
+          <DialogDescription className="sr-only"></DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-3 gap-1 overflow-hidden rounded-lg">
           <Stat data={data.batting.fours} dataKey="Fours" />

@@ -1,30 +1,37 @@
 import { Player } from "@prisma/client";
 
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { TypographyH3 } from "@/components/ui/typography";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface TeamPlayersProps {
   showingTeam:
     | { players: Player[]; captainId: string | null; name: string }
     | undefined;
   onClose: () => void;
+  open: boolean;
 }
 
-function TeamPlayers({ showingTeam, onClose }: TeamPlayersProps) {
-  const { players, captainId, name } = showingTeam ?? {};
+function TeamPlayers({ showingTeam, onClose, open }: TeamPlayersProps) {
+  const { players = [], captainId, name } = showingTeam ?? {};
   const captainIndex =
     players && players.findIndex((player) => player.id === captainId);
 
   return (
-    <Dialog open={!!showingTeam} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
-        <DialogHeader className="w-fit border-b p-4 pt-0">
-          <TypographyH3>{name}</TypographyH3>
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle>{name}</DialogTitle>
+          <DialogDescription>{players.length} players</DialogDescription>
         </DialogHeader>
-        <ul className="max-h-96 overflow-auto">
-          {players?.map((player) => (
+        <ul className="max-h-96 overflow-auto text-lg font-medium">
+          {players.map((player) => (
             <li key={player.id}>
-              <p className="text-lg font-semibold leading-10">
+              <p className="leading-10">
                 {player.name}{" "}
                 {captainIndex === players.indexOf(player) && "(C)"}
               </p>

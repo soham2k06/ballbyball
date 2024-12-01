@@ -69,7 +69,7 @@ type PlayerStats = {
     wickets: number;
     maidens: number;
     dotBalls: number;
-    dotBallsRate: number;
+    // dotBallsRate: number;
     bestSpell: {
       wickets: number;
       runs: number;
@@ -79,6 +79,7 @@ type PlayerStats = {
     economy: number;
     fiveHauls: number;
     threeHauls: number;
+    hattricks: number;
   };
   fielding: { catches: number; runOuts: number; stumpings: number };
   matchesPlayed: number;

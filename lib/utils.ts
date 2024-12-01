@@ -453,6 +453,27 @@ function getIsNotOut({
       .every((evt) => !evt.includes("-1"));
 }
 
+function countHatTricks(ballEvents: string[]): number {
+  let hatTrickCount = 0;
+
+  let consecutiveWickets = 0;
+
+  for (const event of ballEvents) {
+    const isWicket = event.includes("-1");
+    if (isWicket) {
+      consecutiveWickets++;
+      if (consecutiveWickets === 3) {
+        hatTrickCount++;
+        consecutiveWickets = 0;
+      }
+    } else {
+      consecutiveWickets = 0;
+    }
+  }
+
+  return hatTrickCount;
+}
+
 function toastError(err: unknown) {
   if (err instanceof Error) toast.error(err.message);
   else toast.error("Something went wrong!");
@@ -815,6 +836,7 @@ export {
   toPercentage,
   filterRecords,
   getMVP,
+  countHatTricks,
   // Backend
   getValidatedUser,
   createOrUpdateWithUniqueName,

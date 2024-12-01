@@ -44,6 +44,8 @@ function TeamList({
     | undefined
   >(undefined);
 
+  const [openTeam, setOpenTeam] = useState(false);
+
   function handleDelete(id: string) {
     setTeamToDelete(id);
     deleteMutate(id, {
@@ -85,6 +87,7 @@ function TeamList({
                 setShowingTeam={setShowingTeam}
                 userRef={userRef}
                 handleUpdateClick={(team) => handleUpdateClick(i, team)}
+                setOpen={setOpenTeam}
               />
             );
           })}
@@ -116,7 +119,13 @@ function TeamList({
 
       <TeamPlayers
         showingTeam={showingTeam}
-        onClose={() => setShowingTeam(undefined)}
+        open={openTeam}
+        onClose={() => {
+          setOpenTeam(false);
+          setTimeout(() => {
+            setShowingTeam(undefined);
+          }, 200);
+        }}
       />
     </div>
   );

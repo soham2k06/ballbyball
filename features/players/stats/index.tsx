@@ -182,10 +182,12 @@ function PlayerStats({
       >
         <DrawerContent className="p-2 pt-0">
           <DrawerHeader>
-            <DrawerTitle>{playerName}</DrawerTitle>
+            <DrawerTitle>{playerName ?? "Unknown"}</DrawerTitle>
 
             {isLoading ? (
-              <Skeleton className="h-5 w-20 max-sm:mx-auto" />
+              <Skeleton className="h-5 w-20 max-sm:mx-auto">
+                <DrawerDescription className="sr-only"></DrawerDescription>
+              </Skeleton>
             ) : (
               <DrawerDescription>{matchesPlayed} Matches</DrawerDescription>
             )}
@@ -202,10 +204,12 @@ function PlayerStats({
     >
       <DialogContent className="p-2 pt-0">
         <DialogHeader>
-          <DialogTitle>{playerName}</DialogTitle>
+          <DialogTitle>{playerName ?? "-"}</DialogTitle>
 
           {isLoading ? (
-            <Skeleton className="h-5 w-20 max-sm:mx-auto" />
+            <Skeleton className="h-5 w-20 max-sm:mx-auto">
+              <DialogDescription className="sr-only"></DialogDescription>
+            </Skeleton>
           ) : (
             <DialogDescription>{matchesPlayed} Matches</DialogDescription>
           )}
