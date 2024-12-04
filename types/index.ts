@@ -155,6 +155,7 @@ type BowlingRecordsType = {
   bestSpell: { wickets: number; runs: number; balls: number };
   runsConceded: number;
   dots: number;
+  hattricks: number;
 };
 type CommentKey = keyof typeof commentsCollection;
 

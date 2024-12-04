@@ -116,7 +116,7 @@ function Content({
             isLoading={isLoading}
             data={
               bestSpell
-                ? `${bestSpell.wickets}/${bestSpell.runs} (${getOverStr(bestSpell.balls)})`
+                ? `${bestSpell.runs}/${bestSpell.wickets} (${getOverStr(bestSpell.balls)})`
                 : "-"
             }
             dataKey="Best"

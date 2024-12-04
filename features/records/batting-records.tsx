@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { TabsContent } from "@/components/ui/tabs";
 
+import OverallBattingRecords from "./overall-batting-records";
 import RecordsSkeleton from "./records-skeleton";
 
 function BattingRecords({ date, matches }: RecordsProps) {
@@ -223,6 +224,10 @@ function BattingRecords({ date, matches }: RecordsProps) {
           </CardContent>
         </Card>
       )}
+      <OverallBattingRecords
+        battingRecords={battingRecords}
+        isFetching={isFetching}
+      />
     </TabsContent>
   );
 }

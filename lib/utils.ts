@@ -466,9 +466,7 @@ function countHatTricks(ballEvents: string[]): number {
         hatTrickCount++;
         consecutiveWickets = 0;
       }
-    } else {
-      consecutiveWickets = 0;
-    }
+    } else consecutiveWickets = 0;
   }
 
   return hatTrickCount;

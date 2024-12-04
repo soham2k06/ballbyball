@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
         id: true,
         createdAt: true,
         ballEvents: {
+          orderBy: { id: "asc" },
           select: {
             matchId: true,
             id: true,

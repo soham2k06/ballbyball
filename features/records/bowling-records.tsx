@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { TabsContent } from "@/components/ui/tabs";
 
+import OverallBowlingRecords from "./overall-bowling-records";
 import RecordsSkeleton from "./records-skeleton";
 
 function BowlingRecords({ date, matches }: RecordsProps) {
@@ -188,7 +189,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                           </TableCell>
                           <TableCell className="text-center">
                             {bestSpell
-                              ? bestSpell.wickets + "/" + bestSpell.runs
+                              ? `${bestSpell.runs}/${bestSpell.wickets}`
                               : "-"}
                           </TableCell>
                           <TableCell className="text-center">
@@ -239,6 +240,10 @@ function BowlingRecords({ date, matches }: RecordsProps) {
           </CardContent>
         </Card>
       )}
+      <OverallBowlingRecords
+        bowlingRecords={bowlingRecords}
+        isFetching={isFetching}
+      />
     </TabsContent>
   );
 }

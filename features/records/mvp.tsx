@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { TabsContent } from "@/components/ui/tabs";
 
+import OverallMVPRecords from "./overall-mvp-records";
 import RecordsSkeleton from "./records-skeleton";
 
 function MVP({ date, matches }: RecordsProps) {
@@ -152,6 +153,7 @@ function MVP({ date, matches }: RecordsProps) {
           </CardContent>
         </Card>
       )}
+      <OverallMVPRecords mvp={mvp} isFetching={isFetching} />
     </TabsContent>
   );
 }
