@@ -87,7 +87,7 @@ function OverallBowlingRecords({
         <StatCard
           isFetching={isFetching}
           title="Best"
-          stat={`${bestSpell.runs}/${bestSpell.wickets} by ${bestSpell.playerName}`}
+          stat={`${bestSpell.wickets}/${bestSpell.runs} by ${bestSpell.playerName}`}
         />
         <StatCard isFetching={isFetching} title="Dots" stat={allRecords.dots} />
         <StatCard

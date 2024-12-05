@@ -189,7 +189,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                           </TableCell>
                           <TableCell className="text-center">
                             {bestSpell
-                              ? `${bestSpell.runs}/${bestSpell.wickets}`
+                              ? `${bestSpell.wickets}/${bestSpell.runs}`
                               : "-"}
                           </TableCell>
                           <TableCell className="text-center">
