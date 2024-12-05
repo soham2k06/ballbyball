@@ -185,42 +185,12 @@ export async function sortPlayers({ players }: { players: Player[] }) {
   const userId = await getValidatedUser();
 
   try {
-    const updates = players.map((item) => ({
-      id: item.id,
-      order: item.order,
-    }));
-
-    await prisma.$transaction(
-      updates.map((update) =>
-        prisma.player.update({
-          where: { id: update.id, userId },
-          data: { order: update.order },
-        }),
-      ),
-    );
-    // const fromTargetPlayers = await prisma.player.findMany({
-    //   where: { userId, id: { in: [from, target] } },
-    // });
-
-    // const fromItem = fromTargetPlayers.find((item) => item.id === from);
-    // const targetItem = fromTargetPlayers.find((item) => item.id === target);
-
-    // if (!fromItem || !targetItem) {
-    //   throw new Error("One or both items not found");
-    // }
-
-    // await prisma.$transaction([
-    //   prisma.player.update({
-    //     where: { id: from },
-    //     data: { order: targetItem.order },
-    //   }),
-    //   prisma.player.update({
-    //     where: { id: target },
-    //     data: { order: fromItem.order },
-    //   }),
-    // ]);
-
-    // revalidatePath("/players");
+    for (const [index, player] of Array.from(players.entries())) {
+      await prisma.player.update({
+        where: { id: player.id, userId },
+        data: { order: index },
+      });
+    }
   } catch (error) {
     handleError(error);
   }
