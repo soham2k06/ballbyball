@@ -35,7 +35,7 @@ export const ItemTypes = {
 };
 
 interface Player extends PlayerSimplified {
-  totalPoints?: number;
+  points?: number;
 }
 
 interface TeamState {
@@ -80,10 +80,7 @@ function TeamBuilder() {
   ]);
 
   const getTeamPoints = (index: 0 | 1) =>
-    teams[index].players.reduce(
-      (acc, player) => acc + (player.totalPoints ?? 0),
-      0,
-    );
+    teams[index].players.reduce((acc, player) => acc + (player.points ?? 0), 0);
 
   const team1Points = getTeamPoints(0);
   const team2Points = getTeamPoints(1);
