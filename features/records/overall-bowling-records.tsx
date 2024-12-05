@@ -38,6 +38,14 @@ function OverallBowlingRecords({
       acc.threeHauls += threeHauls;
       acc.hattricks += hattricks;
 
+      if (bestSpell.wickets === acc.bestSpell.wickets) {
+        if (bestSpell.runs < acc.bestSpell.runs) {
+          acc.bestSpell = {
+            ...bestSpell,
+            playerName: player.name,
+          };
+        }
+      }
       if (bestSpell.wickets > acc.bestSpell.wickets) {
         acc.bestSpell = {
           ...bestSpell,

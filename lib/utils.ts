@@ -604,7 +604,7 @@ function calcBestSpells(data: EventType[][], topN: number = 1) {
   const playerStats = data.map((balls) => getScore({ balls, forBowler: true }));
 
   playerStats.sort((a, b) => {
-    if (b.wickets === a.wickets) return a.runRate - b.runRate;
+    if (b.wickets === a.wickets) return a.runs - b.runs;
     return b.wickets - a.wickets;
   });
 
