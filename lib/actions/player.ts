@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { Player } from "@prisma/client";
+
 import prisma from "../db/prisma";
 import {
   createOrUpdateWithUniqueName,
@@ -23,10 +25,16 @@ export async function getAllPlayers(user?: string | null) {
   try {
     const players = await prisma.player.findMany({
       where: { userId },
-      orderBy: { id: "asc" },
-      select: { id: true, name: true },
+      select: { id: true, name: true, order: true },
     });
-    return players;
+
+    const sortedPlayers = players.sort((a, b) => {
+      if (a.order === null) return 1; // Move `null` values to the end
+      if (b.order === null) return -1;
+      return a.order - b.order; // Sort by ascending order
+    });
+
+    return sortedPlayers;
   } catch (error) {
     handleError(error);
   }
@@ -168,6 +176,51 @@ export async function deletePlayer(id: string) {
     await prisma.player.delete({ where: { id } });
 
     revalidatePath("/players");
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+export async function sortPlayers({ players }: { players: Player[] }) {
+  const userId = await getValidatedUser();
+
+  try {
+    const updates = players.map((item) => ({
+      id: item.id,
+      order: item.order,
+    }));
+
+    await prisma.$transaction(
+      updates.map((update) =>
+        prisma.player.update({
+          where: { id: update.id, userId },
+          data: { order: update.order },
+        }),
+      ),
+    );
+    // const fromTargetPlayers = await prisma.player.findMany({
+    //   where: { userId, id: { in: [from, target] } },
+    // });
+
+    // const fromItem = fromTargetPlayers.find((item) => item.id === from);
+    // const targetItem = fromTargetPlayers.find((item) => item.id === target);
+
+    // if (!fromItem || !targetItem) {
+    //   throw new Error("One or both items not found");
+    // }
+
+    // await prisma.$transaction([
+    //   prisma.player.update({
+    //     where: { id: from },
+    //     data: { order: targetItem.order },
+    //   }),
+    //   prisma.player.update({
+    //     where: { id: target },
+    //     data: { order: fromItem.order },
+    //   }),
+    // ]);
+
+    // revalidatePath("/players");
   } catch (error) {
     handleError(error);
   }

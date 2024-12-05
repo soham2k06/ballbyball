@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 import Link from "next/link";
 
-import prisma from "@/lib/db/prisma";
+import { getAllPlayers } from "@/lib/actions/player";
 import { checkSession, getValidatedUser } from "@/lib/utils";
 
 import RivalriesList from "@/features/rivalries";
@@ -26,13 +26,8 @@ async function Rivalries({ searchParams }: Props) {
   if (!userRef) await checkSession();
 
   const user = userRef ?? (await getValidatedUser());
-  const players = await prisma.player.findMany({
-    where: { userId: user },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+
+  const players = await getAllPlayers(user);
 
   return (
     <div>
@@ -58,7 +53,7 @@ async function Rivalries({ searchParams }: Props) {
           Show All
         </Link>
       </div>
-      <RivalriesList players={players} all={all} />
+      <RivalriesList players={players ?? []} all={all} />
     </div>
   );
 }

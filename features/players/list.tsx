@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 
+import { DndContext } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
 import { Player } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { deletePlayer } from "@/lib/actions/player";
+import {
+  deletePlayer,
+  sortPlayers as sortPlayersAPI,
+} from "@/lib/actions/player";
 import { useActionMutate } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
@@ -29,6 +35,8 @@ function PlayerList({
   const [playerData, setPlayerData] = useState<Player[]>(players);
   const { mutate: deleteMutate } = useActionMutate(deletePlayer);
 
+  const [isSorting, setIsSorting] = useState(false);
+
   const [playerToDelete, setPlayerToDelete] = useState<string | undefined>();
 
   const [playerToUpdate, setPlayerToUpdate] = useState<
@@ -44,6 +52,27 @@ function PlayerList({
     name: string | undefined;
   }>();
 
+  const { mutate: sortPlayers, isPending } = useMutation({
+    mutationFn: sortPlayersAPI,
+  });
+
+  function handleSort() {
+    sortPlayers(
+      {
+        players: playerData,
+      },
+      {
+        onSuccess: () => {
+          setIsSorting(false);
+          toast.success("Players sorted successfully");
+        },
+        onError: () => {
+          toast.error("Failed to sort players");
+        },
+      },
+    );
+  }
+
   return (
     <>
       <div
@@ -53,29 +82,75 @@ function PlayerList({
       >
         {!userRef && (
           <AddPlayerButton
+            isSorting={isSorting}
+            setIsSorting={setIsSorting}
             setPlayerData={
               setPlayerData as React.Dispatch<
                 React.SetStateAction<(Player | undefined)[]>
               >
             }
+            handleSort={handleSort}
+            isSortPending={isPending}
           />
         )}
         {playerData?.length ? (
-          <ul className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
-            {playerData.map((player) => {
-              return (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  userRef={userRef}
-                  setPlayerToDelete={setPlayerToDelete}
-                  setPlayerToUpdate={setPlayerToUpdate}
-                  setOpenedPlayer={setOpenedPlayer}
-                  setPlayerMatchesOpen={setPlayerMatchesOpen}
-                />
-              );
-            })}
-          </ul>
+          <DndContext
+            onDragEnd={(e) => {
+              const target = e.over?.id as string;
+              const from = e.active?.id as string;
+
+              if (from && target && from !== target)
+                setPlayerData((prevData) => {
+                  // Find the indexes of the players being moved
+                  const targetIndex = prevData.findIndex(
+                    (player) => player?.id === target,
+                  );
+                  const fromIndex = prevData.findIndex(
+                    (player) => player?.id === from,
+                  );
+
+                  // If the indexes are valid and different, perform the swap
+                  if (
+                    targetIndex !== -1 &&
+                    fromIndex !== -1 &&
+                    targetIndex !== fromIndex
+                  ) {
+                    const newPlayerData = [...prevData];
+                    // Remove the player at fromIndex and insert it at targetIndex
+                    const [movedPlayer] = newPlayerData.splice(fromIndex, 1);
+                    newPlayerData.splice(targetIndex, 0, movedPlayer);
+
+                    // Optionally update the order for each player
+                    return newPlayerData.map((player, index) => ({
+                      ...player,
+                      order: index + 1, // Assign sequential order starting from 1
+                    }));
+                  }
+
+                  // Return the previous state if no changes are needed
+                  return prevData;
+                });
+            }}
+          >
+            <SortableContext items={playerData}>
+              <ul className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
+                {playerData.map((player) => {
+                  return (
+                    <PlayerCard
+                      isSorting={isSorting}
+                      key={player.id}
+                      player={player}
+                      userRef={userRef}
+                      setPlayerToDelete={setPlayerToDelete}
+                      setPlayerToUpdate={setPlayerToUpdate}
+                      setOpenedPlayer={setOpenedPlayer}
+                      setPlayerMatchesOpen={setPlayerMatchesOpen}
+                    />
+                  );
+                })}
+              </ul>
+            </SortableContext>
+          </DndContext>
         ) : (
           <EmptyState document="players" />
         )}

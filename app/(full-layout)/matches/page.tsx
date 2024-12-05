@@ -9,7 +9,7 @@ import MatchList from "@/features/matches/list";
 
 export const metadata: Metadata = {
   title: "Matches - BallByBall",
-  description: "List of players",
+  description: "List of matches",
 };
 
 interface Props {

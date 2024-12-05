@@ -1,3 +1,5 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Player } from "@prisma/client";
 import { Edit, LandPlot, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -32,21 +34,38 @@ interface PlayerProps {
     name: string | undefined;
   }) => void;
   userRef?: string | null;
+  isSorting: boolean;
 }
 
 function PlayerCard({
   player,
   userRef,
+  isSorting,
   setPlayerToDelete,
   setPlayerToUpdate,
   setOpenedPlayer,
   setPlayerMatchesOpen,
 }: PlayerProps) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: player.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   const handleDelete = (playerId: string) => setPlayerToDelete(playerId);
   const handleShowMatches = (playerId: string) =>
     setPlayerMatchesOpen(playerId);
+
   return (
-    <Card className="flex items-center justify-between p-2 sm:p-4">
+    <Card
+      className="flex items-center justify-between p-2 sm:p-4"
+      {...(isSorting ? attributes : {})}
+      {...(isSorting ? listeners : {})}
+      style={isSorting ? style : undefined}
+      ref={isSorting ? setNodeRef : undefined}
+    >
       <CardTitle
         onClick={() =>
           setOpenedPlayer({
@@ -58,50 +77,53 @@ function PlayerCard({
       >
         {player.name}
       </CardTitle>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild className="shrink-0">
-          <Button size="icon" variant="ghost">
-            <MoreHorizontal size={20} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            className="gap-2 font-medium"
-            onClick={() => handleShowMatches(player.id)}
-          >
-            <LandPlot size={20} /> Matches
-          </DropdownMenuItem>
-          {!userRef && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-2 font-medium"
-                onClick={() => {
-                  if (player.id.includes("optimistic"))
-                    return toast.error(
-                      "Error updating player, please reload and try again",
-                    );
-                  setPlayerToUpdate(player);
-                }}
-              >
-                <Edit size={20} /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="gap-2 font-medium"
-                onClick={() => {
-                  if (player.id.includes("optimistic"))
-                    return toast.error(
-                      "Error deleting player, please reload and try again",
-                    );
-                  handleDelete(player.id);
-                }}
-              >
-                <Trash2 size={20} /> Delete
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+
+      {!isSorting && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild className="shrink-0">
+            <Button size="icon" variant="ghost">
+              <MoreHorizontal size={20} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              className="gap-2 font-medium"
+              onClick={() => handleShowMatches(player.id)}
+            >
+              <LandPlot size={20} /> Matches
+            </DropdownMenuItem>
+            {!userRef && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="gap-2 font-medium"
+                  onClick={() => {
+                    if (player.id.includes("optimistic"))
+                      return toast.error(
+                        "Error updating player, please reload and try again",
+                      );
+                    setPlayerToUpdate(player);
+                  }}
+                >
+                  <Edit size={20} /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-2 font-medium"
+                  onClick={() => {
+                    if (player.id.includes("optimistic"))
+                      return toast.error(
+                        "Error deleting player, please reload and try again",
+                      );
+                    handleDelete(player.id);
+                  }}
+                >
+                  <Trash2 size={20} /> Delete
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </Card>
   );
 }

@@ -97,6 +97,7 @@ model Player {
   image       String?
   teamId      String?      @db.ObjectId
   teamPlayers TeamPlayer[]
+  order       Int?
 
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
