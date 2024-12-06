@@ -7,15 +7,17 @@ import { getIsvalidBall, getScore, getValidatedUser } from "@/lib/utils";
 import { RivalriesResult } from "@/types";
 
 function getAllRivalries(
-  events: (Omit<BallEvent, "userId" | "id" | "matchId"> & {
+  events: (Omit<BallEvent, "userId" | "id"> & {
     batsman: { name: string };
     bowler: { name: string };
   })[],
 ): RivalriesResult[] {
   const rivalries: Record<string, RivalriesResult> = {};
 
+  const rivalryMatches: Record<string, Set<string>> = {};
+
   events.forEach((event) => {
-    const { batsmanId, bowlerId, type } = event;
+    const { batsmanId, bowlerId, type, matchId } = event;
     const key = `${batsmanId}-${bowlerId}`;
 
     if (!rivalries[key]) {
@@ -34,9 +36,13 @@ function getAllRivalries(
         matches: 0,
         dominance: [0, 0],
       };
+
+      rivalryMatches[key] = new Set();
     }
 
     const rivalry = rivalries[key];
+
+    if (matchId) rivalryMatches[key].add(matchId);
 
     const { runs, totalBalls, wickets } = getScore({
       balls: [type],
@@ -60,6 +66,11 @@ function getAllRivalries(
       rivalry.dots / 2;
   });
 
+  Object.keys(rivalries).forEach((key) => {
+    rivalries[key].matches = rivalryMatches[key].size;
+  });
+
+  console.log(Object.values(rivalries));
   return Object.values(rivalries);
 }
 
@@ -98,6 +109,7 @@ export async function GET(req: NextRequest) {
         batsmanId: true,
         bowlerId: true,
         type: true,
+        matchId: true,
       },
     });
 
@@ -110,20 +122,6 @@ export async function GET(req: NextRequest) {
             rivalry.balls > 0 || rivalry.runs > 0 || rivalry.wickets > 0,
         )
         .map(async (rivalry) => {
-          const ballEvents = await prisma.ballEvent.findMany({
-            where: {
-              userId,
-              OR: [
-                { batsmanId: rivalry.batsmanId, bowlerId: rivalry.bowlerId },
-                { batsmanId: rivalry.bowlerId, bowlerId: rivalry.batsmanId },
-              ],
-            },
-            select: { matchId: true },
-          });
-
-          const matches = new Set(ballEvents.map((event) => event.matchId))
-            .size;
-
           let batsmanPoints = 0;
           let bowlerPoints = 0;
 
@@ -143,13 +141,10 @@ export async function GET(req: NextRequest) {
           const bowlerDominance =
             (bowlerPoints / (batsmanPoints + bowlerPoints)) * 100;
 
-          // min 0 % max 100%
           rivalry.dominance = [
             Math.round(Math.min(100, Math.max(0, batsmanDominance))),
             Math.round(Math.min(100, Math.max(0, bowlerDominance))),
           ];
-
-          rivalry.matches = matches;
 
           return rivalry;
         }),
