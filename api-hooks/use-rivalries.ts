@@ -9,6 +9,7 @@ export function useRivalries({
   batsman,
   bowler,
   all,
+  date,
 }: Omit<GetRivalriesParams, "user">) {
   const sp = useSearchParams();
   const userRef = sp.get("user");
@@ -19,9 +20,9 @@ export function useRivalries({
     isFetching,
     error,
   } = useQuery({
-    queryKey: ["rivalries", batsman, bowler, player, all, userRef],
+    queryKey: ["rivalries", batsman, bowler, player, all, date, userRef],
     queryFn: () =>
-      getRivalries({ player, batsman, bowler, all, user: userRef }),
+      getRivalries({ player, batsman, bowler, all, date, user: userRef }),
     enabled: !!player || !!batsman || !!bowler || !!all,
   });
 

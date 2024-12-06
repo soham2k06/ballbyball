@@ -1,13 +1,9 @@
 import { Metadata } from "next";
 
-import Link from "next/link";
-
 import { getAllPlayers } from "@/lib/actions/player";
 import { checkSession, getValidatedUser } from "@/lib/utils";
 
 import RivalriesList from "@/features/rivalries";
-
-import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Rivalries - Ballbyball",
@@ -22,7 +18,7 @@ interface Props {
 }
 
 async function Rivalries({ searchParams }: Props) {
-  const { user: userRef, all } = searchParams;
+  const { user: userRef } = searchParams;
   if (!userRef) await checkSession();
 
   const user = userRef ?? (await getValidatedUser());
@@ -30,31 +26,17 @@ async function Rivalries({ searchParams }: Props) {
   const players = await getAllPlayers(user);
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight max-sm:text-xl">
-            Rivalries
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Select player or batsman/bowler to see their head-to-head stats.
-          </p>
-        </div>
-        <Link
-          href={
-            userRef
-              ? `/rivalries?user=${userRef}&all=true`
-              : `/rivalries?all=true`
-          }
-          className={buttonVariants({
-            size: "sm",
-          })}
-        >
-          Show All
-        </Link>
+    <>
+      <div className="mb-4">
+        <h1 className="text-3xl font-semibold tracking-tight max-sm:text-xl">
+          Rivalries
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Select player or batsman/bowler to see their head-to-head stats.
+        </p>
       </div>
-      <RivalriesList players={players ?? []} all={all} />
-    </div>
+      <RivalriesList players={players ?? []} />
+    </>
   );
 }
 

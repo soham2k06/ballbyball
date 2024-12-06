@@ -8,6 +8,7 @@ export interface GetRivalriesParams {
   batsman?: string | null;
   bowler?: string | null;
   all?: boolean | null;
+  date?: string | null;
 }
 
 export const getRivalries = async ({
@@ -15,11 +16,12 @@ export const getRivalries = async ({
   player,
   batsman,
   bowler,
+  date,
   all,
 }: GetRivalriesParams) => {
   try {
     const res = await axiosInstance.get<RivalriesResult[]>("rivalries", {
-      params: { user, player, batsman, bowler, all },
+      params: { user, player, batsman, bowler, date, all },
     });
 
     if (res.status !== 200) throw new Error("Network response was not ok");

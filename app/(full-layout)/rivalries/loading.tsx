@@ -1,8 +1,7 @@
-import Link from "next/link";
-
 import { CaretSortIcon } from "@radix-ui/react-icons";
+import { Calendar } from "lucide-react";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 function LoadingSelect({
@@ -38,14 +37,6 @@ function loading() {
             Select player or batsman/bowler to see their head-to-head stats.
           </p>
         </div>
-        <Link
-          href="/rivalries"
-          className={buttonVariants({
-            size: "sm",
-          })}
-        >
-          Show All
-        </Link>
       </div>
       <div className="p-1">
         <div className="mb-4 grid grid-cols-1 gap-1 sm:grid-cols-[1fr_2fr] sm:gap-4">
@@ -55,6 +46,16 @@ function loading() {
             <LoadingSelect label="Bowler">Select</LoadingSelect>
             <Button disabled>Swap</Button>
           </div>
+        </div>
+        <div className="mb-6 flex gap-2">
+          <Button
+            disabled
+            variant="outline"
+            className="w-full justify-start text-left font-normal sm:w-[180px]"
+          >
+            <Calendar className="mr-2 size-4" /> Pick a date
+          </Button>
+          <Button disabled>Show all rivaries</Button>
         </div>
       </div>
     </div>

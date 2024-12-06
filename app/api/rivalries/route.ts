@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { BallEvent, Prisma } from "@prisma/client";
+import { endOfDay, startOfDay } from "date-fns";
 
 import prisma from "@/lib/db/prisma";
 import { getIsvalidBall, getScore, getValidatedUser } from "@/lib/utils";
@@ -70,7 +71,6 @@ function getAllRivalries(
     rivalries[key].matches = rivalryMatches[key].size;
   });
 
-  console.log(Object.values(rivalries));
   return Object.values(rivalries);
 }
 
@@ -81,6 +81,8 @@ export async function GET(req: NextRequest) {
   const batsman = sp.get("batsman");
   const bowler = sp.get("bowler");
   const all = sp.get("all") === "true";
+
+  const date = sp.get("date");
 
   const userId = user ?? (await getValidatedUser());
 
@@ -95,6 +97,16 @@ export async function GET(req: NextRequest) {
           ...(bowler ? { bowlerId: bowler } : {}),
         }
       : {}),
+    ...(date
+      ? {
+          Match: {
+            createdAt: {
+              gte: startOfDay(new Date(date)),
+              lt: endOfDay(new Date(date)),
+            },
+          },
+        }
+      : {}),
   };
 
   try {
@@ -103,6 +115,7 @@ export async function GET(req: NextRequest) {
         userId,
         ...whereQuery,
       },
+
       select: {
         batsman: { select: { name: true } },
         bowler: { select: { name: true } },
