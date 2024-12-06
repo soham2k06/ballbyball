@@ -14,7 +14,6 @@ function getAllRivalries(
   })[],
 ): RivalriesResult[] {
   const rivalries: Record<string, RivalriesResult> = {};
-
   const rivalryMatches: Record<string, Set<string>> = {};
 
   events.forEach((event) => {
@@ -36,6 +35,7 @@ function getAllRivalries(
         weight: 0,
         matches: 0,
         dominance: [0, 0],
+        recentBalls: [], // Add new property to track last 6 balls
       };
 
       rivalryMatches[key] = new Set();
@@ -65,6 +65,8 @@ function getAllRivalries(
       rivalry.runs +
       rivalry.boundaries * 2 +
       rivalry.dots / 2;
+
+    rivalry.recentBalls.push(event.type);
   });
 
   Object.keys(rivalries).forEach((key) => {
@@ -115,7 +117,6 @@ export async function GET(req: NextRequest) {
         userId,
         ...whereQuery,
       },
-
       select: {
         batsman: { select: { name: true } },
         bowler: { select: { name: true } },
@@ -124,44 +125,43 @@ export async function GET(req: NextRequest) {
         type: true,
         matchId: true,
       },
+      orderBy: { id: "asc" },
     });
 
     const allRivalries = getAllRivalries(ballEvents);
 
-    const rivalries = await Promise.all(
-      allRivalries
-        .filter(
-          (rivalry) =>
-            rivalry.balls > 0 || rivalry.runs > 0 || rivalry.wickets > 0,
-        )
-        .map(async (rivalry) => {
-          let batsmanPoints = 0;
-          let bowlerPoints = 0;
+    const rivalries = allRivalries
+      .filter(
+        (rivalry) =>
+          rivalry.balls > 0 || rivalry.runs > 0 || rivalry.wickets > 0,
+      )
+      .map((rivalry) => {
+        let batsmanPoints = 0;
+        let bowlerPoints = 0;
 
-          batsmanPoints += rivalry.runs;
-          batsmanPoints += rivalry.boundaries * 2;
-          if (rivalry.balls > 12) {
-            const sr = rivalry.strikeRate;
-            const srPoints = (sr - 100) / 2;
-            batsmanPoints += srPoints;
-          }
+        batsmanPoints += rivalry.runs;
+        batsmanPoints += rivalry.boundaries * 2;
+        if (rivalry.balls > 12) {
+          const sr = rivalry.strikeRate;
+          const srPoints = (sr - 100) / 2;
+          batsmanPoints += srPoints;
+        }
 
-          bowlerPoints += rivalry.wickets * 30;
-          bowlerPoints += rivalry.dots;
+        bowlerPoints += rivalry.wickets * 30;
+        bowlerPoints += rivalry.dots;
 
-          const batsmanDominance =
-            (batsmanPoints / (batsmanPoints + bowlerPoints)) * 100;
-          const bowlerDominance =
-            (bowlerPoints / (batsmanPoints + bowlerPoints)) * 100;
+        const batsmanDominance =
+          (batsmanPoints / (batsmanPoints + bowlerPoints)) * 100;
+        const bowlerDominance =
+          (bowlerPoints / (batsmanPoints + bowlerPoints)) * 100;
 
-          rivalry.dominance = [
-            Math.round(Math.min(100, Math.max(0, batsmanDominance))),
-            Math.round(Math.min(100, Math.max(0, bowlerDominance))),
-          ];
+        rivalry.dominance = [
+          Math.round(Math.min(100, Math.max(0, batsmanDominance))),
+          Math.round(Math.min(100, Math.max(0, bowlerDominance))),
+        ];
 
-          return rivalry;
-        }),
-    );
+        return rivalry;
+      });
 
     return NextResponse.json(rivalries.sort((a, b) => b.weight - a.weight));
   } catch (error) {

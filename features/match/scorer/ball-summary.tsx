@@ -3,20 +3,9 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { EventType } from "@/types";
 
-function BallSummary({
-  event,
-  size = "default",
-  radius = "full",
-}: {
-  event: EventType;
-  size?: "sm" | "default";
-  radius?: "full" | "sm";
-}) {
-  const isNoBall = event?.includes("-3");
-  const isWicket = event?.includes("-1");
-  const isByes = event?.includes("-5");
-  const isWide = event?.includes("-2");
-  const summaryVariants = cva("text-center flex justify-center items-center", {
+export const summaryVariants = cva(
+  "text-center flex justify-center items-center",
+  {
     variants: {
       variant: {
         default: "bg-muted",
@@ -32,6 +21,7 @@ function BallSummary({
         "-1": "bg-destructive text-destructive-foreground font-extrabold",
       },
       size: {
+        xs: "size-6 min-w-6 text-[11px]",
         sm: "h-8 min-w-8 text-sm",
         default: "h-10 min-w-10 max-sm:min-w-8 max-sm:h-8",
       },
@@ -41,7 +31,22 @@ function BallSummary({
       },
     },
     defaultVariants: { variant: "default", radius: "full", size: "default" },
-  });
+  },
+);
+
+function BallSummary({
+  event,
+  size = "default",
+  radius = "full",
+}: {
+  event: EventType;
+  size?: "xs" | "sm" | "default";
+  radius?: "full" | "sm";
+}) {
+  const isNoBall = event?.includes("-3");
+  const isWicket = event?.includes("-1");
+  const isByes = event?.includes("-5");
+  const isWide = event?.includes("-2");
 
   let summaryToShow;
 
@@ -50,6 +55,7 @@ function BallSummary({
       summaryToShow = (
         <span
           className={cn("bg-muted-foreground", {
+            "size-2": size === "xs",
             "size-3": size === "sm",
             "size-4 max-sm:size-3": size === "default",
             "rounded-full": event === "0",

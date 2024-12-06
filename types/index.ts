@@ -114,6 +114,7 @@ interface RivalriesResult {
   weight: number;
   matches: number;
   dominance: [number, number];
+  recentBalls: string[];
 }
 
 type BattingRecordsType = {

@@ -1,5 +1,5 @@
 import { cn, round } from "@/lib/utils";
-import { RivalriesResult } from "@/types";
+import { EventType, RivalriesResult } from "@/types";
 
 import ProgressSplit from "@/components/progress-split";
 import {
@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+import BallSummary from "../match/scorer/ball-summary";
 
 function RivalryCard({
   rivalry,
@@ -72,7 +74,13 @@ function RivalryCard({
             <p>{rivalry.dots}</p>
           </li>
         </ul>
+
         <ProgressSplit points={rivalry.dominance} title="Dominance" />
+        <ul className="mt-4 flex gap-2 overflow-auto py-2">
+          {rivalry.recentBalls.toReversed().map((event, i) => (
+            <BallSummary key={i} event={event as EventType} size="xs" />
+          ))}
+        </ul>
       </CardContent>
     </Card>
   );
