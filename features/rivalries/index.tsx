@@ -43,7 +43,16 @@ function RivalriesList({ players }: { players: PlayerSimplified[] }) {
       <div className="mb-6 flex w-fit gap-2">
         <DatePicker date={date} setDate={setDate} />
         {!allState && (
-          <Button onClick={() => setAllState("true")}>Show all rivaries</Button>
+          <Button
+            onClick={() => {
+              setAllState("true");
+              setPlayer(null);
+              setBatsman(null);
+              setBowler(null);
+            }}
+          >
+            Show all rivaries
+          </Button>
         )}
       </div>
       {isFetching ? (
