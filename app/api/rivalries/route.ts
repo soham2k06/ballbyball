@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
         type: true,
         matchId: true,
       },
-      orderBy: { id: "asc" },
+      orderBy: { id: "desc" },
     });
 
     const allRivalries = getAllRivalries(ballEvents);

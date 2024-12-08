@@ -78,7 +78,7 @@ function RivalryCard({
         <ProgressSplit points={rivalry.dominance} title="Dominance" />
         {rivalry.recentBalls.length && (
           <ul className="mt-4 flex gap-2 overflow-auto py-2">
-            {rivalry.recentBalls.toReversed().map((event, i) => (
+            {rivalry.recentBalls.map((event, i) => (
               <BallSummary key={i} event={event as EventType} size="xs" />
             ))}
           </ul>
