@@ -40,7 +40,7 @@ function RivalriesList({ players }: { players: PlayerSimplified[] }) {
         setPlayer={setPlayer}
         setAllState={setAllState}
       />
-      <div className="mb-6 flex w-fit gap-2">
+      <div className="mb-6 flex gap-2">
         <DatePicker date={date} setDate={setDate} />
         {!allState && (
           <Button
