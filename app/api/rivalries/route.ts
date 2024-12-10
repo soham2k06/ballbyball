@@ -140,11 +140,21 @@ export async function GET(req: NextRequest) {
         let bowlerPoints = 0;
 
         batsmanPoints += rivalry.runs;
+
         batsmanPoints += rivalry.boundaries * 2;
+
         if (rivalry.balls > 12) {
           const sr = rivalry.strikeRate;
-          const srPoints = (sr - 100) / 2;
-          batsmanPoints += srPoints;
+
+          let strikeRatePoints = 0;
+          if (sr > 200) strikeRatePoints += 8;
+          else if (sr >= 170 && sr <= 200) strikeRatePoints += 6;
+          else if (sr >= 150 && sr <= 170) strikeRatePoints += 4;
+          else if (sr >= 130 && sr <= 150) strikeRatePoints += 2;
+          else if (sr >= 70 && sr <= 100) strikeRatePoints -= 4;
+          else if (sr <= 70) strikeRatePoints -= 8;
+
+          batsmanPoints += strikeRatePoints * (rivalry.balls / 3);
         }
 
         bowlerPoints += rivalry.wickets * 30;
@@ -156,8 +166,8 @@ export async function GET(req: NextRequest) {
           (bowlerPoints / (batsmanPoints + bowlerPoints)) * 100;
 
         rivalry.dominance = [
-          Math.round(Math.min(100, Math.max(0, batsmanDominance))),
-          Math.round(Math.min(100, Math.max(0, bowlerDominance))),
+          Math.round(Math.min(100, Math.max(0, batsmanDominance || 50))),
+          Math.round(Math.min(100, Math.max(0, bowlerDominance || 50))),
         ];
 
         return rivalry;

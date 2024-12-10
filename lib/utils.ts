@@ -343,7 +343,6 @@ function calcBestPerformance({
   playersPerformance: PlayerPerformance[];
 }) {
   playersPerformance.forEach((player) => {
-    const matches = player.matches ?? 1;
     let curPlayerPoints = 0;
 
     // Batting points
@@ -364,7 +363,7 @@ function calcBestPerformance({
     // Fielding Points
     curPlayerPoints += player.catches * 8;
     curPlayerPoints += player.stumpings * 12;
-    curPlayerPoints += player.runOuts * 6;
+    curPlayerPoints += player.runOuts * 10;
 
     let strikeRatePoints = 0;
     if (player.strikeRate > 200) strikeRatePoints += 8;
@@ -386,12 +385,14 @@ function calcBestPerformance({
     else if (player.economy > 10 && player.economy <= 12) economyPoints -= 4;
     else if (player.economy > 12) economyPoints -= 8;
 
-    curPlayerPoints += strikeRatePoints * matches + economyPoints * matches;
+    curPlayerPoints +=
+      strikeRatePoints * (player.ballsFaced / 6) +
+      economyPoints * (player.ballsBowled / 6);
 
     // Winner points
     if (player.isWinner) curPlayerPoints += 25;
 
-    player.points = curPlayerPoints;
+    player.points = round(curPlayerPoints, 0);
   });
 
   return playersPerformance.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
