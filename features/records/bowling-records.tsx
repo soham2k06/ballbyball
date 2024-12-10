@@ -8,7 +8,6 @@ import {
   calculateMaidenOvers,
   calcWicketHauls,
   countHatTricks,
-  filterRecords,
   getOverStr,
   getScore,
   mapGroupedMatches,
@@ -36,17 +35,14 @@ function BowlingRecords({ date, matches }: RecordsProps) {
 
   const bowlingRecords = records
     .map((player) => {
-      const filteredBatEvents = filterRecords(player?.playerBatEvents, date);
-      const filteredBallEvents = filterRecords(player?.playerBallEvents, date);
-
       const groupedMatches = mapGroupedMatches([
-        ...filteredBatEvents,
-        ...filteredBallEvents,
+        ...player.playerBatEvents,
+        ...player.playerBallEvents,
       ]);
 
-      const groupedMatchesBowl = mapGroupedMatches(filteredBallEvents);
+      const groupedMatchesBowl = mapGroupedMatches(player.playerBallEvents);
 
-      const bowlEvents = (filteredBallEvents ?? []).map(
+      const bowlEvents = (player.playerBallEvents ?? []).map(
         (event) => event.type as EventType,
       );
 
