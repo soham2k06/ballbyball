@@ -585,6 +585,7 @@ function calcWicketHauls(groupedMatches: {
   [matchId: string]: BallEventSemi[];
 }) {
   let threes = 0;
+  let fours = 0;
   let fives = 0;
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
@@ -594,11 +595,12 @@ function calcWicketHauls(groupedMatches: {
       forBowler: true,
     });
 
-    if (wickets === 3 || wickets === 4) threes++;
+    if (wickets === 3) threes++;
+    if (wickets === 4) fours++;
     if (wickets >= 5) fives++;
   }
 
-  return { threes, fives };
+  return { threes, fours, fives };
 }
 
 function calcBestSpells(data: EventType[][], topN: number = 1) {

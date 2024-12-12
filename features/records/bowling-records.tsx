@@ -53,8 +53,11 @@ function BowlingRecords({ date, matches }: RecordsProps) {
 
       const bestSpell = calcBestSpells(bowlEventsByMatches, 1)[0];
 
-      const { threes: threeHauls, fives: fiveHauls } =
-        calcWicketHauls(groupedMatchesBowl);
+      const {
+        threes: threeHauls,
+        fours: fourHauls,
+        fives: fiveHauls,
+      } = calcWicketHauls(groupedMatchesBowl);
 
       const maidens = bowlEventsByMatches.reduce(
         (acc, events) => acc + calculateMaidenOvers(events),
@@ -90,6 +93,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
         strikeRate,
         maidens,
         threeHauls,
+        fourHauls,
         fiveHauls,
         bestSpell,
         runsConceded,
@@ -136,6 +140,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                   <TableHead>Best</TableHead>
                   <TableHead>SR</TableHead>
                   <TableHead>3W</TableHead>
+                  <TableHead>4W</TableHead>
                   <TableHead>5W</TableHead>
                   <TableHead>Hattricks</TableHead>
                   <TableHead>Maidens</TableHead>
@@ -157,6 +162,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                         strikeRate,
                         maidens,
                         threeHauls,
+                        fourHauls,
                         fiveHauls,
                         runsConceded,
                         totalBalls,
@@ -193,6 +199,9 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                           </TableCell>
                           <TableCell className="text-center">
                             {threeHauls}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {fourHauls}
                           </TableCell>
                           <TableCell className="text-center">
                             {fiveHauls}
