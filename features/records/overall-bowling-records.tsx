@@ -19,26 +19,24 @@ function OverallBowlingRecords({
         bestSpell,
         player,
         dots,
-        economy,
+        totalBalls,
         fiveHauls,
         maidens,
         runsConceded,
-        strikeRate,
         threeHauls,
         hattricks,
       },
     ) => {
       acc.wickets += wickets;
       acc.dots += dots;
-      acc.economy += economy;
       acc.fiveHauls += fiveHauls;
       acc.maidens += maidens;
       acc.runsConceded += runsConceded;
-      acc.strikeRate += strikeRate;
       acc.threeHauls += threeHauls;
       acc.hattricks += hattricks;
+      acc.totalBalls += totalBalls;
 
-      if (bestSpell.wickets === acc.bestSpell.wickets) {
+      if (bestSpell && bestSpell.wickets === acc.bestSpell.wickets) {
         if (bestSpell.runs < acc.bestSpell.runs) {
           acc.bestSpell = {
             ...bestSpell,
@@ -46,7 +44,7 @@ function OverallBowlingRecords({
           };
         }
       }
-      if (bestSpell.wickets > acc.bestSpell.wickets) {
+      if (bestSpell && bestSpell.wickets > acc.bestSpell.wickets) {
         acc.bestSpell = {
           ...bestSpell,
           playerName: player.name,
@@ -59,11 +57,10 @@ function OverallBowlingRecords({
       wickets: 0,
       bestSpell: { wickets: 0, runs: 0, playerName: "" },
       dots: 0,
-      economy: 0,
       fiveHauls: 0,
       maidens: 0,
       runsConceded: 0,
-      strikeRate: 0,
+      totalBalls: 0,
       threeHauls: 0,
       hattricks: 0,
     },
@@ -85,12 +82,12 @@ function OverallBowlingRecords({
         <StatCard
           isFetching={isFetching}
           title="Economy"
-          stat={round(allRecords.economy / bowlingRecords.length)}
+          stat={round(allRecords.runsConceded / (allRecords.totalBalls / 6))}
         />
         <StatCard
           isFetching={isFetching}
           title="Balls per wicket"
-          stat={round(allRecords.strikeRate / bowlingRecords.length)}
+          stat={round(allRecords.totalBalls / allRecords.wickets)}
         />
         <StatCard
           isFetching={isFetching}

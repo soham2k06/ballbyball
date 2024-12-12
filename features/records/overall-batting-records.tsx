@@ -12,15 +12,19 @@ function OverallBattingRecords({
   isFetching: boolean;
 }) {
   const allRecords = battingRecords.reduce(
-    (acc, { runs, ballsFaced, fours, sixes, milestones, player, average }) => {
+    (
+      acc,
+      { runs, ballsFaced, fours, sixes, milestones, player, innings, notOuts },
+    ) => {
+      const outs = innings - notOuts;
       acc.runs += runs;
       acc.balls += ballsFaced;
+      acc.outs += outs;
       acc.fours += fours;
       acc.sixes += sixes;
       acc.thirties += milestones.thirties;
       acc.fifties += milestones.fifties;
       acc.hundreds += milestones.centuries;
-      acc.average += average === Infinity ? 0 : average;
       if (milestones.highestScore > acc.highestScore.runs) {
         acc.highestScore = {
           runs: milestones.highestScore,
@@ -33,6 +37,7 @@ function OverallBattingRecords({
     {
       runs: 0,
       balls: 0,
+      outs: 0,
       fours: 0,
       sixes: 0,
       thirties: 0,
@@ -40,7 +45,6 @@ function OverallBattingRecords({
       hundreds: 0,
       highestScore: { runs: 0, isNotOut: false, playerName: "" },
       strikeRate: 0,
-      average: 0,
     },
   );
 
@@ -65,7 +69,7 @@ function OverallBattingRecords({
         <StatCard
           isFetching={isFetching}
           title="Average"
-          stat={round(allRecords.average / battingRecords.length)}
+          stat={round(allRecords.runs / allRecords.outs)}
         />
         <StatCard
           isFetching={isFetching}
