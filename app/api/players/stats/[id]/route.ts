@@ -85,8 +85,7 @@ export async function GET(
       stumpings,
     };
 
-    const { ducks, thirties, fifties, centuries, highestScore, isNotout } =
-      calcMilestones(groupedMatchesBat);
+    const milestones = calcMilestones(groupedMatchesBat);
 
     const { fives: fiveHauls, threes: threeHauls } =
       calcWicketHauls(groupedMatchesBowl);
@@ -133,17 +132,12 @@ export async function GET(
       runs: runsScored,
       balls: ballsFaced,
       wickets: outs,
-      fifties,
-      centuries,
-      ducks,
-      thirties,
-      highestScore,
+      ...milestones,
       boundaryRate,
       dotsPlayed,
       singles,
       fours,
       sixes,
-      isNotoutOnHighestScore: isNotout,
     };
 
     const bowlingEvents = playerBallEvents

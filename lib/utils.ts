@@ -556,11 +556,16 @@ function calcMilestones(groupedMatches: {
   [matchId: string]: BallEventSemi[];
 }) {
   let ducks = 0;
+  let twenties = 0;
   let thirties = 0;
   let fifties = 0;
   let centuries = 0;
-  let highestScore = 0;
-  let isNotout = false;
+  let highestScore = {
+    runs: 0,
+    balls: 0,
+    isNotout: false,
+  };
+
   for (const matchId in groupedMatches) {
     const matchEvents = groupedMatches[matchId];
 
@@ -568,17 +573,22 @@ function calcMilestones(groupedMatches: {
       balls: matchEvents.map((event) => event.type),
       forBatsman: true,
     });
+
     if (totalBalls > 0 && runs === 0 && wickets === 1) ducks++;
+    if (runs >= 20 && runs < 30) twenties++;
     if (runs >= 30 && runs < 50) thirties++;
     if (runs >= 50 && runs < 100) fifties++;
     if (runs >= 100) centuries++;
-    if (runs > highestScore) {
-      highestScore = runs;
-      isNotout = wickets === 0;
+    if (runs > highestScore.runs) {
+      highestScore = {
+        runs,
+        balls: totalBalls,
+        isNotout: wickets === 0,
+      };
     }
   }
 
-  return { ducks, thirties, fifties, centuries, highestScore, isNotout };
+  return { ducks, twenties, thirties, fifties, centuries, highestScore };
 }
 
 function calcWicketHauls(groupedMatches: {

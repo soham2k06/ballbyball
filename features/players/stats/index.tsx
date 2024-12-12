@@ -40,6 +40,7 @@ function Content({
   const outTimes = data?.batting.wickets;
   const batAverage = (data?.batting.runs ?? 0) / (outTimes ?? 0);
 
+  const highestScore = data?.batting.highestScore;
   const bestSpell = data?.bowling.bestSpell;
 
   return (
@@ -79,7 +80,7 @@ function Content({
             isLoading={isLoading}
             data={
               data
-                ? `${data?.batting.highestScore}${data?.batting.isNotoutOnHighestScore ? "*" : ""}`
+                ? `${highestScore?.runs}${highestScore?.isNotout ? "*" : ""} (${highestScore?.balls})`
                 : "-"
             }
             dataKey="Best"

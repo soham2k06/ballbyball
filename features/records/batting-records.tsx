@@ -171,8 +171,8 @@ function BattingRecords({ date, matches }: RecordsProps) {
                             {notOuts}
                           </TableCell>
                           <TableCell className="text-center">
-                            {milestones.highestScore}
-                            {milestones.isNotout ? "*" : ""}
+                            {milestones.highestScore.runs}
+                            {milestones.highestScore.isNotout ? "*" : ""}
                           </TableCell>
                           <TableCell className="text-center">
                             {innings

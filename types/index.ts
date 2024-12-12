@@ -51,15 +51,21 @@ type PlayerStats = {
     runs: number;
     balls: number;
     wickets: number;
+
+    ducks: number;
+    twenties: number;
+    thirties: number;
     fifties: number;
     centuries: number;
-    ducks: number;
-    highestScore: number;
-    isNotoutOnHighestScore: boolean;
+    highestScore: {
+      runs: number;
+      balls: number;
+      isNotout: boolean;
+    };
+
     boundaryRate: number;
     dotsPlayed: number;
     singles: number;
-    thirties: number;
     fours: number;
     sixes: number;
   };
@@ -127,8 +133,11 @@ type BattingRecordsType = {
   matches: number;
   innings: number;
   milestones: {
-    highestScore: number;
-    isNotout: boolean;
+    highestScore: {
+      runs: number;
+      balls: number;
+      isNotout: boolean;
+    };
     thirties: number;
     fifties: number;
     centuries: number;

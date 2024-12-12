@@ -17,6 +17,8 @@ function OverallBattingRecords({
       { runs, ballsFaced, fours, sixes, milestones, player, innings, notOuts },
     ) => {
       const outs = innings - notOuts;
+      const highestScore = milestones.highestScore;
+
       acc.runs += runs;
       acc.balls += ballsFaced;
       acc.outs += outs;
@@ -25,10 +27,11 @@ function OverallBattingRecords({
       acc.thirties += milestones.thirties;
       acc.fifties += milestones.fifties;
       acc.hundreds += milestones.centuries;
-      if (milestones.highestScore > acc.highestScore.runs) {
+
+      if (highestScore.runs > acc.highestScore.runs) {
         acc.highestScore = {
-          runs: milestones.highestScore,
-          isNotOut: milestones.isNotout,
+          runs: highestScore.runs,
+          isNotOut: highestScore.isNotout,
           playerName: player.name,
         };
       }
