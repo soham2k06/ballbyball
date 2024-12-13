@@ -1,10 +1,74 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  hashedPassword String?
+
+  accounts Account[]
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationTokens")
 }
 
 model Match {
@@ -20,6 +84,9 @@ model Match {
   ballEvents        BallEvent[]
   matchTeams        MatchTeam[]
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("matches")
 }
 
@@ -30,6 +97,12 @@ model Player {
   image       String?
   teamId      String?      @db.ObjectId
   teamPlayers TeamPlayer[]
+  order       Int?
+
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  playerBatEvents  BallEvent[] @relation("playerBatsman")
+  playerBallEvents BallEvent[] @relation("playerBowler")
 
   @@map("players")
 }
@@ -42,6 +115,9 @@ model Team {
   matchId     String?      @db.ObjectId
   matchTeams  MatchTeam[]
   teamPlayers TeamPlayer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("teams")
 }
@@ -57,11 +133,12 @@ model TeamPlayer {
 }
 
 model MatchTeam {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  team    Team   @relation(fields: [teamId], references: [id])
-  teamId  String @db.ObjectId
-  match   Match  @relation(fields: [matchId], references: [id])
-  matchId String @db.ObjectId
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  batFirst Boolean?
+  team     Team     @relation(fields: [teamId], references: [id])
+  teamId   String   @db.ObjectId
+  match    Match    @relation(fields: [matchId], references: [id])
+  matchId  String   @db.ObjectId
 
   @@map("matchTeams")
 }
@@ -69,7 +146,9 @@ model MatchTeam {
 model BallEvent {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   userId    String
+  batsman   Player  @relation("playerBatsman", fields: [batsmanId], references: [id])
   batsmanId String  @db.ObjectId
+  bowler    Player  @relation("playerBowler", fields: [bowlerId], references: [id])
   bowlerId  String  @db.ObjectId
   type      String
   Match     Match?  @relation(fields: [matchId], references: [id])

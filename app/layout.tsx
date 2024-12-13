@@ -1,71 +1,62 @@
 import type { Metadata } from "next";
+
 import { Lato } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SessionProvider } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
 
+import { Provider } from "@/components/providers";
+
 // If loading a variable font, you don't need to specify the font weight
 const lato = Lato({
   subsets: ["latin"],
   weight: "400",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Ball By Ball | Your cricket partner",
-  description: "Your cricket partner",
-  creator: "Soham Bhikadiya & Rudra Bhikadiya",
+  applicationName: "BallByBall",
+  title: "BallByBall | Your Cricket Scoring Partner",
+  description:
+    "BallByBall is your ultimate cricket scoring partner. Add players, teams, and matches effortlessly. Track scores ball by ball, access real-time updates, and share scorecards with ease. Enjoy comprehensive analytics, intuitive features, and a free, user-friendly experience. Sign in and start scoring today!",
   keywords: [
+    "ballbyball",
+    "ballbyball cricket scoring",
+    "ballbyball cricket score",
+    "ballbyball cricket scorecard",
+    "ballbyball cricket score card",
+    "ballbyball scorecard maker",
+    "ballbyball score card maker",
+    "ballbyball scorecard generator",
+    "ballbyball score card generator",
+    "ballbyball scorecard creator",
+    "ballbyball score card creator",
+    "ballbyball scorecard builder",
+    "ballbyball score card builder",
+    "ballbyball scorecard template",
+    "ballbyball score card template",
+    "ballbyball scorecard format",
     "ball by ball",
-    "ball",
-    "by",
-    "ball by ball cricket",
+    "ball by ball cricket scoring",
     "ball by ball cricket score",
     "ball by ball cricket scorecard",
     "ball by ball cricket score card",
-    "ball by ball cricket scorecard maker",
-    "ball by ball cricket score card maker",
-    "ball by ball cricket scorecard generator",
-    "ball by ball cricket score card generator",
-    "ball by ball cricket scorecard creator",
-    "ball by ball cricket score card creator",
-    "ball by ball cricket scorecard builder",
-    "ball by ball cricket score card builder",
-    "ball by ball cricket scorecard template",
-    "ball by ball cricket score card template",
-    "ball by ball cricket scorecard format",
-    "cricket scorecard",
-    "cricket score card",
-    "cricket scorecard maker",
-    "cricket score card maker",
-    "cricket scorecard generator",
-    "cricket score card generator",
-    "cricket scorecard creator",
-    "cricket score card creator",
-    "cricket scorecard builder",
-    "cricket score card builder",
-    "cricket scorecard template",
-    "cricket score card template",
-    "cricket scorecard format",
-    "cricket score card format",
-    "cricket scorecard online",
-    "cricket score card online",
-    "cricket scorecard app",
-    "cricket score card app",
-    "cricket scorecard software",
-    "cricket score card software",
-    "cricket scorecard excel",
-    "cricket score card excel",
-    "cricket scorecard sheet",
-    "ball by ball cricket score card format",
-    "cricket",
-    "scorer",
-    "score",
-    "scorecard",
-    "cricket scorer",
-    "cricket score",
+    "ball by ball scorecard maker",
+    "ball by ball score card maker",
+    "ball by ball scorecard generator",
+    "ball by ball score card generator",
+    "ball by ball scorecard creator",
+    "ball by ball score card creator",
+    "ball by ball scorecard builder",
+    "ball by ball score card builder",
+    "ball by ball scorecard template",
+    "ball by ball score card template",
+    "ball by ball scorecard format",
     "cricket scorecard",
     "cricket score card",
     "cricket scorecard maker",
@@ -121,28 +112,75 @@ export const metadata: Metadata = {
     "cricket scorecard pdf free",
     "cricket score card pdf free",
     "cricket scorecard live free",
+    "cricket scoring",
+    "live cricket scoring",
+    "online cricket scoring",
+    "free cricket scoring",
+    "cricket scoring app",
+    "cricket scoring software",
+    "cricket scoring online",
+    "real-time cricket scoring",
   ],
+  authors: {
+    name: "Soham Bhikadiya",
+    url: "https://sohamb.tech",
+  },
+
+  openGraph: {
+    title: "BallByBall | Your cricket partner",
+    description:
+      "Add players, teams, and matches. Keep track of the score ball by ball. Share the scorecard with your friends. Ball By Ball is your cricket partner 🏏. It's totally free, just signin and start scoring! Cheers!",
+    images: "/opengraph-banner.png",
+  },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <head>
-          <link
-            rel="icon"
-            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎾</text></svg>"
-          />
-        </head>
-        <body className={cn("antialiased", lato.className)}>
-          {children}
-          <Analytics />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <head>
+        <link rel="icon" href="/favicons/favicon.ico" />
+        <link rel="icon" href="/favicons/favicon-32x32.png" sizes="32x32" />
+        <link rel="icon" href="/favicons/favicon-16x16.png" sizes="16x16" />
+        <link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png" />
+        <link
+          rel="icon"
+          href="/favicons/android-chrome-192x192.png"
+          sizes="192x192"
+        />
+        <link
+          rel="icon"
+          href="/favicons/android-chrome-512x512.png"
+          sizes="512x512"
+        />
+        <link rel="manifest" href="/favicons/site.webmanifest" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta
+          name="google-site-verification"
+          content="VoqGlTAQWR5pCGtJXLewyVpsxWiR1LZr4yRhSg30U-o"
+        />
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-7226440547183724"
+        ></meta>
+      </head>
+      <body className={cn("antialiased", lato.className)}>
+        <SessionProvider>
+          <Provider
+            attribute="class"
+            enableSystem
+            defaultTheme="system"
+            disableTransitionOnChange
+          >
+            {children}
+          </Provider>
+        </SessionProvider>
+        <Analytics />
+        <SpeedInsights />
+      </body>
+    </html>
   );
 }
