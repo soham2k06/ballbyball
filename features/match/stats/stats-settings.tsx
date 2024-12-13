@@ -60,8 +60,8 @@ function StatsAndSettings({
     setShowOverSummaries,
     showWormChart,
     setShowWormChart,
-    showComments,
-    setShowComments,
+    showNames,
+    setShowNames,
     showPlayerRivalries,
     setShowPlayerRivalries,
   } = useStatsOpenContext();
@@ -286,11 +286,11 @@ function StatsAndSettings({
                 <div className="flex gap-2">
                   <div className="flex items-center gap-1">
                     <Checkbox
-                      id="showComments"
-                      checked={showComments}
-                      onCheckedChange={() => setShowComments(!showComments)}
+                      id="showNames"
+                      checked={showNames}
+                      onCheckedChange={() => setShowNames(!showNames)}
                     />
-                    <Label htmlFor="showComments">Comments</Label>
+                    <Label htmlFor="showNames">Names</Label>
                   </div>
                   <TeamSelect
                     selectedTeam={selectedTeam}
@@ -301,7 +301,7 @@ function StatsAndSettings({
               </DrawerHeader>
               <FullOverSummary
                 ballEvents={selectedTeamEvents}
-                showComments={showComments}
+                showNames={showNames}
                 players={match.teams.flatMap((team) => team.players)}
               />
             </DrawerContent>

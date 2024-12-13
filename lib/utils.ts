@@ -8,14 +8,13 @@ import { twMerge } from "tailwind-merge";
 
 import {
   BallEventSemi,
-  CommentKey,
   EventType,
   PlayerPerformance,
   RecordType,
 } from "@/types";
 
 import getCachedSession from "./auth/session";
-import { commentsCollection, invalidBalls, wicketTypes } from "./constants";
+import { invalidBalls, wicketTypes } from "./constants";
 
 interface BatsmanStats {
   batsmanId: string;
@@ -126,72 +125,6 @@ function generateOverSummary(ballEvents: EventType[]) {
   }
 
   return { overSummaries, ballLimitInOver };
-}
-
-function getCommentByEvent({
-  batsman,
-  bowler,
-  event,
-  fielder,
-  randomIndex,
-}: {
-  batsman: string;
-  bowler: string;
-  event: CommentKey;
-  fielder?: string;
-  randomIndex: number;
-}) {
-  function replacePlaceHolder(str: string) {
-    return str
-      .replace(/{batsman}/g, batsman)
-      .replace(/{bowler}/g, bowler)
-      .replace(/{fielder}/g, fielder ?? "fielder");
-  }
-
-  const getRandomComment = (comments: string[]) => comments[randomIndex];
-
-  // Handle wicket events
-  if (event.startsWith("-1_")) {
-    const comments = commentsCollection[event.substring(0, 4) as CommentKey];
-    if (comments)
-      return replacePlaceHolder(getRandomComment(comments) ?? comments[0]);
-  } else if (
-    event.startsWith("-3") ||
-    event.startsWith("-2") ||
-    event.startsWith("-5")
-  ) {
-    // No ball, Wide, Byes with runs
-    const baseEvent = event.substring(0, 2) as CommentKey;
-    const runEvent = event.substring(2) as CommentKey;
-
-    const baseComments = commentsCollection[baseEvent];
-    const runComments = runEvent !== "0" ? commentsCollection[runEvent] : [];
-
-    if (baseComments && runComments) {
-      const baseComment = replacePlaceHolder(
-        getRandomComment(baseComments) ?? baseComments[0],
-      );
-      const runComment =
-        runEvent !== "0"
-          ? replacePlaceHolder(getRandomComment(runComments) ?? runComments[0])
-          : "";
-      return `${baseComment}${runComment ? ` and ${runComment}` : ""}`;
-    } else if (baseComments)
-      return replacePlaceHolder(
-        getRandomComment(baseComments) ?? baseComments[0],
-      );
-    else if (runComments)
-      return replacePlaceHolder(
-        getRandomComment(runComments) ?? runComments[0],
-      );
-  } else {
-    // Normal events
-    const comments = commentsCollection[event];
-    if (comments)
-      return replacePlaceHolder(getRandomComment(comments) ?? comments[0]);
-  }
-  // Default comment
-  return "An unusual event occurred!";
 }
 
 function getBatsmanStats(events: BallEvent[]): BatsmanStats[] {
@@ -841,7 +774,6 @@ export {
   getIsNotOut,
   toastError,
   round,
-  getCommentByEvent,
   mapGroupedMatches,
   calcBestSpells,
   toPercentage,

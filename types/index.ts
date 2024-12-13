@@ -2,8 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 
 import { BallEvent, Match, Player, Team } from "@prisma/client";
 
-import { commentsCollection } from "@/lib/constants";
-
 type EventType = "0" | "1" | "2" | "3" | "4" | "6" | "-1" | "-2" | "-3" | "-5";
 
 type OverlayStateProps = {
@@ -167,7 +165,6 @@ type BowlingRecordsType = {
   dots: number;
   hattricks: number;
 };
-type CommentKey = keyof typeof commentsCollection;
 
 type RecordBallEvent = {
   type: string;
@@ -209,7 +206,6 @@ type BallEventSemi = Pick<
 >;
 
 export type {
-  CommentKey,
   EventType,
   OverlayStateProps,
   PlayerPerformance,

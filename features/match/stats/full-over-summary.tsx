@@ -2,15 +2,13 @@ import { BallEvent } from "@prisma/client";
 
 import {
   calcRuns,
-  // generateOverSummary,
-  getCommentByEvent,
   getIsvalidBall,
   getOverStr,
   getScore,
   round,
 } from "@/lib/utils";
 import { CreateBallEventSchema } from "@/lib/validation/ball-event";
-import { CommentKey, EventType, PlayerSimplified } from "@/types";
+import { EventType, PlayerSimplified } from "@/types";
 
 import BallSummary from "../scorer/ball-summary";
 
@@ -22,16 +20,15 @@ type BallInfo = {
   bowler: string | undefined;
   fielder: string | undefined;
   overStr: string;
-  randomIndex: number;
 };
 
 function FullOverSummary({
   ballEvents,
-  showComments,
+  showNames,
   players,
 }: {
   ballEvents: Event[];
-  showComments: boolean;
+  showNames: boolean;
   players?: PlayerSimplified[];
 }) {
   function generateOverSummary(ballEvents: Event[]) {
@@ -222,16 +219,6 @@ function FullOverSummary({
     let validBallCount = 0;
     let currentOver: BallInfo[] = [];
 
-    function getRandomNumberFromString(str: string) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        hash = (hash << 5) - hash + str.charCodeAt(i);
-        hash |= 0;
-      }
-
-      return Math.abs(hash) % 5;
-    }
-
     for (const ballEvent of ballEvents) {
       const isInvalidBall = getIsvalidBall(ballEvent.type);
       const batsman = players?.find((p) => p.id === ballEvent.batsmanId);
@@ -255,9 +242,6 @@ function FullOverSummary({
           validBallCount + overSummaries.length * 6 + 1,
           true,
         ),
-        randomIndex: getRandomNumberFromString(
-          (ballEvent as BallEvent).id || validBallCount.toString(),
-        ),
       });
       if (isInvalidBall) {
         validBallCount++;
@@ -277,13 +261,13 @@ function FullOverSummary({
     return overSummaries;
   }
 
-  const fullOverSummary = showComments ? getFullOverSummary(ballEvents) : [];
+  const fullOverSummary = showNames ? getFullOverSummary(ballEvents) : [];
 
   return (
     <>
       {ballEvents.length > 0 ? (
         <ul className="h-[calc(100dvh-160px)] divide-y overflow-y-auto p-2">
-          {showComments
+          {showNames
             ? fullOverSummary.map((over, overI) => {
                 const { runs, wickets } = getScore({
                   balls: over.map((b) => b.type),
@@ -295,21 +279,15 @@ function FullOverSummary({
                   >
                     <div className="flex gap-2 text-sm font-bold">
                       <h3>
-                        Over {overI + 1}, {runs}/{wickets}
+                        Over {overI + 1}, {runs}/{wickets}, bowler:{" "}
+                        {over[0].bowler}
                       </h3>
                     </div>
                     <ul className="flex flex-col gap-4">
                       {over.map((ball, ballI) => {
-                        const comment = getCommentByEvent({
-                          batsman: ball.batsman ?? "batsman",
-                          bowler: ball.bowler ?? "bowler",
-                          fielder: ball.fielder,
-                          event: ball.type as CommentKey,
-                          randomIndex: ball.randomIndex,
-                        });
                         return (
                           <li
-                            className="flex gap-4 sm:gap-8 md:items-center"
+                            className="flex items-center gap-4 sm:gap-8"
                             key={ballI}
                           >
                             <BallSummary
@@ -317,8 +295,7 @@ function FullOverSummary({
                               radius="sm"
                             />
                             <p className="max-sm:text-sm">
-                              {ball.overStr}: {ball.bowler} to {ball.batsman},{" "}
-                              {comment}
+                              {ball.overStr}: {ball.batsman}
                             </p>
                           </li>
                         );
