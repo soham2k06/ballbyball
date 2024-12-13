@@ -22,7 +22,11 @@ function RivalryCard({
   inMatch?: boolean;
 }) {
   return (
-    <Card>
+    <Card
+      className={cn({
+        "border-none shadow-none": inMatch,
+      })}
+    >
       <CardHeader className="space-y-0 max-sm:pb-0">
         <CardTitle className="truncate max-sm:text-lg">
           <span

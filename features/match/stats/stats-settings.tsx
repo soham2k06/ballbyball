@@ -23,6 +23,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -32,6 +33,7 @@ import { TypographyH2, TypographyP } from "@/components/ui/typography";
 
 import FullOverSummary from "./full-over-summary";
 import OverStats from "./over-stats";
+import PlayerRivalries from "./player-rivalries";
 import StatsDrawerHeader from "./stats-drawer-header";
 import TeamSelect from "./team-select";
 import WormChart from "./worm-chart";
@@ -52,14 +54,16 @@ function StatsAndSettings({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const {
-    setShowRunrateChart,
     showRunrateChart,
-    setShowOverSummaries,
+    setShowRunrateChart,
     showOverSummaries,
+    setShowOverSummaries,
     showWormChart,
     setShowWormChart,
     showComments,
     setShowComments,
+    showPlayerRivalries,
+    setShowPlayerRivalries,
   } = useStatsOpenContext();
 
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
@@ -138,6 +142,7 @@ function StatsAndSettings({
 
   return (
     <>
+      {/* Main drawer */}
       <Drawer
         open={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
@@ -247,8 +252,10 @@ function StatsAndSettings({
           </DrawerContent>
         )}
       </Drawer>
+
       {match && curTeam && (
         <>
+          {/* Run rate chart */}
           <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
             <DrawerContent>
               <div className="mx-auto w-full max-w-7xl">
@@ -266,6 +273,8 @@ function StatsAndSettings({
               </div>
             </DrawerContent>
           </Drawer>
+
+          {/* Over summaries */}
           <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>
             <DrawerContent>
               <DrawerHeader className="relative mb-2 flex items-center justify-between gap-2 pb-4 pt-6">
@@ -297,6 +306,8 @@ function StatsAndSettings({
               />
             </DrawerContent>
           </Drawer>
+
+          {/* Worm chart */}
           <Drawer open={showWormChart} onOpenChange={setShowWormChart}>
             <DrawerContent>
               <DrawerHeader className="mb-2 pb-4 pt-6">
@@ -318,6 +329,34 @@ function StatsAndSettings({
                 ]}
                 teams={match.teams}
                 totalOvers={match.overs}
+              />
+            </DrawerContent>
+          </Drawer>
+
+          {/* Player Rivalries */}
+          <Drawer
+            open={showPlayerRivalries}
+            onOpenChange={setShowPlayerRivalries}
+          >
+            <DrawerContent>
+              <DrawerHeader className="mb-2 pb-4 pt-6">
+                <div className="flex items-center justify-between gap-2">
+                  <DrawerTitle className="text-xl">
+                    Player Rivalries
+                  </DrawerTitle>
+                  <TeamSelect
+                    selectedTeam={selectedTeam}
+                    setSelectedTeam={setSelectedTeam}
+                    teams={match.teams}
+                  />
+                </div>
+                <DrawerDescription>
+                  Click on rivalry to view more details
+                </DrawerDescription>
+              </DrawerHeader>
+              <PlayerRivalries
+                ballEvents={selectedTeamEvents}
+                players={match.teams.flatMap((team) => team.players)}
               />
             </DrawerContent>
           </Drawer>
