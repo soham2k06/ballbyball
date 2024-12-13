@@ -499,10 +499,6 @@ async function getValidatedUser() {
   return session.user.id;
 }
 
-export function add(a: number, b: number) {
-  return a + b;
-}
-
 async function createOrUpdateWithUniqueName(
   name: string,
   schema: PrismaClient["player"] | PrismaClient["team"] | PrismaClient["match"],
