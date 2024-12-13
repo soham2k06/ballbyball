@@ -15,9 +15,11 @@ import BallSummary from "../match/scorer/ball-summary";
 function RivalryCard({
   rivalry,
   player,
+  inMatch,
 }: {
   rivalry: RivalriesResult;
   player: string | null;
+  inMatch?: boolean;
 }) {
   return (
     <Card>
@@ -45,39 +47,35 @@ function RivalryCard({
             {rivalry.bowler}
           </span>
         </CardTitle>
-        <CardDescription>{rivalry.matches} matches</CardDescription>
+        {!!rivalry.matches && (
+          <CardDescription>{rivalry.matches} matches</CardDescription>
+        )}
       </CardHeader>
       <CardContent>
+        <p className="mb-1 text-sm font-semibold">
+          {rivalry.runs}
+          {rivalry.wickets === 0 && "*"} ({rivalry.balls})
+          {rivalry.wickets > 0 &&
+            (inMatch ? " out" : <> - {rivalry.wickets} outs</>)}
+        </p>
         <ul className="text-xs sm:text-sm">
           <li className="flex items-center justify-between">
-            <h6 className="font-semibold">Runs</h6>
-            <p>{rivalry.runs}</p>
-          </li>
-          <li className="flex items-center justify-between">
-            <h6 className="font-semibold">Balls</h6>
-            <p>{rivalry.balls}</p>
-          </li>
-          <li className="flex items-center justify-between">
-            <h6 className="font-semibold">Outs</h6>
-            <p>{rivalry.wickets}</p>
-          </li>
-          <li className="flex items-center justify-between">
-            <h6 className="font-semibold">Strike Rate</h6>
+            <h6 className="font-medium">Strike Rate</h6>
             <p>{round(rivalry.strikeRate, 1)}</p>
           </li>
           <li className="flex items-center justify-between">
-            <h6 className="font-semibold">Boundaries</h6>
+            <h6 className="font-medium">Boundaries</h6>
             <p>{rivalry.boundaries}</p>
           </li>
           <li className="flex items-center justify-between">
-            <h6 className="font-semibold">Dots</h6>
+            <h6 className="font-medium">Dots</h6>
             <p>{rivalry.dots}</p>
           </li>
         </ul>
 
         <ProgressSplit points={rivalry.dominance} title="Dominance" />
         {rivalry.recentBalls.length && (
-          <ul className="mt-4 flex gap-2 overflow-auto py-2">
+          <ul className="mt-2 flex gap-2 overflow-auto py-2 sm:mt-4">
             {rivalry.recentBalls.map((event, i) => (
               <BallSummary key={i} event={event as EventType} size="xs" />
             ))}
