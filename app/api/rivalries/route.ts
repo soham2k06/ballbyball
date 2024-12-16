@@ -166,8 +166,8 @@ export async function GET(req: NextRequest) {
           (bowlerPoints / (batsmanPoints + bowlerPoints)) * 100;
 
         rivalry.dominance = [
-          Math.round(Math.min(100, Math.max(0, batsmanDominance || 50))),
-          Math.round(Math.min(100, Math.max(0, bowlerDominance || 50))),
+          Math.round(Math.min(100, Math.max(0, batsmanDominance))),
+          Math.round(Math.min(100, Math.max(0, bowlerDominance))),
         ];
 
         return rivalry;

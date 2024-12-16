@@ -63,8 +63,12 @@ function MatchSummary({
     playerIds.includes(event.bowlerId),
   );
 
-  const { setShowRunrateChart, setShowOverSummaries, setShowWormChart } =
-    useStatsOpenContext();
+  const {
+    setShowRunrateChart,
+    setShowOverSummaries,
+    setShowWormChart,
+    setShowPlayerRivalries,
+  } = useStatsOpenContext();
 
   const { allowSinglePlayer, overs } = match || {
     allowSinglePlayer: false,
@@ -476,6 +480,9 @@ function MatchSummary({
               </Button>
               <Button size="sm" onClick={() => setShowOverSummaries(true)}>
                 Over summaries
+              </Button>
+              <Button size="sm" onClick={() => setShowPlayerRivalries(true)}>
+                Player rivalries
               </Button>
             </div>
             <Separator className="my-2" />

@@ -17,27 +17,32 @@ interface StatsOpenContextProps {
   setShowOverSummaries: SetOpenType;
   showWormChart: boolean;
   setShowWormChart: SetOpenType;
-  showComments: boolean;
-  setShowComments: SetOpenType;
+  showNames: boolean;
+  setShowNames: SetOpenType;
+  showPlayerRivalries: boolean;
+  setShowPlayerRivalries: SetOpenType;
 }
 
 const StatsOpenContext = createContext<StatsOpenContextProps>({
   showRunrateChart: false,
-  showOverSummaries: false,
-  showWormChart: false,
-  showComments: false,
   setShowRunrateChart: () => {},
+  showOverSummaries: false,
   setShowOverSummaries: () => {},
+  showWormChart: false,
   setShowWormChart: () => {},
-  setShowComments: () => {},
+  showNames: false,
+  setShowNames: () => {},
+  showPlayerRivalries: false,
+  setShowPlayerRivalries: () => {},
 });
 
 function StatsOpenProvider({ children }: { children: React.ReactNode }) {
   const [showRunrateChart, setShowRunrateChart] = useState(false);
   const [showOverSummaries, setShowOverSummaries] = useState(false);
   const [showWormChart, setShowWormChart] = useState(false);
+  const [showPlayerRivalries, setShowPlayerRivalries] = useState(false);
 
-  const [showComments, setShowComments] = useState(false);
+  const [showNames, setShowNames] = useState(false);
 
   return (
     <StatsOpenContext.Provider
@@ -48,8 +53,10 @@ function StatsOpenProvider({ children }: { children: React.ReactNode }) {
         setShowOverSummaries,
         showWormChart,
         setShowWormChart,
-        showComments,
-        setShowComments,
+        showNames,
+        setShowNames,
+        showPlayerRivalries,
+        setShowPlayerRivalries,
       }}
     >
       {children}
