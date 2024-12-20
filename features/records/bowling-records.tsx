@@ -187,7 +187,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                             {matches}
                           </TableCell>
                           <TableCell className="text-center">
-                            {economy ? round(economy) : "-"}
+                            {economy ? round(economy, 1) : "-"}
                           </TableCell>
                           <TableCell className="text-center">
                             {bestSpell
@@ -195,7 +195,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                               : "-"}
                           </TableCell>
                           <TableCell className="text-center">
-                            {strikeRate ? round(strikeRate) : "-"}
+                            {strikeRate ? round(strikeRate, 1) : "-"}
                           </TableCell>
                           <TableCell className="text-center">
                             {threeHauls}

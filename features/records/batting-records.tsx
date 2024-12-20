@@ -178,11 +178,11 @@ function BattingRecords({ date, matches }: RecordsProps) {
                             {innings
                               ? average === Infinity
                                 ? "N/A"
-                                : round(average)
+                                : round(average, 1)
                               : "-"}
                           </TableCell>
                           <TableCell className="text-center">
-                            {round(strikeRate)}
+                            {Math.round(strikeRate)}
                           </TableCell>
                           <TableCell className="text-center">
                             {ballsFaced}
