@@ -44,18 +44,18 @@ function TeamCard({
   userRef,
 }: TeamProps) {
   return (
-    <Card className="flex items-center justify-between p-2 sm:p-4">
-      <CardTitle
-        className="w-full cursor-pointer truncate py-1 text-xl"
-        onClick={() => {
-          setOpen(true);
-          setShowingTeam({
-            players: team.players,
-            captainId: team.captain,
-            name: team.name,
-          });
-        }}
-      >
+    <Card
+      className="flex cursor-pointer items-center justify-between p-2 sm:p-4"
+      onClick={() => {
+        setOpen(true);
+        setShowingTeam({
+          players: team.players,
+          captainId: team.captain,
+          name: team.name,
+        });
+      }}
+    >
+      <CardTitle className="w-full truncate py-1 text-xl">
         {team.name}
       </CardTitle>
       {!userRef && (
@@ -68,13 +68,19 @@ function TeamCard({
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               className="gap-2 font-bold"
-              onClick={() => handleUpdateClick(team)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUpdateClick(team);
+              }}
             >
               <Edit size={20} /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               className="gap-2 font-bold"
-              onClick={() => setTeamToDelete(team.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setTeamToDelete(team.id);
+              }}
             >
               <Trash2 size={20} /> Delete
             </DropdownMenuItem>
