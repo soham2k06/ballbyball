@@ -35,6 +35,10 @@ function RecordsList() {
         </TabsList>
         <div className="flex gap-2 max-sm:w-full">
           <DatePicker date={date} setDate={setDate} />
+          <label
+            htmlFor="lastMatchesSelection-records"
+            className="sr-only"
+          ></label>
           <Select
             className="w-fit max-sm:w-full"
             value={matches ?? "10"}
