@@ -60,21 +60,19 @@ function PlayerCard({
 
   return (
     <Card
-      className="flex items-center justify-between p-2 sm:p-4"
+      className="flex cursor-pointer items-center justify-between p-2 sm:p-4"
       {...(isSorting ? attributes : {})}
       {...(isSorting ? listeners : {})}
       style={isSorting ? style : undefined}
       ref={isSorting ? setNodeRef : undefined}
+      onClick={() =>
+        setOpenedPlayer({
+          id: player.id,
+          name: player.name,
+        })
+      }
     >
-      <CardTitle
-        onClick={() =>
-          setOpenedPlayer({
-            id: player.id,
-            name: player.name,
-          })
-        }
-        className="w-full cursor-pointer truncate py-1 text-xl"
-      >
+      <CardTitle className="w-full truncate py-1 text-xl">
         {player.name}
       </CardTitle>
 
@@ -88,7 +86,10 @@ function PlayerCard({
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               className="gap-2 font-medium"
-              onClick={() => handleShowMatches(player.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleShowMatches(player.id);
+              }}
             >
               <LandPlot size={20} /> Matches
             </DropdownMenuItem>
@@ -97,7 +98,8 @@ function PlayerCard({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="gap-2 font-medium"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (player.id.includes("optimistic"))
                       return toast.error(
                         "Error updating player, please reload and try again",
@@ -109,7 +111,8 @@ function PlayerCard({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="gap-2 font-medium"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (player.id.includes("optimistic"))
                       return toast.error(
                         "Error deleting player, please reload and try again",
