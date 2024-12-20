@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { BallEvent, Prisma } from "@prisma/client";
 import { endOfDay, startOfDay } from "date-fns";
 
+import { wicketTypes } from "@/lib/constants";
 import prisma from "@/lib/db/prisma";
 import { getIsvalidBall, getScore, getValidatedUser } from "@/lib/utils";
 import { RivalriesResult } from "@/types";
-import { wicketTypes } from "@/lib/constants";
 
 function getAllRivalries(
   events: (Omit<BallEvent, "userId" | "id"> & {
