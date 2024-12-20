@@ -6,6 +6,7 @@ import { endOfDay, startOfDay } from "date-fns";
 import prisma from "@/lib/db/prisma";
 import { getIsvalidBall, getScore, getValidatedUser } from "@/lib/utils";
 import { RivalriesResult } from "@/types";
+import { wicketTypes } from "@/lib/constants";
 
 function getAllRivalries(
   events: (Omit<BallEvent, "userId" | "id"> & {
@@ -53,7 +54,13 @@ function getAllRivalries(
     const isValidBall = getIsvalidBall(type);
 
     if (isValidBall) rivalry.balls += totalBalls;
-    rivalry.wickets += wickets;
+
+    if (wickets) {
+      const typeId = Number(type.split("_")[1]);
+      const wicketType = wicketTypes.find((item) => item.id === typeId);
+
+      if (!wicketType?.isNotBowlersWicket) rivalry.wickets += wickets;
+    }
     rivalry.runs += runs;
     rivalry.strikeRate = (rivalry.runs / rivalry.balls) * 100;
     if (type === "0") rivalry.dots++;
