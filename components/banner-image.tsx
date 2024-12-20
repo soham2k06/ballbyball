@@ -9,7 +9,7 @@ function BannerImage() {
 
   return (
     <Image
-      src={`/banner-demo-${theme}.png`}
+      src={`/banner-demo-${theme ?? "light"}.png`}
       alt="Cricket Scorer demo"
       width={320}
       height={800}
