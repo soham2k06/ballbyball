@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useRecords } from "@/api-hooks/use-records";
+import { addAnalytics } from "@/lib/actions/app-analytics";
 import {
   calcMilestones,
   getScore,
@@ -97,6 +98,15 @@ function BattingRecords({ date, matches }: RecordsProps) {
   const [numRecordsToShow, setNumRecordsToShow] = useState(10);
 
   const recordsToShow = battingRecords.slice(0, numRecordsToShow);
+
+  function handleShowAll() {
+    addAnalytics({
+      event: "click",
+      module: "stats",
+      property: "btn-show_all_batting_records",
+    });
+    setNumRecordsToShow(battingRecords.length);
+  }
 
   return (
     <TabsContent value="runs">
@@ -215,7 +225,7 @@ function BattingRecords({ date, matches }: RecordsProps) {
               {battingRecords.length > numRecordsToShow && (
                 <Button
                   className="mt-4 w-full max-w-sm self-center"
-                  onClick={() => setNumRecordsToShow(battingRecords.length)}
+                  onClick={handleShowAll}
                 >
                   Show all
                 </Button>

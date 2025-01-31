@@ -4,6 +4,7 @@ import { Player } from "@prisma/client";
 import { Edit, LandPlot, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { addAnalytics } from "@/lib/actions/app-analytics";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 
 import { Button } from "@/components/ui/button";
@@ -55,8 +56,27 @@ function PlayerCard({
   };
 
   const handleDelete = (playerId: string) => setPlayerToDelete(playerId);
-  const handleShowMatches = (playerId: string) =>
-    setPlayerMatchesOpen(playerId);
+
+  function handleViewPlayerStats() {
+    addAnalytics({
+      event: "click",
+      module: "stats",
+      property: "card-view_player_stats",
+    });
+    setOpenedPlayer({
+      id: player.id,
+      name: player.name,
+    });
+  }
+
+  function handleViewPlayerMatches() {
+    addAnalytics({
+      event: "click",
+      module: "stats",
+      property: "btn-view_player_matches",
+    });
+    setPlayerMatchesOpen(player.id);
+  }
 
   return (
     <Card
@@ -65,12 +85,7 @@ function PlayerCard({
       {...(isSorting ? listeners : {})}
       style={isSorting ? style : undefined}
       ref={isSorting ? setNodeRef : undefined}
-      onClick={() =>
-        setOpenedPlayer({
-          id: player.id,
-          name: player.name,
-        })
-      }
+      onClick={handleViewPlayerStats}
     >
       <CardTitle className="w-full truncate py-1 text-xl">
         {player.name}
@@ -88,7 +103,7 @@ function PlayerCard({
               className="gap-2 font-medium"
               onClick={(e) => {
                 e.stopPropagation();
-                handleShowMatches(player.id);
+                handleViewPlayerMatches();
               }}
             >
               <LandPlot size={20} /> Matches

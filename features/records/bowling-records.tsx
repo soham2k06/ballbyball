@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useRecords } from "@/api-hooks/use-records";
+import { addAnalytics } from "@/lib/actions/app-analytics";
 import {
   calcBestSpells,
   calculateMaidenOvers,
@@ -116,6 +117,15 @@ function BowlingRecords({ date, matches }: RecordsProps) {
   const [numRecordsToShow, setNumRecordsToShow] = useState(10);
 
   const recordsToShow = bowlingRecords.slice(0, numRecordsToShow);
+
+  function handleShowAll() {
+    addAnalytics({
+      event: "click",
+      module: "stats",
+      property: "btn-show_all_bowling_records",
+    });
+    setNumRecordsToShow(bowlingRecords.length);
+  }
 
   return (
     <TabsContent value="wickets">
@@ -236,7 +246,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
               {bowlingRecords.length > numRecordsToShow && (
                 <Button
                   className="mt-4 w-full max-w-sm self-center"
-                  onClick={() => setNumRecordsToShow(bowlingRecords.length)}
+                  onClick={handleShowAll}
                 >
                   Show all
                 </Button>

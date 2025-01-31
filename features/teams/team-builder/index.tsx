@@ -8,6 +8,7 @@ import {
   usePlayers,
   useSortedPlayersByPerformance,
 } from "@/api-hooks/use-players";
+import { addAnalytics } from "@/lib/actions/app-analytics";
 import { createMultipleTeams } from "@/lib/actions/team";
 import { useActionMutate } from "@/lib/hooks";
 import { toastError, toPercentage } from "@/lib/utils";
@@ -113,6 +114,24 @@ function TeamBuilder() {
         );
   }, [players, teams, isLoading]);
 
+  function handleOpenBuilder() {
+    addAnalytics({
+      event: "click",
+      property: "btn-build_team_open",
+      module: "teams",
+    });
+  }
+
+  function handleSortByPerformance() {
+    addAnalytics({
+      event: "click",
+      property: "btn-sort_by_performance_in_team_builder",
+      module: "teams",
+    });
+    setSortPlayers(true);
+    sort();
+  }
+
   const handlePut = useCallback(
     (index: number) => {
       if (!selectedPlayer) return;
@@ -186,7 +205,7 @@ function TeamBuilder() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild onClick={handleOpenBuilder}>
         <Button>Build teams</Button>
       </DialogTrigger>
       <DialogContent className="max-h-[95%] overflow-y-auto">
@@ -224,10 +243,7 @@ function TeamBuilder() {
                   variant="secondary"
                   type="button"
                   loading={isSorting}
-                  onClick={() => {
-                    setSortPlayers(true);
-                    sort();
-                  }}
+                  onClick={handleSortByPerformance}
                 >
                   {!isSorting ? <SortDesc className="size-4" /> : null}
                 </LoadingButton>
@@ -263,6 +279,13 @@ function TeamBuilder() {
             type="submit"
             className="mt-6 max-sm:w-full"
             loading={isPending}
+            onClick={() =>
+              addAnalytics({
+                event: "click",
+                property: "btn-create_team_builder",
+                module: "teams",
+              })
+            }
           >
             Create teams
           </LoadingButton>

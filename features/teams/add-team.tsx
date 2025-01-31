@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { usePlayers } from "@/api-hooks/use-players";
+import { addAnalytics } from "@/lib/actions/app-analytics";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,15 +26,19 @@ function AddTeamButton() {
 
   const [showCreatePlayer, setShowCreatePlayer] = useState(false);
 
+  function handleAddTeamClick() {
+    addAnalytics({
+      event: "click",
+      property: "btn-add_team_open",
+      module: "teams",
+    });
+    if (!players.length) setShowCreatePlayer(true);
+    else setOpen(true);
+  }
+
   return (
     <>
-      <Button
-        onClick={() => {
-          if (!players.length) setShowCreatePlayer(true);
-          else setOpen(true);
-        }}
-        disabled={isLoading}
-      >
+      <Button onClick={handleAddTeamClick} disabled={isLoading}>
         Add single
       </Button>
 

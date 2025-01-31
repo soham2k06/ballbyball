@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
-
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -38,7 +36,6 @@ import TargetInfo from "./target-info";
 
 interface MatchSummaryProps {
   open: OverlayStateProps["open"];
-  setShowScorecard: Dispatch<SetStateAction<boolean>>;
   ballEvents: BallEvent[] | CreateBallEventSchema[];
   handleUndo: () => void;
   match: MatchExtended | undefined;
@@ -48,7 +45,6 @@ interface MatchSummaryProps {
 
 function MatchSummary({
   open,
-  setShowScorecard,
   ballEvents,
   handleUndo,
   match,
@@ -64,10 +60,11 @@ function MatchSummary({
   );
 
   const {
-    setShowRunrateChart,
-    setShowOverSummaries,
-    setShowWormChart,
-    setShowPlayerRivalries,
+    handleShowScorecard,
+    handleShowOverSummaries,
+    handleShowPlayerRivalries,
+    handleShowRunrateChart,
+    handleShowWormChart,
   } = useStatsOpenContext();
 
   const { allowSinglePlayer, overs } = match || {
@@ -140,18 +137,18 @@ function MatchSummary({
     },
   ];
 
-  const ballEventsbyTeam = (i: number) =>
+  const getBallEventsbyTeam = (i: number) =>
     ballEvents
       .filter((event) => teams[i]?.playerIds?.includes(event.batsmanId))
       .map((event) => event.type);
 
-  const { runs: runs1 } = getScore({ balls: ballEventsbyTeam(0) });
+  const { runs: runs1 } = getScore({ balls: getBallEventsbyTeam(0) });
   const {
     runs: runs2,
     wickets: wickets2,
     totalBalls,
   } = getScore({
-    balls: ballEventsbyTeam(1),
+    balls: getBallEventsbyTeam(1),
   });
   const totalWickets = teams[1]?.playerIds?.length ?? 0;
 
@@ -328,7 +325,7 @@ function MatchSummary({
             <div className="flex justify-between gap-2">
               {teams.map((team, i) => {
                 const { runs, totalBalls, wickets } = getScore({
-                  balls: ballEventsbyTeam(i) || [],
+                  balls: getBallEventsbyTeam(i) || [],
                 });
 
                 return (
@@ -398,7 +395,7 @@ function MatchSummary({
             <ul className="space-y-2">
               {teams.map((team, i) => {
                 const { runs, totalBalls, wickets } = getScore({
-                  balls: ballEventsbyTeam(i) || [],
+                  balls: getBallEventsbyTeam(i) || [],
                 });
 
                 if (!totalBalls && !runs && !wickets)
@@ -469,19 +466,19 @@ function MatchSummary({
 
             <Separator className="my-2" />
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" onClick={() => setShowScorecard(true)}>
+              <Button size="sm" onClick={() => handleShowScorecard(true)}>
                 Scorecard
               </Button>
-              <Button size="sm" onClick={() => setShowRunrateChart(true)}>
+              <Button size="sm" onClick={() => handleShowRunrateChart(true)}>
                 Run rate chart
               </Button>
-              <Button size="sm" onClick={() => setShowWormChart(true)}>
+              <Button size="sm" onClick={() => handleShowWormChart(true)}>
                 Worm Chart
               </Button>
-              <Button size="sm" onClick={() => setShowOverSummaries(true)}>
+              <Button size="sm" onClick={() => handleShowOverSummaries(true)}>
                 Over summaries
               </Button>
-              <Button size="sm" onClick={() => setShowPlayerRivalries(true)}>
+              <Button size="sm" onClick={() => handleShowPlayerRivalries(true)}>
                 Player rivalries
               </Button>
             </div>

@@ -1,3 +1,4 @@
+import { addAnalytics } from "@/lib/actions/app-analytics";
 import { round } from "@/lib/utils";
 import { PlayerStats } from "@/types";
 
@@ -17,9 +18,17 @@ function MoreBowling({ data }: { data: PlayerStats }) {
   const wicketsTaken = data?.bowling.wickets;
   const ballStrikeRate = (data?.bowling.balls ?? 0) / (wicketsTaken ?? 0);
 
+  function handleClickMore() {
+    addAnalytics({
+      event: "click",
+      module: "stats",
+      property: "btn-view_more_bowling",
+    });
+  }
+
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild onClick={handleClickMore}>
         <Button variant="secondary" size="sm">
           More
         </Button>

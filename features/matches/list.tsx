@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { addAnalytics } from "@/lib/actions/app-analytics";
 import { deleteMatch } from "@/lib/actions/match";
 import { getAllTeams } from "@/lib/actions/team";
 import { useActionMutate } from "@/lib/hooks";
@@ -51,6 +52,19 @@ function MatchList({
 
   const [matchToDelete, setMatchToDelete] = useState<string | null>(null);
 
+  function handleShowMore() {
+    addAnalytics({
+      event: "click",
+      property: "btn-show_more_matches",
+      module: "matches",
+    });
+    const curSize = parseInt(searchParams.get("size") ?? "5");
+    const newRoute = `/matches?size=${curSize + 5}`;
+    router.push(userRef ? `${newRoute}&user=${userRef}` : newRoute, {
+      scroll: false,
+    });
+  }
+
   return (
     <div
       className={cn({
@@ -74,19 +88,7 @@ function MatchList({
           </ul>
           {matchesCount > matches.length && (
             <div className="mt-8 flex justify-center">
-              <Button
-                className="w-full max-w-md"
-                onClick={() => {
-                  const curSize = parseInt(searchParams.get("size") ?? "5");
-                  const newRoute = `/matches?size=${curSize + 5}`;
-                  router.push(
-                    userRef ? `${newRoute}&user=${userRef}` : newRoute,
-                    {
-                      scroll: false,
-                    },
-                  );
-                }}
-              >
+              <Button className="w-full max-w-md" onClick={handleShowMore}>
                 Show more
               </Button>
             </div>

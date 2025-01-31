@@ -7,6 +7,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// AUTH
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
@@ -71,6 +72,40 @@ model VerificationToken {
   @@map("verificationTokens")
 }
 
+// Analytics
+enum AnalyticsEvent {
+  page_view
+  click
+}
+
+enum AnalyticsModule {
+  players
+  matches
+  scorer
+  teams
+  stats
+  instant_scorer
+  guide
+  home
+  auth
+  other
+}
+
+model Analytics {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId String?
+
+  event    AnalyticsEvent
+  property String // eg. "/players", "start_match", "btn-add_player", "nav_link"
+  module   AnalyticsModule
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("analytics")
+}
+
+// Actual Models
 model Match {
   id                String      @id @default(auto()) @map("_id") @db.ObjectId
   userId            String

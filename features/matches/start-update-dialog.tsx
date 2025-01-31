@@ -166,14 +166,15 @@ function StartUpdateMatchDialog({
       );
 
       return;
+    } else {
+      createMutate(data as CreateMatchSchema, {
+        onSuccess: (newMatchId) => {
+          reset();
+          setOpen(false);
+          router.push(`/match/${newMatchId}`);
+        },
+      });
     }
-    createMutate(data as CreateMatchSchema, {
-      onSuccess: (newMatchId) => {
-        reset();
-        setOpen(false);
-        router.push(`/match/${newMatchId}`);
-      },
-    });
   }
 
   useEffect(() => {

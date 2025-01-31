@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 
 import { BallEvent, CurPlayer } from "@prisma/client";
 
+import { useStatsOpenContext } from "@/contexts/stats-open-context";
 import { abbreviateEntity } from "@/lib/utils";
 import { CreateBallEventSchema } from "@/lib/validation/ball-event";
 import { MatchExtended } from "@/types";
@@ -24,18 +25,11 @@ interface ToolsProps {
   events: BallEvent[] | CreateBallEventSchema[];
   curPlayers: CurPlayer[];
   setCurPlayers: Dispatch<SetStateAction<CurPlayer[]>>;
-  showScorecard: boolean;
-  setShowScorecard: Dispatch<SetStateAction<boolean>>;
 }
 
-function Tools({
-  curPlayers,
-  events,
-  match,
-  setCurPlayers,
-  showScorecard,
-  setShowScorecard,
-}: ToolsProps) {
+function Tools({ curPlayers, events, match, setCurPlayers }: ToolsProps) {
+  const { showScorecard, handleShowScorecard } = useStatsOpenContext();
+
   const processConditionally = (name: string) =>
     name.length > 10 ? abbreviateEntity(name) : name;
 
@@ -50,7 +44,7 @@ function Tools({
         curPlayers={curPlayers}
         setCurPlayers={setCurPlayers}
       />
-      <Drawer open={showScorecard} onOpenChange={setShowScorecard}>
+      <Drawer open={showScorecard} onOpenChange={handleShowScorecard}>
         <DrawerTrigger asChild>
           <Button className="w-full">Scorecard</Button>
         </DrawerTrigger>

@@ -73,8 +73,6 @@ function ScorerLayout({
     match.strikeIndex ?? 0,
   );
 
-  const [showScorecard, setShowScorecard] = useState(false);
-
   const team = match?.teams[curTeam];
   const opposingTeam = match?.teams[curTeam === 0 ? 1 : 0];
   const playerIds = team?.players.map((player) => player.id) || [];
@@ -450,8 +448,6 @@ function ScorerLayout({
             setCurPlayers={setCurPlayers}
             events={events}
             match={match}
-            showScorecard={showScorecard}
-            setShowScorecard={setShowScorecard}
           />
 
           {/* DIALOGS */}
@@ -498,7 +494,6 @@ function ScorerLayout({
           <MatchSummary
             ballEvents={events}
             open={showMatchSummary}
-            setShowScorecard={setShowScorecard}
             match={match}
             playerIds={playerIds}
             hasEnded={hasEnded}
@@ -518,7 +513,6 @@ function ScorerLayout({
           <MatchSummary
             ballEvents={events}
             open={showMatchSummary}
-            setShowScorecard={setShowScorecard}
             match={match}
             playerIds={playerIds}
             handleUndo={() => {}}
@@ -530,8 +524,6 @@ function ScorerLayout({
               setCurPlayers={setCurPlayers}
               events={events}
               match={match}
-              showScorecard={showScorecard}
-              setShowScorecard={setShowScorecard}
             />
           </div>
         </>

@@ -55,15 +55,16 @@ function StatsAndSettings({
 
   const {
     showRunrateChart,
-    setShowRunrateChart,
     showOverSummaries,
-    setShowOverSummaries,
     showWormChart,
-    setShowWormChart,
     showNames,
     setShowNames,
     showPlayerRivalries,
-    setShowPlayerRivalries,
+
+    handleShowOverSummaries,
+    handleShowPlayerRivalries,
+    handleShowRunrateChart,
+    handleShowWormChart,
   } = useStatsOpenContext();
 
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
@@ -230,20 +231,20 @@ function StatsAndSettings({
             <div className="space-y-2">
               <Button
                 className="w-full space-x-2"
-                onClick={() => setShowWormChart(true)}
+                onClick={() => handleShowWormChart(true)}
               >
                 <LineChart />
                 <span>Worm Chart</span>
               </Button>
               <Button
                 className="w-full space-x-2"
-                onClick={() => setShowRunrateChart(true)}
+                onClick={() => handleShowRunrateChart(true)}
               >
                 <BarChartBig /> <span>Run rate chart</span>
               </Button>
               <Button
                 className="w-full space-x-2"
-                onClick={() => setShowOverSummaries(true)}
+                onClick={() => handleShowRunrateChart(true)}
               >
                 <ListOrdered />
                 <span>Over Summaries</span>
@@ -256,7 +257,7 @@ function StatsAndSettings({
       {match && curTeam && (
         <>
           {/* Run rate chart */}
-          <Drawer open={showRunrateChart} onOpenChange={setShowRunrateChart}>
+          <Drawer open={showRunrateChart} onOpenChange={handleShowRunrateChart}>
             <DrawerContent>
               <div className="mx-auto w-full max-w-7xl">
                 <StatsDrawerHeader
@@ -275,7 +276,10 @@ function StatsAndSettings({
           </Drawer>
 
           {/* Over summaries */}
-          <Drawer open={showOverSummaries} onOpenChange={setShowOverSummaries}>
+          <Drawer
+            open={showOverSummaries}
+            onOpenChange={handleShowOverSummaries}
+          >
             <DrawerContent>
               <DrawerHeader className="relative mb-2 flex items-center justify-between gap-2 pb-4 pt-6">
                 <DrawerTitle className="text-xl">
@@ -308,7 +312,7 @@ function StatsAndSettings({
           </Drawer>
 
           {/* Worm chart */}
-          <Drawer open={showWormChart} onOpenChange={setShowWormChart}>
+          <Drawer open={showWormChart} onOpenChange={handleShowWormChart}>
             <DrawerContent>
               <DrawerHeader className="mb-2 pb-4 pt-6">
                 <DrawerTitle className="space-x-4 text-center text-2xl">
@@ -336,7 +340,7 @@ function StatsAndSettings({
           {/* Player Rivalries */}
           <Drawer
             open={showPlayerRivalries}
-            onOpenChange={setShowPlayerRivalries}
+            onOpenChange={handleShowPlayerRivalries}
           >
             <DrawerContent>
               <DrawerHeader className="mb-2 pb-4 pt-6">
