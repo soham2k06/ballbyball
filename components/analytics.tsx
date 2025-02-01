@@ -25,10 +25,13 @@ function Analytics() {
 
   useEffect(() => {
     const searchQuery = searchParams.toString();
+    const ua = navigator.userAgent;
+
     addAnalytics({
       event: "page_view",
       property: `${pathname}${searchQuery ? `?${searchQuery}` : ""}`,
       module: pathnames[pathname] || "other",
+      ua,
     });
   }, [pathname, searchParams]);
 

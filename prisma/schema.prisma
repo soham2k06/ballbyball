@@ -98,6 +98,11 @@ model Analytics {
   event    AnalyticsEvent
   property String // eg. "/players", "start_match", "btn-add_player", "nav_link"
   module   AnalyticsModule
+  country  String?
+  city     String?
+  os       String?
+  browser  String?
+  device   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
