@@ -17,10 +17,10 @@ interface StatsOpenContextProps {
   showRunrateChart: boolean;
   showOverSummaries: boolean;
   showWormChart: boolean;
-  showNames: boolean;
+  showDetails: boolean;
   showPlayerRivalries: boolean;
 
-  setShowNames: SetOpenType;
+  setShowDetails: SetOpenType;
   // eslint-disable-next-line no-unused-vars
   handleShowScorecard: (o: boolean) => void;
   // eslint-disable-next-line no-unused-vars
@@ -38,10 +38,10 @@ const StatsOpenContext = createContext<StatsOpenContextProps>({
   showRunrateChart: false,
   showOverSummaries: false,
   showWormChart: false,
-  showNames: false,
+  showDetails: false,
   showPlayerRivalries: false,
 
-  setShowNames: () => {},
+  setShowDetails: () => {},
   handleShowScorecard: () => {},
   handleShowRunrateChart: () => {},
   handleShowOverSummaries: () => {},
@@ -56,7 +56,7 @@ function StatsOpenProvider({ children }: { children: React.ReactNode }) {
   const [showWormChart, setShowWormChart] = useState(false);
   const [showPlayerRivalries, setShowPlayerRivalries] = useState(false);
 
-  const [showNames, setShowNames] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   function handleShowScorecard(o: boolean) {
     if (o)
@@ -115,10 +115,10 @@ function StatsOpenProvider({ children }: { children: React.ReactNode }) {
         showRunrateChart,
         showOverSummaries,
         showWormChart,
-        showNames,
+        showDetails,
         showPlayerRivalries,
 
-        setShowNames,
+        setShowDetails,
         handleShowScorecard,
         handleShowRunrateChart,
         handleShowOverSummaries,

@@ -57,8 +57,8 @@ function StatsAndSettings({
     showRunrateChart,
     showOverSummaries,
     showWormChart,
-    showNames,
-    setShowNames,
+    showDetails,
+    setShowDetails,
     showPlayerRivalries,
 
     handleShowOverSummaries,
@@ -290,11 +290,11 @@ function StatsAndSettings({
                 <div className="flex gap-2">
                   <div className="flex items-center gap-1">
                     <Checkbox
-                      id="showNames"
-                      checked={showNames}
-                      onCheckedChange={() => setShowNames(!showNames)}
+                      id="showDetails"
+                      checked={showDetails}
+                      onCheckedChange={() => setShowDetails(!showDetails)}
                     />
-                    <Label htmlFor="showNames">Names</Label>
+                    <Label htmlFor="showDetails">Details</Label>
                   </div>
                   <TeamSelect
                     selectedTeam={selectedTeam}
@@ -305,7 +305,7 @@ function StatsAndSettings({
               </DrawerHeader>
               <FullOverSummary
                 ballEvents={selectedTeamEvents}
-                showNames={showNames}
+                showDetails={showDetails}
                 players={match.teams.flatMap((team) => team.players)}
               />
             </DrawerContent>

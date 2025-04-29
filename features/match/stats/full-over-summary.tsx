@@ -1,5 +1,6 @@
 import { BallEvent } from "@prisma/client";
 
+import { wicketTypes } from "@/lib/constants";
 import {
   calcRuns,
   getIsvalidBall,
@@ -24,11 +25,11 @@ type BallInfo = {
 
 function FullOverSummary({
   ballEvents,
-  showNames,
+  showDetails,
   players,
 }: {
   ballEvents: Event[];
-  showNames: boolean;
+  showDetails: boolean;
   players?: PlayerSimplified[];
 }) {
   function generateOverSummary(ballEvents: Event[]) {
@@ -261,13 +262,13 @@ function FullOverSummary({
     return overSummaries;
   }
 
-  const fullOverSummary = showNames ? getFullOverSummary(ballEvents) : [];
+  const fullOverSummary = showDetails ? getFullOverSummary(ballEvents) : [];
 
   return (
     <>
       {ballEvents.length > 0 ? (
         <ul className="h-[calc(100dvh-160px)] divide-y overflow-y-auto p-2">
-          {showNames
+          {showDetails
             ? fullOverSummary.map((over, overI) => {
                 const { runs, wickets } = getScore({
                   balls: over.map((b) => b.type),
@@ -296,6 +297,15 @@ function FullOverSummary({
                             />
                             <p className="max-sm:text-sm">
                               {ball.overStr}: {ball.batsman}
+                              {ball.type.includes("-1")
+                                ? ` - ${
+                                    wicketTypes.find(
+                                      (w) =>
+                                        w.id ===
+                                        parseInt(ball.type.split("_")[1]),
+                                    )?.type
+                                  }${ball.fielder ? ` by ${ball.fielder}` : ""}`
+                                : ball.type.includes("W")}
                             </p>
                           </li>
                         );
