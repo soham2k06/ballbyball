@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 import {
-  BallEventSemi,
   EventType,
   PlayerPerformance,
+  RecordBallEvent,
   RecordType,
 } from "@/types";
 
@@ -198,8 +198,10 @@ function calculateMaidenOvers(ballsThrown: EventType[]) {
   return maidenOvers;
 }
 
-function mapGroupedMatches(events: BallEventSemi[]) {
-  const groupedMatches: { [matchId: string]: BallEventSemi[] } = {};
+function mapGroupedMatches(events: { matchId: string; type: string }[]) {
+  const groupedMatches: {
+    [matchId: string]: { matchId: string; type: string }[];
+  } = {};
   for (const event of events) {
     const matchId = event.matchId ?? "no-data";
     if (!groupedMatches[matchId]) {
@@ -323,7 +325,7 @@ function calcBestPerformance({
       economyPoints * (player.ballsBowled / 6);
 
     // Winner points
-    if (player.isWinner) curPlayerPoints += 25;
+    curPlayerPoints += 25 * player.matchesWon;
 
     player.points = round(curPlayerPoints, 0);
   });
@@ -486,7 +488,7 @@ async function createOrUpdateWithUniqueName(
 }
 
 function calcMilestones(groupedMatches: {
-  [matchId: string]: BallEventSemi[];
+  [matchId: string]: { type: string }[];
 }) {
   let ducks = 0;
   let twenties = 0;
@@ -525,7 +527,10 @@ function calcMilestones(groupedMatches: {
 }
 
 function calcWicketHauls(groupedMatches: {
-  [matchId: string]: BallEventSemi[];
+  [matchId: string]: {
+    type: string;
+    matchId: string;
+  }[];
 }) {
   let threes = 0;
   let fours = 0;
@@ -563,17 +568,12 @@ function calcBestSpells(data: EventType[][], topN: number = 1) {
     .slice(0, topN);
 }
 
-function getMVP(records: RecordType[]) {
+function getMVP(records: RecordType[]): PlayerPerformance[] {
   const result = records.map((player) => {
     const groupedMatchesBat = mapGroupedMatches(player.playerBatEvents);
     const batEvents = (player.playerBatEvents ?? []).map(
       (event) => event.type as EventType,
     );
-
-    const groupedMatches = mapGroupedMatches([
-      ...player.playerBatEvents,
-      ...player.playerBallEvents,
-    ]);
 
     const noWicketEvents = batEvents.filter((event) => !event.includes("-1"));
 
@@ -657,7 +657,10 @@ function getMVP(records: RecordType[]) {
       // Other
       team: "",
       isWinner: false,
-      matches: Object.keys(groupedMatches).length,
+      matchesPlayed: player.matchesPlayed,
+      inningsPlayed: player.inningsPlayed,
+      matchesWon: player.matchesWon,
+      points: 0,
     };
   });
 
@@ -689,50 +692,70 @@ async function getPlayersFromMatches(
   dataArr: {
     id: string;
     createdAt: Date;
+    overs: number;
+    hasEnded: boolean;
+    allowSinglePlayer: boolean;
+    matchTeams: {
+      team: {
+        name: string;
+        teamPlayers: { playerId: string }[];
+      };
+    }[];
     ballEvents: (Pick<BallEvent, "id" | "type" | "matchId"> & {
       batsman: Pick<Player, "id" | "name">;
       bowler: Pick<Player, "id" | "name">;
     })[];
   }[],
 ) {
-  const players = new Map();
+  const players: Map<string, RecordType> = new Map();
 
+  // batting and bowling events
   dataArr.forEach((data) => {
     data.ballEvents.forEach((event) => {
       const { batsman, bowler } = event;
 
       // Batsman
       if (!players.has(batsman.id)) {
-        players.set(batsman.id, {
+        const newBatsman: RecordType = {
           id: batsman.id,
           name: batsman.name,
           playerBatEvents: [],
           playerBallEvents: [],
           playerFieldEvents: [],
-        });
+          inningsPlayed: 0,
+          matchesPlayed: 0,
+          matchesWon: 0,
+        };
+
+        players.set(batsman.id, newBatsman);
       }
 
       // Bowler
       if (!players.has(bowler.id)) {
-        players.set(bowler.id, {
+        const newBowler: RecordType = {
           id: bowler.id,
           name: bowler.name,
           playerBatEvents: [],
           playerBallEvents: [],
           playerFieldEvents: [],
-        });
+          inningsPlayed: 0,
+          matchesPlayed: 0,
+          matchesWon: 0,
+        };
+        players.set(bowler.id, newBowler);
       }
 
-      const eventSemi = {
-        id: event.id,
+      const eventSemi: RecordBallEvent = {
+        Match: { createdAt: data.createdAt },
         type: event.type,
-        matchId: event.matchId,
+        matchId: event.matchId ?? "",
       };
-      players.get(batsman.id).playerBatEvents.push(eventSemi);
-      players.get(bowler.id).playerBallEvents.push(eventSemi);
+      players.get(batsman.id)?.playerBatEvents.push(eventSemi);
+      players.get(bowler.id)?.playerBallEvents.push(eventSemi);
     });
   });
 
+  // fielding events
   dataArr.forEach((data) => {
     data.ballEvents.forEach((event) => {
       const { type } = event;
@@ -743,12 +766,69 @@ async function getPlayersFromMatches(
           (type === "-1_4" && playerId === event.bowler.id)
         ) {
           player.playerFieldEvents.push({
-            id: event.id,
+            Match: { createdAt: data.createdAt },
             type: event.type,
-            matchId: event.matchId,
+            matchId: event.matchId ?? "",
           });
         }
       });
+    });
+  });
+
+  // matches count, winning performance
+  dataArr.forEach((data) => {
+    players.forEach((player) => {
+      if (
+        data.matchTeams.some((t) =>
+          t.team.teamPlayers.some((p) => p.playerId === player.id),
+        )
+      )
+        player.matchesPlayed++;
+
+      if (data.ballEvents.some((evt) => evt.batsman.id === player.id))
+        player.inningsPlayed++;
+    });
+
+    const teams = data.matchTeams.map(({ team }) => ({
+      name: team.name,
+      playerIds: team.teamPlayers.map(({ playerId }) => playerId),
+    }));
+
+    const ballEventsbyTeam = (i: number) =>
+      data.ballEvents
+        .filter((event) => teams[i].playerIds.includes(event.batsman.id))
+        .map((event) => event.type);
+
+    const { runs: runs1 } = getScore({ balls: ballEventsbyTeam(0) });
+    const {
+      runs: runs2,
+      wickets: wickets2,
+      totalBalls,
+    } = getScore({ balls: ballEventsbyTeam(1) });
+
+    const { winner } = calculateWinner({
+      allowSinglePlayer: data.allowSinglePlayer,
+      matchBalls: data.overs * 6,
+      runs1,
+      runs2,
+      teams: teams.map(({ name }) => name ?? ""),
+      totalBalls,
+      totalWickets: teams[1].playerIds.length,
+      wickets2,
+    });
+
+    players.forEach((player) => {
+      const hasPlayerWon = !data.hasEnded
+        ? undefined
+        : teams[winner]?.playerIds.includes(player.id);
+
+      if (!hasPlayerWon) return;
+
+      if (teams[0].playerIds.includes(player.id)) {
+        player.matchesWon++;
+      } else if (teams[1].playerIds.includes(player.id)) {
+        player.matchesWon++;
+      }
     });
   });
 

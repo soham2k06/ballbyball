@@ -35,12 +35,8 @@ function BattingRecords({ date, matches }: RecordsProps) {
 
   const battingRecords = records
     .map((player) => {
-      const groupedMatches = mapGroupedMatches([
-        ...player.playerBatEvents,
-        ...player.playerBallEvents,
-      ]);
       const groupedInnings = mapGroupedMatches(player.playerBatEvents ?? []);
-      const innings = Object.keys(groupedInnings).length;
+      const innings = player.inningsPlayed;
       const batEvents = player.playerBatEvents.map((event) => event.type);
 
       const milestones = calcMilestones(groupedInnings);
@@ -77,7 +73,7 @@ function BattingRecords({ date, matches }: RecordsProps) {
         },
         runs,
         ballsFaced,
-        matches: Object.keys(groupedMatches).length,
+        matchesPlayed: player.matchesPlayed,
         innings,
         milestones,
         average,
@@ -92,7 +88,7 @@ function BattingRecords({ date, matches }: RecordsProps) {
         b.runs - a.runs ||
         b.strikeRate - a.strikeRate ||
         b.innings - a.innings ||
-        b.matches - a.matches,
+        b.matchesPlayed - a.matchesPlayed,
     );
 
   const [numRecordsToShow, setNumRecordsToShow] = useState(10);
@@ -147,7 +143,7 @@ function BattingRecords({ date, matches }: RecordsProps) {
                       {
                         player,
                         runs,
-                        matches,
+                        matchesPlayed,
                         innings,
                         milestones,
                         ballsFaced,
@@ -172,7 +168,7 @@ function BattingRecords({ date, matches }: RecordsProps) {
                             {runs}
                           </TableCell>
                           <TableCell className="text-center">
-                            {matches}
+                            {matchesPlayed}
                           </TableCell>
                           <TableCell className="text-center">
                             {innings}

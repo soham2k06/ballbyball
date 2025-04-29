@@ -214,6 +214,16 @@ function MatchSummary({
     const runOuts = fieldType.filter((type) => type.includes("_5_")).length;
     const stumpings = fieldType.filter((type) => type.includes("_6_")).length;
 
+    const team =
+      match?.teams.find(
+        ({ players }) =>
+          players.map((player) => player.id).includes(playerId) ?? null,
+      )?.name ?? "";
+
+    const isWinner = !!match?.teams[winner]?.players
+      .map((player) => player.id)
+      .includes(playerId);
+
     return {
       playerId,
       runsScored,
@@ -235,14 +245,12 @@ function MatchSummary({
       isDuck,
       is2,
       is3,
-      team:
-        match?.teams.find(
-          ({ players }) =>
-            players.map((player) => player.id).includes(playerId) ?? null,
-        )?.name ?? "Loading...",
-      isWinner: !!match?.teams[winner]?.players
-        .map((player) => player.id)
-        .includes(playerId),
+      team,
+      matchesWon: isWinner ? 1 : 0,
+      inningsPlayed: 1,
+      matchesPlayed: 1,
+      name: playerId,
+      points: 0,
     };
   });
 

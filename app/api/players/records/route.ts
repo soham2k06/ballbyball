@@ -27,6 +27,25 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         createdAt: true,
+        allowSinglePlayer: true,
+        hasEnded: true,
+        overs: true,
+        matchTeams: {
+          select: {
+            team: {
+              select: {
+                id: true,
+                name: true,
+                teamPlayers: {
+                  select: {
+                    playerId: true,
+                    player: { select: { name: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
         ballEvents: {
           orderBy: { id: "asc" },
           select: {

@@ -38,15 +38,11 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
   const router = useRouter();
   const sp = useSearchParams();
   const userRef = sp.get("user");
-  const { data, isFetching } = usePlayerMatches(playerId);
+  const { data = [], isFetching } = usePlayerMatches(playerId);
 
-  const matchesWon = data?.filter((match) => match.hasPlayerWon).length;
-  const completedMatches = data?.filter(
-    (match) => match.hasPlayerWon !== undefined,
-  );
-  const winRate = matchesWon
-    ? round((matchesWon / (completedMatches?.length ?? 0)) * 100)
-    : 0;
+  const matchesWon = data.filter((match) => match.hasPlayerWon).length;
+
+  const winRate = matchesWon ? round((matchesWon / data.length) * 100) : 0;
 
   return (
     <Dialog
@@ -54,12 +50,19 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
       onOpenChange={() => setPlayerMatchesOpen(playerId ? undefined : playerId)}
     >
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{data?.length} Matches</DialogTitle>
-          <DialogDescription>
-            {matchesWon} ({winRate}%) Won
-          </DialogDescription>
-        </DialogHeader>
+        {isFetching ? (
+          <DialogHeader>
+            <DialogTitle>Matches</DialogTitle>
+            <DialogDescription>Loading...</DialogDescription>
+          </DialogHeader>
+        ) : (
+          <DialogHeader>
+            <DialogTitle>{data.length} Matches</DialogTitle>
+            <DialogDescription>
+              {matchesWon} ({winRate}%) Won
+            </DialogDescription>
+          </DialogHeader>
+        )}
         <ScrollArea className="max-h-[480px]">
           <ul className="space-y-3 px-0.5">
             {isFetching ? (
@@ -70,7 +73,7 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
                 <MatchSkeleton />
                 <MatchSkeleton />
               </>
-            ) : data?.length ? (
+            ) : data.length ? (
               data.map((match) => {
                 const didBat = match.batScore.totalBalls > 0;
                 const didBowl =

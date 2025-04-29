@@ -18,7 +18,10 @@ type PlayerScore = {
 };
 
 type PlayerPerformance = {
-  matches?: number;
+  name: string;
+  matchesPlayed: number;
+  inningsPlayed: number;
+  matchesWon: number;
   playerId: string;
   runsScored: number;
   ballsFaced: number;
@@ -40,8 +43,7 @@ type PlayerPerformance = {
   isDuck: boolean;
   maidens: number;
   team: string;
-  isWinner: boolean;
-  points?: number;
+  points: number;
 };
 
 type PlayerStats = {
@@ -128,7 +130,7 @@ type BattingRecordsType = {
   };
   runs: number;
   ballsFaced: number;
-  matches: number;
+  matchesPlayed: number;
   innings: number;
   milestones: {
     highestScore: {
@@ -154,7 +156,7 @@ type BowlingRecordsType = {
   };
   wickets: number;
   totalBalls: number;
-  matches: number;
+  matchesPlayed: number;
   economy: number;
   strikeRate: number;
   maidens: number;
@@ -167,18 +169,19 @@ type BowlingRecordsType = {
 };
 
 type RecordBallEvent = {
+  // batsmanId: string;
+  // bowlerId: string;
+  Match: { createdAt: Date };
   type: string;
-  batsmanId: string;
-  bowlerId: string;
-  matchId: string | null;
-  Match: {
-    createdAt: Date;
-  } | null;
+  matchId: string;
 };
 
 type RecordType = {
   id: string;
   name: string;
+  matchesPlayed: number;
+  inningsPlayed: number;
+  matchesWon: number;
   playerBatEvents: RecordBallEvent[];
   playerBallEvents: RecordBallEvent[];
   playerFieldEvents: RecordBallEvent[];
@@ -221,5 +224,6 @@ export type {
   BowlingRecordsType,
   BallEventSemi,
   RecordType,
+  RecordBallEvent,
   RecordsProps,
 };

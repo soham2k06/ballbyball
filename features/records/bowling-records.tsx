@@ -36,11 +36,6 @@ function BowlingRecords({ date, matches }: RecordsProps) {
 
   const bowlingRecords = records
     .map((player) => {
-      const groupedMatches = mapGroupedMatches([
-        ...player.playerBatEvents,
-        ...player.playerBallEvents,
-      ]);
-
       const groupedMatchesBowl = mapGroupedMatches(player.playerBallEvents);
 
       const bowlEvents = (player.playerBallEvents ?? []).map(
@@ -87,9 +82,9 @@ function BowlingRecords({ date, matches }: RecordsProps) {
           id: player.id,
           name: player.name,
         },
+        matchesPlayed: player.matchesPlayed,
         wickets,
         totalBalls,
-        matches: Object.keys(groupedMatches).length,
         economy: runRate,
         strikeRate,
         maidens,
@@ -103,15 +98,15 @@ function BowlingRecords({ date, matches }: RecordsProps) {
       };
     })
     .sort((a, b) => {
-      return a.matches === 0 && b.matches === 0
+      return a.matchesPlayed === 0 && b.matchesPlayed === 0
         ? 0
-        : a.matches === 0
+        : a.matchesPlayed === 0
           ? 1
-          : b.matches === 0
+          : b.matchesPlayed === 0
             ? -1
             : b.wickets - a.wickets ||
               a.economy - b.economy ||
-              a.matches - b.matches;
+              a.matchesPlayed - b.matchesPlayed;
     });
 
   const [numRecordsToShow, setNumRecordsToShow] = useState(10);
@@ -165,7 +160,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                     (
                       {
                         player,
-                        matches,
+                        matchesPlayed,
                         wickets,
                         bestSpell,
                         economy,
@@ -194,7 +189,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                             {wickets}
                           </TableCell>
                           <TableCell className="text-center">
-                            {matches}
+                            {matchesPlayed}
                           </TableCell>
                           <TableCell className="text-center">
                             {economy ? round(economy, 1) : "-"}

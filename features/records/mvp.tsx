@@ -27,26 +27,18 @@ function MVP({ date, matches }: RecordsProps) {
 
   const mvpRecords = getMVP(records);
 
-  const calculateMVP = (
-    player: (PlayerPerformance & {
-      name: string;
-      matches: number;
-    })[],
-  ) => {
-    const performance = calcBestPerformance({ playersPerformance: player });
+  const calculateMVP = (players: PlayerPerformance[]) => {
+    const performance = calcBestPerformance({ playersPerformance: players });
     return performance.map((p) => {
-      const curRecord = mvpRecords.find(
-        (record) => record.playerId === p.playerId,
-      );
-      const matches = curRecord?.matches ?? 0;
-      const name = curRecord?.name ?? "";
+      const matchesPlayed = p.matchesPlayed;
 
-      const ppm = matches ? (p.points ?? 0) / matches : 0;
+      const ppm = matchesPlayed ? (p.points ?? 0) / matchesPlayed : 0;
+
+      const winRate = matchesPlayed ? (p.matchesWon / matchesPlayed) * 100 : 0;
 
       return {
         ...p,
-        matches,
-        name,
+        winRate,
         ppm,
       };
     });
@@ -86,6 +78,7 @@ function MVP({ date, matches }: RecordsProps) {
                   </TableHead>
                   <TableHead>Points</TableHead>
                   <TableHead>Matches</TableHead>
+                  <TableHead>Win Rate</TableHead>
                   <TableHead>AVG</TableHead>
                   <TableHead>Runs</TableHead>
                   <TableHead>Wickets</TableHead>
@@ -102,13 +95,14 @@ function MVP({ date, matches }: RecordsProps) {
                     (
                       {
                         name,
+                        winRate,
                         playerId,
                         points,
                         runsScored,
                         wicketsTaken,
                         fifties,
                         centuries,
-                        matches,
+                        matchesPlayed,
                         catches,
                         runOuts,
                         stumpings,
@@ -128,7 +122,8 @@ function MVP({ date, matches }: RecordsProps) {
                           <TableCell className="bg-primary/5">
                             {points}
                           </TableCell>
-                          <TableCell>{matches}</TableCell>
+                          <TableCell>{matchesPlayed}</TableCell>
+                          <TableCell>{round(winRate, 0)}%</TableCell>
                           <TableCell>{ppm ? round(ppm) : 0}</TableCell>
                           <TableCell>{runsScored}</TableCell>
                           <TableCell>{wicketsTaken}</TableCell>
