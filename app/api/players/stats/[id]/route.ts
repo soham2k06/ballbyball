@@ -32,13 +32,27 @@ export async function GET(
       },
     });
 
-    const playerBallEvents = player?.playerBallEvents ?? [];
+    const playerBatEvents = (player?.playerBatEvents ?? [])
+      .filter((event) => event.matchId !== null)
+      .map((e) => ({
+        ...e,
+        matchId: e.matchId as string,
+      }));
 
-    const battingEventsExtended =
-      player?.playerBatEvents.filter((event) => event.batsmanId === id) ?? [];
+    const playerBallEvents = (player?.playerBallEvents ?? [])
+      .filter((event) => event.matchId !== null)
+      .map((e) => ({
+        ...e,
+        matchId: e.matchId as string,
+      }));
 
-    const bowlingEventsExtended =
-      player?.playerBallEvents.filter((event) => event.bowlerId === id) ?? [];
+    const battingEventsExtended = playerBatEvents.filter(
+      (event) => event.batsmanId === id,
+    );
+
+    const bowlingEventsExtended = playerBallEvents.filter(
+      (event) => event.bowlerId === id,
+    );
 
     const groupedMatchesBat = mapGroupedMatches(battingEventsExtended);
     const groupedMatchesBowl = mapGroupedMatches(bowlingEventsExtended);

@@ -66,6 +66,7 @@ export async function createTeam(data: CreateTeamSchema) {
 
     await prisma.team.create({
       data: {
+        matchId: null,
         userId,
         name: newName,
         teamPlayers: {

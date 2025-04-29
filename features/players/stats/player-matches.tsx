@@ -1,4 +1,5 @@
-import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { usePlayerMatches } from "@/api-hooks/use-player-matches";
 import { getOverStr, round } from "@/lib/utils";
@@ -35,7 +36,6 @@ function MatchSkeleton() {
 }
 
 function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
-  const router = useRouter();
   const sp = useSearchParams();
   const userRef = sp.get("user");
   const { data = [], isFetching } = usePlayerMatches(playerId);
@@ -81,58 +81,58 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
                 const isNotout = match.batScore.isNotout;
 
                 return (
-                  <Card
+                  <Link
+                    // className="rounded-md border shadow"
                     key={match.id}
-                    className="cursor-pointer rounded-md border shadow"
-                    onClick={() =>
-                      router.push(
-                        userRef
-                          ? `/match/${match.id}?user=${userRef}`
-                          : `/match/${match.id}`,
-                      )
+                    href={
+                      userRef
+                        ? `/match/${match.id}?user=${userRef}`
+                        : `/match/${match.id}`
                     }
                   >
-                    <CardHeader className="flex flex-row justify-between gap-2 space-y-0 !pb-1">
-                      <CardTitle className="text-lg leading-none">
-                        {match.name}{" "}
-                        {match.hasPlayerWon !== undefined && (
-                          <span className="font-sans text-xs">
-                            {match.hasPlayerWon === true ? "(Won)" : "(Lost)"}
-                          </span>
-                        )}
-                      </CardTitle>
-                      <p className="text-right text-xs text-muted-foreground">
-                        Created at{" "}
-                        {new Date(match.createdAt).toLocaleDateString()}
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex justify-between gap-2">
-                        <p>
-                          {didBat ? (
-                            <>
-                              {match.batScore.runs}
-                              {isNotout && "*"} ({match.batScore.totalBalls})
-                            </>
-                          ) : (
-                            "Did Not Bat"
-                          )}{" "}
-                          •{" "}
-                          {didBowl ? (
-                            <>
-                              {match.bowlScore.wickets}/{match.bowlScore.runs} (
-                              {getOverStr(match.bowlScore.totalBalls)})
-                            </>
-                          ) : (
-                            "Did Not Bowl"
+                    <Card className="rounded-md border shadow">
+                      <CardHeader className="flex flex-row justify-between gap-2 space-y-0 !pb-1">
+                        <CardTitle className="text-lg leading-none">
+                          {match.name}{" "}
+                          {match.hasPlayerWon !== undefined && (
+                            <span className="font-sans text-xs">
+                              {match.hasPlayerWon === true ? "(Won)" : "(Lost)"}
+                            </span>
                           )}
+                        </CardTitle>
+                        <p className="text-right text-xs text-muted-foreground">
+                          Created at{" "}
+                          {new Date(match.createdAt).toLocaleDateString()}
                         </p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {match.winInfo}
-                      </p>
-                    </CardContent>
-                  </Card>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex justify-between gap-2">
+                          <p>
+                            {didBat ? (
+                              <>
+                                {match.batScore.runs}
+                                {isNotout && "*"} ({match.batScore.totalBalls})
+                              </>
+                            ) : (
+                              "Did Not Bat"
+                            )}{" "}
+                            •{" "}
+                            {didBowl ? (
+                              <>
+                                {match.bowlScore.wickets}/{match.bowlScore.runs}{" "}
+                                ({getOverStr(match.bowlScore.totalBalls)})
+                              </>
+                            ) : (
+                              "Did Not Bowl"
+                            )}
+                          </p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {match.winInfo}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 );
               })
             ) : (
