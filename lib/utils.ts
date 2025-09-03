@@ -835,6 +835,20 @@ async function getPlayersFromMatches(
   return Array.from(players.values());
 }
 
+function getBowlerBestSpellStr(
+  bestSpell:
+    | {
+        wickets: number;
+        runs: number;
+        balls?: number;
+      }
+    | undefined,
+) {
+  return bestSpell
+    ? `${bestSpell.runs}-${bestSpell.wickets}${bestSpell.balls ? ` (${getOverStr(bestSpell.balls)})` : ""}`
+    : "-";
+}
+
 export {
   cn,
   getScore,
@@ -868,4 +882,5 @@ export {
   handleError,
   checkSession,
   getPlayersFromMatches,
+  getBowlerBestSpellStr,
 };

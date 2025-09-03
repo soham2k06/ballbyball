@@ -1,6 +1,6 @@
 import { usePlayerStats } from "@/api-hooks/use-player-stats";
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
-import { getOverStr, round } from "@/lib/utils";
+import { getBowlerBestSpellStr, getOverStr, round } from "@/lib/utils";
 import type { PlayerStats } from "@/types";
 
 import {
@@ -115,11 +115,7 @@ function Content({
           />
           <Stat
             isLoading={isLoading}
-            data={
-              bestSpell
-                ? `${bestSpell.wickets}/${bestSpell.runs} (${getOverStr(bestSpell.balls)})`
-                : "-"
-            }
+            data={getBowlerBestSpellStr(bestSpell)}
             dataKey="Best"
           />
           <Stat

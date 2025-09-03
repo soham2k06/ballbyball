@@ -9,6 +9,7 @@ import {
   calculateMaidenOvers,
   calcWicketHauls,
   countHatTricks,
+  getBowlerBestSpellStr,
   getOverStr,
   getScore,
   mapGroupedMatches,
@@ -195,9 +196,7 @@ function BowlingRecords({ date, matches }: RecordsProps) {
                             {economy ? round(economy, 1) : "-"}
                           </TableCell>
                           <TableCell className="text-center">
-                            {bestSpell
-                              ? `${bestSpell.wickets}/${bestSpell.runs}`
-                              : "-"}
+                            {getBowlerBestSpellStr(bestSpell)}
                           </TableCell>
                           <TableCell className="text-center">
                             {strikeRate ? round(strikeRate, 1) : "-"}

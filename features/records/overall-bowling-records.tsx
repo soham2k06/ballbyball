@@ -1,4 +1,4 @@
-import { round } from "@/lib/utils";
+import { getBowlerBestSpellStr, round } from "@/lib/utils";
 import { BowlingRecordsType } from "@/types";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,7 +92,7 @@ function OverallBowlingRecords({
         <StatCard
           isFetching={isFetching}
           title="Best"
-          stat={`${bestSpell.wickets}/${bestSpell.runs} by ${bestSpell.playerName}`}
+          stat={`${getBowlerBestSpellStr(bestSpell)} by ${bestSpell.playerName}`}
         />
         <StatCard isFetching={isFetching} title="Dots" stat={allRecords.dots} />
         <StatCard
