@@ -67,17 +67,27 @@ function OverallBattingRecords({
         <StatCard
           isFetching={isFetching}
           title="Strike rate"
-          stat={round((allRecords.runs / allRecords.balls) * 100)}
+          stat={
+            allRecords.runs
+              ? round((allRecords.runs / allRecords.balls) * 100)
+              : "-"
+          }
         />
         <StatCard
           isFetching={isFetching}
           title="Average"
-          stat={round(allRecords.runs / allRecords.outs)}
+          stat={
+            allRecords.runs ? round(allRecords.runs / allRecords.outs) : "-"
+          }
         />
         <StatCard
           isFetching={isFetching}
           title="Best"
-          stat={`${highestScore.runs}${highestScore.isNotOut ? "*" : ""} by ${highestScore.playerName}`}
+          stat={
+            highestScore.runs
+              ? `${highestScore.runs}${highestScore.isNotOut ? "*" : ""} by ${highestScore.playerName}`
+              : "-"
+          }
         />
         <StatCard
           isFetching={isFetching}

@@ -82,17 +82,29 @@ function OverallBowlingRecords({
         <StatCard
           isFetching={isFetching}
           title="Economy"
-          stat={round(allRecords.runsConceded / (allRecords.totalBalls / 6))}
+          stat={
+            allRecords.totalBalls
+              ? round(allRecords.runsConceded / (allRecords.totalBalls / 6))
+              : "-"
+          }
         />
         <StatCard
           isFetching={isFetching}
           title="Balls per wicket"
-          stat={round(allRecords.totalBalls / allRecords.wickets)}
+          stat={
+            allRecords.totalBalls
+              ? round(allRecords.totalBalls / allRecords.wickets)
+              : "-"
+          }
         />
         <StatCard
           isFetching={isFetching}
           title="Best"
-          stat={`${getBowlerBestSpellStr(bestSpell)} by ${bestSpell.playerName}`}
+          stat={
+            bestSpell.runs && bestSpell.wickets
+              ? `${getBowlerBestSpellStr(bestSpell)} by ${bestSpell.playerName}`
+              : "-"
+          }
         />
         <StatCard isFetching={isFetching} title="Dots" stat={allRecords.dots} />
         <StatCard
