@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useDeleteMatch, useMatches, useTeams } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { UpdateMatchSchema } from "@/lib/validation/match";
-import { MatchExtended } from "@/types";
 
 import AlertNote from "@/components/alert-note";
 import EmptyState from "@/components/empty-state";

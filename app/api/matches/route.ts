@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
           ...rest,
         };
       });
+      // eslint-disable-next-line no-unused-vars
       const { matchTeams, ...rest } = match;
       return { ...rest, teams };
     });

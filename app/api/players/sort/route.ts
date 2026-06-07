@@ -12,9 +12,9 @@ export async function PATCH(req: NextRequest) {
     if (!Array.isArray(players))
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-    for (const [index, player] of players.entries()) {
+    for (let index = 0; index < players.length; index++) {
       await prisma.player.update({
-        where: { id: player.id, userId },
+        where: { id: players[index].id, userId },
         data: { order: index },
       });
     }
