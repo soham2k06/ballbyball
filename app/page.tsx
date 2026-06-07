@@ -55,7 +55,7 @@ const features = [
     Icon: BadgeIndianRupee,
     title: "Free Forever",
     description:
-    "Completely free to use, Simply sign in and start scoring your matches.",
+      "Completely free to use, Simply sign in and start scoring your matches.",
   },
   {
     Icon: AreaChart,
@@ -359,13 +359,13 @@ async function HomePage({ searchParams: { user } }: Props) {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ Icon, title, description }, index) => (
               <Card key={index} className="transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <div className="mb-3 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                  <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <Icon className="size-6" />
                   </div>
                   <CardTitle className="text-lg">{title}</CardTitle>
                 </CardHeader>
-                <hr className="mx-4" />
+                <hr className="mx-2 sm:mx-4" />
                 <CardContent className="pt-4">
                   <p className="text-sm text-muted-foreground">{description}</p>
                 </CardContent>
