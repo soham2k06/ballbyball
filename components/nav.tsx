@@ -65,7 +65,7 @@ function Nav({
           className="inline-flex items-center gap-2"
         >
           <Image src="/logo.png" alt="Logo" width={40} height={40} />
-          <h2 className="text-2xl font-semibold tracking-tighter md:hidden lg:block">
+          <h2 className="hidden text-2xl font-semibold tracking-tighter lg:block">
             ballbyball.
           </h2>
         </Link>
@@ -129,7 +129,8 @@ function Nav({
               <X className="size-5" />
             </Button>
             <DrawerHeader className="mb-4 text-left">
-              <Link href="/">
+              <Link href="/" className="inline-flex items-center gap-2">
+                <Image src="/logo.png" alt="Logo" width={40} height={40} />
                 <TypographyH2 className="text-2xl font-semibold tracking-tighter">
                   ballbyball.
                 </TypographyH2>

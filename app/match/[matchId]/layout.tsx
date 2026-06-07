@@ -1,16 +1,5 @@
-import { Provider } from "@/components/providers";
-
 function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <Provider
-      attribute="class"
-      enableSystem
-      defaultTheme="system"
-      disableTransitionOnChange
-    >
-      <div className="p-4">{children}</div>
-    </Provider>
-  );
+  return <div className="p-4">{children}</div>;
 }
 
 export default Layout;
