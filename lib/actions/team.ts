@@ -99,7 +99,7 @@ export async function createMultipleTeams(data: CreateTeamSchema[]) {
             userId,
             name: newName,
             teamPlayers: {
-              create: playerIds.map((playerId: string) => ({
+              create: [...playerIds].reverse().map((playerId: string) => ({
                 player: { connect: { id: playerId } },
               })),
             },
