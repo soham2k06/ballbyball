@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 
-import { getAllPlayers } from "@/lib/actions/player";
-import { checkSession, getValidatedUser } from "@/lib/utils";
+import { checkSession } from "@/lib/utils";
 
 import RivalriesList from "@/features/rivalries";
 
@@ -11,19 +10,12 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  searchParams: {
-    user: string;
-    all: string;
-  };
+  searchParams: Promise<{ user?: string }>;
 }
 
 async function Rivalries({ searchParams }: Props) {
-  const { user: userRef } = searchParams;
+  const { user: userRef } = await searchParams;
   if (!userRef) await checkSession();
-
-  const user = userRef ?? (await getValidatedUser());
-
-  const players = await getAllPlayers(user);
 
   return (
     <>
@@ -35,7 +27,7 @@ async function Rivalries({ searchParams }: Props) {
           Select player or batsman/bowler to see their head-to-head stats.
         </p>
       </div>
-      <RivalriesList players={players ?? []} />
+      <RivalriesList />
     </>
   );
 }

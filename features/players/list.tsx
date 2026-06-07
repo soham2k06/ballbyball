@@ -1,23 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { DndContext } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
 import { Player } from "@prisma/client";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import {
-  deletePlayer,
-  sortPlayers as sortPlayersAPI,
-} from "@/lib/actions/player";
-import { useActionMutate } from "@/lib/hooks";
+import { useDeletePlayer, usePlayers, useSortPlayers } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 
 import AlertNote from "@/components/alert-note";
 import EmptyState from "@/components/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import AddPlayerButton from "./add-player";
 import AddEditPlayerFormDialog from "./add-update-player-dialog";
@@ -25,42 +21,33 @@ import PlayerCard from "./player-card";
 import PlayerStats from "./stats";
 import PlayerMatches from "./stats/player-matches";
 
-function PlayerList({
-  players,
-  userRef,
-}: {
-  players: Player[];
-  userRef?: string | null;
-}) {
-  const [playerData, setPlayerData] = useState<Player[]>(players);
-  const { mutate: deleteMutate } = useActionMutate(deletePlayer);
+function PlayerList({ userRef }: { userRef?: string | null }) {
+  const { players, isLoading } = usePlayers(userRef);
+  const [playerData, setPlayerData] = useState<Player[]>([]);
+  const { mutate: deleteMutate } = useDeletePlayer();
 
   const [isSorting, setIsSorting] = useState(false);
-
   const [playerToDelete, setPlayerToDelete] = useState<string | undefined>();
-
   const [playerToUpdate, setPlayerToUpdate] = useState<
     UpdatePlayerSchema | undefined
   >();
-
   const [playerMatchesOpen, setPlayerMatchesOpen] = useState<
     string | undefined
   >();
-
   const [openedPlayer, setOpenedPlayer] = useState<{
     id: string | undefined;
     name: string | undefined;
   }>();
 
-  const { mutate: sortPlayers, isPending } = useMutation({
-    mutationFn: sortPlayersAPI,
-  });
+  const { mutate: sortPlayers, isPending } = useSortPlayers();
+
+  useEffect(() => {
+    if (!isSorting) setPlayerData(players as Player[]);
+  }, [players]);
 
   function handleSort() {
     sortPlayers(
-      {
-        players: playerData,
-      },
+      { players: playerData },
       {
         onSuccess: () => {
           setIsSorting(false);
@@ -70,6 +57,16 @@ function PlayerList({
           toast.error("Failed to sort players");
         },
       },
+    );
+  }
+
+  if (isLoading && !playerData.length) {
+    return (
+      <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Skeleton key={i} className="h-16 w-full rounded-md" />
+        ))}
+      </div>
     );
   }
 
@@ -101,7 +98,6 @@ function PlayerList({
 
               if (from && target && from !== target)
                 setPlayerData((prevData) => {
-                  // Find the indexes of the players being moved
                   const targetIndex = prevData.findIndex(
                     (player) => player?.id === target,
                   );
@@ -109,45 +105,38 @@ function PlayerList({
                     (player) => player?.id === from,
                   );
 
-                  // If the indexes are valid and different, perform the swap
                   if (
                     targetIndex !== -1 &&
                     fromIndex !== -1 &&
                     targetIndex !== fromIndex
                   ) {
                     const newPlayerData = [...prevData];
-                    // Remove the player at fromIndex and insert it at targetIndex
                     const [movedPlayer] = newPlayerData.splice(fromIndex, 1);
                     newPlayerData.splice(targetIndex, 0, movedPlayer);
-
-                    // Optionally update the order for each player
                     return newPlayerData.map((player, index) => ({
                       ...player,
-                      order: index + 1, // Assign sequential order starting from 1
+                      order: index + 1,
                     }));
                   }
 
-                  // Return the previous state if no changes are needed
                   return prevData;
                 });
             }}
           >
             <SortableContext items={playerData}>
               <ul className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
-                {playerData.map((player) => {
-                  return (
-                    <PlayerCard
-                      isSorting={isSorting}
-                      key={player.id}
-                      player={player}
-                      userRef={userRef}
-                      setPlayerToDelete={setPlayerToDelete}
-                      setPlayerToUpdate={setPlayerToUpdate}
-                      setOpenedPlayer={setOpenedPlayer}
-                      setPlayerMatchesOpen={setPlayerMatchesOpen}
-                    />
-                  );
-                })}
+                {playerData.map((player) => (
+                  <PlayerCard
+                    isSorting={isSorting}
+                    key={player.id}
+                    player={player}
+                    userRef={userRef}
+                    setPlayerToDelete={setPlayerToDelete}
+                    setPlayerToUpdate={setPlayerToUpdate}
+                    setOpenedPlayer={setOpenedPlayer}
+                    setPlayerMatchesOpen={setPlayerMatchesOpen}
+                  />
+                ))}
               </ul>
             </SortableContext>
           </DndContext>

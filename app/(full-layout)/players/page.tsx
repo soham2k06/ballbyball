@@ -1,8 +1,5 @@
 import { Metadata } from "next";
 
-import { Player } from "@prisma/client";
-
-import { getAllPlayers } from "@/lib/actions/player";
 import { checkSession } from "@/lib/utils";
 
 import PlayerList from "@/features/players/list";
@@ -13,15 +10,12 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  searchParams: {
-    user: string;
-  };
+  searchParams: Promise<{ user?: string }>;
 }
 
 async function page({ searchParams }: Props) {
-  const userRef = searchParams.user;
+  const { user: userRef } = await searchParams;
   if (!userRef) await checkSession();
-  const players = await getAllPlayers(userRef);
 
   return (
     <div className="w-full">
@@ -31,7 +25,7 @@ async function page({ searchParams }: Props) {
       <p className="mb-4 text-sm text-muted-foreground">
         Click on a player to view their stats
       </p>
-      <PlayerList players={players as Player[]} userRef={userRef} />
+      <PlayerList userRef={userRef} />
     </div>
   );
 }

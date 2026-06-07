@@ -1,4 +1,3 @@
-import { addAnalytics } from "@/lib/actions/app-analytics";
 import { round } from "@/lib/utils";
 import { PlayerStats } from "@/types";
 
@@ -16,11 +15,6 @@ import { Stat } from "./stat";
 
 function MoreBatting({ data }: { data: PlayerStats }) {
   function handleClickMore() {
-    addAnalytics({
-      event: "click",
-      module: "stats",
-      property: "btn-view_more_batting",
-    });
   }
 
   return (

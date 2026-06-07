@@ -4,8 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
 import { useForm } from "react-hook-form";
 
-import { createPlayer, updatePlayer } from "@/lib/actions/player";
-import { useActionMutate } from "@/lib/hooks";
+import { useCreatePlayer, useUpdatePlayer } from "@/lib/hooks";
 import { toastError } from "@/lib/utils";
 import {
   CreatePlayerSchema,
@@ -53,8 +52,8 @@ function AddUpdatePlayerDialog({
     formState: { isDirty },
   } = form;
 
-  const { mutate: createMutate } = useActionMutate(createPlayer);
-  const { mutate: updateMutate } = useActionMutate(updatePlayer);
+  const { mutate: createMutate } = useCreatePlayer();
+  const { mutate: updateMutate } = useUpdatePlayer();
 
   async function onSubmit(data: CreatePlayerSchema | UpdatePlayerSchema) {
     if (!!playerToUpdate) {

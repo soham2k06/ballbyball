@@ -9,6 +9,4 @@
 6. Avoid making unnecessary changes, especially if they're purely based on your personal
    preferences. Doing so is the maintainers' job. ;-)
 
-❤️ & 🔆  
-The team @ Ballbyball  
-https://discord.gg/autogpt
+❤️ @ Ballbyball

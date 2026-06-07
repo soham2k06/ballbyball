@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 
-import { getAllTeams } from "@/lib/actions/team";
 import { checkSession } from "@/lib/utils";
 
 import TeamList from "@/features/teams/list";
@@ -11,22 +10,19 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  searchParams: {
-    user: string;
-  };
+  searchParams: Promise<{ user?: string }>;
 }
 
 async function Teams({ searchParams }: Props) {
-  const userRef = searchParams.user;
+  const { user: userRef } = await searchParams;
   if (!userRef) await checkSession();
 
-  const teams = await getAllTeams(userRef);
   return (
     <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Teams
       </h1>
-      <TeamList teams={teams ?? []} userRef={userRef} />
+      <TeamList userRef={userRef ?? null} />
     </div>
   );
 }

@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { useRecords } from "@/api-hooks/use-records";
-import { addAnalytics } from "@/lib/actions/app-analytics";
 import { calcBestPerformance, getMVP, round } from "@/lib/utils";
 import { PlayerPerformance, RecordsProps } from "@/types";
 
@@ -51,11 +50,6 @@ function MVP({ date, matches }: RecordsProps) {
   const recordsToShow = mvp.slice(0, numRecordsToShow);
 
   function handleShowAll() {
-    addAnalytics({
-      event: "click",
-      module: "stats",
-      property: "btn-show_all_mvp_records",
-    });
     setNumRecordsToShow(mvp.length);
   }
 

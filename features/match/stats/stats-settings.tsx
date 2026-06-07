@@ -6,9 +6,7 @@ import { BallEvent, CurPlayer } from "@prisma/client";
 import { BarChartBig, LineChart, ListOrdered, X } from "lucide-react";
 
 import { useStatsOpenContext } from "@/contexts/stats-open-context";
-import { saveBallEvents } from "@/lib/actions/ball-event";
-import { updateMatch } from "@/lib/actions/match";
-import { useActionMutate } from "@/lib/hooks";
+import { useSaveBallEvents, useUpdateMatch } from "@/lib/hooks";
 import { cn, getOverStr, getScore } from "@/lib/utils";
 import { CreateBallEventSchema } from "@/lib/validation/ball-event";
 import { EventType, MatchExtended } from "@/types";
@@ -78,8 +76,8 @@ function StatsAndSettings({
     match?.teams[0].name ?? "",
   );
 
-  const { mutate: createBallEvent } = useActionMutate(saveBallEvents);
-  const { mutate: updateMutate } = useActionMutate(updateMatch);
+  const { mutate: createBallEvent } = useSaveBallEvents();
+  const { mutate: updateMutate } = useUpdateMatch();
 
   const curTeam = match?.teams[match.curTeam];
   const opposingTeam = match?.teams[match.curTeam === 0 ? 1 : 0];

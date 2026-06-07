@@ -9,17 +9,18 @@ import { type ThemeProviderProps } from "next-themes/dist/types";
 import { Toaster } from "./ui/sonner";
 
 export function Provider({ children, ...props }: ThemeProviderProps) {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60 * 1000 * 5,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-      },
-    },
-  });
-
-  const [queryClientState] = useState(() => queryClient);
+  const [queryClientState] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000 * 5,
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClientState}>

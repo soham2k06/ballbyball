@@ -2,14 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
-
-import { Player } from "@prisma/client";
 import { Loader2, Plus } from "lucide-react";
 
-import { createPlayer, getAllPlayers } from "@/lib/actions/player";
-import { updateTeam } from "@/lib/actions/team";
-import { useActionMutate } from "@/lib/hooks";
+import { useCreatePlayer, usePlayers, useUpdateTeam } from "@/lib/hooks";
 import { TeamWithPlayers } from "@/types";
 
 import { Button } from "@/components/ui/button";
@@ -38,28 +33,27 @@ function UpdateTeamPlayersDialog({
   setOpen,
   team,
 }: UpdateTeamPlayersDialogProps) {
-  const router = useRouter();
+  const { players: cachedPlayers, isLoading } = usePlayers();
+  const { mutateAsync: createPlayerAsync, isPending: isCreatingPlayer } =
+    useCreatePlayer();
+  const { mutate: updateTeamMutate, isPending: isSaving } = useUpdateTeam();
 
-  const [allPlayers, setAllPlayers] = useState<Pick<Player, "id" | "name">[]>(
-    [],
-  );
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
-  const [isCreatingPlayer, setIsCreatingPlayer] = useState(false);
+  const [extraPlayers, setExtraPlayers] = useState<
+    { id: string; name: string }[]
+  >([]);
 
-  const { mutate: updateTeamMutate, isPending: isSaving } =
-    useActionMutate(updateTeam);
+  const allPlayers = [
+    ...cachedPlayers,
+    ...extraPlayers.filter((p) => !cachedPlayers.find((cp) => cp.id === p.id)),
+  ];
 
   useEffect(() => {
     if (!open) return;
     setSelectedIds(team.players.map((p) => p.id));
     setNewPlayerName("");
-    setIsLoadingPlayers(true);
-    getAllPlayers().then((players) => {
-      setAllPlayers(players ?? []);
-      setIsLoadingPlayers(false);
-    });
+    setExtraPlayers([]);
   }, [open, team]);
 
   function togglePlayer(id: string) {
@@ -71,16 +65,13 @@ function UpdateTeamPlayersDialog({
   async function handleCreatePlayer() {
     const name = newPlayerName.trim();
     if (!name) return;
-    setIsCreatingPlayer(true);
     try {
-      const created = await createPlayer({ name }, { revalidate: false });
-      if (created) {
-        setAllPlayers((prev) => [...prev, created]);
-        setSelectedIds((prev) => [...prev, created.id]);
-      }
+      const created = await createPlayerAsync({ name });
+      setExtraPlayers((prev) => [...prev, created]);
+      setSelectedIds((prev) => [...prev, created.id]);
       setNewPlayerName("");
-    } finally {
-      setIsCreatingPlayer(false);
+    } catch {
+      // error surfaced by mutation
     }
   }
 
@@ -93,10 +84,7 @@ function UpdateTeamPlayersDialog({
         captain: team.captain ?? null,
       },
       {
-        onSuccess: () => {
-          setOpen(false);
-          router.refresh();
-        },
+        onSuccess: () => setOpen(false),
       },
     );
   }
@@ -108,7 +96,7 @@ function UpdateTeamPlayersDialog({
           <DialogTitle>Update Players — {team.name}</DialogTitle>
         </DialogHeader>
 
-        {isLoadingPlayers ? (
+        {isLoading ? (
           <ul className="flex-1 space-y-1 overflow-y-auto">
             {Array.from({ length: 12 }, (_, i) => (
               <li key={i}>

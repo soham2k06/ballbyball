@@ -6,10 +6,12 @@ import { BallEvent, CurPlayer, Player } from "@prisma/client";
 import { toast } from "sonner";
 
 import { StatsOpenProvider } from "@/contexts/stats-open-context";
-import { deleteAllBallEvents, saveBallEvents } from "@/lib/actions/ball-event";
-import { updateMatch } from "@/lib/actions/match";
 import { strikeChangers } from "@/lib/constants";
-import { useActionMutate } from "@/lib/hooks";
+import {
+  useDeleteAllBallEvents,
+  useSaveBallEvents,
+  useUpdateMatch,
+} from "@/lib/hooks";
 import {
   calcRuns,
   generateOverSummary,
@@ -50,11 +52,9 @@ function ScorerLayout({
   userRef: string | null;
 }) {
   // ** Action hooks
-  const { mutate: createBallEvent, isPending } =
-    useActionMutate(saveBallEvents);
-  const { mutate: updateMutate } = useActionMutate(updateMatch);
-  const { mutate: deleteAllBallEventsMutate } =
-    useActionMutate(deleteAllBallEvents);
+  const { mutate: createBallEvent, isPending } = useSaveBallEvents();
+  const { mutate: updateMutate } = useUpdateMatch();
+  const { mutate: deleteAllBallEventsMutate } = useDeleteAllBallEvents();
 
   // ** States
   const [hasEnded, setHasEnded] = useState(match.hasEnded);

@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Player } from "@prisma/client";
 import { Loader2 } from "lucide-react";
 
-import { addAnalytics } from "@/lib/actions/app-analytics";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -31,29 +30,14 @@ function AddPlayerButton({
   const [openMultiple, setOpenMultiple] = useState(false);
 
   function handleClickAddSingle() {
-    addAnalytics({
-      event: "click",
-      module: "players",
-      property: "btn-open-add-single-player",
-    });
     setOpen(true);
   }
 
   function handleClickAddMultiple() {
-    addAnalytics({
-      event: "click",
-      module: "players",
-      property: "btn-open-add-multiple-players",
-    });
     setOpenMultiple(true);
   }
 
   function handleSortClick() {
-    addAnalytics({
-      event: "click",
-      module: "players",
-      property: `btn-${isSorting ? "sort-players-done" : "sort-players-init"}`,
-    });
     if (isSorting) handleSort();
     else setIsSorting((prev) => !prev);
   }

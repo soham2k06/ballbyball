@@ -4,7 +4,6 @@ import { Player } from "@prisma/client";
 import { Edit, LandPlot, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { addAnalytics } from "@/lib/actions/app-analytics";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 
 import { Button } from "@/components/ui/button";
@@ -58,11 +57,6 @@ function PlayerCard({
   const handleDelete = (playerId: string) => setPlayerToDelete(playerId);
 
   function handleViewPlayerStats() {
-    addAnalytics({
-      event: "click",
-      module: "stats",
-      property: "card-view_player_stats",
-    });
     setOpenedPlayer({
       id: player.id,
       name: player.name,
@@ -70,11 +64,6 @@ function PlayerCard({
   }
 
   function handleViewPlayerMatches() {
-    addAnalytics({
-      event: "click",
-      module: "stats",
-      property: "btn-view_player_matches",
-    });
     setPlayerMatchesOpen(player.id);
   }
 

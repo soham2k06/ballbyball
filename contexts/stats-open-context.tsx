@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 
-import { addAnalytics } from "@/lib/actions/app-analytics";
 
 type SetOpenType = Dispatch<SetStateAction<boolean>>;
 
@@ -59,52 +58,22 @@ function StatsOpenProvider({ children }: { children: React.ReactNode }) {
   const [showDetails, setShowDetails] = useState(false);
 
   function handleShowScorecard(o: boolean) {
-    if (o)
-      addAnalytics({
-        event: "click",
-        module: "scorer",
-        property: "btn-scorecard",
-      });
     setShowScorecard(o);
   }
 
   function handleShowRunrateChart(o: boolean) {
-    if (o)
-      addAnalytics({
-        event: "click",
-        module: "scorer",
-        property: "btn-runrate_chart",
-      });
     setShowRunrateChart(o);
   }
 
   function handleShowOverSummaries(o: boolean) {
-    if (o)
-      addAnalytics({
-        event: "click",
-        module: "scorer",
-        property: "btn-over_summaries",
-      });
     setShowOverSummaries(o);
   }
 
   function handleShowWormChart(o: boolean) {
-    if (o)
-      addAnalytics({
-        event: "click",
-        module: "scorer",
-        property: "btn-worm_chart",
-      });
     setShowWormChart(o);
   }
 
   function handleShowPlayerRivalries(o: boolean) {
-    if (o)
-      addAnalytics({
-        event: "click",
-        module: "scorer",
-        property: "btn-player_rivalries",
-      });
     setShowPlayerRivalries(o);
   }
 

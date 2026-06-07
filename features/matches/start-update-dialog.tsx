@@ -6,8 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Control, useForm } from "react-hook-form";
 
-import { createMatch, updateMatch } from "@/lib/actions/match";
-import { useActionMutate, useValidateMatchData } from "@/lib/hooks";
+import { useCreateMatch, useUpdateMatch, useValidateMatchData } from "@/lib/hooks";
 import { cn, abbreviateEntity } from "@/lib/utils";
 import {
   CreateMatchSchema,
@@ -133,10 +132,8 @@ function StartUpdateMatchDialog({
     formState: { isDirty },
   } = form;
 
-  const { mutate: createMutate, isPending: isCreating } =
-    useActionMutate(createMatch);
-  const { mutate: updateMutate, isPending: isUpdating } =
-    useActionMutate(updateMatch);
+  const { mutate: createMutate, isPending: isCreating } = useCreateMatch();
+  const { mutate: updateMutate, isPending: isUpdating } = useUpdateMatch();
 
   const watchedTeamIds = form.watch("teamIds") || [];
   const selectedTeams = watchedTeamIds
@@ -168,10 +165,10 @@ function StartUpdateMatchDialog({
       return;
     } else {
       createMutate(data as CreateMatchSchema, {
-        onSuccess: (newMatchId) => {
+        onSuccess: (result) => {
           reset();
           setOpen(false);
-          router.push(`/match/${newMatchId}`);
+          router.push(`/match/${result.id}`);
         },
       });
     }

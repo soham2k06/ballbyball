@@ -1,7 +1,6 @@
 import { Player } from "@prisma/client";
 import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
 
-import { addAnalytics } from "@/lib/actions/app-analytics";
 import { TeamWithPlayers } from "@/types";
 
 import { Button } from "@/components/ui/button";
@@ -45,11 +44,6 @@ function TeamCard({
   userRef,
 }: TeamProps) {
   function handleViewTeam() {
-    addAnalytics({
-      event: "click",
-      module: "teams",
-      property: "card-view_team",
-    });
     setShowingTeam({
       players: team.players,
       captainId: team.captain,

@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import Link from "next/link";
 
-import { addAnalytics } from "@/lib/actions/app-analytics";
 import { TeamWithPlayers } from "@/types";
 
 import { Button } from "@/components/ui/button";
@@ -33,11 +32,6 @@ function StartMatchButton({
   const [showCreateTeam, setShowCreateTeam] = useState(false);
 
   function handleStartButtonClick() {
-    addAnalytics({
-      event: "click",
-      property: "btn-start_match_open",
-      module: "matches",
-    });
     if (teams.length < 2) setShowCreateTeam(true);
     else setOpen(true);
   }

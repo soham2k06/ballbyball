@@ -1,9 +1,6 @@
 import { Metadata } from "next";
 
-import { getAllMatches } from "@/lib/actions/match";
-import prisma from "@/lib/db/prisma";
-import { checkSession, getValidatedUser } from "@/lib/utils";
-import { MatchExtended } from "@/types";
+import { checkSession } from "@/lib/utils";
 
 import MatchList from "@/features/matches/list";
 
@@ -13,30 +10,19 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  searchParams: {
-    user: string;
-    size: string;
-  };
+  searchParams: Promise<{ user?: string; size?: string }>;
 }
 
 async function Matches({ searchParams }: Props) {
-  const { user: userRef, size } = searchParams;
-  const userId = userRef ?? (await getValidatedUser());
+  const { user: userRef } = await searchParams;
   if (!userRef) await checkSession();
-
-  const matches = await getAllMatches(userRef, size);
-
-  const matchesCount = await prisma.match.count({ where: { userId } });
 
   return (
     <div className="w-full">
       <h1 className="mb-4 text-3xl font-semibold tracking-tight max-sm:text-xl">
         Matches
       </h1>
-      <MatchList
-        matches={matches as MatchExtended[]}
-        matchesCount={matchesCount}
-      />
+      <MatchList />
     </div>
   );
 }

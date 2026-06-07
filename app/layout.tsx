@@ -1,18 +1,14 @@
-import { Suspense } from "react";
-
 import type { Metadata } from "next";
 
 import { Lato } from "next/font/google";
 
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SessionProvider } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
-
-import Analytics from "@/components/analytics";
-import FullPageLoader from "@/components/full-page-loader";
 import { Provider } from "@/components/providers";
 
 // If loading a variable font, you don't need to specify the font weight
@@ -181,10 +177,7 @@ export default async function RootLayout({
             {children}
           </Provider>
         </SessionProvider>
-        {/* <Analytics /> */}
-        <Suspense fallback={<FullPageLoader />}>
-          <Analytics />
-        </Suspense>
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>

@@ -4,8 +4,7 @@ import { useState } from "react";
 
 import { Player } from "@prisma/client";
 
-import { deleteTeam } from "@/lib/actions/team";
-import { useActionMutate } from "@/lib/hooks";
+import { useDeleteTeam, useTeams } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { UpdateTeamSchema } from "@/lib/validation/team";
 import { TeamWithPlayers } from "@/types";
@@ -20,14 +19,9 @@ import TeamBuilder from "./team-builder";
 import TeamCard from "./team-card";
 import TeamPlayers from "./team-players";
 
-function TeamList({
-  teams,
-  userRef,
-}: {
-  teams: TeamWithPlayers[];
-  userRef: string | null;
-}) {
-  const { mutate: deleteMutate, isPending } = useActionMutate(deleteTeam);
+function TeamList({ userRef }: { userRef: string | null }) {
+  const { teams } = useTeams(userRef);
+  const { mutate: deleteMutate, isPending } = useDeleteTeam();
 
   const [teamToDelete, setTeamToDelete] = useState<string | undefined>();
 

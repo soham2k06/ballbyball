@@ -4,8 +4,7 @@ import { Minus, Plus } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { createMultiplePlayers } from "@/lib/actions/player";
-import { useActionMutate } from "@/lib/hooks";
+import { useCreateMultiplePlayers } from "@/lib/hooks";
 import { toastError } from "@/lib/utils";
 import { OverlayStateProps } from "@/types";
 
@@ -58,7 +57,7 @@ function AddMultiplePlayersDialog({
     shouldUnregister: false,
   });
 
-  const { mutate, isPending } = useActionMutate(createMultiplePlayers);
+  const { mutate, isPending } = useCreateMultiplePlayers();
 
   function onSubmit(data: { names: string[] }) {
     setPlayerData((prevData) => [

@@ -4,12 +4,7 @@ import { useState } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useQuery } from "@tanstack/react-query";
-
-import { addAnalytics } from "@/lib/actions/app-analytics";
-import { deleteMatch } from "@/lib/actions/match";
-import { getAllTeams } from "@/lib/actions/team";
-import { useActionMutate } from "@/lib/hooks";
+import { useDeleteMatch, useMatches, useTeams } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { UpdateMatchSchema } from "@/lib/validation/match";
 import { MatchExtended } from "@/types";
@@ -17,34 +12,23 @@ import { MatchExtended } from "@/types";
 import AlertNote from "@/components/alert-note";
 import EmptyState from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import Match from "./match-card";
 import Start from "./start";
 import StartUpdateMatchDialog from "./start-update-dialog";
 
-function MatchList({
-  matches,
-  matchesCount,
-}: {
-  matches: MatchExtended[] | undefined;
-  matchesCount: number;
-}) {
+function MatchList() {
   const searchParams = useSearchParams();
   const userRef = searchParams.get("user");
+  const size = searchParams.get("size");
 
   const router = useRouter();
 
-  const {
-    data: teams = [],
-    isLoading,
-    isFetching,
-  } = useQuery({
-    queryKey: ["allTeams"],
-    queryFn: () => getAllTeams(),
-  });
-
-  const { mutate: deleteMutate, isPending: isDeleting } =
-    useActionMutate(deleteMatch);
+  const { teams, isLoading: isTeamsLoading, isFetching: isTeamsFetching } =
+    useTeams();
+  const { matches, matchesCount, isLoading } = useMatches(size, userRef);
+  const { mutate: deleteMutate, isPending: isDeleting } = useDeleteMatch();
 
   const [matchToUpdate, setMatchToUpdate] = useState<
     (UpdateMatchSchema & { teams: { id: string }[] }) | undefined
@@ -53,16 +37,21 @@ function MatchList({
   const [matchToDelete, setMatchToDelete] = useState<string | null>(null);
 
   function handleShowMore() {
-    addAnalytics({
-      event: "click",
-      property: "btn-show_more_matches",
-      module: "matches",
-    });
     const curSize = parseInt(searchParams.get("size") ?? "5");
     const newRoute = `/matches?size=${curSize + 5}`;
     router.push(userRef ? `${newRoute}&user=${userRef}` : newRoute, {
       scroll: false,
     });
+  }
+
+  if (isLoading && !matches.length) {
+    return (
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-32 w-full rounded-md" />
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -72,7 +61,11 @@ function MatchList({
       })}
     >
       {!userRef && (
-        <Start teams={teams} isLoading={isLoading} isFetching={isFetching} />
+        <Start
+          teams={teams}
+          isLoading={isTeamsLoading}
+          isFetching={isTeamsFetching}
+        />
       )}
       {matches?.length ? (
         <>
@@ -104,7 +97,7 @@ function MatchList({
             setOpen={() => setMatchToUpdate(undefined)}
             matchToUpdate={matchToUpdate}
             teams={teams}
-            isTeamsFetching={isFetching}
+            isTeamsFetching={isTeamsFetching ?? false}
           />
           <AlertNote
             open={!!matchToDelete}

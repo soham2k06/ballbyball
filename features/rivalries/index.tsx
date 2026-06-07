@@ -1,9 +1,11 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { useQueryState } from "nuqs";
 
 import { useRivalries } from "@/api-hooks/use-rivalries";
-import { PlayerSimplified } from "@/types";
+import { usePlayers } from "@/lib/hooks";
 
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +15,10 @@ import PlayerSelection from "./player-selection";
 import RivalryCard from "./rivalry-card";
 import RivalryCardSkeleton from "./rivalry-card-skeleton";
 
-function RivalriesList({ players }: { players: PlayerSimplified[] }) {
+function RivalriesList() {
+  const searchParams = useSearchParams();
+  const userRef = searchParams.get("user");
+  const { players } = usePlayers(userRef);
   const [player, setPlayer] = useQueryState("player");
   const [batsman, setBatsman] = useQueryState("batsman");
   const [bowler, setBowler] = useQueryState("bowler");

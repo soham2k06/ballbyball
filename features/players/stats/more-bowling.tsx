@@ -1,4 +1,3 @@
-import { addAnalytics } from "@/lib/actions/app-analytics";
 import { round } from "@/lib/utils";
 import { PlayerStats } from "@/types";
 
@@ -19,11 +18,6 @@ function MoreBowling({ data }: { data: PlayerStats }) {
   const ballStrikeRate = (data?.bowling.balls ?? 0) / (wicketsTaken ?? 0);
 
   function handleClickMore() {
-    addAnalytics({
-      event: "click",
-      module: "stats",
-      property: "btn-view_more_bowling",
-    });
   }
 
   return (

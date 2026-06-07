@@ -4,8 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { usePlayers } from "@/api-hooks/use-players";
-import { createTeam, updateTeam } from "@/lib/actions/team";
-import { useActionMutate } from "@/lib/hooks";
+import { useCreateTeam, useUpdateTeam } from "@/lib/hooks";
 import {
   CreateTeamSchema,
   UpdateTeamSchema,
@@ -67,10 +66,8 @@ function AddUpdateTeamDialog({
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
-  const { mutate: createMutate, isPending: isCreating } =
-    useActionMutate(createTeam);
-  const { mutate: updateMutate, isPending: isUpdating } =
-    useActionMutate(updateTeam);
+  const { mutate: createMutate, isPending: isCreating } = useCreateTeam();
+  const { mutate: updateMutate, isPending: isUpdating } = useUpdateTeam();
 
   const isPending = isCreating || isUpdating;
 

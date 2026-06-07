@@ -1,6 +1,5 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, SortDesc } from "lucide-react";
 import { toast } from "sonner";
 
@@ -8,9 +7,7 @@ import {
   usePlayers,
   useSortedPlayersByPerformance,
 } from "@/api-hooks/use-players";
-import { addAnalytics } from "@/lib/actions/app-analytics";
-import { createMultipleTeams } from "@/lib/actions/team";
-import { useActionMutate } from "@/lib/hooks";
+import { useCreateMultipleTeams } from "@/lib/hooks";
 import { toastError, toPercentage } from "@/lib/utils";
 import { PlayerSimplified } from "@/types";
 
@@ -91,8 +88,7 @@ function TeamBuilder() {
       ? toPercentage(team1Points, team2Points)
       : null;
 
-  const qc = useQueryClient();
-  const { mutate, isPending } = useActionMutate(createMultipleTeams);
+  const { mutate, isPending } = useCreateMultipleTeams();
 
   const teamsPayload = teams.map((team) => ({
     name: team.name,
@@ -114,20 +110,7 @@ function TeamBuilder() {
         );
   }, [players, teams, isLoading]);
 
-  function handleOpenBuilder() {
-    addAnalytics({
-      event: "click",
-      property: "btn-build_team_open",
-      module: "teams",
-    });
-  }
-
   function handleSortByPerformance() {
-    addAnalytics({
-      event: "click",
-      property: "btn-sort_by_performance_in_team_builder",
-      module: "teams",
-    });
     setSortPlayers(true);
     sort();
   }
@@ -186,16 +169,15 @@ function TeamBuilder() {
       if (teamsPayload.some((team) => team.name.length === 0))
         return toastError(new Error("Each team must have a name"));
 
-      await mutate(teamsPayload, {
+      mutate(teamsPayload, {
         onError: (error) => toastError(error),
         onSuccess: () => {
-          qc.invalidateQueries({ queryKey: ["allTeams"] });
           toast.success("Teams created successfully");
           setOpen(false);
         },
       });
     },
-    [mutate, qc, teamsPayload],
+    [mutate, teamsPayload],
   );
 
   useEffect(() => {
@@ -205,7 +187,7 @@ function TeamBuilder() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild onClick={handleOpenBuilder}>
+      <DialogTrigger asChild>
         <Button>Build teams</Button>
       </DialogTrigger>
       <DialogContent className="max-h-[95%] overflow-y-auto">
@@ -279,13 +261,6 @@ function TeamBuilder() {
             type="submit"
             className="mt-6 max-sm:w-full"
             loading={isPending}
-            onClick={() =>
-              addAnalytics({
-                event: "click",
-                property: "btn-create_team_builder",
-                module: "teams",
-              })
-            }
           >
             Create teams
           </LoadingButton>
