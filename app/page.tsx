@@ -9,10 +9,13 @@ import {
   Component,
   ExternalLink,
   SmilePlus,
+  Trophy,
+  Users,
   Zap,
 } from "lucide-react";
 
 import getSession from "@/lib/auth/session";
+import prisma from "@/lib/db/prisma";
 
 import BannerImage from "@/components/banner-image";
 import Footer from "@/components/footer";
@@ -43,27 +46,16 @@ const steps = [
 
 const features = [
   {
-    Icon: SmilePlus,
-    title: "User-Friendly Interface",
-    description:
-      "BallByBall offers an interface that simplifies the cricket scoring process",
-  },
-  {
     Icon: Zap,
     title: "Instant Setup",
-    description: "Get started with BallByBall in minutes. No complex setups.",
-  },
-  {
-    Icon: Component,
-    title: "Comprehensive Features",
     description:
-      "Add players, teams, and matches with ease. Keep track of the score ball by ball",
+      "Get started with BallByBall in minutes. Start with just a single device.",
   },
   {
     Icon: BadgeIndianRupee,
-    title: "Free Service",
+    title: "Free Forever",
     description:
-      "Completely free to use, Simply sign in and start scoring your matches.",
+    "Completely free to use, Simply sign in and start scoring your matches.",
   },
   {
     Icon: AreaChart,
@@ -71,7 +63,28 @@ const features = [
     description:
       "Visualize your cricket scores with Worm Chart, Runrate Chart, and Player Stats.",
   },
+  {
+    Icon: SmilePlus,
+    title: "User-Friendly Interface",
+    description:
+      "BallByBall offers an interface that simplifies the cricket scoring process",
+  },
 ];
+
+async function getStats() {
+  const [users, matches, teams, players] = await Promise.all([
+    prisma.user.count(),
+    prisma.match.count(),
+    prisma.team.count(),
+    prisma.player.count(),
+  ]);
+  return { users, matches, teams, players };
+}
+
+function formatStat(n: number) {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k+`;
+  return `${n}+`;
+}
 
 interface Props {
   searchParams: { user?: string };
@@ -84,30 +97,56 @@ async function AsyncNav() {
 }
 
 async function HomePage({ searchParams: { user } }: Props) {
+  const stats = await getStats();
+
   function generateHref(href: string) {
     return user ? `${href}?user=${user}` : href;
   }
+
+  const statItems = [
+    { label: "Users Signed Up", value: formatStat(stats.users), Icon: Users },
+    {
+      label: "Matches Scored",
+      value: formatStat(stats.matches),
+      Icon: Trophy,
+    },
+    {
+      label: "Teams Created",
+      value: formatStat(stats.teams),
+      Icon: Component,
+    },
+    {
+      label: "Players Added",
+      value: formatStat(stats.players),
+      Icon: SmilePlus,
+    },
+  ];
+
   return (
     <>
       <Suspense fallback={<Nav session={null} loading />}>
         <AsyncNav />
       </Suspense>
       <main className="mx-auto w-full max-w-7xl p-4">
+        {/* Hero */}
         <section className="flex items-center justify-between gap-12 pt-8 max-md:flex-col md:pt-8 lg:pt-16">
           <div className="flex max-w-3xl flex-col gap-6">
-            <h1 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-6xl lg:leading-[1.1]">
-              Cricket Scoring Made Easy
+            <div className="inline-flex w-fit items-center rounded-full border bg-muted/60 px-3 py-1 text-sm text-muted-foreground">
+              🏏 Ball-by-ball cricket scoring, for free
+            </div>
+            <h1 className="text-balance text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:leading-[1.1]">
+              Cricket Scoring <span className="text-primary">Made Easy</span>
             </h1>
             <span className="max-w-[568px] text-lg text-muted-foreground sm:text-xl">
               Make Every Match More Memorable: Share Your Cricket Scores and
               Relive the Excitement with Friends and Teammates
             </span>
 
-            <div className="flex w-full items-center space-x-4 md:pb-10">
-              <Button asChild>
+            <div className="flex w-full items-center gap-3 md:pb-10">
+              <Button size="lg" asChild>
                 <Link href={generateHref("/players")}>Start with players</Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button size="lg" asChild variant="outline">
                 <Link href={generateHref("/scorer")}>Instant scoring</Link>
               </Button>
             </div>
@@ -115,6 +154,26 @@ async function HomePage({ searchParams: { user } }: Props) {
 
           <div className="ml-8 aspect-[1/2] w-80 rounded-lg bg-muted max-md:hidden">
             <BannerImage />
+          </div>
+        </section>
+
+        {/* Stats */}
+        <section className="mt-12 lg:mt-20">
+          <div className="grid grid-cols-2 gap-4 rounded-2xl border bg-card p-6 shadow-sm lg:grid-cols-4">
+            {statItems.map(({ label, value, Icon }) => (
+              <div
+                key={label}
+                className="flex flex-col items-center gap-2 py-4 text-center"
+              >
+                <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="size-6" />
+                </div>
+                <span className="text-2xl font-bold tracking-tight">
+                  {value}
+                </span>
+                <span className="text-sm text-muted-foreground">{label}</span>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -132,9 +191,11 @@ async function HomePage({ searchParams: { user } }: Props) {
             and teammates.
           </p>
         </div>
-        <section className="pt-8 md:pt-8 lg:pt-16">
-          <div className="mb-4 flex max-w-3xl flex-col gap-2 md:mb-8">
-            <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:leading-[1.1]">
+
+        {/* Visualize */}
+        <section className="pt-16 lg:pt-24">
+          <div className="mb-6 flex max-w-3xl flex-col gap-2 md:mb-10">
+            <h2 className="text-balance text-2xl font-bold leading-tight tracking-tight md:text-3xl lg:leading-[1.1]">
               Visualize Your Cricket Scores
             </h2>
             <span className="max-w-[568px] text-lg text-muted-foreground sm:text-xl">
@@ -142,76 +203,77 @@ async function HomePage({ searchParams: { user } }: Props) {
             </span>
           </div>
 
-          <div className="grid rounded-xl rounded-b-none border bg-primary/5 md:grid-cols-[8fr_4fr]">
-            <div className="group flex flex-col justify-between p-4 md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">Run rate chart</h2>
-                <p className="text-muted-foreground">
-                  Bar chart comparing the run rates achieved by each team in
-                  every over of the match
-                </p>
+          <div className="overflow-hidden rounded-2xl border bg-primary/5 shadow-sm">
+            <div className="grid md:grid-cols-[8fr_4fr]">
+              <div className="group flex flex-col justify-between border-b p-6 md:border-b-0 md:border-r md:p-8">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold">Run rate chart</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Bar chart comparing the run rates achieved by each team in
+                    every over of the match
+                  </p>
+                </div>
+                <Image
+                  alt="Run rate chart"
+                  draggable="false"
+                  width="864"
+                  height="433"
+                  className="rounded-xl transition-transform duration-300 group-hover:scale-[101%]"
+                  src="/runrate-chart.png"
+                />
               </div>
-              <Image
-                alt="Run rate chart"
-                draggable="false"
-                width="864"
-                height="433"
-                className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
-                src="/runrate-chart.png"
-              />
+              <div className="group flex flex-col justify-between p-6 md:p-8">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold">Worm Chart</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Graphical representation of the cumulative runs scored by
+                    each team over time, showing the edge and flow of the game
+                  </p>
+                </div>
+                <Image
+                  alt="Worm Chart"
+                  width="700"
+                  height="403"
+                  className="rounded-xl transition-transform duration-300 group-hover:scale-[101%]"
+                  src="/worm-chart.png"
+                />
+              </div>
             </div>
-            <div className="group flex flex-col justify-between border-l p-4 md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">Worm Chart</h2>
-                <p className="text-muted-foreground">
-                  Graphical representation of the cumulative runs scored by each
-                  team over time during the match, showing the edge and flow of
-                  the game
-                </p>
+            <div className="grid border-t md:grid-cols-2">
+              <div className="group flex flex-col justify-between border-b p-6 md:border-b-0 md:border-r md:p-8">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold">Player Stats</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Detailed statistics showcasing individual player
+                    performances, including runs, wickets, and other key metrics
+                  </p>
+                </div>
+                <Image
+                  alt="Player Stats"
+                  width="700"
+                  height="403"
+                  className="rounded-xl transition-transform duration-300 group-hover:scale-[101%]"
+                  src="/player-stats.png"
+                />
               </div>
-              <Image
-                alt="Worm Chart"
-                width="700"
-                height="403"
-                className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
-                src="/worm-chart.png"
-              />
-            </div>
-          </div>
-          <div className="grid rounded-xl rounded-t-none border border-t-0 bg-primary/5 md:grid-cols-[6fr_6fr]">
-            <div className="group flex flex-col justify-between border-r p-4 md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">Player Stats</h2>
-                <p className="text-muted-foreground">
-                  Detailed statistics showcasing individual player performances,
-                  including runs, wickets, and other key metrics
-                </p>
+              <div className="group flex flex-col justify-between p-6 md:p-8">
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold">Match summary</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Comprehensive summary of the match, highlighting key
+                    statistics, scores, and outcomes for both teams, including
+                    man of the match declaration
+                  </p>
+                </div>
+                <Image
+                  alt="Match summary"
+                  draggable="false"
+                  width="864"
+                  height="433"
+                  className="rounded-xl transition-transform duration-300 group-hover:scale-[101%]"
+                  src="/match-summary.png"
+                />
               </div>
-              <Image
-                alt="Player Stats"
-                width="700"
-                height="403"
-                className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
-                src="/player-stats.png"
-              />
-            </div>
-            <div className="group flex flex-col justify-between p-4 md:p-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">Match summary</h2>
-                <p className="text-muted-foreground">
-                  Comprehensive summary of the match, highlighting key
-                  statistics, scores, and outcomes for both teams, including man
-                  of the match declaration
-                </p>
-              </div>
-              <Image
-                alt="Match summary"
-                draggable="false"
-                width="864"
-                height="433"
-                className="rounded-lg transition-transform duration-300 group-hover:scale-[101%]"
-                src="/match-summary.png"
-              />
             </div>
           </div>
         </section>
@@ -246,38 +308,48 @@ async function HomePage({ searchParams: { user } }: Props) {
             cricket scoring partner for enthusiasts worldwide.
           </p>
         </section>
-        <section className="pt-8 md:pt-8 lg:pt-16">
-          <div className="mb-4 flex max-w-3xl flex-col gap-2 md:mb-8">
-            <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:leading-[1.1]">
+
+        {/* Get Started */}
+        <section className="pt-16 lg:pt-24">
+          <div className="mb-6 flex max-w-3xl flex-col gap-2 md:mb-10">
+            <h2 className="text-balance text-2xl font-bold leading-tight tracking-tight md:text-3xl lg:leading-[1.1]">
               Get started like a pro!
             </h2>
             <span className="text-lg text-muted-foreground sm:text-xl">
               Starting with BallByBall is as easy as 1-2-3. Follow these simple
+              steps to get going.
             </span>
           </div>
           <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
             {steps.map(({ title, description, link }, index) => (
-              <Card key={index} className="text-center">
+              <Card
+                key={index}
+                className="group relative overflow-hidden transition-shadow hover:shadow-md"
+              >
                 <CardHeader>
                   <Link
                     href={link ? generateHref(link) : ""}
-                    className="flex items-center justify-center gap-2"
+                    className="flex items-center gap-2"
                   >
-                    <CardTitle>{title}</CardTitle>
-                    <ExternalLink />
+                    <CardTitle className="text-base transition-colors group-hover:text-primary md:text-lg">
+                      {title}
+                    </CardTitle>
+                    <ExternalLink className="size-4 text-muted-foreground" />
                   </Link>
                 </CardHeader>
                 <hr className="mx-4" />
-                <CardContent>
+                <CardContent className="pt-4">
                   <p className="text-muted-foreground">{description}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         </section>
-        <section className="pt-8 md:pt-8 lg:pt-16">
-          <div className="mb-4 flex max-w-3xl flex-col gap-2 md:mb-8">
-            <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:leading-[1.1]">
+
+        {/* Why Choose */}
+        <section className="pt-16 lg:pt-24">
+          <div className="mb-6 flex max-w-3xl flex-col gap-2 md:mb-10">
+            <h2 className="text-balance text-2xl font-bold leading-tight tracking-tight md:text-3xl lg:leading-[1.1]">
               Why Choose BallByBall?
             </h2>
             <span className="text-lg text-muted-foreground sm:text-xl">
@@ -286,19 +358,40 @@ async function HomePage({ searchParams: { user } }: Props) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ Icon, title, description }, index) => (
-              <Card key={index} className="text-center">
+              <Card key={index} className="transition-shadow hover:shadow-md">
                 <CardHeader>
-                  <div className="mx-auto mb-2">
-                    <Icon className="size-8" />
+                  <div className="mb-3 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Icon className="size-6" />
                   </div>
-                  <CardTitle>{title}</CardTitle>
+                  <CardTitle className="text-lg">{title}</CardTitle>
                 </CardHeader>
                 <hr className="mx-4" />
-                <CardContent>
-                  <p className="text-muted-foreground">{description}</p>
+                <CardContent className="pt-4">
+                  <p className="text-sm text-muted-foreground">{description}</p>
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="my-16 lg:my-24">
+          <div className="rounded-2xl border bg-primary/5 px-8 py-12 text-center shadow-sm">
+            <h2 className="text-balance text-2xl font-bold tracking-tight md:text-3xl">
+              Ready to score your next match?
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-lg text-muted-foreground">
+              Join thousands of cricketers already using BallByBall to track
+              their games. It&apos;s free, fast, and easy to use.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button size="lg" asChild>
+                <Link href={generateHref("/players")}>Get started free</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href={generateHref("/scorer")}>Try instant scoring</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
