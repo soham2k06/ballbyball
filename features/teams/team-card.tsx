@@ -62,7 +62,7 @@ function TeamCard({
       className="flex cursor-pointer items-center justify-between p-2 sm:p-4"
       onClick={handleViewTeam}
     >
-      <CardTitle className="w-full truncate py-1 text-xl">
+      <CardTitle className="w-full truncate py-1 text-lg">
         {team.name}
       </CardTitle>
       {!userRef && (
@@ -74,22 +74,22 @@ function TeamCard({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              className="gap-2 font-bold"
+              className="gap-2 font-medium"
               onClick={(e) => {
                 e.stopPropagation();
                 handleUpdateClick(team);
               }}
             >
-              <Edit size={20} /> Edit
+              <Edit size={16} /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="gap-2 font-bold"
+              className="gap-2 font-medium"
               onClick={(e) => {
                 e.stopPropagation();
                 setTeamToDelete(team.id);
               }}
             >
-              <Trash2 size={20} /> Delete
+              <Trash2 size={16} /> Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

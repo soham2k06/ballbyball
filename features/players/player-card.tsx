@@ -87,7 +87,7 @@ function PlayerCard({
       ref={isSorting ? setNodeRef : undefined}
       onClick={handleViewPlayerStats}
     >
-      <CardTitle className="w-full truncate py-1 text-xl">
+      <CardTitle className="w-full truncate py-1 text-lg">
         {player.name}
       </CardTitle>
 
@@ -106,7 +106,7 @@ function PlayerCard({
                 handleViewPlayerMatches();
               }}
             >
-              <LandPlot size={20} /> Matches
+              <LandPlot size={16} /> Matches
             </DropdownMenuItem>
             {!userRef && (
               <>
@@ -122,7 +122,7 @@ function PlayerCard({
                     setPlayerToUpdate(player);
                   }}
                 >
-                  <Edit size={20} /> Edit
+                  <Edit size={16} /> Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="gap-2 font-medium"
@@ -135,7 +135,7 @@ function PlayerCard({
                     handleDelete(player.id);
                   }}
                 >
-                  <Trash2 size={20} /> Delete
+                  <Trash2 size={16} /> Delete
                 </DropdownMenuItem>
               </>
             )}

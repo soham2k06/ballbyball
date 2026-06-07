@@ -69,8 +69,8 @@ function MatchCard({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
   return (
     <Card className="relative flex flex-col justify-between">
       <CardHeader className="flex-row items-center justify-between gap-1 space-y-0">
-        <CardTitle className="text-xl">{match.name}</CardTitle>
-        <div className="flex items-center space-x-4">
+        <CardTitle className="text-lg">{match.name}</CardTitle>
+        <div className="flex items-center gap-2">
           <Button asChild size="icon">
             <Link
               href={`/match/${match.id}${userRef ? `?user=${userRef}` : ""}`}
@@ -92,16 +92,16 @@ function MatchCard({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                  className="gap-2 font-bold"
+                  className="gap-2 font-medium"
                   onClick={() => setMatchToUpdate(matchToUpdateVar)}
                 >
-                  <Edit size={20} /> Edit
+                  <Edit size={16} /> Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="gap-2 font-bold"
+                  className="gap-2 font-medium"
                   onClick={() => setMatchToDelete(match.id)}
                 >
-                  <Trash2 size={20} /> Delete
+                  <Trash2 size={16} /> Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

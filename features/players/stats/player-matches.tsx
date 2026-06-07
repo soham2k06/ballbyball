@@ -64,7 +64,7 @@ function PlayerMatches({ playerId, setPlayerMatchesOpen }: PlayerMatchesProps) {
           </DialogHeader>
         )}
         <ScrollArea className="max-h-[480px]">
-          <ul className="space-y-3 px-0.5">
+          <ul className="-m-0.5 flex flex-col gap-3 p-0.5">
             {isFetching ? (
               <>
                 <MatchSkeleton />
