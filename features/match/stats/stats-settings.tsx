@@ -36,6 +36,7 @@ import OverStats from "./over-stats";
 import PlayerRivalries from "./player-rivalries";
 import StatsDrawerHeader from "./stats-drawer-header";
 import TeamSelect from "./team-select";
+import UpdateTeamPlayersDialog from "./update-team-players";
 import WormChart from "./worm-chart";
 
 interface StatsAndSettingsProps {
@@ -69,6 +70,9 @@ function StatsAndSettings({
 
   const [showSelectBatsman, setShowSelectBatsman] = useState(false);
   const [showSelectBowler, setShowSelectBowler] = useState(false);
+  const [updatePlayersTeamIndex, setUpdatePlayersTeamIndex] = useState<
+    0 | 1 | null
+  >(null);
 
   const [selectedTeam, setSelectedTeam] = useState<string>(
     match?.teams[0].name ?? "",
@@ -224,6 +228,21 @@ function StatsAndSettings({
               }}
               team={opposingTeam}
             />
+            <TypographyP className="mb-2 mt-4 text-sm font-bold uppercase text-muted-foreground">
+              Team Players
+            </TypographyP>
+            <div className="mb-2 space-y-2">
+              {match.teams.map((team, i) => (
+                <Button
+                  key={team.id}
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => setUpdatePlayersTeamIndex(i as 0 | 1)}
+                >
+                  {team.name}
+                </Button>
+              ))}
+            </div>
             <TypographyP className="mb-2 text-sm font-bold uppercase text-muted-foreground">
               Stats
             </TypographyP>
@@ -253,6 +272,14 @@ function StatsAndSettings({
           </DrawerContent>
         )}
       </Drawer>
+
+      {match && updatePlayersTeamIndex !== null && (
+        <UpdateTeamPlayersDialog
+          open={updatePlayersTeamIndex !== null}
+          setOpen={(v) => !v && setUpdatePlayersTeamIndex(null)}
+          team={match.teams[updatePlayersTeamIndex]}
+        />
+      )}
 
       {match && curTeam && (
         <>

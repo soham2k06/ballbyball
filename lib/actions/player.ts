@@ -109,7 +109,10 @@ export async function getPlayerBySortedPerformance() {
   }
 }
 
-export async function createPlayer(data: CreatePlayerSchema) {
+export async function createPlayer(
+  data: CreatePlayerSchema,
+  opts?: { revalidate?: boolean },
+) {
   const userId = await getValidatedUser();
   const parsedRes = createPlayerSchema.safeParse(data);
 
@@ -123,14 +126,16 @@ export async function createPlayer(data: CreatePlayerSchema) {
   try {
     const newName = await createOrUpdateWithUniqueName(name, prisma.player);
 
-    await prisma.player.create({
+    const player = await prisma.player.create({
       data: {
         userId,
         name: newName,
       },
+      select: { id: true, name: true },
     });
 
-    revalidatePath("/players");
+    if (opts?.revalidate !== false) revalidatePath("/players");
+    return player;
   } catch (error) {
     handleError(error);
   }
