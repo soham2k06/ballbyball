@@ -13,6 +13,7 @@ import AddTeam from "@/features/teams/add-team";
 
 import AlertNote from "@/components/alert-note";
 import EmptyState from "@/components/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import AddUpdateTeamDialog from "./add-update-team-dialog";
 import TeamBuilder from "./team-builder";
@@ -20,7 +21,7 @@ import TeamCard from "./team-card";
 import TeamPlayers from "./team-players";
 
 function TeamList({ userRef }: { userRef: string | null }) {
-  const { teams } = useTeams(userRef);
+  const { teams, isLoading } = useTeams(userRef);
   const { mutate: deleteMutate, isPending } = useDeleteTeam();
 
   const [teamToDelete, setTeamToDelete] = useState<string | undefined>();
@@ -56,6 +57,16 @@ function TeamList({ userRef }: { userRef: string | null }) {
     };
 
     setTeamToUpdate(teamToUpdateVar);
+  }
+
+  if (isLoading && !teams?.length) {
+    return (
+      <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Skeleton key={i} className="h-16 w-full rounded-md" />
+        ))}
+      </div>
+    );
   }
 
   return (
