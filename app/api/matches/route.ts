@@ -9,13 +9,22 @@ export async function GET(req: NextRequest) {
   try {
     const userRef = req.nextUrl.searchParams.get("user");
     const userId = userRef ?? (await getValidatedUser());
-    const size = req.nextUrl.searchParams.get("size") ?? "5";
+    const page = parseInt(req.nextUrl.searchParams.get("page") ?? "1");
+    const pageSize = parseInt(req.nextUrl.searchParams.get("pageSize") ?? "10");
+    const sort = req.nextUrl.searchParams.get("sort") ?? "desc";
+    const search = req.nextUrl.searchParams.get("search") ?? "";
+
+    const where = {
+      userId,
+      ...(search ? { name: { contains: search, mode: "insensitive" as const } } : {}),
+    };
 
     const [matches, count] = await Promise.all([
       prisma.match.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        take: parseInt(size),
+        where,
+        orderBy: { createdAt: sort === "asc" ? "asc" : "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
         select: {
           id: true,
           name: true,
@@ -42,7 +51,7 @@ export async function GET(req: NextRequest) {
           },
         },
       }),
-      prisma.match.count({ where: { userId } }),
+      prisma.match.count({ where }),
     ]);
 
     const simplified = matches.map((match) => {

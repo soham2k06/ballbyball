@@ -8,16 +8,30 @@ export async function GET(req: NextRequest) {
   try {
     const userRef = req.nextUrl.searchParams.get("user");
     const userId = userRef ?? (await getValidatedUser());
-    const players = await prisma.player.findMany({
-      where: { userId },
-      select: { id: true, name: true, order: true },
-    });
-    const sorted = players.sort((a, b) => {
-      if (a.order === null) return 1;
-      if (b.order === null) return -1;
-      return a.order - b.order;
-    });
-    return NextResponse.json(sorted);
+    const pageParam = req.nextUrl.searchParams.get("page");
+    const pageSizeParam = req.nextUrl.searchParams.get("pageSize");
+    const search = req.nextUrl.searchParams.get("search") ?? "";
+
+    const where = {
+      userId,
+      ...(search ? { name: { contains: search, mode: "insensitive" as const } } : {}),
+    };
+
+    const paginated = !!pageSizeParam;
+    const page = parseInt(pageParam ?? "1");
+    const pageSize = parseInt(pageSizeParam ?? "0");
+
+    const [players, count] = await Promise.all([
+      prisma.player.findMany({
+        where,
+        select: { id: true, name: true, order: true },
+        orderBy: { order: "asc" as const },
+        ...(paginated ? { skip: (page - 1) * pageSize, take: pageSize } : {}),
+      }),
+      prisma.player.count({ where }),
+    ]);
+
+    return NextResponse.json({ players, count });
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

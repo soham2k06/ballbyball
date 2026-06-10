@@ -10,7 +10,7 @@ import { TeamWithPlayers } from "@/types";
 
 export function useTeams() {
   const { data: teams = [], isFetching, isFetched } = useQuery({
-    queryKey: queryKeys.teams.all,
+    queryKey: queryKeys.teams.all(),
     queryFn: () => apiFetch<TeamWithPlayers[]>("/api/teams"),
   });
   return { teams, isLoading: isFetching, isFetched };
@@ -21,7 +21,7 @@ export function useCreateTeam() {
   return useMutation({
     mutationFn: (data: CreateTeamSchema) =>
       apiFetch("/api/teams", { method: "POST", body: JSON.stringify(data) }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all() }),
   });
 }
 
@@ -33,7 +33,7 @@ export function useCreateMultipleTeams() {
         method: "POST",
         body: JSON.stringify({ teams }),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all() }),
   });
 }
 
@@ -45,7 +45,7 @@ export function useUpdateTeam() {
         method: "PATCH",
         body: JSON.stringify(data),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all() }),
   });
 }
 
@@ -54,6 +54,6 @@ export function useDeleteTeam() {
   return useMutation({
     mutationFn: (id: string) =>
       apiFetch(`/api/teams/${id}`, { method: "DELETE" }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.teams.all() }),
   });
 }

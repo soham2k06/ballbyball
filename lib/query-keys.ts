@@ -1,13 +1,13 @@
 export const queryKeys = {
   players: {
-    all: ["players"] as const,
+    all: (params?: object) => ["players", params ?? {}] as const,
     performance: ["players", "performance"] as const,
   },
   teams: {
-    all: ["teams"] as const,
+    all: (params?: object) => ["teams", params ?? {}] as const,
   },
   matches: {
-    all: (size?: string) => ["matches", size ?? "5"] as const,
+    all: (params?: object) => ["matches", params ?? {}] as const,
     detail: (id: string) => ["matches", id] as const,
   },
 } as const;

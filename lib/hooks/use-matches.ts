@@ -11,7 +11,7 @@ import { MatchExtended } from "@/types";
 export function useMatches(size?: string) {
   const params = size ? `?size=${size}` : "";
   const { data: matches = [], isFetching, isFetched } = useQuery({
-    queryKey: queryKeys.matches.all(size),
+    queryKey: queryKeys.matches.all(),
     queryFn: () => apiFetch<MatchExtended[]>(`/api/matches${params}`),
   });
   return { matches, isLoading: isFetching, isFetched };

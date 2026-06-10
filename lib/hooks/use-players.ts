@@ -16,7 +16,7 @@ export function usePlayers() {
     isFetching,
     isFetched,
   } = useQuery({
-    queryKey: queryKeys.players.all,
+    queryKey: queryKeys.players.all(),
     queryFn: () => apiFetch<PlayerSimple[]>("/api/players"),
   });
   return { players, isLoading: isFetching, isFetched };
@@ -30,7 +30,7 @@ export function useCreatePlayer() {
         method: "POST",
         body: JSON.stringify(data),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all() }),
   });
 }
 
@@ -42,7 +42,7 @@ export function useCreateMultiplePlayers() {
         method: "POST",
         body: JSON.stringify({ names }),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all() }),
   });
 }
 
@@ -54,7 +54,7 @@ export function useUpdatePlayer() {
         method: "PATCH",
         body: JSON.stringify(data),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all() }),
   });
 }
 
@@ -63,7 +63,7 @@ export function useDeletePlayer() {
   return useMutation({
     mutationFn: (id: string) =>
       apiFetch(`/api/players/${id}`, { method: "DELETE" }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all() }),
   });
 }
 
@@ -75,6 +75,6 @@ export function useSortPlayers() {
         method: "PATCH",
         body: JSON.stringify({ players }),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.players.all() }),
   });
 }

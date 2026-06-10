@@ -18,7 +18,7 @@ import RivalryCardSkeleton from "./rivalry-card-skeleton";
 function RivalriesList() {
   const searchParams = useSearchParams();
   const userRef = searchParams.get("user");
-  const { players } = usePlayers(userRef);
+  const { players } = usePlayers({ userRef });
   const [player, setPlayer] = useQueryState("player");
   const [batsman, setBatsman] = useQueryState("batsman");
   const [bowler, setBowler] = useQueryState("bowler");

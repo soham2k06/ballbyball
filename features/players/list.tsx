@@ -1,18 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { DndContext } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
 import { Player } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useQueryState, parseAsInteger, parseAsString } from "nuqs";
 import { toast } from "sonner";
 
+import { getPlayersQueryOptions } from "@/api-hooks/use-players";
 import { useDeletePlayer, usePlayers, useSortPlayers } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { UpdatePlayerSchema } from "@/lib/validation/player";
 
 import AlertNote from "@/components/alert-note";
 import EmptyState from "@/components/empty-state";
+import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import AddPlayerButton from "./add-player";
@@ -21,12 +35,47 @@ import PlayerCard from "./player-card";
 import PlayerStats from "./stats";
 import PlayerMatches from "./stats/player-matches";
 
+const PAGE_SIZES = [10, 20, 50];
+
+function getPaginationPages(current: number, total: number): (number | "…")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, "…", total];
+  if (current >= total - 3)
+    return [1, "…", total - 4, total - 3, total - 2, total - 1, total];
+  return [1, "…", current - 1, current, current + 1, "…", total];
+}
+
 function PlayerList({ userRef }: { userRef?: string | null }) {
-  const { players, isLoading } = usePlayers(userRef);
+  const qc = useQueryClient();
+
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [pageSize, setPageSize] = useQueryState(
+    "pageSize",
+    parseAsInteger.withDefault(20),
+  );
+  const [search, setSearch] = useQueryState(
+    "search",
+    parseAsString.withDefault(""),
+  );
+
+  const [inputSearch, setInputSearch] = useState(search);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setSearch(inputSearch || null);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputSearch]);
+  useEffect(() => {
+    setInputSearch(search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  const [isSorting, setIsSorting] = useState(false);
   const [playerData, setPlayerData] = useState<Player[]>([]);
   const { mutate: deleteMutate } = useDeletePlayer();
 
-  const [isSorting, setIsSorting] = useState(false);
   const [playerToDelete, setPlayerToDelete] = useState<string | undefined>();
   const [playerToUpdate, setPlayerToUpdate] = useState<
     UpdatePlayerSchema | undefined
@@ -40,6 +89,13 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
   }>();
 
   const { mutate: sortPlayers, isPending } = useSortPlayers();
+
+  // When sorting, fetch all players so DnD operates on the full list
+  const { players, playersCount, isLoading } = usePlayers(
+    isSorting
+      ? { userRef }
+      : { page: String(page), pageSize: String(pageSize), search, userRef },
+  );
 
   useEffect(() => {
     if (!isSorting) setPlayerData(players as Player[]);
@@ -60,10 +116,44 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
     );
   }
 
+  const totalPages = Math.max(1, Math.ceil(playersCount / pageSize));
+  const pages = getPaginationPages(page, totalPages);
+
+  const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handlePrefetchEnter(p: number) {
+    prefetchTimer.current = setTimeout(() => {
+      if (p < 1 || p > totalPages) return;
+      qc.prefetchQuery(
+        getPlayersQueryOptions({
+          page: String(p),
+          pageSize: String(pageSize),
+          search,
+          userRef,
+        }),
+      );
+    }, 100);
+  }
+
+  function handlePrefetchLeave() {
+    if (prefetchTimer.current) {
+      clearTimeout(prefetchTimer.current);
+      prefetchTimer.current = null;
+    }
+  }
+
+  function handlePageSizeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setPageSize(parseInt(e.target.value));
+    setPage(1);
+  }
+
+  const isEmpty = !isLoading && !playerData.length;
+  const dndDisabled = isSorting ? false : true;
+
   if (isLoading && !playerData.length) {
     return (
       <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6">
-        {Array.from({ length: 12 }).map((_, i) => (
+        {Array.from({ length: Math.min(pageSize, 12) }).map((_, i) => (
           <Skeleton key={i} className="h-16 w-full rounded-md" />
         ))}
       </div>
@@ -74,7 +164,7 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
     <>
       <div
         className={cn({
-          "flex flex-col items-center md:p-8": !playerData?.length,
+          "flex flex-col items-center md:p-8": isEmpty,
         })}
       >
         {!userRef && (
@@ -90,9 +180,22 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
             isSortPending={isPending}
           />
         )}
+
+        {!isSorting && (
+          <div className="mt-4 flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Input
+              placeholder="Search players..."
+              value={inputSearch}
+              onChange={(e) => setInputSearch(e.target.value)}
+              className="max-w-xs"
+            />
+          </div>
+        )}
+
         {playerData?.length ? (
           <DndContext
             onDragEnd={(e) => {
+              if (dndDisabled) return;
               const target = e.over?.id as string;
               const from = e.active?.id as string;
 
@@ -143,7 +246,90 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
         ) : (
           <EmptyState document="players" />
         )}
+
+        {!isSorting && playerData.length > 0 && (
+          <div className="mt-6 flex w-full flex-col items-center gap-4 sm:flex-row sm:justify-between">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Rows per page</span>
+              <Select
+                value={String(pageSize)}
+                onChange={handlePageSizeChange}
+                className="h-8 w-[70px]"
+              >
+                {PAGE_SIZES.map((s) => (
+                  <option key={s} value={String(s)}>
+                    {s}
+                  </option>
+                ))}
+              </Select>
+              <span>
+                {(page - 1) * pageSize + 1}–
+                {Math.min(page * pageSize, playersCount)} of {playersCount}
+              </span>
+            </div>
+
+            <Pagination className="mx-0 w-auto justify-end">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    aria-disabled={page <= 1}
+                    className={cn(
+                      page <= 1 && "pointer-events-none opacity-50",
+                    )}
+                    onMouseEnter={() => handlePrefetchEnter(page - 1)}
+                    onMouseLeave={handlePrefetchLeave}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page > 1) setPage(page - 1);
+                    }}
+                  />
+                </PaginationItem>
+
+                {pages.map((p, i) =>
+                  p === "…" ? (
+                    <PaginationItem key={`ellipsis-${i}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={p}>
+                      <PaginationLink
+                        href="#"
+                        isActive={p === page}
+                        onMouseEnter={() => handlePrefetchEnter(p)}
+                        onMouseLeave={handlePrefetchLeave}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage(p);
+                        }}
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ),
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    aria-disabled={page >= totalPages}
+                    className={cn(
+                      page >= totalPages && "pointer-events-none opacity-50",
+                    )}
+                    onMouseEnter={() => handlePrefetchEnter(page + 1)}
+                    onMouseLeave={handlePrefetchLeave}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page < totalPages) setPage(page + 1);
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
+
       {!userRef && (
         <>
           <AddEditPlayerFormDialog
