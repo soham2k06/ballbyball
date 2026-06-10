@@ -41,7 +41,7 @@ function StartMatchButton({
       <Button
         onClick={handleStartButtonClick}
         disabled={isLoading}
-        className="max-sm:w-full"
+        className="max-sm:w-full w-fit"
       >
         Start match
       </Button>

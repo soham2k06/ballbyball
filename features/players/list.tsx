@@ -162,11 +162,7 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
 
   return (
     <>
-      <div
-        className={cn({
-          "flex flex-col items-center md:p-8": isEmpty,
-        })}
-      >
+      <div className={cn({ "flex flex-col": isEmpty })}>
         {!userRef && (
           <AddPlayerButton
             isSorting={isSorting}

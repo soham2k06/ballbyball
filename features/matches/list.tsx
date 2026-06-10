@@ -143,7 +143,7 @@ function MatchList() {
   const isEmpty = !isLoading && !matches.length;
 
   return (
-    <div className={cn({ "flex flex-col items-center": isEmpty })}>
+    <div className={cn({ "flex flex-col": isEmpty })}>
       {!userRef && (
         <Start
           teams={teams}

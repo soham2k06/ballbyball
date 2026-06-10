@@ -160,7 +160,7 @@ function TeamList({ userRef }: { userRef: string | null }) {
   }
 
   return (
-    <div className={cn({ "flex flex-col items-center": isEmpty })}>
+    <div className={cn({ "flex flex-col": isEmpty })}>
       {!userRef && (
         <div className="max-sm:grid max-sm:gap-2 sm:space-x-2">
           <TeamBuilder />
