@@ -5,11 +5,13 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 
 function BannerImage() {
-  const { theme } = useTheme();
+  const { theme, systemTheme } = useTheme();
+
+  const activeTheme = theme === "system" ? systemTheme : theme || "light";
 
   return (
     <Image
-      src={`/banner-demo-${theme ?? "light"}.png`}
+      src={`/banner-demo-${activeTheme}.png`}
       alt="Cricket Scorer demo"
       width={320}
       height={800}
