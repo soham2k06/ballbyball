@@ -1,6 +1,6 @@
 {
   "extends": ["next"],
-  "plugins": ["react", "react-hooks", "import"],
+  "plugins": ["react", "import"],
   "rules": {
     "react/prop-types": "off", // You can customize rules here
     "react-hooks/rules-of-hooks": "error",
