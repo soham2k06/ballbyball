@@ -2,7 +2,6 @@
   "name": "scorer",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.33.4",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -58,9 +57,6 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
     "zod": "^3.23.6"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma", "unrs-resolver"]
   },
   "devDependencies": {
     "@types/node": "^20",
