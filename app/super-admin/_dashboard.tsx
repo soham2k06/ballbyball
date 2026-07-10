@@ -65,6 +65,26 @@ function getPageNums(current: number, total: number): (number | "…")[] {
   return [1, "…", current - 1, current, current + 1, "…", total];
 }
 
+// Narrow layout has no room for the full sliding window of page numbers,
+// so collapse down to first, current, current + 1, and last — e.g.
+// selecting page 2 shows "1, 2, 3, …, last". The first and last pages stay
+// visible at all times; a "…" fills any gap in between.
+function getCompactPageNums(current: number, total: number): (number | "…")[] {
+  if (total <= 4) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const page = Math.min(Math.max(current, 1), total);
+  const nums = Array.from(
+    new Set([1, page, Math.min(page + 1, total), total]),
+  ).sort((a, b) => a - b);
+
+  const result: (number | "…")[] = [];
+  nums.forEach((n, i) => {
+    if (i > 0 && n - nums[i - 1] > 1) result.push("…");
+    result.push(n);
+  });
+  return result;
+}
+
 // ─── Skeleton rows ────────────────────────────────────────────────────────────
 
 function UserSkeletonRows() {
@@ -156,6 +176,7 @@ function Pagination({
   const from = total === 0 ? 0 : (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
   const nums = getPageNums(page, pages);
+  const compactNums = getCompactPageNums(page, pages);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 text-sm">
@@ -181,29 +202,54 @@ function Pagination({
       </div>
 
       {pages > 1 && (
-        <div className="flex items-center gap-1">
-          <PageBtn onClick={() => onPage(page - 1)} disabled={page <= 1}>
-            Prev
-          </PageBtn>
-          {nums.map((n, i) =>
-            n === "…" ? (
-              <span key={`e${i}`} className="px-1 text-muted-foreground">
-                …
-              </span>
-            ) : (
-              <PageBtn
-                key={n}
-                onClick={() => onPage(n as number)}
-                active={n === page}
-              >
-                {n}
-              </PageBtn>
-            ),
-          )}
-          <PageBtn onClick={() => onPage(page + 1)} disabled={page >= pages}>
-            Next
-          </PageBtn>
-        </div>
+        <>
+          <div className="flex items-center gap-1 sm:hidden">
+            <PageBtn onClick={() => onPage(page - 1)} disabled={page <= 1}>
+              Prev
+            </PageBtn>
+            {compactNums.map((n, i) =>
+              n === "…" ? (
+                <span key={`ce${i}`} className="px-1 text-muted-foreground">
+                  …
+                </span>
+              ) : (
+                <PageBtn
+                  key={n}
+                  onClick={() => onPage(n as number)}
+                  active={n === page}
+                >
+                  {n}
+                </PageBtn>
+              ),
+            )}
+            <PageBtn onClick={() => onPage(page + 1)} disabled={page >= pages}>
+              Next
+            </PageBtn>
+          </div>
+          <div className="hidden items-center gap-1 sm:flex">
+            <PageBtn onClick={() => onPage(page - 1)} disabled={page <= 1}>
+              Prev
+            </PageBtn>
+            {nums.map((n, i) =>
+              n === "…" ? (
+                <span key={`e${i}`} className="px-1 text-muted-foreground">
+                  …
+                </span>
+              ) : (
+                <PageBtn
+                  key={n}
+                  onClick={() => onPage(n as number)}
+                  active={n === page}
+                >
+                  {n}
+                </PageBtn>
+              ),
+            )}
+            <PageBtn onClick={() => onPage(page + 1)} disabled={page >= pages}>
+              Next
+            </PageBtn>
+          </div>
+        </>
       )}
     </div>
   );

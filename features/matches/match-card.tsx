@@ -135,7 +135,7 @@ function MatchCard({ match, setMatchToDelete, setMatchToUpdate }: MatchProps) {
           );
         })}
         {match.hasEnded && (
-          <CardDescription className="mt-3">{winInfo}</CardDescription>
+          <CardDescription className="mt-3 pr-16">{winInfo}</CardDescription>
         )}
         <CardDescription className="absolute bottom-2 right-2 text-right sm:bottom-3 sm:right-3">
           Started at <br />{" "}

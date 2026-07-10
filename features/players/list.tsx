@@ -16,16 +16,8 @@ import { UpdatePlayerSchema } from "@/lib/validation/player";
 
 import AlertNote from "@/components/alert-note";
 import EmptyState from "@/components/empty-state";
+import PaginationNav from "@/components/pagination-nav";
 import { Input } from "@/components/ui/input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -36,14 +28,6 @@ import PlayerStats from "./stats";
 import PlayerMatches from "./stats/player-matches";
 
 const PAGE_SIZES = [10, 20, 50];
-
-function getPaginationPages(current: number, total: number): (number | "…")[] {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  if (current <= 4) return [1, 2, 3, 4, 5, "…", total];
-  if (current >= total - 3)
-    return [1, "…", total - 4, total - 3, total - 2, total - 1, total];
-  return [1, "…", current - 1, current, current + 1, "…", total];
-}
 
 function PlayerList({ userRef }: { userRef?: string | null }) {
   const qc = useQueryClient();
@@ -117,7 +101,6 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
   }
 
   const totalPages = Math.max(1, Math.ceil(playersCount / pageSize));
-  const pages = getPaginationPages(page, totalPages);
 
   const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -264,64 +247,13 @@ function PlayerList({ userRef }: { userRef?: string | null }) {
               </span>
             </div>
 
-            <Pagination className="mx-0 w-auto justify-end">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    aria-disabled={page <= 1}
-                    className={cn(
-                      page <= 1 && "pointer-events-none opacity-50",
-                    )}
-                    onMouseEnter={() => handlePrefetchEnter(page - 1)}
-                    onMouseLeave={handlePrefetchLeave}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (page > 1) setPage(page - 1);
-                    }}
-                  />
-                </PaginationItem>
-
-                {pages.map((p, i) =>
-                  p === "…" ? (
-                    <PaginationItem key={`ellipsis-${i}`}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  ) : (
-                    <PaginationItem key={p}>
-                      <PaginationLink
-                        href="#"
-                        isActive={p === page}
-                        onMouseEnter={() => handlePrefetchEnter(p)}
-                        onMouseLeave={handlePrefetchLeave}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(p);
-                        }}
-                      >
-                        {p}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ),
-                )}
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    aria-disabled={page >= totalPages}
-                    className={cn(
-                      page >= totalPages && "pointer-events-none opacity-50",
-                    )}
-                    onMouseEnter={() => handlePrefetchEnter(page + 1)}
-                    onMouseLeave={handlePrefetchLeave}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (page < totalPages) setPage(page + 1);
-                    }}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <PaginationNav
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              onPrefetchEnter={handlePrefetchEnter}
+              onPrefetchLeave={handlePrefetchLeave}
+            />
           </div>
         )}
       </div>
